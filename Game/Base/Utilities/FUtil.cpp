@@ -1,3 +1,5 @@
+module;
+
 #include <glaze/glaze.hpp>
 
 module fbc.futil;

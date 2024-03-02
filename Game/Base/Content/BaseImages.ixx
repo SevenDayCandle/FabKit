@@ -2,7 +2,6 @@ export module fbc.baseImages;
 
 import fbc.futil;
 import fbc.ftexture;
-import raylib;
 
 export namespace fbc::content {
 
@@ -39,7 +38,6 @@ export namespace fbc::content {
 	sptr<FTexture> BaseImages::loadTexture(const str& pathStr)
 	{
 		path pathImpl = getContentFolder() / pathStr;
-		raylib::loadTexture()
-		return nullptr;
+		return FTexture::loadTexture(pathImpl.string());
 	}
 }
