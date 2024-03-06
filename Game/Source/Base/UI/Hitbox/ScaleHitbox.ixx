@@ -1,13 +1,13 @@
 export module fbc.scaleHitbox;
 
 import fbc;
-import fbc.offsetHitbox;
+import fbc.hitbox;
 
-export namespace fbc::hitbox {
-	export class ScaleHitbox : OffsetHitbox {
+export namespace fbc::ui {
+	export class ScaleHitbox : Hitbox {
 	public:
 		ScaleHitbox() {}
-		ScaleHitbox(float offsetX, float offsetY, float offsetWidth, float offsetHeight): OffsetHitbox(offsetX, offsetY, offsetWidth, offsetHeight) {
+		ScaleHitbox(float offsetX, float offsetY, float offsetWidth, float offsetHeight): Hitbox(offsetX, offsetY, offsetWidth, offsetHeight) {
 			refreshSize();
 		}
 		~ScaleHitbox() override {}
@@ -17,13 +17,13 @@ export namespace fbc::hitbox {
 		void refreshPosition() override;
 	};
 
-	// Set the hitbox position in accordance to the screen's current size
+	// Set the ui position in accordance to the screen's current size
 	void ScaleHitbox::refreshPosition() {
 		x = renderScale() * offsetX;
 		y = renderScale() * offsetY;
 	}
 
-	// Set the hitbox dimensions in accordance to the screen's current size
+	// Set the ui dimensions in accordance to the screen's current size
 	void ScaleHitbox::refreshSize() {
 		width = renderScale() * offsetWidth;
 		height = renderScale() * offsetHeight;

@@ -151,104 +151,108 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Base\Content\BaseContent.ixx">
+    <ClCompile Include="Source\Base\Content\BaseAudio.ixx" />
+    <ClCompile Include="Source\Base\Content\BaseContent.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Base\Content\BaseImages.ixx" />
-    <ClCompile Include="Base\Content\BaseStrings.ixx" />
-    <ClCompile Include="Base\UI\Hitbox\ScreenHitbox.ixx" />
-    <ClCompile Include="Base\UI\Hitbox\RelativeHitbox.ixx" />
-    <ClCompile Include="Base\UI\Hitbox\ScaleHitbox.ixx" />
-    <ClCompile Include="Base\UI\Hitbox\OffsetHitbox.ixx" />
-    <ClCompile Include="Base\Utilities\FUtil.cpp" />
-    <ClCompile Include="Content\Core\CoreConfig.ixx" />
-    <ClCompile Include="Fabricate.ixx">
+    <ClCompile Include="Source\Base\Content\BaseImages.ixx" />
+    <ClCompile Include="Source\Base\Content\BaseStrings.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\UICanvas.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\UITipHoverable.ixx" />
+    <ClCompile Include="Source\Base\UI\Hitbox\ScreenHitbox.ixx" />
+    <ClCompile Include="Source\Base\UI\Hitbox\RelativeHitbox.ixx" />
+    <ClCompile Include="Source\Base\UI\Hitbox\ScaleHitbox.ixx" />
+    <ClCompile Include="Source\Base\Utilities\Objects\FShader.ixx" />
+    <ClCompile Include="Source\Base\Utilities\Objects\FMusic.ixx" />
+    <ClCompile Include="Source\Base\Utilities\Objects\FSound.ixx" />
+    <ClCompile Include="Source\Content\Core\CoreConfig.ixx" />
+    <ClCompile Include="Source\Fabricate.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Base\Raylib.ixx">
+    <ClCompile Include="Source\Base\Raylib.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Base\UI\Component\UIBase.ixx">
+    <ClCompile Include="Source\Base\UI\Component\UIBase.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Base\UI\Component\UIHoverable.ixx">
+    <ClCompile Include="Source\Base\UI\Component\UIHoverable.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Base\UI\Component\UIImage.ixx">
+    <ClCompile Include="Source\Base\UI\Component\UIImage.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Base\UI\Component\UIText.ixx">
+    <ClCompile Include="Source\Base\UI\Component\UIText.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Base\UI\Hitbox\Hitbox.ixx">
+    <ClCompile Include="Source\Base\UI\Hitbox\Hitbox.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Base\UI\ScreenManager.ixx">
+    <ClCompile Include="Source\Base\UI\ScreenManager.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Base\UI\Screens\BaseScreen.ixx">
+    <ClCompile Include="Source\Base\UI\Screens\BaseScreen.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Base\UI\Tooltip\Tooltip.ixx">
+    <ClCompile Include="Source\Base\UI\Tooltip\Tooltip.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Base\Utilities\Config\Config.ixx">
+    <ClCompile Include="Source\Base\Utilities\Config\Config.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Base\Utilities\Config\ConfigItem.ixx">
+    <ClCompile Include="Source\Base\Utilities\Config\ConfigItem.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Base\Utilities\Config\Hotkeys.ixx">
+    <ClCompile Include="Source\Base\Utilities\Config\Hotkeys.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Base\Utilities\Config\InputAction.ixx">
+    <ClCompile Include="Source\Base\Utilities\Config\InputAction.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Base\Utilities\FUtil.ixx">
+    <ClCompile Include="Source\Base\Utilities\FUtil.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Base\Utilities\Localization\KeywordStrings.ixx">
+    <ClCompile Include="Source\Base\Utilities\Localization\KeywordStrings.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Base\Utilities\Localization\ObjectStrings.ixx">
+    <ClCompile Include="Source\Base\Utilities\Localization\ObjectStrings.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Base\Utilities\Objects\FFont.ixx">
+    <ClCompile Include="Source\Base\Utilities\Objects\FFont.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Base\Utilities\Objects\FTexture.ixx">
+    <ClCompile Include="Source\Base\Utilities\Objects\FTexture.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Base\Utilities\Localization\GameLanguage.ixx" />
-    <ClCompile Include="Base\Utilities\Objects\TextInfo.ixx">
+    <ClCompile Include="Source\Base\Utilities\Localization\GameLanguage.ixx" />
+    <ClCompile Include="Source\Base\UI\ITextInfo.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Content\Core\CoreContent.ixx">
+    <ClCompile Include="Source\Content\Core\CoreContent.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Main.cpp">
+    <ClCompile Include="Source\Main.cpp">
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
   </ItemGroup>

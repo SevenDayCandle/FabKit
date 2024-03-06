@@ -2,17 +2,17 @@ export module fbc.relativeHitbox;
 
 import fbc;
 import fbc.hitbox;
-import fbc.offsetHitbox;
+import fbc.hitbox;
 import fbc.futil;
 
-export namespace fbc::hitbox {
-	export class RelativeHitbox : public OffsetHitbox {
+export namespace fbc::ui {
+	export class RelativeHitbox : public Hitbox {
 	public:
 		RelativeHitbox(sptr<Hitbox> parent) : parent(parent) {
-			refreshSize();
+			RelativeHitbox::refreshSize();
 		}
-		RelativeHitbox(sptr<Hitbox> parent, float offsetX, float offsetY, float offsetWidth, float offsetHeight) : parent(parent), OffsetHitbox(offsetX, offsetY, offsetWidth, offsetHeight) {
-			refreshSize();
+		RelativeHitbox(sptr<Hitbox> parent, float offsetX, float offsetY, float offsetWidth, float offsetHeight) : parent(parent), Hitbox(offsetX, offsetY, offsetWidth, offsetHeight) {
+			RelativeHitbox::refreshSize();
 		}
 		~RelativeHitbox() override {}
 	protected:
@@ -28,7 +28,7 @@ export namespace fbc::hitbox {
 		y = parent->y + renderScale() * offsetY;
 	}
 
-	// Set the hitbox dimensions in accordance to the screen's current size
+	// Set the ui dimensions in accordance to the screen's current size
 	void RelativeHitbox::refreshSize() {
 		width = renderScale() * offsetWidth;
 		height = renderScale() * offsetHeight;

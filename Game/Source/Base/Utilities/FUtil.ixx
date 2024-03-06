@@ -22,8 +22,11 @@ export using path = std::filesystem::path;
 export namespace fbc {
 	const str JSON_EXT = ".json";
 
-	export template <typename T> T read_file_json(T input, str path);
-	export template <typename T> T read_json(str input);
-	export template <typename T> str write_file_json(T input, str path);
-	export template <typename T> str write_json(T input);
+	export template <typename T, typename Pred> bool all(T container, Pred predicate) {
+		return std::all_of(container.begin(), container.end(), predicate);
+	}
+
+	export template <typename T, typename Pred> bool any(T container, Pred predicate) {
+		return std::any_of(container.begin(), container.end(), predicate);
+	}
 }

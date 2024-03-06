@@ -3,6 +3,7 @@ export module fbc.coreContent;
 import fbc.baseContent;
 import fbc.coreConfig;
 import fbc.futil;
+import raylib;
 
 export namespace fbc::core {
 	export class CoreContent : public fbc::content::BaseContent {
@@ -36,7 +37,7 @@ export namespace fbc::core {
 	// TODO
 	path CoreContent::getContentFolder()
 	{
-		return path();
+		return path(raylib::getWorkingDirectory());
 	}
 
 }

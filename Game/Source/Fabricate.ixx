@@ -14,7 +14,7 @@ export namespace fbc {
 
 	// TODO
 	void dispose() {
-		fbc::screenManager::dispose();
+		fbc::ui::screenManager::dispose();
 		cct.dispose();
 	}
 
@@ -26,6 +26,12 @@ export namespace fbc {
 
 		raylib::endDrawing();
 	}
+
+	// Get the supposed window width
+	float getScreenXSize() { return cct.cfg.graphicsResolutionX.get(); }
+
+	// Get the supposed window height
+	float getScreenYSize() { return cct.cfg.graphicsResolutionY.get(); }
 
 	// Update the window from the config
 	void refreshWindow() {
@@ -43,13 +49,20 @@ export namespace fbc {
 	}
 
 	// Return the current render scale for the window
-	float renderScale() { return renderScalePrivate; }
+	float renderScale() {
+		return renderScalePrivate;
+	}
+
+	// Return the size scaled by renderScale
+	float renderScale(float mult) {
+		return renderScalePrivate * mult;
+	}
 
 	// TODO
 	void initialize() {
 		cct.initialize();
 
-		raylib::initWindow(cct.cfg.graphicsResolutionX.get(), cct.cfg.graphicsResolutionY.get(), "Fabricate");
+		raylib::initWindow(getScreenXSize(), getScreenYSize(), "Fabricate");
 		refreshGraphics();
 	}
 

@@ -1,6 +1,6 @@
 export module fbc.uiBase;
 
-export namespace fbc::cpt {
+export namespace fbc::ui {
 	export class UIBase {
 	public:
 		virtual ~UIBase() {}

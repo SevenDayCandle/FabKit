@@ -4,6 +4,7 @@ import fbc.futil;
 import fbc.ftexture;
 
 export namespace fbc::content {
+	const str IMAGE_PATH = "Images";
 
 	export class BaseImages {
 	public:
@@ -13,9 +14,10 @@ export namespace fbc::content {
 		const str ID;
 
 		sptr<FTexture> getTexture(const str& path);
+		virtual void postInitialize() {}
+
 		virtual void dispose() = 0;
 		virtual void initialize() = 0;
-		virtual void postInitialize() = 0;
 	protected:
 		virtual path getContentFolder() = 0;
 	private:

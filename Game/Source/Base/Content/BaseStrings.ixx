@@ -14,7 +14,7 @@ import raylib;
 
 export namespace fbc::content {
 	const str DEFAULT_KEYWORDS = "keyword";
-	const str LOCALIZATION_PATH = "localization";
+	const str LOCALIZATION_PATH = "Localization";
 
 	export class BaseStrings {
 	public:
@@ -26,8 +26,12 @@ export namespace fbc::content {
 		inline unmap<str, loc::KeywordStrings> loadKeywordStrings() { return loadKeywordStrings(DEFAULT_KEYWORDS); }
 		unmap<str, loc::KeywordStrings> loadKeywordStrings(const str& suffix);
 		unmap<str, loc::ObjectStrings> loadObjectStrings(const str& suffix);
+		virtual void postInitialize() {}
+
+		virtual void dispose() = 0;
+		virtual void initialize() = 0;
 	protected:
-		virtual path getStringsFolder();
+		virtual path getStringsFolder() = 0;
 		inline path getPathForLanguage(const str& suffix) {
 			return getPathForLanguage(fbc::cct.cfg.textLanguage.get(), suffix);
 		};
