@@ -1,14 +1,14 @@
 export module fbc.scaleHitbox;
 
-import fbc;
 import fbc.hitbox;
+import fbc.coreConfig;
 
-export namespace fbc::ui {
-	export class ScaleHitbox : Hitbox {
+export namespace fbc {
+	export class ScaleHitbox : public Hitbox {
 	public:
 		ScaleHitbox() {}
 		ScaleHitbox(float offsetX, float offsetY, float offsetWidth, float offsetHeight): Hitbox(offsetX, offsetY, offsetWidth, offsetHeight) {
-			refreshSize();
+			ScaleHitbox::refreshSize();
 		}
 		~ScaleHitbox() override {}
 

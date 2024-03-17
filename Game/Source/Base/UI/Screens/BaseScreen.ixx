@@ -1,19 +1,13 @@
 export module fbc.baseScreen;
 
-import fbc.screenHitbox;
-import fbc.uiCanvas;
-
-export namespace fbc::ui {
+export namespace fbc {
 	export class BaseScreen {
 	public:
 		virtual ~BaseScreen() {}
 
-		UICanvas canvas;
-
-		virtual void close();
-		virtual void dispose();
-		virtual void open();
-		virtual void render();
-		virtual void update();
+		virtual void close() = 0; // Called when the screen is destroyed
+		virtual void open() = 0; // Called when the screen is first opened or reopened after a screen above it is closed
+		virtual void render() = 0;
+		virtual void update() = 0;
 	};
 }

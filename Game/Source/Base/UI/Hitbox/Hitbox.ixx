@@ -3,18 +3,19 @@ export module fbc.hitbox;
 import fbc.futil;
 import raylib;
 
-export namespace fbc::ui {
+export namespace fbc {
 	export class Hitbox : public raylib::Rectangle {
 	public:
 		Hitbox(): raylib::Rectangle() {}
 		Hitbox(float offsetX, float offsetY, float offsetWidth, float offsetHeight) : raylib::Rectangle(), offsetX(offsetX), offsetY(offsetY), offsetWidth(offsetWidth), offsetHeight(offsetHeight) {}
 		virtual ~Hitbox() {}
 
-		inline bool isClicked() { return hovered && raylib::isMouseButtonDown(raylib::MouseButton::MOUSE_BUTTON_LEFT); };
-		inline bool isClickedRight() { return hovered && raylib::isMouseButtonDown(raylib::MouseButton::MOUSE_BUTTON_RIGHT); };
+		inline bool isClicked() { return hovered && futil::hasLeftClicked(); };
+		inline bool isClickedRight() { return hovered && futil::hasRightClicked(); };
 		inline bool isHovered() const { return hovered; }
-		inline bool justClicked() { return hovered && raylib::isMouseButtonPressed(raylib::MouseButton::MOUSE_BUTTON_LEFT); };
-		inline bool justClickedRight() { return hovered && raylib::isMouseButtonPressed(raylib::MouseButton::MOUSE_BUTTON_RIGHT); };
+		inline bool isJust() const { return just; }
+		inline bool justClicked() { return hovered && futil::holdingLeftClick(); };
+		inline bool justClickedRight() { return hovered && futil::holdingRightClick(); };
 		inline bool justHovered() const { return hovered && just; }
 		inline float cX() { return (x + width) / 2; }
 		inline float cY() { return (y + height) / 2; }

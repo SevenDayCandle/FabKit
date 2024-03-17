@@ -4,15 +4,16 @@ import fbc.ffont;
 import fbc.futil;
 import raylib;
 
-export namespace fbc::ui {
-	export class ITextInfo {
+export namespace fbc {
+	export class TextInfo {
 	public:
-		ITextInfo() {}
-		ITextInfo(sptr<fbc::FFont> font) : font(font) {}
-		virtual ~ITextInfo() {}
+		TextInfo() {}
+		TextInfo(sptr<fbc::FFont> font) : font(font) {}
+		TextInfo(sptr<fbc::FFont> font, str text) : font(font), text(text) {}
+		virtual ~TextInfo() {}
 
-		str text;
 		sptr<fbc::FFont> font;
+		str text;
 		raylib::Color color = raylib::White;
 		float scale = 1;
 		float spacing = 0;

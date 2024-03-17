@@ -1,12 +1,16 @@
 export module fbc.baseAudio;
 
 import fbc.futil;
+import fbc.baseContent;
 
-export namespace fbc::content {
+export namespace fbc {
 	export class BaseAudio {
-		BaseAudio(const str& ID) : ID(ID) {}
+		BaseAudio(const BaseContent& content) : content(content) {}
 		virtual ~BaseAudio() {}
 
-		const str ID;
+		const BaseContent& content;
+
+		virtual void initialize() {};
+		virtual void postInitialize() {}
 	};
 }

@@ -28,10 +28,9 @@ export namespace fbc {
             other.glyphs = nullptr;
         }
         /**
-         * Explicitly forbid copy constructor and assignment.
+         * Explicitly forbid copy constructor.
          */
         FFont(const FFont&) = delete;
-        FFont& operator=(const FFont&) = delete;
 
         /**
 		 * On destruction, unload the font.

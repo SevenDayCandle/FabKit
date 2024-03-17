@@ -4,12 +4,12 @@ import fbc.futil;
 import raylib;
 import std;
 
-export namespace fbc::cfg {
-    const str BASE_FILE = "config.json";
+export namespace fbc {
+    constexpr strv BASE_FILE = "config.json";
 
     export class Config {
     public:
-        Config(str ID) : ID(ID) {}
+        Config(strv ID) : ID(ID) {}
         const str ID;
 
         inline void addOnReload(func<void()> callback) {
@@ -30,13 +30,13 @@ export namespace fbc::cfg {
 
     // Save the contents of the values_map to an external file
     void Config::commit() {
-        str configPath = getConfigPath();
+        strv configPath = getConfigPath();
         // glz::write_file_json(values_map, configPath);
     }
 
     // Refresh the value map contents from the external file if it exists
     void Config::initialize() {
-        str configPath = getConfigPath();
+        strv configPath = getConfigPath();
         if (std::filesystem::exists(configPath)) {
             //glz::read_file_json(values_map, configPath);
         }
@@ -44,7 +44,7 @@ export namespace fbc::cfg {
 
     // Get the path to the file used to store this config's data
     str Config::getConfigPath() {
-        return raylib::getApplicationDirectory() + ID + BASE_FILE;
+        return raylib::getApplicationDirectory() + ID + str(BASE_FILE);
     }
 
     // Get the mapped value for key
@@ -53,6 +53,7 @@ export namespace fbc::cfg {
         if (val != values_map.end()) {
             return val->second;
         }
+        return "";
     }
 
     // Refresh the config (reloadInternal) and then update all listeners with the new config values

@@ -4,12 +4,12 @@ import fbc.futil;
 import fbc.hitbox;
 import fbc.uiBase;
 
-export namespace fbc::ui {
+export namespace fbc {
 	export class UIHoverable : public UIBase {
 	public:
-		uptr<ui::Hitbox> hb;
+		uptr<Hitbox> hb;
 
-		UIHoverable(ui::Hitbox* hb): hb(hb) {}
+		UIHoverable(Hitbox* hb): hb(hb) {}
 		~UIHoverable() override {}
 
 		virtual bool isHovered();

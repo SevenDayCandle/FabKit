@@ -3,10 +3,10 @@ export module fbc.configItem;
 import fbc.config;
 import fbc.futil;
 
-export namespace fbc::cfg {
+export namespace fbc {
     export template<typename T> class ConfigItem {
     public:
-        ConfigItem(fbc::cfg::Config& config, const str& ID, const T& defaultValue) : config(config), ID(ID), defaultValue(defaultValue), value(defaultValue) {
+        ConfigItem(fbc::Config& config, const str& ID, const T& defaultValue) : config(config), ID(ID), defaultValue(defaultValue), value(defaultValue) {
             config.addOnReload([this]() { this->reload(); });
         }
         inline void addSubscriber(func<void(const T&)> callback) {onChange.push_back(callback);}
@@ -18,7 +18,7 @@ export namespace fbc::cfg {
         void reload();
 
     private:
-        fbc::cfg::Config& config;
+        fbc::Config& config;
         const T defaultValue;
         const str ID;
         vec<func<void(const T&)>> onChange;

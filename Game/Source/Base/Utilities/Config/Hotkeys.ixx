@@ -3,7 +3,7 @@ export module fbc.hotkeys;
 import fbc.futil;
 import raylib;
 
-export namespace fbc::cfg {
+export namespace fbc {
 	export class Hotkeys {
         public:
             Hotkeys();

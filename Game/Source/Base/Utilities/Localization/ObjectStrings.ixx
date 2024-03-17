@@ -2,7 +2,7 @@ export module fbc.objectStrings;
 
 import fbc.futil;
 
-export namespace fbc::loc {
+export namespace fbc {
 	export struct ObjectStrings {
 		const str NAME;
 		vec<str> DESCRIPTION;

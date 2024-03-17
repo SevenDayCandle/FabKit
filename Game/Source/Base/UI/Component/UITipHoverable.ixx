@@ -5,12 +5,12 @@ import fbc.hitbox;
 import fbc.tooltip;
 import fbc.uiHoverable;
 
-export namespace fbc::ui {
+export namespace fbc {
 	export class UITipHoverable : public UIHoverable {
 	public:
 		sptr<tooltip::Tooltip> tooltip;
 
-		UITipHoverable(ui::Hitbox* hb) : UIHoverable(hb), tooltip(nullptr) {}
+		UITipHoverable(Hitbox* hb) : UIHoverable(hb), tooltip(nullptr) {}
 		~UITipHoverable() override {}
 
 		virtual void renderImpl() override;

@@ -22,10 +22,9 @@ export namespace fbc {
             other.format = 0;
         }
         /**
-         * Explicitly forbid copy constructor and assignment.
+         * Explicitly forbid copy constructor.
          */
         FTexture(const FTexture&) = delete;
-        FTexture& operator=(const FTexture&) = delete;
 
         /**
          * On destruction, unload the Texture.
@@ -128,15 +127,20 @@ export namespace fbc {
          *
          * @see ::DrawTexturePro()
          */
+        void draw(const raylib::Rectangle& destRec, const raylib::Vector2& origin = { 0, 0 },
+            float rotation = 0, raylib::Color tint = raylib::White) const {
+            raylib::drawTexturePro(*this, { 0, 0, (float)this->width, (float)this->height }, destRec, origin, rotation, tint);
+        }
+
         void draw(const raylib::Rectangle& sourceRec, const raylib::Rectangle& destRec, const raylib::Vector2& origin = { 0, 0 },
             float rotation = 0, raylib::Color tint = raylib::White) const {
             raylib::drawTexturePro(*this, sourceRec, destRec, origin, rotation, tint);
         }
 
         /** Wrapper function around raylib::loadTexture to get an FTexture instead of a Texture **/
-        static sptr<FTexture> loadTexture(const str& fileName) {
+        static uptr<FTexture> loadTexture(const str& fileName) {
             Texture tex = raylib::loadTexture(fileName.c_str());
-            return std::make_shared<FTexture>(std::move(tex));
+            return std::make_unique<FTexture>(std::move(tex));
         }
 	};
 }

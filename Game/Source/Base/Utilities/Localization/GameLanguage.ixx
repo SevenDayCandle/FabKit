@@ -2,7 +2,7 @@ export module fbc.gameLanguage;
 
 import fbc.futil;
 
-export namespace fbc::loc {
+export namespace fbc {
 	export enum GameLanguage {
 		ENG,
 		ZHS,
@@ -12,10 +12,10 @@ export namespace fbc::loc {
 	str langToStr(GameLanguage lang) {
 		switch (lang) {
 		case ZHS:
-			return "zhs";
+			return "ZHS";
 		case ZHT:
-			return "zht";
+			return "ZHT";
 		}
-		return "eng";
+		return "ENG";
 	}
 }

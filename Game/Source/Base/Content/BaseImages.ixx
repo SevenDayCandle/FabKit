@@ -1,45 +1,45 @@
 export module fbc.baseImages;
 
+import fbc.baseContent;
 import fbc.futil;
 import fbc.ftexture;
 
-export namespace fbc::content {
-	const str IMAGE_PATH = "Images";
+export namespace fbc {
+	constexpr strv IMAGE_PATH = "Images";
 
 	export class BaseImages {
 	public:
-		BaseImages(const str& ID) : ID(ID) {}
+		BaseImages(const BaseContent& content) : content(content) {}
 		virtual ~BaseImages() {}
 
-		const str ID;
+		const BaseContent& content;
 
-		sptr<FTexture> getTexture(const str& path);
+		FTexture& getTexture(const strv& path);
+		virtual void initialize() {};
 		virtual void postInitialize() {}
-
-		virtual void dispose() = 0;
-		virtual void initialize() = 0;
-	protected:
-		virtual path getContentFolder() = 0;
 	private:
-		sptr<FTexture> loadTexture(const str& path);
-		unmap<str, sptr<FTexture>> textures;
+		FTexture& loadTexture(const strv& path);
+		unmap<strv, uptr<FTexture>> textures;
 	};
 
 	// Attempt to fetch a cached texture. If none are found, generate one and put it into the map
-	sptr<FTexture> BaseImages::getTexture(const str& path) {
-		auto found = textures.find(path);
+	FTexture& BaseImages::getTexture(const strv& key) {
+		auto found = textures.find(key);
 		if (found != textures.end()) {
-			return found->second;
+			return *found->second;
 		}
-		sptr<FTexture> tex = loadTexture(path);
-		textures[path] = tex;
-		return tex;
+		return loadTexture(key);
 	}
 
 	// Attempt to load a texture from disk
-	sptr<FTexture> BaseImages::loadTexture(const str& pathStr)
+	FTexture& BaseImages::loadTexture(const strv& key)
 	{
-		path pathImpl = getContentFolder() / pathStr;
-		return FTexture::loadTexture(pathImpl.string());
+		path pathImpl = content.contentFolder;
+		pathImpl /= IMAGE_PATH;
+		pathImpl /= key;
+		auto [it, inserted] = textures.emplace(std::piecewise_construct,
+			std::forward_as_tuple(key),
+			std::forward_as_tuple(FTexture::loadTexture(pathImpl.string())));
+		return *it->second;
 	}
 }

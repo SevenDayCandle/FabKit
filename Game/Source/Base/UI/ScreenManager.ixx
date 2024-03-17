@@ -5,25 +5,26 @@ import fbc.futil;
 import fbc.hitbox;
 import fbc.uiBase;
 
-deque<fbc::ui::BaseScreen*> screens;
-deque<fbc::ui::UIBase*> overlays;
-fbc::ui::Hitbox* lastClicked;
+deque<uptr<fbc::BaseScreen>> screens;
+deque<fbc::UIBase*> overlays;
+fbc::Hitbox* lastClicked;
 
-export namespace fbc::ui::screenManager {
+export namespace fbc::screenManager {
 
 	// Clear the screen of overlays
 	void closeAllOverlays() {
-		for (fbc::ui::UIBase* overlay : overlays) {
+		for (fbc::UIBase* overlay : overlays) {
 			overlay->close();
 		}
 		overlays.clear();
 	}
 
-	// Close the currently opened screen and reopen the last screen opened
+	// Close the currently opened screen and reopen the last screen opened.
+	// The screen's close method should save any screen state as necessary since the screen will get disposed of
 	void closeCurrentScreen() {
 		if (!screens.empty()) {
-			fbc::ui::BaseScreen* screen = screens.front();
-			screen->close();
+			fbc::BaseScreen& screen = *screens.front();
+			screen.close();
 			closeAllOverlays();
 			if (!screens.empty()) {
 				screens.front()->open();
@@ -32,51 +33,48 @@ export namespace fbc::ui::screenManager {
 	}
 
 	// Close a specific overlay and all overlays above it
-	void closeOverlay(fbc::ui::UIBase* target) {
+	void closeOverlay(fbc::UIBase* target) {
 		while (!overlays.empty() && overlays.front() != target) {
-			fbc::ui::UIBase* overlay = overlays.front();
+			fbc::UIBase* overlay = overlays.front();
 			overlay->close();
 			overlays.pop_front();
 		}
 	}
 
-	// Dispose all screens and their objects
-	void dispose() {
-
-	}
-
 	// Add an overlay to the top of the screen
-	void openOverlay(fbc::ui::UIBase* target) {
+	void openOverlay(fbc::UIBase* target) {
 		overlays.push_front(target);
 	}
 
 	// Add a screen to the history of opened screens and open that screen
-	void openScreen(fbc::ui::BaseScreen* screen) {
+	void openScreen(uptr<fbc::BaseScreen> screen) {
 		closeAllOverlays();
-		screens.push_front(screen);
-		screen->open();
+		screens.push_front(std::move(screen));
+		screens.front()->open();
 	}
 
 	void render() {
 		if (!screens.empty()) {
 			screens.front()->render();
 		}
-		for (fbc::ui::UIBase* overlay : overlays) {
+		for (fbc::UIBase* overlay : overlays) {
 			overlay->render();
 		}
 	}
 
 	// Close the current screen and switch the specified screen
-	void swapScreen(fbc::ui::BaseScreen* screen) {
+	void swapScreen(uptr<fbc::BaseScreen> screen) {
 		if (!screens.empty()) {
-			fbc::ui::BaseScreen* screen = screens.front();
-			screen->close();
+			fbc::BaseScreen& screenFront = *screens.front();
+			screenFront.close();
 		}
-		openScreen(screen);
+		closeAllOverlays();
+		screens.push_front(std::move(screen));
+		screens.front()->open();
 	}
 
 	// Helper method to ensure that only one button is clicked at a time
-	bool tryClick(fbc::ui::Hitbox* hb) {
+	bool tryClick(fbc::Hitbox* hb) {
 		if (lastClicked == nullptr || lastClicked == hb) {
 			lastClicked = hb;
 			return true;

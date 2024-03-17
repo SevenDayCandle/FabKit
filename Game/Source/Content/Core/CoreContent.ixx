@@ -1,22 +1,28 @@
 export module fbc.coreContent;
 
 import fbc.baseContent;
-import fbc.coreConfig;
+import fbc.coreImages;
+import fbc.coreStrings;
 import fbc.futil;
 import raylib;
+import std;
 
-export namespace fbc::core {
-	export class CoreContent : public fbc::content::BaseContent {
+export namespace fbc {
+	const str BASE_FOLDER = "/Resources";
+
+	export class CoreContent : public fbc::BaseContent {
 	public:
-		CoreContent(const str& ID) : fbc::content::BaseContent(ID) {}
+		CoreContent(strv ID) : fbc::BaseContent(ID, raylib::getWorkingDirectory() + BASE_FOLDER) {}
 
-		CoreConfig cfg = CoreConfig(ID);
-		void dispose();
-		void initialize();
-		void postInitialize();
-	protected:
-		path getContentFolder();
+		CoreImages images = CoreImages(*this);
+		CoreStrings strings = CoreStrings(*this);
+
+		void dispose() override;
+		void initialize() override;
+		void postInitialize() override;
 	};
+
+	export CoreContent cct = CoreContent(futil::FBC);
 
 	// TODO
 	void CoreContent::dispose()
@@ -26,18 +32,14 @@ export namespace fbc::core {
 	// TODO
 	void CoreContent::initialize()
 	{
-		cfg.initialize();
+		images.initialize();
+		strings.initialize();
 	}
 
 	// TODO
 	void CoreContent::postInitialize()
 	{
+		images.postInitialize();
+		strings.postInitialize();
 	}
-
-	// TODO
-	path CoreContent::getContentFolder()
-	{
-		return path(raylib::getWorkingDirectory());
-	}
-
 }

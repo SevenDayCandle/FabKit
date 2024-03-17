@@ -7,22 +7,18 @@ import fbc.textInfo;
 import fbc.tooltip;
 import fbc.uiTipHoverable;
 
-export namespace fbc::ui {
-	export class UIText : public UITipHoverable, public ITextInfo {
+export namespace fbc {
+	export class UIText : public UITipHoverable, public TextInfo {
 	public:
-		UIText(fbc::ui::Hitbox* hb, sptr<fbc::FFont> f) : UITipHoverable(hb), ITextInfo(f) {}
+		UIText(fbc::Hitbox* hb, sptr<fbc::FFont> f) : UITipHoverable(hb), TextInfo(f) {}
+		UIText(fbc::Hitbox* hb, sptr<fbc::FFont> f, const str& text) : UITipHoverable(hb), TextInfo(f, text) {}
 		~UIText() override {}
 
 		virtual void renderImpl() override;
-		virtual void updateImpl() override;
 	};
 
 	void UIText::renderImpl() {
-		this->UITipHoverable::renderImpl();
-		ITextInfo::drawText(hb->x, hb->y);
-	}
-
-	void UIText::updateImpl() {
-		this->UITipHoverable::updateImpl();
+		UITipHoverable::renderImpl();
+		TextInfo::drawText(hb->x, hb->y);
 	}
 }

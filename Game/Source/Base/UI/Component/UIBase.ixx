@@ -1,26 +1,29 @@
 export module fbc.uiBase;
 
-export namespace fbc::ui {
+export namespace fbc {
 	export class UIBase {
 	public:
 		virtual ~UIBase() {}
 
-		bool enabled;
+		bool enabled = true;
 
-		virtual void close();
-		virtual void dispose();
-		virtual void renderImpl();
-		virtual void updateImpl();
+		inline virtual void close() {}
+		virtual void render();
+		virtual void update();
 
-		void render() {
-			if (enabled) {
-				renderImpl();
-			}
-		}
-		void update() {
-			if (enabled) {
-				updateImpl();
-			}
-		}
+		virtual void renderImpl() = 0;
+		virtual void updateImpl() = 0;
 	};
+
+	void UIBase::render() {
+		if (enabled) {
+			renderImpl();
+		}
+	}
+
+	void UIBase::update() {
+		if (enabled) {
+			updateImpl();
+		}
+	}
 }
