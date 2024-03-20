@@ -10,8 +10,8 @@ import fbc.uiTipHoverable;
 export namespace fbc {
 	export class UIText : public UITipHoverable, public TextInfo {
 	public:
-		UIText(fbc::Hitbox* hb, sptr<fbc::FFont> f) : UITipHoverable(hb), TextInfo(f) {}
-		UIText(fbc::Hitbox* hb, sptr<fbc::FFont> f, const str& text) : UITipHoverable(hb), TextInfo(f, text) {}
+		UIText(fbc::Hitbox* hb, FFont& f) : UITipHoverable(hb), TextInfo(f) {}
+		UIText(fbc::Hitbox* hb, FFont& f, const str& text) : UITipHoverable(hb), TextInfo(f, text) {}
 		~UIText() override {}
 
 		virtual void renderImpl() override;

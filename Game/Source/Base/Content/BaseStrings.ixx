@@ -26,6 +26,7 @@ export namespace fbc {
 		inline unmap<str, KeywordStrings> loadKeywordStrings() { return loadKeywordStrings(DEFAULT_KEYWORDS); }
 		unmap<str, KeywordStrings> loadKeywordStrings(const strv& suffix);
 		unmap<str, ObjectStrings> loadObjectStrings(const strv& suffix);
+		unmap<str, str> loadUIStrings(const strv& suffix);
 		virtual void initialize() {};
 		virtual void postInitialize() {}
 	protected:
@@ -48,5 +49,10 @@ export namespace fbc {
 	unmap<str, ObjectStrings> BaseStrings::loadObjectStrings(const strv& suffix)
 	{
 		return unmap<str, ObjectStrings>();
+	}
+
+	// TODO
+	unmap<str, str> BaseStrings::loadUIStrings(const strv& suffix) {
+		return unmap<str, str>();
 	}
 }

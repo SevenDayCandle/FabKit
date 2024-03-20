@@ -1,3 +1,7 @@
+module;
+
+#include "glaze/glaze.hpp"
+
 export module fbc.config;
 
 import fbc.futil;
@@ -30,15 +34,15 @@ export namespace fbc {
 
     // Save the contents of the values_map to an external file
     void Config::commit() {
-        strv configPath = getConfigPath();
-        // glz::write_file_json(values_map, configPath);
+        str configPath = getConfigPath();
+        glz::write_file_json(values_map, configPath, str{});
     }
 
     // Refresh the value map contents from the external file if it exists
     void Config::initialize() {
-        strv configPath = getConfigPath();
+        str configPath = getConfigPath();
         if (std::filesystem::exists(configPath)) {
-            //glz::read_file_json(values_map, configPath);
+            glz::read_file_json(values_map, configPath, str{});
         }
     }
 

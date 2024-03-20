@@ -7,8 +7,8 @@ import fbc.futil;
 import raylib;
 
 export namespace fbc {
-	export class CoreStrings : public fbc::BaseStrings {
+	export class CoreStrings : public BaseStrings {
 	public:
-		CoreStrings(fbc::BaseContent& cnt) : fbc::BaseStrings(cnt) {}
+		CoreStrings(BaseContent& cnt) : BaseStrings(cnt) {}
 	};
 }

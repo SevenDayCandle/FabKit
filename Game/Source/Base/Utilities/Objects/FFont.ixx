@@ -66,9 +66,9 @@ export namespace fbc {
         }
 
         /** Wrapper function around raylib::loadFont to get an FFont instead of a Font **/
-        static sptr<FFont> loadFont(const str& path) {
+        static uptr<FFont> loadFont(const str& path) {
             Font f = raylib::loadFont(path.c_str());
-            return std::make_shared<FFont>(std::move(f));
+            return std::make_unique<FFont>(std::move(f));
         }
 	};
 }

@@ -1,11 +1,12 @@
 export module fbc.ftexture;
 
 import fbc.futil;
+import fbc.iDrawable;
 import raylib;
 import std;
 
 export namespace fbc {
-	export class FTexture : public raylib::Texture {
+	export class FTexture : public raylib::Texture, public IDrawable {
     public:
         /* Move constructor moves the other texture's data to this one */
         FTexture(Texture&& other) {
@@ -52,6 +53,14 @@ export namespace fbc {
             return getData();
         }
 
+        float getHeight() override {
+            return (float) height;
+        }
+
+        float getWidth() override {
+            return (float) width;
+        }
+
         /**
          * Set texture scaling filter mode
          */
@@ -89,7 +98,7 @@ export namespace fbc {
          *
          * @see ::DrawTexture()
          */
-        void draw(int posX = 0, int posY = 0, const raylib::Color& tint = raylib::White) const {
+        void draw(int posX = 0, int posY = 0, const raylib::Color& tint = raylib::White) {
             raylib::drawTexture(*this, posX, posY, tint);
         }
 
@@ -98,7 +107,7 @@ export namespace fbc {
          *
          * @see ::DrawTextureV()
          */
-        void draw(const raylib::Vector2& position, const raylib::Color& tint = raylib::White) const {
+        void draw(const raylib::Vector2& position, const raylib::Color& tint = raylib::White) {
             raylib::drawTextureV(*this, position, tint);
         }
 
@@ -108,7 +117,7 @@ export namespace fbc {
          * @see ::DrawTextureEx()
          */
         void draw(const raylib::Vector2& position, float rotation, float scale = 1.0f,
-            raylib::Color tint = raylib::White) const {
+            raylib::Color tint = raylib::White) {
             raylib::drawTextureEx(*this, position, rotation, scale, tint);
         }
 
@@ -118,7 +127,7 @@ export namespace fbc {
          * @see ::DrawTextureRec()
          */
         void draw(const raylib::Rectangle& sourceRec, const raylib::Vector2& position = { 0, 0 },
-            raylib::Color tint = raylib::White) const {
+            raylib::Color tint = raylib::White) {
             raylib::drawTextureRec(*this, sourceRec, position, tint);
         }
 
@@ -128,12 +137,12 @@ export namespace fbc {
          * @see ::DrawTexturePro()
          */
         void draw(const raylib::Rectangle& destRec, const raylib::Vector2& origin = { 0, 0 },
-            float rotation = 0, raylib::Color tint = raylib::White) const {
+            float rotation = 0, raylib::Color tint = raylib::White) override {
             raylib::drawTexturePro(*this, { 0, 0, (float)this->width, (float)this->height }, destRec, origin, rotation, tint);
         }
 
         void draw(const raylib::Rectangle& sourceRec, const raylib::Rectangle& destRec, const raylib::Vector2& origin = { 0, 0 },
-            float rotation = 0, raylib::Color tint = raylib::White) const {
+            float rotation = 0, raylib::Color tint = raylib::White) override {
             raylib::drawTexturePro(*this, sourceRec, destRec, origin, rotation, tint);
         }
 

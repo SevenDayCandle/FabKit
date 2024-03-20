@@ -1,7 +1,7 @@
 export module fbc.uiButton;
 
-import fbc.ftexture;
 import fbc.futil;
+import fbc.iDrawable;
 import fbc.hitbox;
 import fbc.uiImage;
 import raylib;
@@ -10,8 +10,8 @@ export namespace fbc {
 	export class UIButton : public UIImage {
 	public:
 
-		UIButton(Hitbox* hb, fbc::FTexture& image) : UIImage(hb, image) {}
-		UIButton(Hitbox* hb, fbc::FTexture& image, raylib::Vector2 origin) : UIImage(hb, image, origin) {}
+		UIButton(Hitbox* hb, IDrawable& image) : UIImage(hb, image) {}
+		UIButton(Hitbox* hb, IDrawable& image, raylib::Vector2 origin) : UIImage(hb, image, origin) {}
 		~UIButton() override {}
 
 		inline bool isInteractable() { return interactable; }

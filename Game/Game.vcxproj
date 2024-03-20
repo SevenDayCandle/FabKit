@@ -160,18 +160,35 @@
     </ClCompile>
     <ClCompile Include="Source\Base\Content\BaseImages.ixx" />
     <ClCompile Include="Source\Base\Content\BaseStrings.ixx" />
-    <ClCompile Include="Source\Base\UI\Component\UIBorderedImage.ixx" />
     <ClCompile Include="Source\Base\UI\Component\UIButton.ixx" />
     <ClCompile Include="Source\Base\UI\Component\UICanvas.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\UIScrollbar.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Base\UI\Component\UITipHoverable.ixx" />
+    <ClCompile Include="Source\Base\UI\Hitbox\DraggableHitbox.ixx" />
     <ClCompile Include="Source\Base\UI\Hitbox\ScreenHitbox.ixx" />
     <ClCompile Include="Source\Base\UI\Hitbox\RelativeHitbox.ixx" />
     <ClCompile Include="Source\Base\UI\Hitbox\ScaleHitbox.ixx" />
     <ClCompile Include="Source\Base\UI\Component\UITextButton.ixx" />
+    <ClCompile Include="Source\Base\UI\Hitbox\ScreenSizeHitbox.ixx" />
     <ClCompile Include="Source\Base\UI\Screens\CanvasScreen.ixx" />
+    <ClCompile Include="Source\Base\Utilities\Objects\BorderedDrawable.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Base\Utilities\Objects\FShader.ixx" />
     <ClCompile Include="Source\Base\Utilities\Objects\FMusic.ixx" />
     <ClCompile Include="Source\Base\Utilities\Objects\FSound.ixx" />
+    <ClCompile Include="Source\Base\Utilities\Objects\IDrawable.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Utilities\Objects\Cache.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Content\Core\CoreConfig.ixx" />
     <ClCompile Include="Source\Content\Core\CoreImages.ixx" />
     <ClCompile Include="Source\Content\Core\CoreStrings.ixx" />
@@ -281,7 +298,15 @@
     <Image Include="Resources\Images\UI\SmallPanel_Corner_TR.png" />
     <Image Include="Resources\Images\UI\SquareButton.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Localization\ENG\UIStrings.json" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties Resources_4Localization_4ENG_4UIStrings_1json__JsonSchema="https://appsemble.app/api.json" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

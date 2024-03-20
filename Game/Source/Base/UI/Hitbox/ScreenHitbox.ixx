@@ -4,10 +4,11 @@ import fbc.coreConfig;
 import fbc.hitbox;
 
 export namespace fbc {
+	/* Hitbox whose position scale with screen dimensions, and whose size scale with render scale */
 	export class ScreenHitbox : public Hitbox {
 	public:
 		ScreenHitbox(): Hitbox(0, 0, 1, 1) {}
-		ScreenHitbox(float offsetX, float offsetY, float offsetWidth, float offsetHeight): Hitbox(offsetX, offsetY, offsetWidth, offsetHeight) {
+		ScreenHitbox(float screenXPercent, float screenYPercent, float offsetWidth, float offsetHeight): Hitbox(screenXPercent, screenYPercent, offsetWidth, offsetHeight) {
 			ScreenHitbox::refreshSize();
 		}
 		~ScreenHitbox() override {}
