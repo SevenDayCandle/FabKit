@@ -14,7 +14,10 @@ export namespace fbc {
 
 		const BaseContent& content;
 
+		inline void dispose() { textures.clear(); }
+
 		FTexture& getTexture(const strv& path);
+
 		virtual void initialize() {};
 		virtual void postInitialize() {}
 	private:

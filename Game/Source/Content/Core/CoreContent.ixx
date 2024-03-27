@@ -36,6 +36,9 @@ export namespace fbc {
 	// TODO
 	void CoreContent::dispose()
 	{
+		images.dispose();
+		fontBoldData = nullptr;
+		fontRegularData = nullptr;
 	}
 
 	// TODO

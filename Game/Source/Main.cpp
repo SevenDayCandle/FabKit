@@ -8,6 +8,7 @@ using namespace fbc;
 
 void dispose() {
 	// TODO save game state as necessary
+	cct.dispose();
 	sdl::quit();
 }
 

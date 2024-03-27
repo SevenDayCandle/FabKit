@@ -39,8 +39,8 @@ export namespace fbc {
 	// Draw the base stretched around destRec, then draw the corners and edges around destRec
 	// Assumes that corner and border textures have the exact same size
 	void BorderedDrawable::draw(const sdl::RectF* destRec, const sdl::Point& origin, float rotation, const sdl::Color& tint, sdl::RendererFlip flip) {
-		float width = cornerTL.width;
-		float height = cornerTL.height;
+		float width = cornerTL.getWidth();
+		float height = cornerTL.getHeight();
 		float left = destRec->x - width;
 		float top = destRec->y - height;
 		float right = destRec->x + destRec->w;
@@ -56,13 +56,13 @@ export namespace fbc {
 
 		base.draw(destRec, origin, rotation, tint, flip);
 		cornerTL.draw(&ctl, origin, rotation, tint, flip);
-		cornerTR.draw(&ctr, origin, rotation, tint);
-		cornerBL.draw(&cbl , origin, rotation, tint);
-		cornerBR.draw(&cbr, origin, rotation, tint);
-		borderT.draw(&bt, origin, rotation, tint);
-		borderL.draw(&bl, origin, rotation, tint);
-		borderR.draw(&br, origin, rotation, tint);
-		borderB.draw(&bb, origin, rotation, tint);
+		cornerTR.draw(&ctr, origin, rotation, tint, flip);
+		cornerBL.draw(&cbl ,origin, rotation, tint, flip);
+		cornerBR.draw(&cbr, origin, rotation, tint, flip);
+		borderT.draw(&bt, origin, rotation, tint, flip);
+		borderL.draw(&bl, origin, rotation, tint, flip);
+		borderR.draw(&br, origin, rotation, tint, flip);
+		borderB.draw(&bb, origin, rotation, tint, flip);
 	}
 
 	// Unsupported, falls back to base draw function

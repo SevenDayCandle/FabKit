@@ -183,11 +183,11 @@ export namespace sdl {
 
 	/* Misc functions */
 	export int getTicks() { return SDL_GetTicks64(); }
-	export void log(SDL_LogPriority priority, std::string_view message) { SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, priority, message.data()); }
-	export void log(SDL_LogPriority priority, const char* message, va_list args) { SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, priority, message, args); }
-	export void log(SDL_LogPriority priority, std::string_view message, va_list args) { SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, priority, message.data(), args); }
-	export void logError(const char* message, va_list args) { log(SDL_LOG_PRIORITY_ERROR, message, args); }
-	export void logError(std::string_view message, va_list args) { log(SDL_LOG_PRIORITY_ERROR, message, args); }
+	export const char* __cdecl getError() { return TTF_GetError(); }
+	export template <typename... Args> void log(SDL_LogPriority priority, const char* message, const Args&... args) { SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, priority, message, args...); }
+	export template <typename... Args> void log(SDL_LogPriority priority, std::string_view message, const Args&... args) { SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, priority, message.data(), args...); }
+	export template <typename... Args> void logError(const char* message, const Args&... args) { log(SDL_LOG_PRIORITY_ERROR, message, args...); }
+	export template <typename... Args> void logError(std::string_view message, const Args&... args) { log(SDL_LOG_PRIORITY_ERROR, message, args...); }
 
 
 	/* When using a fixed framerate, sleep to fill up remaining time */

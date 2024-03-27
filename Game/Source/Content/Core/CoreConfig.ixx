@@ -2,6 +2,7 @@ export module fbc.coreConfig;
 
 import fbc.config;
 import fbc.configItem;
+import fbc.ffont;
 import fbc.futil;
 import fbc.gameLanguage;
 import sdl;
@@ -25,7 +26,7 @@ export namespace fbc {
 		ConfigItem<int> soundVolumeEffects = ConfigItem<int>(*this, "SoundVolumeEffects", 100);
 		ConfigItem<int> soundVolumeMaster = ConfigItem<int>(*this, "SoundVolumeMaster", 100);
 		ConfigItem<int> soundVolumeMusic = ConfigItem<int>(*this, "SoundVolumeMusic", 100);
-		ConfigItem<str> textFont = ConfigItem<str>(*this, "TextFont", "");
+		ConfigItem<str> textFont = ConfigItem<str>(*this, "TextFont", FONT_REGULAR);
 		ConfigItem<bool> textIcons = ConfigItem<bool>(*this, "TextIcons", false);
 		ConfigItem<GameLanguage> textLanguage = ConfigItem<GameLanguage>(*this, "TextIcons", GameLanguage::ENG);
 	};

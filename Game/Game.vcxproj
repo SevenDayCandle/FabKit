@@ -129,7 +129,7 @@
       <AdditionalDependencies>raylibd.lib;winmm.lib;SDL2.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2_ttf.lib;SDL2main.lib;SDL2test.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)"</Command>
+      <Command>xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xcopy /E /I /Y /D "$(ProjectDir)Resources" "$(TargetDir)Resources"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -298,6 +298,12 @@
   <ItemGroup>
     <None Include="Resources\Localization\ENG\KeywordStrings.json" />
     <None Include="Resources\Localization\ENG\UIStrings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Resources\Fonts\Rubik-Bold.ttf" />
+    <Font Include="Resources\Fonts\Rubik-BoldItalic.ttf" />
+    <Font Include="Resources\Fonts\Rubik-Italic.ttf" />
+    <Font Include="Resources\Fonts\Rubik-Regular.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
