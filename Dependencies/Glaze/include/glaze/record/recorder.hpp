@@ -1,15 +1,13 @@
 #pragma once
 
 #include <deque>
-#include <map>
 #include <string>
 #include <variant>
-#include <vector>
 
 #include "glaze/core/common.hpp"
 #include "glaze/csv.hpp" // TODO: split out recorder specializations so this isn't necessary
 #include "glaze/json.hpp" // TODO: split out recorder specializations so this isn't necessary
-#include "glaze/util/string_view.hpp"
+#include "glaze/util/string_literal.hpp"
 #include "glaze/util/type_traits.hpp"
 #include "glaze/util/variant.hpp"
 

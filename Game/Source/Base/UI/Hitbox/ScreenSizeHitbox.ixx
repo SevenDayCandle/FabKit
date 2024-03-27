@@ -26,8 +26,8 @@ export namespace fbc {
 
 	// Set the ui dimensions in accordance to the screen's current size
 	void ScreenSizeHitbox::refreshSize() {
-		width = getScreenXSize() * offsetWidth;
-		height = getScreenYSize() * offsetHeight;
+		w = getScreenXSize() * offsetWidth;
+		h = getScreenYSize() * offsetHeight;
 		refreshPosition();
 	}
 }

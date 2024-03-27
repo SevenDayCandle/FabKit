@@ -51,12 +51,12 @@ export namespace fbc {
 		if (elements.size() > 1) {
 			UIHoverable& last = *elements[elements.size() - 2];
 			Hitbox& lhb = *(last.hb);
-			float xOff = lhb.getOffsetX() + lhb.width + spacing;
+			float xOff = lhb.getOffsetX() + lhb.w + spacing;
 			float yOff = lhb.getOffsetY();
 
-			if (xOff > hb->width) {
+			if (xOff > hb->w) {
 				xOff = start;
-				yOff = yOff - element->hb->height - spacing;
+				yOff = yOff - element->hb->h - spacing;
 			}
 
 			lhb.setOffsetPos(xOff, yOff);
@@ -75,10 +75,10 @@ export namespace fbc {
 			UIHoverable& last = *elements[elements.size() - 2];
 			Hitbox& lhb = *(last.hb);
 			float xOff = lhb.getOffsetX();
-			float yOff = lhb.getOffsetY() - element->hb->height - spacing;
+			float yOff = lhb.getOffsetY() - element->hb->h - spacing;
 
 			if (yOff < 0) {
-				xOff = xOff + lhb.width + spacing;
+				xOff = xOff + lhb.w + spacing;
 				yOff = start;
 			}
 

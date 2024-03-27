@@ -8,6 +8,7 @@
 #include "glaze/reflection/get_name.hpp"
 #include "glaze/tuplet/tuple.hpp"
 #include "glaze/util/for_each.hpp"
+#include "glaze/util/string_literal.hpp"
 #include "glaze/util/type_traits.hpp"
 #include "glaze/util/variant.hpp"
 
@@ -178,49 +179,38 @@ namespace glz
    template <class T>
    concept named = requires { meta<T>::name; } || requires { T::glaze::name; };
 
-   template <class T, bool fail_on_unknown = false>
+   template <class T>
    inline constexpr std::string_view name_v = [] {
       if constexpr (named<T>) {
          if constexpr (requires { T::glaze::name; }) {
-            if constexpr (fail_on_unknown) {
-               static_assert(T::glaze::name.find("glz::unknown") == std::string_view::npos,
-                             "name_v used on unnamed type");
-            }
             return T::glaze::name;
          }
          else {
-            if constexpr (fail_on_unknown) {
-               static_assert(meta<T>::name.find("glz::unknown") == std::string_view::npos,
-                             "name_v used on unnamed type");
-            }
             return meta<T>::name;
          }
       }
       else if constexpr (std::is_void_v<T>) {
          return "void";
       }
-      else if constexpr (fail_on_unknown) {
-         static_assert(false_v<T>, "name_v used on unnamed type");
-      }
       else {
-         return type_name<std::decay_t<T>>;
+         return type_name<T>;
       }
    }();
 
    template <class T>
-   concept tagged = requires { meta<T>::tag; } || requires { T::glaze::tag; };
+   concept tagged = requires { meta<std::decay_t<T>>::tag; } || requires { std::decay_t<T>::glaze::tag; };
 
    template <class T>
-   concept ided = requires { meta<T>::ids; } || requires { T::glaze::ids; };
+   concept ided = requires { meta<std::decay_t<T>>::ids; } || requires { std::decay_t<T>::glaze::ids; };
 
    template <class T>
    inline constexpr std::string_view tag_v = [] {
       if constexpr (tagged<T>) {
          if constexpr (detail::local_meta_t<T>) {
-            return T::glaze::tag;
+            return std::decay_t<T>::glaze::tag;
          }
          else {
-            return meta<T>::tag;
+            return meta<std::decay_t<T>>::tag;
          }
       }
       else {
@@ -228,14 +218,27 @@ namespace glz
       }
    }();
 
+   namespace detail
+   {
+      template <class T, size_t N>
+      inline constexpr std::array<std::string_view, N> convert_ids_to_array_of_sv(const std::array<T, N>& arr)
+      {
+         std::array<std::string_view, N> result;
+         for (size_t i = 0; i < N; ++i) {
+            result[i] = arr[i];
+         }
+         return result;
+      }
+   }
+
    template <is_variant T>
    inline constexpr auto ids_v = [] {
       if constexpr (ided<T>) {
          if constexpr (detail::local_meta_t<T>) {
-            return T::glaze::ids;
+            return detail::convert_ids_to_array_of_sv(std::decay_t<T>::glaze::ids);
          }
          else {
-            return meta<T>::ids;
+            return detail::convert_ids_to_array_of_sv(meta<std::decay_t<T>>::ids);
          }
       }
       else {

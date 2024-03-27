@@ -10,11 +10,11 @@ import fbc.futil;
 import fbc.gameLanguage;
 import fbc.keywordStrings;
 import fbc.objectStrings;
-import raylib;
 
 export namespace fbc {
-	const str DEFAULT_KEYWORDS = "keyword";
-	const str LOCALIZATION_PATH = "Localization";
+	constexpr strv DEFAULT_KEYWORDS = "KeywordStrings";
+	constexpr strv DEFAULT_UI = "UIStrings";
+	constexpr strv LOCALIZATION_PATH = "Localization";
 
 	export class BaseStrings {
 	public:
@@ -23,10 +23,6 @@ export namespace fbc {
 
 		const BaseContent& content;
 
-		inline unmap<str, KeywordStrings> loadKeywordStrings() { return loadKeywordStrings(DEFAULT_KEYWORDS); }
-		unmap<str, KeywordStrings> loadKeywordStrings(const strv& suffix);
-		unmap<str, ObjectStrings> loadObjectStrings(const strv& suffix);
-		unmap<str, str> loadUIStrings(const strv& suffix);
 		virtual void initialize() {};
 		virtual void postInitialize() {}
 	protected:
@@ -35,24 +31,26 @@ export namespace fbc {
 		};
 		inline path getPathForLanguage(const GameLanguage& lang, const strv& suffix) {
 			path p = content.contentFolder;
-			return p / LOCALIZATION_PATH / langToStr(lang) / suffix / futil::JSON_EXT;
+			return (p / LOCALIZATION_PATH / langToStr(lang) / suffix).replace_extension(futil::JSON_EXT);
 		};
+		void loadKeywordStrings(unmap<str, KeywordStrings>& res, const strv& suffix);
+		void loadObjectStrings(unmap<str, ObjectStrings>& res, const strv& suffix);
+		void loadUIStrings(unmap<str, str>& res, const strv& suffix);
 	};
 
-	// TODO
-	unmap<str, KeywordStrings> BaseStrings::loadKeywordStrings(const strv& suffix)
+	void BaseStrings::loadKeywordStrings(unmap<str, KeywordStrings>& res, const strv& suffix = DEFAULT_KEYWORDS)
 	{
-		return unmap<str, KeywordStrings>();
+		glz::read_file_json(res, getPathForLanguage(suffix).string(), str{});
 	}
 
 	// TODO
-	unmap<str, ObjectStrings> BaseStrings::loadObjectStrings(const strv& suffix)
+	void BaseStrings::loadObjectStrings(unmap<str, ObjectStrings>& res, const strv& suffix)
 	{
-		return unmap<str, ObjectStrings>();
+		glz::read_file_json(res, getPathForLanguage(suffix).string(), str{});
 	}
 
 	// TODO
-	unmap<str, str> BaseStrings::loadUIStrings(const strv& suffix) {
-		return unmap<str, str>();
+	void BaseStrings::loadUIStrings(unmap<str, str>& res, const strv& suffix = DEFAULT_UI) {
+		glz::read_file_json(res, getPathForLanguage(suffix).string(), str{});
 	}
 }

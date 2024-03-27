@@ -5,7 +5,7 @@ module;
 export module fbc.config;
 
 import fbc.futil;
-import raylib;
+import sdl;
 import std;
 
 export namespace fbc {
@@ -48,7 +48,7 @@ export namespace fbc {
 
     // Get the path to the file used to store this config's data
     str Config::getConfigPath() {
-        return raylib::getApplicationDirectory() + ID + str(BASE_FILE);
+        return sdl::dirPref(futil::FBC.data(), ID.c_str()) + str(BASE_FILE);
     }
 
     // Get the mapped value for key

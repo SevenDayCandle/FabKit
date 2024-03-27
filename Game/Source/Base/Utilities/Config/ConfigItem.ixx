@@ -13,6 +13,8 @@ export namespace fbc {
         inline T get() {return value;}
         void set(const T& newValue);
 
+        operator T() { return value; }
+
     protected:
         T parseValue(const str& input);
         void reload();

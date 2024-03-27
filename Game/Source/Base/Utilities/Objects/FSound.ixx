@@ -1,11 +1,11 @@
 export module fbc.fsound;
 
 import fbc.futil;
-import raylib;
+import sdl;
 import std;
 
 export namespace fbc {
-	export class FSound : raylib::Sound {
+	export class FSound {
 		
 	};
 }

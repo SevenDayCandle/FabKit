@@ -2,7 +2,7 @@ export module fbc.textInfo;
 
 import fbc.ffont;
 import fbc.futil;
-import raylib;
+import sdl;
 
 export namespace fbc {
 	export class TextInfo {
@@ -13,15 +13,11 @@ export namespace fbc {
 
 		FFont& font;
 		str text;
-		raylib::Color color = raylib::White;
-		float scale = 1;
-		float spacing = 0;
+		sdl::Color color = sdl::WHITE;
+		sdl::Color outline = sdl::BLACK;
 
-		void drawText(const raylib::Vector2& pos) {
-			font.draw(text, pos, scale, spacing, color);
-		}
 		void drawText(float x, float y) {
-			font.draw(text, x, y, scale, spacing, color);
+			font.draw(text, x, y, color, outline);
 		}
 	};
 }

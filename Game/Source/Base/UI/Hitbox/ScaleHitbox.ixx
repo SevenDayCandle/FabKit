@@ -25,8 +25,8 @@ export namespace fbc {
 
 	// Set the ui dimensions in accordance to the screen's current size
 	void ScaleHitbox::refreshSize() {
-		width = renderScale() * offsetWidth;
-		height = renderScale() * offsetHeight;
+		w = renderScale() * offsetWidth;
+		h = renderScale() * offsetHeight;
 		refreshPosition();
 	}
 }

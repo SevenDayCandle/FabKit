@@ -74,6 +74,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)Builds\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\Builds\Intermediate\$(Configuration)\</IntDir>
+    <LibraryPath>D:\1089C\Documents\VisualStudio\FabricateRaylib\Dependencies\SDL\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)Builds\$(Configuration)\</OutDir>
@@ -113,7 +114,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;GRAPHICS_API_OPENGL_33;PLATFORM_DESKTOP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Raylib\include;$(SolutionDir)Dependencies\Glaze\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Raylib\include;$(SolutionDir)Dependencies\Glaze\include;$(SolutionDir)Dependencies\SDL\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -124,9 +125,12 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Raylib\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>raylibd.lib;winmm.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\SDL\lib;$(SolutionDir)Dependencies\Raylib\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>raylibd.lib;winmm.lib;SDL2.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2_ttf.lib;SDL2main.lib;SDL2test.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -160,6 +164,7 @@
     </ClCompile>
     <ClCompile Include="Source\Base\Content\BaseImages.ixx" />
     <ClCompile Include="Source\Base\Content\BaseStrings.ixx" />
+    <ClCompile Include="Source\Base\SDL.ixx" />
     <ClCompile Include="Source\Base\UI\Component\UIButton.ixx" />
     <ClCompile Include="Source\Base\UI\Component\UICanvas.ixx" />
     <ClCompile Include="Source\Base\UI\Component\UIScrollbar.ixx">
@@ -174,6 +179,10 @@
     <ClCompile Include="Source\Base\UI\Component\UITextButton.ixx" />
     <ClCompile Include="Source\Base\UI\Hitbox\ScreenSizeHitbox.ixx" />
     <ClCompile Include="Source\Base\UI\Screens\CanvasScreen.ixx" />
+    <ClCompile Include="Source\Base\Utilities\Config\WindowMode.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Base\Utilities\Objects\BorderedDrawable.ixx">
       <SubType>
       </SubType>
@@ -192,10 +201,6 @@
     <ClCompile Include="Source\Content\Core\CoreConfig.ixx" />
     <ClCompile Include="Source\Content\Core\CoreImages.ixx" />
     <ClCompile Include="Source\Content\Core\CoreStrings.ixx" />
-    <ClCompile Include="Source\Base\Raylib.ixx">
-      <FileType>Document</FileType>
-      <DeploymentContent>false</DeploymentContent>
-    </ClCompile>
     <ClCompile Include="Source\Base\UI\Component\UIBase.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
@@ -233,14 +238,6 @@
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
     <ClCompile Include="Source\Base\Utilities\Config\ConfigItem.ixx">
-      <FileType>Document</FileType>
-      <DeploymentContent>false</DeploymentContent>
-    </ClCompile>
-    <ClCompile Include="Source\Base\Utilities\Config\Hotkeys.ixx">
-      <FileType>Document</FileType>
-      <DeploymentContent>false</DeploymentContent>
-    </ClCompile>
-    <ClCompile Include="Source\Base\Utilities\Config\InputAction.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
@@ -299,6 +296,7 @@
     <Image Include="Resources\Images\UI\SquareButton.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Localization\ENG\KeywordStrings.json" />
     <None Include="Resources\Localization\ENG\UIStrings.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

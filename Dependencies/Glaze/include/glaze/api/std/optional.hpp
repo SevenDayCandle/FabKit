@@ -5,17 +5,13 @@
 
 #include <optional>
 
-#include "glaze/api/name.hpp"
+#include "glaze/core/meta.hpp"
 
 namespace glz
 {
    template <class T>
-   concept optional = is_specialization_v<T, std::optional>;
-
-   template <optional T>
-   struct meta<T>
+   struct meta<std::optional<T>>
    {
-      using V = typename T::value_type;
-      static constexpr std::string_view name = detail::join_v<chars<"std::optional<">, name_v<V>, chars<">">>;
+      static constexpr std::string_view name = join_v<chars<"std::optional<">, name_v<T>, chars<">">>;
    };
 }

@@ -37,9 +37,10 @@ export namespace fbc {
 		path pathImpl = content.contentFolder;
 		pathImpl /= IMAGE_PATH;
 		pathImpl /= key;
+		str pathStr = pathImpl.string();
 		auto [it, inserted] = textures.emplace(std::piecewise_construct,
 			std::forward_as_tuple(key),
-			std::forward_as_tuple(FTexture::loadTexture(pathImpl.string())));
+			std::forward_as_tuple(std::make_unique<FTexture>(pathStr)));
 		return *it->second;
 	}
 }

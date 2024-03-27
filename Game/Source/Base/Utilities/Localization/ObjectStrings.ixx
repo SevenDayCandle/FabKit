@@ -4,7 +4,7 @@ import fbc.futil;
 
 export namespace fbc {
 	export struct ObjectStrings {
-		const str NAME;
+		str NAME;
 		vec<str> DESCRIPTION;
 	};
 }

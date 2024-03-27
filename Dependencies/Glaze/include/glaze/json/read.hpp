@@ -225,17 +225,19 @@ namespace glz
       template <complex_t T>
       struct from_json<T>
       {
-         template <auto Opts>
+         template <auto Options>
          GLZ_ALWAYS_INLINE static void op(auto&& v, is_context auto&& ctx, auto&&... args) noexcept
          {
-            if constexpr (!Opts.ws_handled) {
-               skip_ws<Opts>(ctx, args...);
+            if constexpr (!Options.ws_handled) {
+               skip_ws<Options>(ctx, args...);
                if (bool(ctx.error)) [[unlikely]]
                   return;
             }
             match<"[">(ctx, args...);
             if (bool(ctx.error)) [[unlikely]]
                return;
+
+            constexpr auto Opts = ws_handled_off<Options>();
 
             auto* ptr = reinterpret_cast<typename T::value_type*>(&v);
             static_assert(sizeof(T) == sizeof(typename T::value_type) * 2);
@@ -870,7 +872,18 @@ namespace glz
             skip_value<Opts>(ctx, it, end);
             if (bool(ctx.error)) [[unlikely]]
                return;
-            value.str = {it_start, static_cast<std::size_t>(it - it_start)};
+            value.str = {it_start, static_cast<size_t>(it - it_start)};
+         }
+      };
+
+      template <class T>
+      struct from_json<basic_text<T>>
+      {
+         template <auto Opts>
+         GLZ_ALWAYS_INLINE static void op(auto&& value, is_context auto&&, auto&& it, auto&& end) noexcept
+         {
+            value.str = {it, static_cast<size_t>(end - it)}; // read entire contents as string
+            it = end;
          }
       };
 
@@ -887,7 +900,7 @@ namespace glz
                if (bool(ctx.error)) [[unlikely]]
                   return;
             }
-            static constexpr auto Opts = ws_handled_off<Options>();
+            constexpr auto Opts = ws_handled_off<Options>();
 
             match<'['>(ctx, it);
             if (bool(ctx.error)) [[unlikely]]
@@ -935,7 +948,7 @@ namespace glz
                if (bool(ctx.error)) [[unlikely]]
                   return;
             }
-            static constexpr auto Opts = ws_handled_off<Options>();
+            constexpr auto Opts = ws_handled_off<Options>();
 
             match<'['>(ctx, it);
             if (bool(ctx.error)) [[unlikely]]
@@ -1093,7 +1106,7 @@ namespace glz
                if (bool(ctx.error)) [[unlikely]]
                   return;
             }
-            static constexpr auto Opts = ws_handled_off<Options>();
+            constexpr auto Opts = ws_handled_off<Options>();
 
             match<'['>(ctx, it);
             if (bool(ctx.error)) [[unlikely]]
@@ -1283,7 +1296,7 @@ namespace glz
          for_each<N>([&](auto I) {
             constexpr auto first = get<0>(get<I>(meta_v<T>));
             using T0 = std::decay_t<decltype(first)>;
-            if constexpr (std::is_member_object_pointer_v<T0>) {
+            if constexpr (std::is_member_pointer_v<T0>) {
                constexpr auto s = get_name<first>();
                for (auto& c : s) {
                   if (c == '\\' || c == '"' || is_unicode(c)) {
@@ -1341,14 +1354,7 @@ namespace glz
             stats.min_length = tag_size;
          }
 
-         constexpr auto N = [] {
-            if constexpr (reflectable<T>) {
-               return count_members<T>;
-            }
-            else {
-               return std::tuple_size_v<meta_t<T>>;
-            }
-         }();
+         constexpr auto N = reflection_count<T>;
 
          for_each<N>([&](auto I) {
             using Element = glaze_tuple_element<I, N, T>;
@@ -1447,14 +1453,7 @@ namespace glz
          if (bool(ctx.error)) [[unlikely]]
             return {};
 
-         constexpr auto N = [] {
-            if constexpr (reflectable<T>) {
-               return count_members<T>;
-            }
-            else {
-               return std::tuple_size_v<meta_t<T>>;
-            }
-         }();
+         constexpr auto N = reflection_count<T>;
 
          if constexpr (keys_may_contain_escape<T>()) {
             std::string& static_key = string_buffer();
@@ -1490,7 +1489,7 @@ namespace glz
             if (bool(ctx.error)) [[unlikely]]
                return;
 
-            static constexpr auto Opts = opening_handled_off<ws_handled_off<Options>()>();
+            constexpr auto Opts = opening_handled_off<ws_handled_off<Options>()>();
 
             // Only used if error_on_missing_keys = true
             [[maybe_unused]] bit_array<1> fields{};
@@ -1544,16 +1543,9 @@ namespace glz
             if (bool(ctx.error)) [[unlikely]]
                return;
 
-            static constexpr auto Opts = opening_handled_off<ws_handled_off<Options>()>();
+            constexpr auto Opts = opening_handled_off<ws_handled_off<Options>()>();
 
-            static constexpr auto num_members = [] {
-               if constexpr (reflectable<T>) {
-                  return count_members<T>;
-               }
-               else {
-                  return std::tuple_size_v<meta_t<T>>;
-               }
-            }();
+            static constexpr auto num_members = reflection_count<T>;
             if constexpr ((glaze_object_t<T> || reflectable<T>)&&num_members == 0 && Opts.error_on_unknown_keys) {
                if (*it == '}') [[likely]] {
                   ++it;
@@ -1566,7 +1558,7 @@ namespace glz
                // Only used if error_on_missing_keys = true
                [[maybe_unused]] bit_array<num_members> fields{};
 
-               decltype(auto) frozen_map = [&] {
+               decltype(auto) frozen_map = [&]() -> decltype(auto) {
                   if constexpr (reflectable<T> && num_members > 0) {
 #if ((defined _MSC_VER) && (!defined __clang__))
                      static thread_local auto cmap = make_map<T, Opts.use_hash_comparison>();
@@ -1722,27 +1714,38 @@ namespace glz
                               if (bool(ctx.error)) [[unlikely]]
                                  return;
                               key = {start, size_t(it - start)};
-                           }
-                           ++it; // skip the quote
+                              ++it; // skip the quote
 
-                           parse_object_entry_sep<Opts>(ctx, it, end);
-                           if (bool(ctx.error)) [[unlikely]]
-                              return;
+                              parse_object_entry_sep<Opts>(ctx, it, end);
+                              if (bool(ctx.error)) [[unlikely]]
+                                 return;
 
-                           if constexpr (Opts.error_on_missing_keys) {
-                              // TODO: Kludge/hack. Should work but could easily cause memory issues with small changes.
-                              // At the very least if we are going to do this add a get_index method to the maps and
-                              // call that
-                              auto index = member_it - frozen_map.begin();
-                              fields[index] = true;
+                              read<json>::handle_unknown<Opts>(key, value, ctx, it, end);
+                              if (bool(ctx.error)) [[unlikely]]
+                                 return;
                            }
-                           std::visit(
-                              [&](auto&& member_ptr) {
-                                 read<json>::op<ws_handled<Opts>()>(get_member(value, member_ptr), ctx, it, end);
-                              },
-                              member_it->second);
-                           if (bool(ctx.error)) [[unlikely]]
-                              return;
+                           else {
+                              ++it; // skip the quote
+
+                              parse_object_entry_sep<Opts>(ctx, it, end);
+                              if (bool(ctx.error)) [[unlikely]]
+                                 return;
+
+                              if constexpr (Opts.error_on_missing_keys) {
+                                 // TODO: Kludge/hack. Should work but could easily cause memory issues with small
+                                 // changes. At the very least if we are going to do this add a get_index method to the
+                                 // maps and call that
+                                 auto index = member_it - frozen_map.begin();
+                                 fields[index] = true;
+                              }
+                              std::visit(
+                                 [&](auto&& member_ptr) {
+                                    read<json>::op<ws_handled<Opts>()>(get_member(value, member_ptr), ctx, it, end);
+                                 },
+                                 member_it->second);
+                              if (bool(ctx.error)) [[unlikely]]
+                                 return;
+                           }
                         }
                         else [[unlikely]] {
                            if (*it != '"') {
@@ -1850,7 +1853,7 @@ namespace glz
             if (bool(ctx.error)) [[unlikely]]
                return;
 
-            static constexpr auto Opts = opening_handled_off<ws_handled_off<Options>()>();
+            constexpr auto Opts = opening_handled_off<ws_handled_off<Options>()>();
 
             // Only used if partial_read_nested = true
             [[maybe_unused]] uint32_t opening_counter = 1;
@@ -1859,7 +1862,7 @@ namespace glz
             bit_array<num_members> all_fields{};
             for_each<num_members>([&](auto I) constexpr { all_fields[I] = true; });
 
-            decltype(auto) frozen_map = [&] {
+            decltype(auto) frozen_map = [&]() -> decltype(auto) {
                if constexpr (reflectable<T> && num_members > 0) {
 #if ((defined _MSC_VER) && (!defined __clang__))
                   static thread_local auto cmap = make_map<T, Opts.use_hash_comparison>();
@@ -2043,7 +2046,7 @@ namespace glz
       };
 
       template <is_variant T>
-      GLZ_ALWAYS_INLINE constexpr auto variant_is_auto_deducible()
+      consteval auto variant_is_auto_deducible()
       {
          // Contains at most one each of the basic json types bool, numeric, string, object, array
          // If all objects are meta-objects then we can attempt to deduce them as well either through a type tag or
@@ -2060,7 +2063,7 @@ namespace glz
             objects += pair_t<V>;
             objects += (writable_map_t<V> || readable_map_t<V>);
             objects += glaze_object_t<V>;
-            meta_objects += glaze_object_t<V>;
+            meta_objects += glaze_object_t<V> || reflectable<V>;
             arrays += glaze_array_t<V>;
             arrays += array_t<V>;
             // TODO null
@@ -2068,13 +2071,13 @@ namespace glz
          return bools < 2 && numbers < 2 && strings < 2 && (objects < 2 || meta_objects == objects) && arrays < 2;
       }
 
-      template <typename>
+      template <class>
       struct variant_types;
 
-      template <typename... Ts>
+      template <class... Ts>
       struct variant_types<std::variant<Ts...>>
       {
-         // TODO this way of filtering types is compile time intensive.
+         // TODO: this way of filtering types is compile time intensive.
          using bool_types = decltype(tuplet::tuple_cat(
             std::conditional_t<bool_t<remove_meta_wrapper_t<Ts>>, tuplet::tuple<Ts>, tuplet::tuple<>>{}...));
          using number_types = decltype(tuplet::tuple_cat(
@@ -2095,10 +2098,10 @@ namespace glz
       };
 
       // post process output of variant_types
-      template <typename>
+      template <class>
       struct tuple_types;
 
-      template <typename... Ts>
+      template <class... Ts>
       struct tuple_types<tuplet::tuple<Ts...>>
       {
          using glaze_const_types = decltype(tuplet::tuple_cat(
@@ -2107,17 +2110,32 @@ namespace glz
             std::conditional_t<!glaze_const_value_t<Ts>, tuplet::tuple<Ts>, tuplet::tuple<>>{}...));
       };
 
-      template <typename tuple_types_t>
+      template <class>
+      struct variant_type_count;
+
+      template <class... Ts>
+      struct variant_type_count<std::variant<Ts...>>
+      {
+         using V = variant_types<std::variant<Ts...>>;
+         static constexpr auto n_bool = std::tuple_size_v<typename V::bool_types>;
+         static constexpr auto n_number = std::tuple_size_v<typename V::number_types>;
+         static constexpr auto n_string = std::tuple_size_v<typename V::string_types>;
+         static constexpr auto n_object = std::tuple_size_v<typename V::object_types>;
+         static constexpr auto n_array = std::tuple_size_v<typename V::array_types>;
+         static constexpr auto n_null = std::tuple_size_v<typename V::nullable_types>;
+      };
+
+      template <class Tuple>
       struct process_arithmetic_boolean_string_or_array
       {
          template <auto Options>
          GLZ_FLATTEN static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end)
          {
-            if constexpr (std::tuple_size_v<tuple_types_t> < 1) {
+            if constexpr (std::tuple_size_v<Tuple> < 1) {
                ctx.error = error_code::no_matching_variant_type;
             }
             else {
-               using const_glaze_types = typename tuple_types<tuple_types_t>::glaze_const_types;
+               using const_glaze_types = typename tuple_types<Tuple>::glaze_const_types;
                bool found_match{};
                for_each<std::tuple_size_v<const_glaze_types>>([&]([[maybe_unused]] auto I) mutable {
                   if (found_match) {
@@ -2141,7 +2159,7 @@ namespace glz
                   return;
                }
 
-               using non_const_types = typename tuple_types<tuple_types_t>::glaze_non_const_types;
+               using non_const_types = typename tuple_types<Tuple>::glaze_non_const_types;
                if constexpr (std::tuple_size_v < non_const_types >> 0) {
                   using V = std::tuple_element_t<0, non_const_types>;
                   if (!std::holds_alternative<V>(value)) value = V{};
@@ -2167,7 +2185,7 @@ namespace glz
                   if (bool(ctx.error)) [[unlikely]]
                      return;
                }
-               static constexpr auto Opts = ws_handled_off<Options>();
+               constexpr auto Opts = ws_handled_off<Options>();
                switch (*it) {
                case '\0':
                   ctx.error = error_code::unexpected_end;
@@ -2388,7 +2406,7 @@ namespace glz
                if (bool(ctx.error)) [[unlikely]]
                   return;
             }
-            static constexpr auto Opts = ws_handled_off<Options>();
+            constexpr auto Opts = ws_handled_off<Options>();
 
             match<'['>(ctx, it);
             if (bool(ctx.error)) [[unlikely]]
@@ -2437,7 +2455,97 @@ namespace glz
          }
       };
 
+      template <is_expected T>
+      struct from_json<T>
+      {
+         template <auto Opts, class... Args>
+         GLZ_FLATTEN static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
+         {
+            if constexpr (!Opts.ws_handled) {
+               skip_ws<Opts>(ctx, it, end);
+               if (bool(ctx.error)) [[unlikely]]
+                  return;
+            }
+
+            if (*it == '{') {
+               auto start = it;
+               ++it;
+               skip_ws<Opts>(ctx, it, end);
+               if (bool(ctx.error)) [[unlikely]]
+                  return;
+               if (*it == '}') {
+                  it = start;
+                  // empty object
+                  if (value) {
+                     read<json>::op<Opts>(*value, ctx, it, end);
+                  }
+                  else {
+                     value.emplace();
+                     read<json>::op<Opts>(*value, ctx, it, end);
+                  }
+               }
+               else {
+                  // either we have an unexpected value or we are decoding an object
+                  auto& key = string_buffer();
+                  read<json>::op<Opts>(key, ctx, it, end);
+                  if (bool(ctx.error)) [[unlikely]]
+                     return;
+                  if (key == "unexpected") {
+                     skip_ws<Opts>(ctx, it, end);
+                     if (bool(ctx.error)) [[unlikely]]
+                        return;
+                     match<':'>(ctx, it);
+                     if (bool(ctx.error)) [[unlikely]]
+                        return;
+                     // read in unexpected value
+                     if (!value) {
+                        read<json>::op<Opts>(value.error(), ctx, it, end);
+                        if (bool(ctx.error)) [[unlikely]]
+                           return;
+                     }
+                     else {
+                        // set value to unexpected
+                        using error_type = typename std::decay_t<decltype(value)>::error_type;
+                        std::decay_t<error_type> error{};
+                        read<json>::op<Opts>(error, ctx, it, end);
+                        if (bool(ctx.error)) [[unlikely]]
+                           return;
+                        value = glz::unexpected(error);
+                     }
+                     skip_ws<Opts>(ctx, it, end);
+                     if (bool(ctx.error)) [[unlikely]]
+                        return;
+                     match<'}'>(ctx, it);
+                     if (bool(ctx.error)) [[unlikely]]
+                        return;
+                  }
+                  else {
+                     it = start;
+                     if (value) {
+                        read<json>::op<Opts>(*value, ctx, it, end);
+                     }
+                     else {
+                        value.emplace();
+                        read<json>::op<Opts>(*value, ctx, it, end);
+                     }
+                  }
+               }
+            }
+            else {
+               // this is not an object and therefore cannot be an unexpected value
+               if (value) {
+                  read<json>::op<Opts>(*value, ctx, it, end);
+               }
+               else {
+                  value.emplace();
+                  read<json>::op<Opts>(*value, ctx, it, end);
+               }
+            }
+         }
+      };
+
       template <nullable_t T>
+         requires(!is_expected<T>)
       struct from_json<T>
       {
          template <auto Options>
@@ -2448,7 +2556,7 @@ namespace glz
                if (bool(ctx.error)) [[unlikely]]
                   return;
             }
-            static constexpr auto Opts = ws_handled_off<Options>();
+            constexpr auto Opts = ws_handled_off<Options>();
 
             if (*it == 'n') {
                ++it;
@@ -2494,6 +2602,14 @@ namespace glz
       context ctx{};
       glz::skip skip_value{};
       return read<opts{.force_conformance = true}>(skip_value, std::forward<Buffer>(buffer), ctx);
+   }
+
+   template <class Buffer>
+   [[nodiscard]] inline parse_error validate_jsonc(Buffer&& buffer) noexcept
+   {
+      context ctx{};
+      glz::skip skip_value{};
+      return read<opts{}>(skip_value, std::forward<Buffer>(buffer), ctx);
    }
 
    template <class T, class Buffer>

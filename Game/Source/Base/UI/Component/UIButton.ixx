@@ -4,14 +4,14 @@ import fbc.futil;
 import fbc.iDrawable;
 import fbc.hitbox;
 import fbc.uiImage;
-import raylib;
+import sdl;
 
 export namespace fbc {
 	export class UIButton : public UIImage {
 	public:
 
 		UIButton(Hitbox* hb, IDrawable& image) : UIImage(hb, image) {}
-		UIButton(Hitbox* hb, IDrawable& image, raylib::Vector2 origin) : UIImage(hb, image, origin) {}
+		UIButton(Hitbox* hb, IDrawable& image, sdl::Point origin) : UIImage(hb, image, origin) {}
 		~UIButton() override {}
 
 		inline bool isInteractable() { return interactable; }
@@ -42,10 +42,10 @@ export namespace fbc {
 					// TODO play sound
 				}
 
-				if (futil::hasLeftClicked() && this->onClick) {
+				if (sdl::mouseIsLeftJustClicked() && this->onClick) {
 					this->onClick(*this);
 				}
-				else if (futil::hasRightClicked() && this->onRightClick) {
+				else if (sdl::mouseIsRightJustClicked() && this->onRightClick) {
 					this->onRightClick(*this);
 				}
 			}

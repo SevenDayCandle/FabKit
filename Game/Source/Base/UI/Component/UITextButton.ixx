@@ -9,6 +9,7 @@ import fbc.uiButton;
 
 export namespace fbc {
 	export class UITextButton : public UIButton, public TextInfo {
+	public:
 		UITextButton(Hitbox* hb, IDrawable& image, FFont& f) : UIButton(hb, image), TextInfo(f) {}
 		UITextButton(Hitbox* hb, IDrawable& image, FFont& f, str text) : UIButton(hb, image), TextInfo(f, text) {}
 		~UITextButton() override {}

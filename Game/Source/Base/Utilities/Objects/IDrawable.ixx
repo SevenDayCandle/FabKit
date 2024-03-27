@@ -1,7 +1,7 @@
 export module fbc.iDrawable;
 
 import fbc.futil;
-import raylib;
+import sdl;
 
 export namespace fbc {
 	export class IDrawable {
@@ -9,8 +9,8 @@ export namespace fbc {
 		IDrawable() {}
 		virtual ~IDrawable() {}
 
-		virtual void draw(const raylib::Rectangle& destRec, const raylib::Vector2& origin = { 0, 0 }, float rotation = 0, raylib::Color tint = raylib::White) = 0;
-		virtual void draw(const raylib::Rectangle& sourceRec, const raylib::Rectangle& destRec, const raylib::Vector2& origin = { 0, 0 }, float rotation = 0, raylib::Color tint = raylib::White) = 0;
+		virtual void draw(const sdl::RectF* destRec, const sdl::Point& origin, float rotation, const sdl::Color& tint, sdl::RendererFlip flip) = 0;
+		virtual void draw(const sdl::RectI* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, const sdl::Color& tint, sdl::RendererFlip flip) = 0;
 		virtual float getHeight() = 0;
 		virtual float getWidth() = 0;
 	};

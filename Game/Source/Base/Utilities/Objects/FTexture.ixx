@@ -2,154 +2,45 @@ export module fbc.ftexture;
 
 import fbc.futil;
 import fbc.iDrawable;
-import raylib;
+import sdl;
 import std;
 
 export namespace fbc {
-	export class FTexture : public raylib::Texture, public IDrawable {
+	export class FTexture : public IDrawable {
     public:
-        /* Move constructor moves the other texture's data to this one */
-        FTexture(Texture&& other) {
-            this->id = other.id;
-            this->width = other.width;
-            this->height = other.height;
-            this->mipmaps = other.mipmaps;
-            this->format = other.format;
-
-            other.id = 0;
-            other.width = 0;
-            other.height = 0;
-            other.mipmaps = 0;
-            other.format = 0;
+        FTexture(strv path) {
+            texture = sdl::textureLoad(path.data());
+            sdl::textureQuery(texture, &format, &access, &dim.w, &dim.h);
         }
-        /**
-         * Explicitly forbid copy constructor.
-         */
         FTexture(const FTexture&) = delete;
-
-        /**
-         * On destruction, unload the Texture.
-         */
         ~FTexture() {
-            raylib::unloadTexture(*this);
+            // Unload texture when destroyed
+            sdl::textureDestroy(texture);
         }
 
-        /**
-         * Generate GPU mipmaps for a texture
-         */
-        FTexture& genMipmaps() {
-            raylib::genTextureMipmaps(this);
-            return *this;
+        sdl::RectI dim;
+        sdl::Texture* texture;
+        std::uint32_t format;
+        int access;
+        int width;
+        int height;
+
+        void draw(const sdl::RectF* destRec, const sdl::Point& origin = { 0, 0 }, float rotation = 0, const sdl::Color& tint = sdl::WHITE, sdl::RendererFlip flip = SDL_FLIP_NONE) override {
+            sdl::renderSetDrawColor(tint);
+            sdl::renderCopyEx(texture, &dim, destRec, rotation, &origin, flip);
         }
 
-        /**
-         * Get pixel data from GPU texture and return an Image
-         */
-        raylib::Image getData() const {
-            return raylib::loadImageFromTexture(*this);
+        void draw(const sdl::RectI* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin = { 0, 0 }, float rotation = 0, const sdl::Color& tint = sdl::WHITE, sdl::RendererFlip flip = SDL_FLIP_NONE) override {
+            sdl::renderSetDrawColor(tint);
+            sdl::renderCopyEx(texture, sourceRec, destRec, rotation, &origin, flip);
         }
 
-        operator raylib::Image() {
-            return getData();
+        float getHeight() {
+            return dim.h;
         }
 
-        float getHeight() override {
-            return (float) height;
-        }
-
-        float getWidth() override {
-            return (float) width;
-        }
-
-        /**
-         * Set texture scaling filter mode
-         */
-        FTexture& setFilter(int filterMode) {
-            raylib::setTextureFilter(*this, filterMode);
-            return *this;
-        }
-
-        /**
-         * Update GPU texture with new data
-         */
-        FTexture& setPixels(const void* pixels) {
-            raylib::updateTexture(*this, pixels);
-            return *this;
-        }
-
-        /**
-         * Set shader uniform value for texture (sampler2d)
-         */
-        FTexture& setShader(const raylib::Shader& shader, int locIndex) {
-            raylib::setShaderValueTexture(shader, locIndex, *this);
-            return *this;
-        }
-
-        /**
-         * Set texture wrapping mode
-         */
-        FTexture& setWrap(int wrapMode) {
-            raylib::setTextureWrap(*this, wrapMode);
-            return *this;
-        }
-
-        /**
-         * Draw a Texture2D
-         *
-         * @see ::DrawTexture()
-         */
-        void draw(int posX = 0, int posY = 0, const raylib::Color& tint = raylib::White) {
-            raylib::drawTexture(*this, posX, posY, tint);
-        }
-
-        /**
-         * Draw a Texture2D with position defined as Vector2
-         *
-         * @see ::DrawTextureV()
-         */
-        void draw(const raylib::Vector2& position, const raylib::Color& tint = raylib::White) {
-            raylib::drawTextureV(*this, position, tint);
-        }
-
-        /**
-         * Draw a Texture2D with extended parameters
-         *
-         * @see ::DrawTextureEx()
-         */
-        void draw(const raylib::Vector2& position, float rotation, float scale = 1.0f,
-            raylib::Color tint = raylib::White) {
-            raylib::drawTextureEx(*this, position, rotation, scale, tint);
-        }
-
-        /**
-         * Draw a part of a texture defined by a rectangle
-         *
-         * @see ::DrawTextureRec()
-         */
-        void draw(const raylib::Rectangle& sourceRec, const raylib::Vector2& position = { 0, 0 },
-            raylib::Color tint = raylib::White) {
-            raylib::drawTextureRec(*this, sourceRec, position, tint);
-        }
-
-        /**
-         * Draw a part of a texture defined by a rectangle with 'pro' parameters
-         *
-         * @see ::DrawTexturePro()
-         */
-        void draw(const raylib::Rectangle& destRec, const raylib::Vector2& origin = { 0, 0 },
-            float rotation = 0, raylib::Color tint = raylib::White) override {
-            raylib::drawTexturePro(*this, { 0, 0, (float)this->width, (float)this->height }, destRec, origin, rotation, tint);
-        }
-
-        void draw(const raylib::Rectangle& sourceRec, const raylib::Rectangle& destRec, const raylib::Vector2& origin = { 0, 0 },
-            float rotation = 0, raylib::Color tint = raylib::White) override {
-            raylib::drawTexturePro(*this, sourceRec, destRec, origin, rotation, tint);
-        }
-
-        /** Wrapper function around raylib::loadTexture to get an FTexture instead of a Texture **/
-        static uptr<FTexture> loadTexture(const str& fileName) {
-            Texture tex = raylib::loadTexture(fileName.c_str());
-            return std::make_unique<FTexture>(std::move(tex));
+        float getWidth() {
+            return dim.w;
         }
 	};
 }

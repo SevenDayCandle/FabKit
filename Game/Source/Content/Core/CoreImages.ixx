@@ -7,16 +7,17 @@ import fbc.cache;
 import fbc.coreConfig;
 import fbc.ftexture;
 import fbc.futil;
-import raylib;
 
 export namespace fbc {
 	export class CoreImages : public BaseImages {
 	public:
 		CoreImages(BaseContent& cnt) : BaseImages(cnt) {
+			panelCache = std::make_unique<Cache<BorderedDrawable>>([this]() { return BorderedDrawable(panelCenter(), panelBorderB(), panelBorderL(), panelBorderR(), panelBorderT(), panelCornerBL(), panelCornerBR(), panelCornerTL(), panelCornerTR()); });
+			smallPanelCache = std::make_unique<Cache<BorderedDrawable>>([this]() { return BorderedDrawable(panelCenter(), smallPanelBorderB(), smallPanelBorderL(), smallPanelBorderR(), smallPanelBorderT(), smallPanelCornerBL(), smallPanelCornerBR(), smallPanelCornerTL(), smallPanelCornerTR()); });
 		}
 
-		Cache<BorderedDrawable> panel = Cache<BorderedDrawable>([this]() { return BorderedDrawable(panelCenter(), panelBorderB(), panelBorderL(), panelBorderR(), panelBorderT(), panelCornerBL(), panelCornerBR(), panelCornerTL(), panelCornerTR()); });
-		Cache<BorderedDrawable> smallPanel = Cache<BorderedDrawable>([this]() { return BorderedDrawable(panelCenter(), smallPanelBorderB(), smallPanelBorderL(), smallPanelBorderR(), smallPanelBorderT(), smallPanelCornerBL(), smallPanelCornerBR(), smallPanelCornerTL(), smallPanelCornerTR()); });
+		inline BorderedDrawable& panel() { return *panelCache.get(); }
+		inline BorderedDrawable& smallPanel() { return *smallPanelCache.get(); }
 
 		inline FTexture& panelBorderB() { return getTexture("UI/Panel_Border_B.png"); };
 		inline FTexture& panelBorderL() { return getTexture("UI/Panel_Border_L.png"); };
@@ -36,5 +37,8 @@ export namespace fbc {
 		inline FTexture& smallPanelCornerTL() { return getTexture("UI/SmallPanel_Corner_TL.png"); };
 		inline FTexture& smallPanelCornerTR() { return getTexture("UI/SmallPanel_Corner_TR.png"); };
 		inline FTexture& squareButton() { return getTexture("UI/SquareButton.png"); };
+	private:
+		uptr<Cache<BorderedDrawable>> panelCache;
+		uptr<Cache<BorderedDrawable>> smallPanelCache;
 	};
 }

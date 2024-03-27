@@ -1,27 +1,27 @@
 export module fbc.hitbox;
 
 import fbc.futil;
-import raylib;
+import sdl;
 
 export namespace fbc {
-	export class Hitbox : public raylib::Rectangle {
+	export class Hitbox : public sdl::RectF {
 	public:
-		Hitbox(): raylib::Rectangle() {}
-		Hitbox(float offsetX, float offsetY, float offsetWidth, float offsetHeight) : raylib::Rectangle(), offsetX(offsetX), offsetY(offsetY), offsetWidth(offsetWidth), offsetHeight(offsetHeight) {}
+		Hitbox(): sdl::RectF() {}
+		Hitbox(float offsetX, float offsetY, float offsetWidth, float offsetHeight) : sdl::RectF(), offsetX(offsetX), offsetY(offsetY), offsetWidth(offsetWidth), offsetHeight(offsetHeight) {}
 		virtual ~Hitbox() {}
 
-		inline bool isClicked() { return hovered && futil::hasLeftClicked(); };
-		inline bool isClickedRight() { return hovered && futil::hasRightClicked(); };
+		inline bool isClicked() { return hovered && sdl::mouseIsLeftClicked(); };
+		inline bool isClickedRight() { return hovered && sdl::mouseIsRightClicked(); };
 		inline bool isHovered() const { return hovered; }
 		inline bool isJust() const { return just; }
-		inline bool justClicked() { return hovered && futil::holdingLeftClick(); };
-		inline bool justClickedRight() { return hovered && futil::holdingRightClick(); };
+		inline bool justClicked() { return hovered && sdl::mouseIsLeftJustClicked(); };
+		inline bool justClickedRight() { return hovered && sdl::mouseIsRightJustClicked(); };
 		inline bool justHovered() const { return hovered && just; }
-		inline float cX() { return (x + width) / 2; }
-		inline float cY() { return (y + height) / 2; }
+		inline float cX() { return (x + w) / 2; }
+		inline float cY() { return (y + h) / 2; }
 		inline float getOffsetX() { return offsetX; }
 		inline float getOffsetY() { return offsetY; }
-		inline Hitbox& moveCenter(const float x, const float y) { return move(x - (width / 2), y - (height / 2)); }
+		inline Hitbox& moveCenter(const float x, const float y) { return move(x - (w / 2), y - (h / 2)); }
 		Hitbox& setOffsetPos(const float x, const float y);
 		Hitbox& setOffsetSize(const float x, const float y);
 		Hitbox& setOffsetX(const float x);
@@ -47,9 +47,9 @@ export namespace fbc {
 
 	// Return true if the mouse is within the rectangle
 	bool Hitbox::isMouseInHoverRange() {
-		int mx = raylib::getMouseX();
-		int my = raylib::getMouseY();
-		return mx > x && my > y && mx < x + width && my < y + height;
+		int mx = sdl::mouseGetX();
+		int my = sdl::mouseGetY();
+		return mx >= x && my >= y && mx < x + w && my < y + h;
 	}
 
 	// Move the bottom-left corner of the ui
@@ -63,8 +63,8 @@ export namespace fbc {
 	// Resize the ui
 	Hitbox& Hitbox::resize(const float x, const float y)
 	{
-		this->width = x;
-		this->height = y;
+		this->w = x;
+		this->h = y;
 		return *this;
 	}
 

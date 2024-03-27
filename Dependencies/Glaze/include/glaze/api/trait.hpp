@@ -8,7 +8,7 @@
 #include "glaze/api/hash.hpp"
 #include "glaze/core/common.hpp"
 #include "glaze/core/meta.hpp"
-#include "glaze/util/string_view.hpp"
+#include "glaze/util/string_literal.hpp"
 
 namespace glz
 {
@@ -67,45 +67,45 @@ namespace glz
       static constexpr sv members = glz::name_v<glz::detail::member_tuple_t<T>>;
 
       static constexpr sv to_hash =
-         detail::join_v<type_name_hash,
+         join_v<type_name_hash,
 
-                        type_size_hash,
+                type_size_hash,
 
-                        major_version, minor_version, revision,
+                major_version, minor_version, revision,
 
-                        is_trivial, is_standard_layout,
+                is_trivial, is_standard_layout,
 
-                        is_default_constructible, is_trivially_default_constructible, is_nothrow_default_constructible,
+                is_default_constructible, is_trivially_default_constructible, is_nothrow_default_constructible,
 
-                        is_trivially_copyable,
+                is_trivially_copyable,
 
-                        is_move_constructible, is_trivially_move_constructible, is_nothrow_move_constructible,
+                is_move_constructible, is_trivially_move_constructible, is_nothrow_move_constructible,
 
-                        is_destructible, is_trivially_destructible, is_nothrow_destructible,
+                is_destructible, is_trivially_destructible, is_nothrow_destructible,
 
-                        has_unique_object_representations,
+                has_unique_object_representations,
 
-                        is_polymorphic, has_virtual_destructor, is_aggregate,
+                is_polymorphic, has_virtual_destructor, is_aggregate,
 
 #ifdef __clang__
-                        clang,
+                clang,
 #endif
 #ifdef __GNUC__
-                        gnuc,
+                gnuc,
 #endif
 #ifdef _MSC_VER
-                        msvc,
+                msvc,
 #endif
-                        blank,
+                blank,
 
-                        members>;
+                members>;
 
      private:
       static constexpr sv v = "v";
       static constexpr sv comma = ",";
 
      public:
-      static constexpr sv version_sv = detail::join_v<v, major_version, comma, minor_version, comma, revision>;
+      static constexpr sv version_sv = join_v<v, major_version, comma, minor_version, comma, revision>;
       static constexpr version_t version = ::glz::version<T>;
 
       static constexpr sv hash = hash128_v<to_hash>;

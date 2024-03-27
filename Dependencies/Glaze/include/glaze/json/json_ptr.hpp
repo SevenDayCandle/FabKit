@@ -12,7 +12,7 @@
 #include "glaze/core/read.hpp"
 #include "glaze/json/read.hpp"
 #include "glaze/util/parse.hpp"
-#include "glaze/util/string_view.hpp"
+#include "glaze/util/string_literal.hpp"
 
 namespace glz
 {
@@ -101,7 +101,7 @@ namespace glz
          }
 
          if constexpr (glaze_object_t<T> || reflectable<T>) {
-            decltype(auto) frozen_map = [&] {
+            decltype(auto) frozen_map = [&]() -> decltype(auto) {
                if constexpr (reflectable<T>) {
 #if ((defined _MSC_VER) && (!defined __clang__))
                   static thread_local auto cmap = make_map<T>();
@@ -478,13 +478,11 @@ namespace glz
       size_t start{};
 
       for_each<n_unique>([&](auto I) {
-         // NOTE: VS 2019 wont let us grab n_items_per_group as constexpr unless
-         // its static but this is a constexpr func This is fixed in VS 2022
-         constexpr size_t n_items = std::tuple_size_v<std::decay_t<decltype(glz::get<I>(arrs).second)>>;
+         constexpr size_t n_items = n_items_per_group[I];
 
          glz::get<I>(arrs).first = unique_keys[I];
          glz::get<I>(arrs).second = glz::sub_group<n_items, Arr>(start);
-         start += n_items_per_group[I];
+         start += n_items;
       });
 
       return arrs;

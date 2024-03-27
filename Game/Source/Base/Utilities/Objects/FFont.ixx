@@ -2,73 +2,46 @@ export module fbc.ffont;
 
 import fbc.ftexture;
 import fbc.futil;
-import raylib;
+import sdl;
 import std;
 
 export namespace fbc {
-	export class FFont : public raylib::Font {
+	export class FFont {
     public:
-        FFont(int baseSize,int glyphCount,int glyphPadding, const raylib::Texture& texture, raylib::Rectangle* recs = nullptr, raylib::GlyphInfo* glyphs = nullptr)
-            : raylib::Font{ baseSize, glyphCount, glyphPadding, texture, recs, glyphs } {
+        FFont(strv path, int size = 12, int outlineSize = 4): size(size), outlineSize(outlineSize) {
+            font = sdl::fontOpen(path.data(), size);
         }
-        /* Move constructor moves the other texture's data to this one */
-        FFont(Font&& other) {
-            baseSize = other.baseSize;
-            glyphCount = other.glyphCount;
-            glyphPadding = other.glyphPadding;
-            texture = other.texture;
-            recs = other.recs;
-            glyphs = other.glyphs;
-
-            other.baseSize = 0;
-            other.glyphCount = 0;
-            other.glyphPadding = 0;
-            other.texture = {};
-            other.recs = nullptr;
-            other.glyphs = nullptr;
-        }
-        /**
-         * Explicitly forbid copy constructor.
-         */
         FFont(const FFont&) = delete;
-
-        /**
-		 * On destruction, unload the font.
-		 */
         ~FFont() {
-            raylib::unloadFont(*this);
+            // Unload font when destroyed
+            sdl::fontClose(font);
         }
 
-        // Write the given text
-        void draw(const str& text, const raylib::Vector2& position, float fontSize, float spacing, const raylib::Color& tint = raylib::White) const {
-            raylib::drawTextEx(*this, text.c_str(), position, fontSize, spacing, tint);
-        }
+        sdl::Font* font;
+        int outlineSize;
+        int size;
 
-        void draw(const str& text, float posX, float posY, float fontSize, float spacing, const raylib::Color& tint = raylib::White) const {
-            raylib::drawTextEx(*this, text.c_str(),
-                { posX, posY },
-                fontSize, spacing, tint);
-        }
-
-        void draw(const str& text, const raylib::Vector2& position, const raylib::Vector2& origin, float rotation, float fontSize, float spacing, const raylib::Color& tint = raylib::White) const {
-            raylib::drawTextPro(*this, text.c_str(), position, origin, rotation, fontSize, spacing, tint);
-        }
-
-        void draw(int codepoint, const raylib::Vector2& position, float fontSize, raylib::Color tint = raylib::White) const {
-            raylib::drawTextCodepoint(*this, codepoint, position, fontSize, tint);
-        }
-
-        void draw(const int* codepoints,int count, const raylib::Vector2& position,float fontSize, float spacing, const raylib::Color& tint = raylib::White) const {
-            raylib::drawTextCodepoints(*this,
-                codepoints, count,
-                position, fontSize,
-                spacing, tint);
-        }
-
-        /** Wrapper function around raylib::loadFont to get an FFont instead of a Font **/
-        static uptr<FFont> loadFont(const str& path) {
-            Font f = raylib::loadFont(path.c_str());
-            return std::make_unique<FFont>(std::move(f));
-        }
+        void draw(strv text, float x, float y, sdl::Color color, sdl::Color outlineColor);
 	};
+
+
+    void FFont::draw(strv text, float x, float y, sdl::Color color = sdl::WHITE, sdl::Color outlineColor = sdl::BLACK)
+    {
+        sdl::fontOutlineSet(font, outlineSize);
+        sdl::Surface* outlineSurf = sdl::textRenderSolid(font, text.data(), outlineColor);
+        sdl::Texture* outlineTex = sdl::textureCreateFromSurface(outlineSurf);
+        sdl::RectF outlineRect = { x, y, outlineSurf->w, outlineSurf->h };
+        sdl::renderCopy(outlineTex, nullptr, &outlineRect);
+        sdl::surfaceFree(outlineSurf);
+        sdl::textureDestroy(outlineTex);
+
+        // Render the text on top
+        sdl::fontOutlineSet(font, 0); // Reset outline to zero for main text
+        sdl::Surface* textSurf = sdl::textRenderSolid(font, text.data(), color);
+        sdl::Texture* textTex = sdl::textureCreateFromSurface(textSurf);
+        sdl::RectF textRect = { x - outlineSize, y - outlineSize, textSurf->w, textSurf->h };
+        sdl::renderCopy(textTex, nullptr, &textRect);
+        sdl::surfaceFree(textSurf);
+        sdl::textureDestroy(textTex);
+    }
 }

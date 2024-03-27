@@ -4,7 +4,7 @@ import fbc.config;
 import fbc.configItem;
 import fbc.futil;
 import fbc.gameLanguage;
-import raylib;
+import sdl;
 import std;
 
 float renderScalePrivate = 1;
@@ -16,10 +16,9 @@ export namespace fbc {
 		CoreConfig(strv ID) : Config(ID) {}
 
 		ConfigItem<int> gameActionSpeed = ConfigItem<int>(*this, "GameActionSpeed", 3);
-		ConfigItem<bool> graphicsIsBorderless = ConfigItem<bool>(*this, "GraphicsIsBorderless", false);
-		ConfigItem<bool> graphicsIsFullScreen = ConfigItem<bool>(*this, "GraphicsIsFullScreen", false);
 		ConfigItem<bool> graphicsVSync = ConfigItem<bool>(*this, "GraphicsVSync", false);
 		ConfigItem<int> graphicsFPS = ConfigItem<int>(*this, "GraphicsFPS", 60);
+		ConfigItem<int> graphicsWindowMode = ConfigItem<int>(*this, "GraphicsFPS", 0);
 		ConfigItem<bool> graphicsParticleEffects = ConfigItem<bool>(*this, "GraphicsParticleEffects", true);
 		ConfigItem<int> graphicsResolutionX = ConfigItem<int>(*this, "GraphicsResolutionX", 1920);
 		ConfigItem<int> graphicsResolutionY = ConfigItem<int>(*this, "GraphicsResolutionY", 1080);
@@ -41,17 +40,9 @@ export namespace fbc {
 
 	// Update the window from the config
 	export void refreshWindow() {
-		raylib::setWindowSize(cfg.graphicsResolutionX.get(), cfg.graphicsResolutionY.get());
-		if (raylib::isWindowFullscreen() != cfg.graphicsIsFullScreen.get()) {
-			raylib::toggleFullscreen();
-		}
+		sdl::windowSetSize(cfg.graphicsResolutionX.get(), cfg.graphicsResolutionY.get());
+		sdl::windowSetFullscreen(cfg.graphicsWindowMode.get());
 		renderScalePrivate = cfg.graphicsResolutionX.get() / BASE_WIDTH;
-	}
-
-	// Update graphics settings from the config
-	export void refreshGraphics() {
-		raylib::setTargetFPS(cfg.graphicsFPS.get());
-		refreshWindow();
 	}
 
 	// Return the current render scale for the window
@@ -62,10 +53,5 @@ export namespace fbc {
 	// Return the size scaled by renderScale
 	export float renderScale(float mult) {
 		return renderScalePrivate * mult;
-	}
-
-	export void initializeCfg() {
-		cfg.initialize();
-		raylib::initWindow(getScreenXSize(), getScreenYSize(), "Fabricate");
-	}
+	} 
 }

@@ -1,43 +1,60 @@
 import fbc.coreConfig;
+import fbc.coreContent;
 import fbc.screenManager;
 import fbc.titleScreen;
-import raylib;
+import sdl;
+
+using namespace fbc;
 
 void dispose() {
 	// TODO save game state as necessary
+	sdl::quit();
 }
 
 void draw() {
-	raylib::beginDrawing();
-	raylib::clearBackground(raylib::White);
+	sdl::renderSetDrawColor(sdl::BLACK);
+	sdl::renderClear();
 
-	fbc::screenManager::render();
+	screenManager::render();
 
-	raylib::endDrawing();
+	sdl::renderPresent();
 }
 
 void update() {
-	fbc::screenManager::update();
+	screenManager::update();
 }
 
-void initialize() {
-	fbc::initializeCfg();
-	fbc::screenManager::openScreen(std::make_unique<fbc::TitleScreen>());
+bool initialize() {
+	if (!sdl::initSDL()) {
+		return false;
+	}
+
+	cfg.initialize();
+	cct.initialize();
+
+	sdl::initWindow(cfg.graphicsResolutionX.get(), cfg.graphicsResolutionY.get(), cfg.graphicsWindowMode.get(), cfg.graphicsVSync.get());
+
+	screenManager::openScreen(std::make_unique<fbc::TitleScreen>());
+	return true;
 }
 
 int main()
 {
-	raylib::setExitKey(raylib::KeyboardKey::KEY_NULL); // Don't close the game when esc is pressed
+	if (!initialize()) {
+		return -1;
+	}
 
-	initialize();
-
-	while(!raylib::windowShouldClose())
+	while(sdl::poll())
 	{
 		update();
 		draw();
+		
+		// Only limit frame if vsync is off
+		if (!cfg.graphicsVSync.get()) {
+			sdl::capFrame(cfg.graphicsFPS.get());
+		}
 	}
 
 	dispose();
-
-	raylib::closeWindow();
+	return 0;
 }

@@ -1,6 +1,6 @@
 export module fbc.futil;
 
-import raylib;
+import sdl;
 import std;
 
 // std shorthands
@@ -32,21 +32,5 @@ export namespace fbc::futil {
 
 	export template <typename T, typename Pred> bool any(const T& container, Pred predicate) {
 		return std::any_of(container.begin(), container.end(), predicate);
-	}
-
-	export bool hasLeftClicked() {
-		return raylib::isMouseButtonPressed(raylib::MouseButton::MOUSE_BUTTON_LEFT);
-	}
-
-	export bool hasRightClicked() {
-		return raylib::isMouseButtonPressed(raylib::MouseButton::MOUSE_BUTTON_RIGHT);
-	}
-
-	export bool holdingLeftClick() {
-		return raylib::isMouseButtonDown(raylib::MouseButton::MOUSE_BUTTON_LEFT);
-	}
-
-	export bool holdingRightClick() {
-		return raylib::isMouseButtonDown(raylib::MouseButton::MOUSE_BUTTON_RIGHT);
 	}
 }
