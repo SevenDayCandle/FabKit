@@ -13,7 +13,9 @@ export namespace fbc {
 
 		void initialize() override;
 
+		inline str screen_setup_header() { return uiStrings["screen_setup_header"]; };
 		inline str screen_title_header() { return uiStrings["screen_title_header"]; };
+		inline str ui_close() { return uiStrings["ui_close"]; };
 	private:
 		unmap<str, KeywordStrings> keywordStrings;
 		unmap<str, str> uiStrings;

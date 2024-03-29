@@ -19,6 +19,8 @@ export namespace fbc {
 
 	void UITextButton::renderImpl() {
 		UIButton::renderImpl();
-		TextInfo::drawText(hb->x, hb->cY());
+		float textX = hb->x + (hb->w - getTextWidth()) / 2;
+		float textY = hb->cY() - (getTextHeight() / 2);
+		TextInfo::drawText(textX, textY);
 	}
 }

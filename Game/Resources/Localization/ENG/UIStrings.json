@@ -1,3 +1,5 @@
 {
-  "screen_title_header": "Fabricate"
+    "screen_setup_header": "Setup Run",
+    "screen_title_header": "Fabricate",
+    "ui_close": "Close"
 }

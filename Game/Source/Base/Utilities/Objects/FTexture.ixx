@@ -24,17 +24,19 @@ export namespace fbc {
             }
         }
 
+        inline sdl::RectI* getBaseRec() override { return &dim; }
+        inline float getHeight() override { return dim.h; }
+        inline float getWidth() override { return dim.w; }
+
+        void dispose();
+        void drawBase(const sdl::RectI* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip) override;
+        void setDrawBlend(const sdl::BlendMode bl) override;
+        void setDrawColor(const sdl::Color& tint) override;
+    private:
         sdl::RectI dim;
         sdl::Texture* texture;
         std::uint32_t format;
         int access;
-
-        inline float getHeight() { return dim.h; }
-        inline float getWidth() { return dim.w; }
-
-        void dispose();
-        void draw(const sdl::RectF* destRec, const sdl::Point& origin = { 0, 0 }, float rotation = 0, const sdl::Color& tint = sdl::WHITE, sdl::RendererFlip flip = SDL_FLIP_NONE) override;
-        void draw(const sdl::RectI* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin = { 0, 0 }, float rotation = 0, const sdl::Color& tint = sdl::WHITE, sdl::RendererFlip flip = SDL_FLIP_NONE) override;
 	};
 
     void FTexture::dispose()
@@ -43,13 +45,19 @@ export namespace fbc {
         texture = nullptr;
     }
 
-    void FTexture::draw(const sdl::RectF* destRec, const sdl::Point& origin, float rotation, const sdl::Color& tint, sdl::RendererFlip flip) {
-        sdl::renderSetDrawColor(tint);
+    void FTexture::drawBase(const sdl::RectI* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip)
+    {
         sdl::renderCopyEx(texture, &dim, destRec, rotation, &origin, flip);
     }
 
-    void FTexture::draw(const sdl::RectI* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, const sdl::Color& tint, sdl::RendererFlip flip) {
-        sdl::renderSetDrawColor(tint);
-        sdl::renderCopyEx(texture, sourceRec, destRec, rotation, &origin, flip);
+    void FTexture::setDrawBlend(const sdl::BlendMode bl)
+    {
+        sdl::textureSetBlendMode(texture, bl);
+    }
+
+    void FTexture::setDrawColor(const sdl::Color& tint)
+    {
+        sdl::textureSetColorMod(texture, tint.r, tint.g, tint.b);
+        sdl::textureSetAlphaMod(texture, tint.a);
     }
 }

@@ -30,7 +30,7 @@ export namespace fbc {
 
 	void UIImage::renderImpl() {
 		this->UITipHoverable::renderImpl();
-		image.draw(hb.get(), origin, rotation, color, flip);
+		image.draw(hb.get(), color, origin, rotation, flip);
 	}
 
 	void UIImage::updateImpl() {

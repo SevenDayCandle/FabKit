@@ -19,6 +19,7 @@ export template <typename T, typename U> using unmap = std::unordered_map<T, U>;
 export template <typename R, typename... Args > using func = std::function<R>;
 export using str = std::string;
 export using strv = std::string_view;
+export using uint32 = std::uint32_t;
 export using path = std::filesystem::path;
 
 export namespace fbc::futil {

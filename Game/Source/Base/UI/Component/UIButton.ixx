@@ -22,7 +22,7 @@ export namespace fbc {
 		virtual void renderImpl() override;
 		virtual void updateImpl() override;
 	protected:
-		bool interactable;
+		bool interactable = true;
 	private:
 		func<void(UIButton&)> onClick;
 		func<void(UIButton&)> onRightClick;
@@ -30,7 +30,9 @@ export namespace fbc {
 
 	void UIButton::renderImpl() {
 		UIImage::renderImpl();
-		// TODO highlight if hovered
+		if (hb->isHovered()) {
+			image.draw(hb.get(), SDL_BLENDMODE_ADD, color, origin, rotation, flip);
+		}
 	}
 
 	void UIButton::updateImpl() {

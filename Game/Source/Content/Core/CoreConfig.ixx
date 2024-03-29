@@ -29,6 +29,8 @@ export namespace fbc {
 		ConfigItem<str> textFont = ConfigItem<str>(*this, "TextFont", FONT_REGULAR);
 		ConfigItem<bool> textIcons = ConfigItem<bool>(*this, "TextIcons", false);
 		ConfigItem<GameLanguage> textLanguage = ConfigItem<GameLanguage>(*this, "TextIcons", GameLanguage::ENG);
+
+		void postInitialize() override;
 	};
 
 	export CoreConfig cfg = CoreConfig(futil::FBC);
@@ -55,4 +57,11 @@ export namespace fbc {
 	export float renderScale(float mult) {
 		return renderScalePrivate * mult;
 	} 
+
+
+	// Sets up render scale
+	void CoreConfig::postInitialize()
+	{
+		renderScalePrivate = cfg.graphicsResolutionX.get() / BASE_WIDTH;
+	}
 }

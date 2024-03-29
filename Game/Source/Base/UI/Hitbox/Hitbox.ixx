@@ -7,6 +7,7 @@ export namespace fbc {
 	export class Hitbox : public sdl::RectF {
 	public:
 		Hitbox(): sdl::RectF() {}
+		Hitbox(float offsetWidth, float offsetHeight) : sdl::RectF(), offsetWidth(offsetWidth), offsetHeight(offsetHeight) {}
 		Hitbox(float offsetX, float offsetY, float offsetWidth, float offsetHeight) : sdl::RectF(), offsetX(offsetX), offsetY(offsetY), offsetWidth(offsetWidth), offsetHeight(offsetHeight) {}
 		virtual ~Hitbox() {}
 
@@ -17,8 +18,8 @@ export namespace fbc {
 		inline bool justClicked() { return hovered && sdl::mouseIsLeftJustClicked(); };
 		inline bool justClickedRight() { return hovered && sdl::mouseIsRightJustClicked(); };
 		inline bool justHovered() const { return hovered && just; }
-		inline float cX() { return (x + w) / 2; }
-		inline float cY() { return (y + h) / 2; }
+		inline float cX() { return x + (w / 2); }
+		inline float cY() { return y + (h / 2); }
 		inline float getOffsetX() { return offsetX; }
 		inline float getOffsetY() { return offsetY; }
 		inline Hitbox& moveCenter(const float x, const float y) { return move(x - (w / 2), y - (h / 2)); }
@@ -45,7 +46,7 @@ export namespace fbc {
 		virtual bool isMouseInHoverRange();
 	};
 
-	// Return true if the mouse is within the rectangle
+	// Return true if the mouse is within the rectangle. Note that the Y coordinates goes from top to bottom, with 0,0 being the top-left corner of the screen
 	bool Hitbox::isMouseInHoverRange() {
 		int mx = sdl::mouseGetX();
 		int my = sdl::mouseGetY();

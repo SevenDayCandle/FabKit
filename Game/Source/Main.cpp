@@ -31,6 +31,7 @@ bool initialize() {
 	}
 
 	cfg.initialize();
+	cfg.postInitialize();
 	cct.initialize();
 
 	sdl::initWindow(cfg.graphicsResolutionX.get(), cfg.graphicsResolutionY.get(), cfg.graphicsWindowMode.get(), cfg.graphicsVSync.get());

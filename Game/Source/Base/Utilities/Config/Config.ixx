@@ -19,6 +19,8 @@ export namespace fbc {
         inline void addOnReload(func<void()> callback) {
             items.push_back(callback);
         }
+        inline virtual void postInitialize() {}
+
         void commit();
         str getValue(const str& key);
         void initialize();

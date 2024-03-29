@@ -29,16 +29,18 @@ export namespace fbc {
 		FTexture& cornerTL;
 		FTexture& cornerTR;
 
+		inline sdl::RectI* getBaseRec() override { return base.getBaseRec(); }
 		inline float getHeight() override { return base.getHeight();}
 		inline float getWidth() override { return base.getWidth(); }
 
-		void draw(const sdl::RectF* destRec, const sdl::Point& origin = { 0, 0 }, float rotation = 0, const sdl::Color& tint = sdl::WHITE, sdl::RendererFlip flip = SDL_FLIP_NONE) override;
-		void draw(const sdl::RectI* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin = { 0, 0 }, float rotation = 0, const sdl::Color& tint = sdl::WHITE, sdl::RendererFlip flip = SDL_FLIP_NONE) override;
+		void drawBase(const sdl::RectI* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip) override;
+		void setDrawBlend(const sdl::BlendMode bl) override;
+		void setDrawColor(const sdl::Color& tint) override;
 	};
 
 	// Draw the base stretched around destRec, then draw the corners and edges around destRec
 	// Assumes that corner and border textures have the exact same size
-	void BorderedDrawable::draw(const sdl::RectF* destRec, const sdl::Point& origin, float rotation, const sdl::Color& tint, sdl::RendererFlip flip) {
+	void BorderedDrawable::drawBase(const sdl::RectI* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip) {
 		float width = cornerTL.getWidth();
 		float height = cornerTL.getHeight();
 		float left = destRec->x - width;
@@ -54,19 +56,41 @@ export namespace fbc {
 		sdl::RectF br = { right, destRec->y, width, destRec->h };
 		sdl::RectF bb = { destRec->x, bottom, destRec->w, height };
 
-		base.draw(destRec, origin, rotation, tint, flip);
-		cornerTL.draw(&ctl, origin, rotation, tint, flip);
-		cornerTR.draw(&ctr, origin, rotation, tint, flip);
-		cornerBL.draw(&cbl ,origin, rotation, tint, flip);
-		cornerBR.draw(&cbr, origin, rotation, tint, flip);
-		borderT.draw(&bt, origin, rotation, tint, flip);
-		borderL.draw(&bl, origin, rotation, tint, flip);
-		borderR.draw(&br, origin, rotation, tint, flip);
-		borderB.draw(&bb, origin, rotation, tint, flip);
+		base.draw(destRec, origin, rotation, flip);
+		cornerTL.draw(&ctl, origin, rotation, flip);
+		cornerTR.draw(&ctr, origin, rotation, flip);
+		cornerBL.draw(&cbl ,origin, rotation, flip);
+		cornerBR.draw(&cbr, origin, rotation, flip);
+		borderT.draw(&bt, origin, rotation, flip);
+		borderL.draw(&bl, origin, rotation, flip);
+		borderR.draw(&br, origin, rotation, flip);
+		borderB.draw(&bb, origin, rotation, flip);
 	}
 
-	// Unsupported, falls back to base draw function
-	void BorderedDrawable::draw(const sdl::RectI* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, const sdl::Color& tint, sdl::RendererFlip flip) {
-		draw(destRec, origin, rotation, tint, flip);
+	void BorderedDrawable::setDrawBlend(const sdl::BlendMode bl)
+	{
+		base.setDrawBlend(bl);
+		cornerTL.setDrawBlend(bl);
+		cornerTR.setDrawBlend(bl);
+		cornerBL.setDrawBlend(bl);
+		cornerBR.setDrawBlend(bl);
+		borderT.setDrawBlend(bl);
+		borderL.setDrawBlend(bl);
+		borderR.setDrawBlend(bl);
+		borderB.setDrawBlend(bl);
+	}
+
+	void BorderedDrawable::setDrawColor(const sdl::Color& tint)
+	{
+		base.setDrawColor(tint);
+		base.setDrawColor(tint);
+		cornerTL.setDrawColor(tint);
+		cornerTR.setDrawColor(tint);
+		cornerBL.setDrawColor(tint);
+		cornerBR.setDrawColor(tint);
+		borderT.setDrawColor(tint);
+		borderL.setDrawColor(tint);
+		borderR.setDrawColor(tint);
+		borderB.setDrawColor(tint);
 	}
 }

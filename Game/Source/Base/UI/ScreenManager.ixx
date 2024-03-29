@@ -25,6 +25,7 @@ export namespace fbc::screenManager {
 		if (!screens.empty()) {
 			fbc::BaseScreen& screen = *screens.front();
 			screen.close();
+			screens.pop_front();
 			closeAllOverlays();
 			if (!screens.empty()) {
 				screens.front()->open();
