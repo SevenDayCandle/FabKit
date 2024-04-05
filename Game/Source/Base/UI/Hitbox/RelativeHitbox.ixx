@@ -11,7 +11,7 @@ export namespace fbc {
 		RelativeHitbox(Hitbox& parent) : parent(parent) {
 			RelativeHitbox::refreshSize();
 		}
-		RelativeHitbox(Hitbox& parent, float offsetX, float offsetY, float offsetWidth, float offsetHeight) : parent(parent), Hitbox(offsetX, offsetY, offsetWidth, offsetHeight) {
+		RelativeHitbox(Hitbox& parent, float parentOffsetX, float parentOffsetY, float offsetWidth, float offsetHeight) : parent(parent), Hitbox(parentOffsetX, parentOffsetY, offsetWidth, offsetHeight) {
 			RelativeHitbox::refreshSize();
 		}
 		~RelativeHitbox() override {}
@@ -19,6 +19,7 @@ export namespace fbc {
 		Hitbox& parent;
 		void refreshPosition() override;
 		void refreshSize() override;
+		void update() override;
 	};
 
 	// Refresh coordinates starting from parent's starting coordinates
@@ -32,6 +33,13 @@ export namespace fbc {
 	void RelativeHitbox::refreshSize() {
 		w = renderScale() * offsetWidth;
 		h = renderScale() * offsetHeight;
+		refreshPosition();
+	}
+
+	// Position should always remain relative to the parent
+	void RelativeHitbox::update()
+	{
+		Hitbox::update();
 		refreshPosition();
 	}
 }

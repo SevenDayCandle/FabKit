@@ -70,6 +70,16 @@ export namespace sdl {
 	/* Mouse state functions */
 	export int mouseGetX() { return mousePosX; }
 	export int mouseGetY() { return mousePosY; }
+	export bool mouseIsHovering(const RectF rect) {
+		int mx = sdl::mouseGetX();
+		int my = sdl::mouseGetY();
+		return mx >= rect.x && my >= rect.y && mx < rect.x + rect.w && my < rect.y + rect.h;
+	}
+	export bool mouseIsHovering(const RectI rect) {
+		int mx = sdl::mouseGetX();
+		int my = sdl::mouseGetY();
+		return mx >= rect.x && my >= rect.y && mx < rect.x + rect.w && my < rect.y + rect.h;
+	}
 	export bool mouseIsLeftClicked() { return mouse == SDL_BUTTON_LEFT; }
 	export bool mouseIsLeftJustClicked() { return mouse == SDL_BUTTON_LEFT && mouseLast != SDL_BUTTON_LEFT; }
 	export bool mouseIsLeftJustReleased() { return mouse != SDL_BUTTON_LEFT && mouseLast == SDL_BUTTON_LEFT; }

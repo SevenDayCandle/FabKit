@@ -3,6 +3,7 @@ import fbc.coreContent;
 import fbc.screenManager;
 import fbc.titleScreen;
 import sdl;
+import std;
 
 using namespace fbc;
 

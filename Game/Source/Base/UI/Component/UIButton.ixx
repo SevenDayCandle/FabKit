@@ -44,6 +44,7 @@ export namespace fbc {
 					// TODO play sound
 				}
 
+				// TODO employ click mutex with tryClick to avoid multiple button presses
 				if (sdl::mouseIsLeftJustClicked() && this->onClick) {
 					this->onClick(*this);
 				}

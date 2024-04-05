@@ -7,7 +7,9 @@ export namespace fbc {
 	/* Hitbox whose position AND size scale with screen dimensions */
 	export class ScreenSizeHitbox : public Hitbox {
 	public:
-		ScreenSizeHitbox() : Hitbox(0, 0, 1, 1) {}
+		ScreenSizeHitbox() : Hitbox(0, 0, 1, 1) {
+			ScreenSizeHitbox::refreshSize();
+		}
 		ScreenSizeHitbox(float screenXPercentPos, float screenYPercentPos, float screenXPercentSize, float screenYPercentSize) : Hitbox(screenXPercentPos, screenYPercentPos, screenXPercentSize, screenYPercentSize) {
 			ScreenSizeHitbox::refreshSize();
 		}

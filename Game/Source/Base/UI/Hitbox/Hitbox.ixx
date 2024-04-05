@@ -20,6 +20,8 @@ export namespace fbc {
 		inline bool justHovered() const { return hovered && just; }
 		inline float cX() { return x + (w / 2); }
 		inline float cY() { return y + (h / 2); }
+		inline float getOffsetHeight() { return offsetHeight; }
+		inline float getOffsetWidth() { return offsetWidth; }
 		inline float getOffsetX() { return offsetX; }
 		inline float getOffsetY() { return offsetY; }
 		inline Hitbox& moveCenter(const float x, const float y) { return move(x - (w / 2), y - (h / 2)); }
@@ -48,9 +50,7 @@ export namespace fbc {
 
 	// Return true if the mouse is within the rectangle. Note that the Y coordinates goes from top to bottom, with 0,0 being the top-left corner of the screen
 	bool Hitbox::isMouseInHoverRange() {
-		int mx = sdl::mouseGetX();
-		int my = sdl::mouseGetY();
-		return mx >= x && my >= y && mx < x + w && my < y + h;
+		return sdl::mouseIsHovering(*this);
 	}
 
 	// Move the bottom-left corner of the ui

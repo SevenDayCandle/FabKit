@@ -8,6 +8,8 @@ export namespace fbc {
 		bool enabled = true;
 
 		inline virtual void close() {}
+		inline virtual void open() {}
+
 		virtual void render();
 		virtual void update();
 

@@ -81,10 +81,10 @@ export namespace fbc {
 		return *this;
 	}
 
-	// Whenever font, text, or outline color change, outline render must be updated
+	// Whenever font, text, or outline color change, outline render must be updated. Ignore outline if outline size is 0
 	void TextInfo::updateOutlineCache()
 	{
-		if (text.empty()) {
+		if (text.empty() || font.getOutlineSize() <= 0) {
 			cacheOutline = FFontRender();
 		}
 		else {

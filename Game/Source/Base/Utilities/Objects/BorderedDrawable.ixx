@@ -83,7 +83,6 @@ export namespace fbc {
 	void BorderedDrawable::setDrawColor(const sdl::Color& tint)
 	{
 		base.setDrawColor(tint);
-		base.setDrawColor(tint);
 		cornerTL.setDrawColor(tint);
 		cornerTR.setDrawColor(tint);
 		cornerBL.setDrawColor(tint);

@@ -1,34 +1,28 @@
 export module fbc.titleScreen;
 
 import fbc.coreContent;
-import fbc.canvasScreen;
-import fbc.screenHitbox;
+import fbc.screenPosHitbox;
+import fbc.screenSizeHitbox;
 import fbc.screenManager;
 import fbc.setupScreen;
+import fbc.uiButton;
+import fbc.uiCanvas;
 import fbc.uiTextButton;
 import fbc.futil;
 import std;
 
 export namespace fbc {
-	export class TitleScreen : public CanvasScreen {
+	export class TitleScreen : public UICanvas {
 	public:
-		TitleScreen() {
-			UITextButton& b = canvas.addElement(std::make_unique<UITextButton>(
-				new ScreenHitbox(0.5f, 0.5f, 150, 100),
+		TitleScreen(): UICanvas(new ScreenSizeHitbox()) {
+			UITextButton& b = addElement(std::make_unique<UITextButton>(
+				new ScreenPosHitbox(0.5f, 0.5f, 150, 100),
 				cct.images.smallPanel(),
 				cct.fontRegular(),
 				cct.strings.screen_title_header()));
 			b.setOnClick([](UIButton& i) {
 				screenManager::openScreen(std::make_unique<SetupScreen>());
 				});
-		}
-
-		void close() {
-
-		}
-
-		void open() {
-
 		}
 	};
 }

@@ -171,14 +171,21 @@
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\UIVerticalCanvas.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Base\UI\Component\UITipHoverable.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\UIVerticalScrollbar.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Base\UI\Hitbox\DraggableHitbox.ixx" />
-    <ClCompile Include="Source\Base\UI\Hitbox\ScreenHitbox.ixx" />
+    <ClCompile Include="Source\Base\UI\Hitbox\ScreenPosHitbox.ixx" />
     <ClCompile Include="Source\Base\UI\Hitbox\RelativeHitbox.ixx" />
     <ClCompile Include="Source\Base\UI\Hitbox\ScaleHitbox.ixx" />
     <ClCompile Include="Source\Base\UI\Component\UITextButton.ixx" />
     <ClCompile Include="Source\Base\UI\Hitbox\ScreenSizeHitbox.ixx" />
-    <ClCompile Include="Source\Base\UI\Screens\CanvasScreen.ixx" />
     <ClCompile Include="Source\Base\Utilities\Config\WindowMode.ixx">
       <SubType>
       </SubType>
@@ -190,11 +197,19 @@
     <ClCompile Include="Source\Base\Utilities\Objects\FShader.ixx" />
     <ClCompile Include="Source\Base\Utilities\Objects\FMusic.ixx" />
     <ClCompile Include="Source\Base\Utilities\Objects\FSound.ixx" />
+    <ClCompile Include="Source\Base\Utilities\Objects\HorizontalDrawable.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Base\Utilities\Objects\IDrawable.ixx">
       <SubType>
       </SubType>
     </ClCompile>
     <ClCompile Include="Source\Base\Utilities\Objects\Cache.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Utilities\Objects\VerticalDrawable.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -222,10 +237,6 @@
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
     <ClCompile Include="Source\Base\UI\ScreenManager.ixx">
-      <FileType>Document</FileType>
-      <DeploymentContent>false</DeploymentContent>
-    </ClCompile>
-    <ClCompile Include="Source\Base\UI\Screens\BaseScreen.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
