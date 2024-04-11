@@ -17,8 +17,8 @@ export namespace fbc {
 		CoreConfig(strv ID) : Config(ID) {}
 
 		ConfigItem<int> gameActionSpeed = ConfigItem<int>(*this, "GameActionSpeed", 3);
-		ConfigItem<bool> graphicsVSync = ConfigItem<bool>(*this, "GraphicsVSync", false);
-		ConfigItem<int> graphicsFPS = ConfigItem<int>(*this, "GraphicsFPS", 60);
+		ConfigItem<bool> graphicsVSync = ConfigItem<bool>(*this, "GraphicsVSync", true);
+		ConfigItem<int> graphicsFPS = ConfigItem<int>(*this, "GraphicsFPS", 144);
 		ConfigItem<int> graphicsWindowMode = ConfigItem<int>(*this, "GraphicsFPS", 0);
 		ConfigItem<bool> graphicsParticleEffects = ConfigItem<bool>(*this, "GraphicsParticleEffects", true);
 		ConfigItem<int> graphicsResolutionX = ConfigItem<int>(*this, "GraphicsResolutionX", 1920);

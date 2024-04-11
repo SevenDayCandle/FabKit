@@ -16,18 +16,18 @@ export namespace fbc {
 		FTexture& borderB;
 		FTexture& borderT;
 
-		inline sdl::RectI* getBaseRec() override { return base.getBaseRec(); }
+		inline sdl::RectF* getBaseRec() override { return base.getBaseRec(); }
 		inline float getHeight() override { return base.getHeight(); }
 		inline float getWidth() override { return base.getWidth(); }
 
-		void drawBase(const sdl::RectI* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip) override;
+		void drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip) override;
 		void setDrawBlend(const sdl::BlendMode bl) override;
 		void setDrawColor(const sdl::Color& tint) override;
 	};
 
 	// Draw the base stretched around destRec, then draw the corners and edges around destRec
 	// Assumes that corner and border textures have the exact same size
-	void VerticalDrawable::drawBase(const sdl::RectI* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip) {
+	void VerticalDrawable::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip) {
 		float height = borderB.getHeight();
 		float top = destRec->y - height;
 		float bottom = destRec->y + destRec->h;

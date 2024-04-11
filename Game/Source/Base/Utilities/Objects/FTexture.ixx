@@ -13,7 +13,10 @@ export namespace fbc {
             if (texture == nullptr) {
                 sdl::logError("Failed to load texture %s: %s", path.data(), sdl::getError());
             }
-            sdl::textureQuery(texture, &format, &access, &dim.w, &dim.h);
+            int w, h;
+            sdl::textureQuery(texture, &format, &access, &w, &h);
+            dim.w = w;
+            dim.h = h;
         }
         FTexture(const FTexture&) = delete;
         ~FTexture() {
@@ -24,18 +27,18 @@ export namespace fbc {
             }
         }
 
-        inline sdl::RectI* getBaseRec() override { return &dim; }
+        inline sdl::RectF* getBaseRec() override { return &dim; }
         inline float getHeight() override { return dim.h; }
         inline float getWidth() override { return dim.w; }
 
         void dispose();
-        void drawBase(const sdl::RectI* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip) override;
+        void drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip) override;
         void setDrawBlend(const sdl::BlendMode bl) override;
         void setDrawColor(const sdl::Color& tint) override;
     private:
-        sdl::RectI dim;
+        sdl::RectF dim;
         sdl::Texture* texture;
-        std::uint32_t format;
+        sdl::PixelFormatEnum format;
         int access;
 	};
 
@@ -45,7 +48,7 @@ export namespace fbc {
         texture = nullptr;
     }
 
-    void FTexture::drawBase(const sdl::RectI* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip)
+    void FTexture::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip)
     {
         sdl::renderCopyEx(texture, &dim, destRec, rotation, &origin, flip);
     }

@@ -68,9 +68,10 @@ export namespace fbc {
         sdl::fontOutlineSet(font, outlineSize);
         sdl::Surface* outlineSurf = sdl::textRenderUTF8BlendedWrapped(font, text.data(), color, w);
         sdl::Texture* outlineTex = sdl::textureCreateFromSurface(outlineSurf);
-        sdl::surfaceFree(outlineSurf);
+        FFontRender f = { outlineTex, outlineSurf->w, outlineSurf->h };
+        sdl::surfaceDestroy(outlineSurf);
         sdl::fontOutlineSet(font, 0);
-        return { outlineTex, outlineSurf->w, outlineSurf->h };
+        return f;
     }
 
     // Create a texture snapshot of the text rendered with this font in the given color. Text must NOT be empty
@@ -78,8 +79,9 @@ export namespace fbc {
     {
         sdl::Surface* textSurf = sdl::textRenderUTF8BlendedWrapped(font, text.data(), color, w);
         sdl::Texture* textTex = sdl::textureCreateFromSurface(textSurf);
-        sdl::surfaceFree(textSurf);
-        return { textTex, textSurf->w, textSurf->h };
+        FFontRender f = { textTex, textSurf->w, textSurf->h };
+        sdl::surfaceDestroy(textSurf);
+        return f;
     }
 
     /* Close the font */
@@ -100,7 +102,7 @@ export namespace fbc {
             sdl::Texture* outlineTex = sdl::textureCreateFromSurface(outlineSurf);
             sdl::RectF outlineRect = { x - outlineSize, y - outlineSize, outlineSurf->w, outlineSurf->h };
             sdl::renderCopy(outlineTex, nullptr, &outlineRect);
-            sdl::surfaceFree(outlineSurf);
+            sdl::surfaceDestroy(outlineSurf);
             sdl::textureDestroy(outlineTex);
 
             // Render the text
@@ -109,7 +111,7 @@ export namespace fbc {
             sdl::Texture* textTex = sdl::textureCreateFromSurface(textSurf);
             sdl::RectF textRect = { x, y, textSurf->w, textSurf->h };
             sdl::renderCopy(textTex, nullptr, &textRect);
-            sdl::surfaceFree(textSurf);
+            sdl::surfaceDestroy(textSurf);
             sdl::textureDestroy(textTex);
         }
     }

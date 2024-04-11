@@ -10,9 +10,9 @@ import fbc.scaleHitbox;
 export namespace fbc {
 	export class UIVerticalCanvas : public UICanvas {
 	public:
-		UIVerticalCanvas(Hitbox* hb, float scrollSpeed = 0.02): UICanvas(hb),
+		UIVerticalCanvas(Hitbox* hb, float scrollSpeed = 1): UICanvas(hb),
 			scrollSpeed(scrollSpeed),
-			scrollbar{ new ScaleHitbox(hb->w * 0.93f / renderScale(), hb->y, 48, hb->h * 0.93f / renderScale())},
+			scrollbar{ new ScaleHitbox(hb->w * 0.93f / renderScale(), hb->y + hb->h * 0.05f / renderScale(), 48, hb->h * 0.9f / renderScale())},
 			baseOffsetY(hb->getOffsetY()) {
 			scrollbar.setOnScroll([this](float f) {reposition(f); });
 		}
@@ -30,7 +30,7 @@ export namespace fbc {
 	private:
 		float baseOffsetY;
 
-		inline void reposition(float percent) { hb->setOffsetY(baseOffsetY + percent * scrollSpeed); }
+		inline void reposition(float percent) { hb->setOffsetY(baseOffsetY - percent * scrollSpeed); }
 	};
 
 	UIVerticalCanvas& UIVerticalCanvas::setScrollSpeed(float scrollSpeed)

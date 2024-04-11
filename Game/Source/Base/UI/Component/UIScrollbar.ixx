@@ -4,6 +4,7 @@ import fbc.hitbox;
 import fbc.uiHoverable;
 import fbc.futil;
 import fbc.iDrawable;
+import fbc.screenManager;
 import sdl;
 import std;
 
@@ -26,18 +27,19 @@ export namespace fbc {
 		virtual void updateDropzonePos(float percent) = 0;
 		virtual void updateDropzoneSize(float percent) = 0;
 	protected:
+		float actualRange;
 		IDrawable& imageBar;
 		IDrawable& imageButton;
 		sdl::RectF dropzone;
 	private:
-		float clickPercent;
+		float clickPercent = -1;
 		float scrollPercent;
 		func<void(float)> onScroll;
 	};
 
 	void UIScrollbar::renderImpl() {
-		imageBar.draw(hb.get(), { 0.0f, 0.0f }, 0, SDL_FLIP_NONE);
-		imageButton.draw(&dropzone, { 0.0f, 0.0f }, 0, SDL_FLIP_NONE);
+		imageBar.draw(hb.get(), { 0.0f, 0.0f }, 0, sdl::RendererFlip::SDL_FLIP_NONE);
+		imageButton.draw(&dropzone, { 0.0f, 0.0f }, 0, sdl::RendererFlip::SDL_FLIP_NONE);
 	}
 
 	// Updates the scrollbar button position and triggers the scroll event at the new position
@@ -57,20 +59,25 @@ export namespace fbc {
 	void UIScrollbar::updateImpl() {
 		UIHoverable::updateImpl();
 
-		if (hb->isHovered() && sdl::mouseIsLeftClicked()) {
-			float per = toPercentage(sdl::mouseGetX(), sdl::mouseGetY());
+		if (hb->isHovered() && sdl::mouseIsLeftJustClicked()) {
+			screenManager::activeElement = this;
+			float per = std::clamp(toPercentage(sdl::mouseGetX(), sdl::mouseGetY()), 0.0f, 1.0f);
+			clickPercent = per;
 			if (!sdl::mouseIsHovering(dropzone)) {
 				scroll(per);
 			}
-			else if (per != clickPercent) {
-				if (clickPercent >= 0) {
-					scroll(scrollPercent + per - clickPercent);
-				}
-				clickPercent = per;
-			}
 		}
-		else {
-			clickPercent = -1;
+		else if (screenManager::activeElement == this) {
+			if (sdl::mouseIsLeftClicked()) {
+				float per = std::clamp(toPercentage(sdl::mouseGetX(), sdl::mouseGetY()), 0.0f, 1.0f);
+				if (per != clickPercent) {
+					scroll(scrollPercent + per - clickPercent);
+					clickPercent = per;
+				}
+			}
+			else {
+				screenManager::activeElement = nullptr;
+			}
 		}
 	}
 }

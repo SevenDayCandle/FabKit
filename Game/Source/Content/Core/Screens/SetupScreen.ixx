@@ -2,7 +2,7 @@ export module fbc.setupScreen;
 
 import fbc.coreContent;
 import fbc.futil;
-import fbc.screenPosHitbox;
+import fbc.relativeHitbox;
 import fbc.screenSizeHitbox;
 import fbc.screenManager;
 import fbc.uiButton;
@@ -15,7 +15,7 @@ export namespace fbc {
 	public:
 		SetupScreen(): UIVerticalCanvas(new ScreenSizeHitbox()) {
 			UITextButton& b = addElement(std::make_unique<UITextButton>(
-				new ScreenPosHitbox(0.25f, 0.5f, 130, 100),
+				new RelativeHitbox(*hb, 130, 500, 130, 100),
 				cct.images.smallPanel(),
 				cct.fontRegular(),
 				cct.strings.ui_close()));

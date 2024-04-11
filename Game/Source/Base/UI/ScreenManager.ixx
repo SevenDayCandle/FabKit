@@ -11,6 +11,7 @@ fbc::UIBase* queuedCloseOverlay;
 bool queuedCloseScreen;
 
 export namespace fbc::screenManager {
+	fbc::UIBase* activeElement;
 
 	// Close the currently opened screen and reopen the last screen opened.
 	// The screen's close method should save any screen state as necessary since the screen will get disposed of
@@ -37,6 +38,7 @@ export namespace fbc::screenManager {
 		if (!overlays.empty()) {
 			closeOverlay(overlays.back().get());
 		}
+		activeElement = nullptr;
 	}
 
 	// Render the last opened screen, as well as all overlays
@@ -60,6 +62,7 @@ export namespace fbc::screenManager {
 		if (!overlays.empty()) {
 			closeOverlay(overlays.back().get());
 		}
+		activeElement = nullptr;
 	}
 
 	// Update the last opened overlay if it exists, otherwise update the last opened screen
@@ -85,6 +88,7 @@ export namespace fbc::screenManager {
 					screens.front()->open();
 				}
 			}
+			activeElement = nullptr;
 			queuedCloseOverlay = nullptr;
 			queuedCloseScreen = false;
 		}

@@ -37,14 +37,20 @@ export namespace fbc {
     // Save the contents of the values_map to an external file
     void Config::commit() {
         str configPath = getConfigPath();
-        glz::write_file_json(values_map, configPath, str{});
+        glz::write_error error = glz::write_file_json(values_map, configPath, str{});
+        if (error) {
+            sdl::logError("Failed to save config at path %s: %s", configPath, error.ec);
+        }
     }
 
     // Refresh the value map contents from the external file if it exists
     void Config::initialize() {
         str configPath = getConfigPath();
         if (std::filesystem::exists(configPath)) {
-            glz::read_file_json(values_map, configPath, str{});
+            glz::parse_error error = glz::read_file_json(values_map, configPath, str{});
+            if (error) {
+                sdl::logError("Failed to read config at path %s: %s", configPath, error.ec);
+            }
         }
     }
 

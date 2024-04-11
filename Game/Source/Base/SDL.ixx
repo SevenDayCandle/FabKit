@@ -1,9 +1,9 @@
 module;
 
-#include "SDL.h"
-#include "SDL_image.h"
-#include "SDL_mixer.h"
-#include "SDL_ttf.h"
+#include "SDL3/SDL.h"
+#include "SDL3_image/SDL_image.h"
+#include "SDL3_mixer/SDL_mixer.h"
+#include "SDL3_ttf/SDL_ttf.h"
 
 export module sdl;
 
@@ -23,11 +23,12 @@ export namespace sdl {
 	export using BlendMode = ::SDL_BlendMode;
 	export using Color = ::SDL_Color;
 	export using Font = ::TTF_Font;
+	export using PixelFormatEnum = ::SDL_PixelFormatEnum;
 	export using Point = ::SDL_FPoint;
 	export using PointI = ::SDL_Point;
 	export using RectF = ::SDL_FRect;
 	export using RectI = ::SDL_Rect;
-	export using RendererFlip = ::SDL_RendererFlip;
+	export using RendererFlip = ::SDL_FlipMode;
 	export using Surface = ::SDL_Surface;
 	export using Texture = ::SDL_Texture;
 
@@ -56,8 +57,8 @@ export namespace sdl {
 	export int fontLineSkip(TTF_Font* font) { return TTF_FontLineSkip(font); }
 	export TTF_Font* fontOpen(const char* file, int ptsize) { return TTF_OpenFont(file, ptsize); }
 	export TTF_Font* fontOpenIndex(const char* file, int ptsize, long index) { return TTF_OpenFontIndex(file, ptsize, index); }
-	export TTF_Font* fontOpenIndexRW(SDL_RWops* src, int freesrc, int ptsize, long index) { return TTF_OpenFontIndexRW(src, freesrc, ptsize, index); }
-	export TTF_Font* fontOpenRW(SDL_RWops* src, int freesrc, int ptsize) { return TTF_OpenFontRW(src, freesrc, ptsize); }
+	export TTF_Font* fontOpenIndexIO(SDL_IOStream* src, int closeio, int ptsize, long index) { return TTF_OpenFontIndexIO(src, closeio, ptsize, index); }
+	export TTF_Font* fontOpenIO(SDL_IOStream* src, int closeio, int ptsize) { return TTF_OpenFontIO(src, closeio, ptsize); }
 	export int fontOutlineGet(TTF_Font* font) { return TTF_GetFontOutline(font); }
 	export void fontOutlineSet(TTF_Font* font, int outline) { TTF_SetFontOutline(font, outline); }
 	export int fontSizeText(TTF_Font* font, const char* text, int* w, int* h) { return TTF_SizeText(font, text, w, h); }
@@ -89,48 +90,46 @@ export namespace sdl {
 
 	/* Rendering functions */
 	export void renderClear() { SDL_RenderClear(renderer); }
-	export void renderCopy(Texture* texture, const RectI* srcrect, const RectF* dstrect) { SDL_RenderCopyF(renderer, texture, srcrect, dstrect); }
-	export void renderCopyEx(Texture* texture, const RectI* srcrect, const RectF* dstrect, const double angle, const Point* center, const SDL_RendererFlip flip) { SDL_RenderCopyExF(renderer, texture, srcrect, dstrect, angle, center, flip); }
-	export void renderDrawLine(float x1, float y1, float x2, float y2) { SDL_RenderDrawLineF(renderer, x1, y1, x2, y2); }
-	export void renderDrawLines(const Point* points, int count) { SDL_RenderDrawLinesF(renderer, points, count); }
-	export void renderDrawPoint(float x, float y) { SDL_RenderDrawPointF(renderer, x, y); }
-	export void renderDrawPoints(const Point* points, float count) { SDL_RenderDrawPointsF(renderer, points, count); }
-	export void renderDrawRect(const RectF* rect) { SDL_RenderDrawRectF(renderer, rect); }
-	export void renderDrawRects(const RectF* rects, int count) { SDL_RenderDrawRectsF(renderer, rects, count); }
-	export void renderFillRect(const RectF* rect) { SDL_RenderFillRectF(renderer, rect); }
-	export void renderFillRects(const RectF* rects, int count) { SDL_RenderFillRectsF(renderer, rects, count); }
+	export void renderCopy(Texture* texture, const RectF* srcrect, const RectF* dstrect) { SDL_RenderTexture(renderer, texture, srcrect, dstrect); }
+	export void renderCopyEx(Texture* texture, const RectF* srcrect, const RectF* dstrect, const double angle, const Point* center, const SDL_FlipMode flip) { SDL_RenderTextureRotated(renderer, texture, srcrect, dstrect, angle, center, flip); }
+	export void renderLine(float x1, float y1, float x2, float y2) { SDL_RenderLine(renderer, x1, y1, x2, y2); }
+	export void renderLines(const Point* points, int count) { SDL_RenderLines(renderer, points, count); }
+	export void renderPoint(float x, float y) { SDL_RenderPoint(renderer, x, y); }
+	export void renderPoints(const Point* points, float count) { SDL_RenderPoints(renderer, points, count); }
+	export void renderRect(const RectF* rect) { SDL_RenderRect(renderer, rect); }
+	export void renderRects(const RectF* rects, int count) { SDL_RenderRects(renderer, rects, count); }
+	export void renderFillRect(const RectF* rect) { SDL_RenderFillRect(renderer, rect); }
+	export void renderFillRects(const RectF* rects, int count) { SDL_RenderFillRects(renderer, rects, count); }
 	export void renderGetBlendMode(SDL_BlendMode* blendMode) { SDL_GetRenderDrawBlendMode(renderer, blendMode); }
-	export void renderGetClipRect(SDL_Rect* rect) { SDL_RenderGetClipRect(renderer, rect); }
+	export void renderGetClipRect(SDL_Rect* rect) { SDL_GetRenderClipRect(renderer, rect); }
 	export void renderGetDrawColor(Uint8* r, Uint8* g, Uint8* b, Uint8* a) { SDL_GetRenderDrawColor(renderer, r, g, b, a); }
-	export void renderGetScale(float* scaleX, float* scaleY) { SDL_RenderGetScale(renderer, scaleX, scaleY); }
-	export void renderGetViewport(SDL_Rect* rect) { SDL_RenderGetViewport(renderer, rect); }
-	export SDL_bool renderIsClipEnabled() { return SDL_RenderIsClipEnabled(renderer); }
+	export void renderGetScale(float* scaleX, float* scaleY) { SDL_GetRenderScale(renderer, scaleX, scaleY); }
+	export void renderGetViewport(SDL_Rect* rect) { SDL_GetRenderViewport(renderer, rect); }
+	export SDL_bool renderIsClipEnabled() { return SDL_RenderClipEnabled(renderer); }
 	export void renderPresent() { SDL_RenderPresent(renderer); }
 	export void renderSetBlendMode(SDL_BlendMode blendMode) { SDL_SetRenderDrawBlendMode(renderer, blendMode); }
-	export void renderSetClipRect(const RectI* rect) { SDL_RenderSetClipRect(renderer, rect); }
+	export void renderSetClipRect(const RectI* rect) { SDL_SetRenderClipRect(renderer, rect); }
 	export void renderSetDrawColor(const Color& c) { SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a); }
 	export void renderSetDrawColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a) { SDL_SetRenderDrawColor(renderer, r, g, b, a); }
-	export void renderSetScale(float scaleX, float scaleY) { SDL_RenderSetScale(renderer, scaleX, scaleY); }
-	export void renderSetViewport(const RectI* rect) { SDL_RenderSetViewport(renderer, rect); }
+	export void renderSetScale(float scaleX, float scaleY) { SDL_SetRenderScale(renderer, scaleX, scaleY); }
+	export void renderSetViewport(const RectI* rect) { SDL_SetRenderViewport(renderer, rect); }
 
 	/* Surface functions */
 	export int surfaceBlit(SDL_Surface* src, const SDL_Rect* srcrect, SDL_Surface* dst, SDL_Rect* dstrect) { return SDL_BlitSurface(src, srcrect, dst, dstrect); }
-	export int surfaceBlitScaled(SDL_Surface* src, const SDL_Rect* srcrect, SDL_Surface* dst, SDL_Rect* dstrect) { return SDL_BlitScaled(src, srcrect, dst, dstrect); }
-	export int surfaceFillRect(SDL_Surface* surface, const SDL_Rect* rect, Uint32 color) { return SDL_FillRect(surface, rect, color); }
-	export int surfaceFillRects(SDL_Surface* surface, const SDL_Rect* rects, int count, Uint32 color) { return SDL_FillRects(surface, rects, count, color); }
+	export int surfaceBlitScaled(SDL_Surface* src, const SDL_Rect* srcrect, SDL_Surface* dst, SDL_Rect* dstrect, SDL_ScaleMode mode) { return SDL_BlitSurfaceScaled(src, srcrect, dst, dstrect, mode); }
+	export int surfaceFillRect(SDL_Surface* surface, const SDL_Rect* rect, Uint32 color) { return SDL_FillSurfaceRect(surface, rect, color); }
+	export int surfaceFillRects(SDL_Surface* surface, const SDL_Rect* rects, int count, Uint32 color) { return SDL_FillSurfaceRects(surface, rects, count, color); }
 	export int surfaceLock(SDL_Surface* surface) { return SDL_LockSurface(surface); }
 	export int surfaceSetAlphaMod(SDL_Surface* surface, Uint8 alpha) { return SDL_SetSurfaceAlphaMod(surface, alpha); }
 	export int surfaceSetBlendMode(SDL_Surface* surface, SDL_BlendMode blendMode) { return SDL_SetSurfaceBlendMode(surface, blendMode); }
-	export int surfaceSetColorKey(SDL_Surface* surface, Uint32 key) { return SDL_SetColorKey(surface, SDL_TRUE, key); }
+	export int surfaceSetColorKey(SDL_Surface* surface, Uint32 key) { return SDL_SetSurfaceColorKey(surface, SDL_TRUE, key); }
 	export int surfaceSetPalette(SDL_Surface* surface, SDL_Palette* palette) { return SDL_SetSurfacePalette(surface, palette); }
-	export int surfaceUpperBlit(SDL_Surface* src, const SDL_Rect* srcrect, SDL_Surface* dst, SDL_Rect* dstrect) { return SDL_UpperBlit(src, srcrect, dst, dstrect); }
-	export int surfaceUpperBlitScaled(SDL_Surface* src, const SDL_Rect* srcrect, SDL_Surface* dst, SDL_Rect* dstrect) { return SDL_UpperBlitScaled(src, srcrect, dst, dstrect); }
-	export SDL_Surface* surfaceConvertFormat(SDL_Surface* surface, Uint32 pixel_format, Uint32 flags) { return SDL_ConvertSurfaceFormat(surface, pixel_format, flags); }
+	export SDL_Surface* surfaceConvertFormat(SDL_Surface* surface, SDL_PixelFormatEnum pixel_format) { return SDL_ConvertSurfaceFormat(surface, pixel_format); }
 	export SDL_Surface* surfaceCopy(SDL_Surface* src) { return SDL_DuplicateSurface(src); }
-	export SDL_Surface* surfaceCreate(Uint32 flags, int width, int height, int depth, Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask) { return SDL_CreateRGBSurface(flags, width, height, depth, Rmask, Gmask, Bmask, Amask); }
-	export SDL_Surface* surfaceCreateFrom(void* pixels, int width, int height, int depth, int pitch, Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask) { return SDL_CreateRGBSurfaceFrom(pixels, width, height, depth, pitch, Rmask, Gmask, Bmask, Amask); }
+	export SDL_Surface* surfaceCreate(int width, int height, int depth, Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask) { return SDL_CreateSurface(width, height, SDL_GetPixelFormatEnumForMasks(depth, Rmask, Gmask, Bmask, Amask)); }
+	export SDL_Surface* surfaceCreateFrom(void* pixels, int width, int height, int pitch, int depth, Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask) { return SDL_CreateSurfaceFrom(pixels, width, height, pitch, SDL_GetPixelFormatEnumForMasks(depth, Rmask, Gmask, Bmask, Amask)); }
 	export SDL_Surface* surfaceLoad(const char* file) { return IMG_Load(file); } // Note: This uses SDL_image, not just SDL
-	export void surfaceFree(SDL_Surface* surface) { SDL_FreeSurface(surface); }
+	export void surfaceDestroy(SDL_Surface* surface) { SDL_DestroySurface(surface); }
 	export void surfaceUnlock(SDL_Surface* surface) { SDL_UnlockSurface(surface); }
 
 	/* Text rendering functions */
@@ -152,14 +151,14 @@ export namespace sdl {
 	export int textureGetBlendMode(Texture* texture, SDL_BlendMode* blendMode) { return SDL_GetTextureBlendMode(texture, blendMode); }
 	export int textureGetColorMod(Texture* texture, Uint8* r, Uint8* g, Uint8* b) { return SDL_GetTextureColorMod(texture, r, g, b); }
 	export int textureLock(Texture* texture, const RectI* rect, void** pixels, int* pitch) { return SDL_LockTexture(texture, rect, pixels, pitch); }
-	export int textureQuery(Texture* texture, Uint32* format, int* access, int* w, int* h) { return SDL_QueryTexture(texture, format, access, w, h); }
+	export int textureQuery(Texture* texture, SDL_PixelFormatEnum* format, int* access, int* w, int* h) { return SDL_QueryTexture(texture, format, access, w, h); }
 	export int textureSetAlphaMod(Texture* texture, Uint8 alpha) { return SDL_SetTextureAlphaMod(texture, alpha); }
 	export int textureSetBlendMode(Texture* texture, SDL_BlendMode blendMode) { return SDL_SetTextureBlendMode(texture, blendMode); }
 	export int textureSetColorMod(Texture* texture, Uint8 r, Uint8 g, Uint8 b) { return SDL_SetTextureColorMod(texture, r, g, b); }
 	export int textureSetRenderTarget(Texture* texture) { return SDL_SetRenderTarget(renderer, texture); }
 	export int textureUpdate(Texture* texture, const RectI* rect, const void* pixels, int pitch) { return SDL_UpdateTexture(texture, rect, pixels, pitch); }
 	export int textureUpdateYUV(Texture* texture, const RectI* rect, const Uint8* Yplane, int Ypitch, const Uint8* Uplane, int Upitch, const Uint8* Vplane, int Vpitch) { return SDL_UpdateYUVTexture(texture, rect, Yplane, Ypitch, Uplane, Upitch, Vplane, Vpitch); }
-	export Texture* textureCreate(Uint32 format, int access, int w, int h) { return SDL_CreateTexture(renderer, format, access, w, h); }
+	export Texture* textureCreate(SDL_PixelFormatEnum format, int access, int w, int h) { return SDL_CreateTexture(renderer, format, access, w, h); }
 	export Texture* textureCreateFromSurface(SDL_Surface* surface) { return SDL_CreateTextureFromSurface(renderer, surface); }
 	export Texture* textureLoad(const char* path) { return IMG_LoadTexture(renderer, path); }
 	export void textureDestroy(Texture* texture) { SDL_DestroyTexture(texture); }
@@ -170,10 +169,10 @@ export namespace sdl {
 	export int windowGetOpacity(float* out_opacity) { return SDL_GetWindowOpacity(window, out_opacity); }
 	export int windowSetFullscreen(Uint32 flags) { return SDL_SetWindowFullscreen(window, flags); }
 	export int windowUpdateSurface() { return SDL_UpdateWindowSurface(window); }
-	export SDL_bool windowGetGrab() { return SDL_GetWindowGrab(window); }
-	export SDL_Renderer* windowCreateRenderer(int index, Uint32 flags) { return SDL_CreateRenderer(window, index, flags); }
+	export SDL_bool windowGetMouseGrab() { return SDL_GetWindowMouseGrab(window); }
+	export SDL_Renderer* windowCreateRenderer(Uint32 flags) { return SDL_CreateRenderer(window, nullptr, flags); }
 	export SDL_Surface* windowGetSurface() { return SDL_GetWindowSurface(window); }
-	export SDL_Window* windowCreate(const char* title, int x, int y, int w, int h, Uint32 flags) { return SDL_CreateWindow(title, x, y, w, h, flags); }
+	export SDL_Window* windowCreate(const char* title, int w, int h, Uint32 flags) { return SDL_CreateWindow(title, w, h, flags); }
 	export Uint32 windowGetFlags() { return SDL_GetWindowFlags(window); }
 	export void windowGetPosition(int* x, int* y) { SDL_GetWindowPosition(window, x, y); }
 	export void windowGetSize(int* w, int* h) { SDL_GetWindowSize(window, w, h); }
@@ -182,9 +181,9 @@ export namespace sdl {
 	export void windowMinimize() { SDL_MinimizeWindow(window); }
 	export void windowRaise() { SDL_RaiseWindow(window); }
 	export void windowRestore() { SDL_RestoreWindow(window); }
-	export void windowSetGrab(SDL_bool grabbed) { SDL_SetWindowGrab(window, grabbed); }
 	export void windowSetIcon(SDL_Surface* icon) { SDL_SetWindowIcon(window, icon); }
 	export void windowSetModalFor(SDL_Window* modal_window, SDL_Window* parent_window) { SDL_SetWindowModalFor(modal_window, parent_window); }
+	export void windowSetMouseGrab(SDL_bool grabbed) { SDL_SetWindowMouseGrab(window, grabbed); }
 	export void windowSetOpacity(float opacity) { SDL_SetWindowOpacity(window, opacity); }
 	export void windowSetPosition(int x, int y) { SDL_SetWindowPosition(window, x, y); }
 	export void windowSetSize(int w, int h) { SDL_SetWindowSize(window, w, h); }
@@ -192,7 +191,7 @@ export namespace sdl {
 	export void windowShow() { SDL_ShowWindow(window); }
 
 	/* Misc functions */
-	export int getTicks() { return SDL_GetTicks64(); }
+	export int getTicks() { return SDL_GetTicksNS(); }
 	export const char* __cdecl getError() { return TTF_GetError(); }
 	export template <typename... Args> void log(SDL_LogPriority priority, const char* message, const Args&... args) { SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, priority, message, args...); }
 	export template <typename... Args> void log(SDL_LogPriority priority, std::string_view message, const Args&... args) { SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, priority, message.data(), args...); }
@@ -211,7 +210,7 @@ export namespace sdl {
 
 	/* Set up SDL. Returns true if SDL setup succeeds */
 	export bool initSDL() { 
-		int val = SDL_Init(SDL_INIT_EVERYTHING);
+		int val = SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_GAMEPAD);
 		if (val < 0) {
 			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "SDL_INIT failed with value %d", val);
 			return false;
@@ -228,7 +227,8 @@ export namespace sdl {
 			return false;
 		}
 
-		if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+		// TODO adjust spec as needed
+		if (Mix_OpenAudio(0, nullptr) < 0) {
 			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "Mix_OpenAudio failed");
 			return false;
 		}
@@ -237,9 +237,9 @@ export namespace sdl {
 	}
 
 	/* Set up window and renderer. Returns true if window and renderer were created */
-	export bool initWindow(int w, int h, Uint32 windowFlags = SDL_WINDOW_SHOWN, bool vsync = false, const char* title = "Fabricate") {
-		window = windowCreate(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, windowFlags);
-		renderer = SDL_CreateRenderer(window, -1, vsync ? (SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC) : SDL_RENDERER_ACCELERATED);
+	export bool initWindow(int w, int h, Uint32 windowFlags = 0, bool vsync = false, const char* title = "Fabricate") {
+		window = windowCreate(title, w, h, windowFlags);
+		renderer = SDL_CreateRenderer(window, nullptr, vsync ? (SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC) : SDL_RENDERER_ACCELERATED);
 		if (!window || !renderer) {
 			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "Window or renderer went derp");
 			SDL_Quit();
@@ -251,7 +251,7 @@ export namespace sdl {
 	/* Update the renderer with the VSync settings */
 	export void updateWindow(bool vsync) {
 		SDL_DestroyRenderer(renderer);
-		renderer = SDL_CreateRenderer(window, -1, vsync ? (SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC) : SDL_RENDERER_ACCELERATED);
+		renderer = SDL_CreateRenderer(window, nullptr, vsync ? (SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC) : SDL_RENDERER_ACCELERATED);
 	}
 
 	/* 
@@ -267,27 +267,27 @@ export namespace sdl {
 		int res = SDL_PollEvent(&e);
 		if (res != 0) {
 			switch (e.type) {
-			case SDL_QUIT:
+			case SDL_EVENT_QUIT:
 				return false;
-			case SDL_MOUSEBUTTONDOWN:
+			case SDL_EVENT_MOUSE_BUTTON_DOWN:
 				mouse = e.button.button;
 				mousePosX = e.button.x;
 				mousePosY = e.button.y;
 				break;
-			case SDL_MOUSEBUTTONUP:
+			case SDL_EVENT_MOUSE_BUTTON_UP:
 				mouse = -1;
 				mousePosX = e.button.x;
 				mousePosY = e.button.y;
 				break;
-			case SDL_MOUSEMOTION:
+			case SDL_EVENT_MOUSE_MOTION:
 				mousePosX = e.button.x;
 				mousePosY = e.button.y;
 				break;
 				// TODO handling for ITextInput
-			case SDL_TEXTINPUT:
+			case SDL_EVENT_TEXT_INPUT:
 				break;
 				// TODO file dialog
-			case SDL_DROPFILE:
+			case SDL_EVENT_DROP_FILE:
 				break;
 			}
 		}

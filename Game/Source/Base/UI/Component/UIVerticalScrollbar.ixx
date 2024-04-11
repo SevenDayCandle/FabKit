@@ -10,7 +10,7 @@ export namespace fbc {
 	export class UIVerticalScrollbar : public UIScrollbar {
 	public:
 		UIVerticalScrollbar(Hitbox* hb): UIScrollbar(hb, cct.images.scrollbar(), cct.images.scrollbutton()) {
-			updateDropzoneSize(0.1f);
+			updateDropzoneSize(0.05f);
 		}
 		virtual ~UIVerticalScrollbar() {}
 
@@ -22,12 +22,12 @@ export namespace fbc {
 
 	float UIVerticalScrollbar::toPercentage(float x, float y)
 	{
-		return (y - hb->y) / hb->h;
+		return (y - hb->y) / actualRange;
 	}
 
 	void UIVerticalScrollbar::updateDropzonePos(float percent)
 	{
-		dropzone.y = hb->y + percent * hb->h;
+		dropzone.y = hb->y + percent * actualRange;
 	}
 
 	void UIVerticalScrollbar::updateDropzoneSize(float percent)
@@ -36,6 +36,7 @@ export namespace fbc {
 		dropzone.w = hb->w;
 		dropzone.y = hb->y;
 		dropzone.h = hb->h * percent;
+		actualRange = hb->h - dropzone.h;
 	}
 
 }

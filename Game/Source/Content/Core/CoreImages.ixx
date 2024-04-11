@@ -25,6 +25,8 @@ export namespace fbc {
 		inline VerticalDrawable& scrollbar() { return *scrollbarCache.get(); }
 		inline VerticalDrawable& scrollbutton() { return *scrollbuttonCache.get(); }
 
+		inline FTexture& checkboxEmpty() { return getTexture("UI/Checkbox_Empty.png"); };
+		inline FTexture& checkboxFilled() { return getTexture("UI/Checkbox_Filled.png"); };
 		inline FTexture& panelBorderB() { return getTexture("UI/Panel_Border_B.png"); };
 		inline FTexture& panelBorderL() { return getTexture("UI/Panel_Border_L.png"); };
 		inline FTexture& panelBorderR() { return getTexture("UI/Panel_Border_R.png"); };

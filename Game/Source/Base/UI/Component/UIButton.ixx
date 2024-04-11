@@ -3,6 +3,7 @@ export module fbc.uiButton;
 import fbc.futil;
 import fbc.iDrawable;
 import fbc.hitbox;
+import fbc.screenManager;
 import fbc.uiImage;
 import sdl;
 
@@ -31,27 +32,34 @@ export namespace fbc {
 	void UIButton::renderImpl() {
 		UIImage::renderImpl();
 		if (hb->isHovered()) {
-			image.draw(hb.get(), SDL_BLENDMODE_ADD, color, origin, rotation, flip);
+			image.draw(hb.get(), sdl::BlendMode::SDL_BLENDMODE_ADD, color, origin, rotation, flip);
 		}
 	}
 
 	void UIButton::updateImpl() {
 		UIImage::updateImpl();
 
-		if (isInteractable()) {
-			if (hb->isHovered()) {
+		if (hb->isHovered()) {
+			if (screenManager::activeElement == nullptr && isInteractable()) {
 				if (hb->isJust()) {
 					// TODO play sound
 				}
 
-				// TODO employ click mutex with tryClick to avoid multiple button presses
-				if (sdl::mouseIsLeftJustClicked() && this->onClick) {
+				if (sdl::mouseIsLeftJustClicked() || sdl::mouseIsRightJustClicked()) {
+					screenManager::activeElement = this;
+				}
+			}
+			else if (screenManager::activeElement == this) {
+				if (sdl::mouseIsLeftJustReleased() && this->onClick) {
 					this->onClick(*this);
 				}
-				else if (sdl::mouseIsRightJustClicked() && this->onRightClick) {
+				else if (sdl::mouseIsRightJustReleased() && this->onRightClick) {
 					this->onRightClick(*this);
 				}
 			}
+		}
+		else if (screenManager::activeElement == this && (sdl::mouseIsLeftJustReleased() || sdl::mouseIsRightJustReleased())) {
+			screenManager::activeElement = nullptr;
 		}
 	}
 }
