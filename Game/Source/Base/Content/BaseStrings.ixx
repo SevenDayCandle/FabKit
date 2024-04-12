@@ -33,12 +33,12 @@ export namespace fbc {
 			path p = content.contentFolder;
 			return (p / LOCALIZATION_PATH / langToStr(lang) / suffix).replace_extension(futil::JSON_EXT);
 		};
-		void loadKeywordStrings(unmap<str, KeywordStrings>& res, const strv& suffix);
+		void loadKeywordStrings(unmap<str, KeywordStrings>& res, const strv& suffix = DEFAULT_KEYWORDS);
 		void loadObjectStrings(unmap<str, ObjectStrings>& res, const strv& suffix);
-		void loadUIStrings(unmap<str, str>& res, const strv& suffix);
+		void loadUIStrings(unmap<str, str>& res, const strv& suffix = DEFAULT_UI);
 	};
 
-	void BaseStrings::loadKeywordStrings(unmap<str, KeywordStrings>& res, const strv& suffix = DEFAULT_KEYWORDS)
+	void BaseStrings::loadKeywordStrings(unmap<str, KeywordStrings>& res, const strv& suffix)
 	{
 		glz::read_file_json(res, getPathForLanguage(suffix).string(), str{});
 	}
@@ -50,7 +50,7 @@ export namespace fbc {
 	}
 
 	// TODO
-	void BaseStrings::loadUIStrings(unmap<str, str>& res, const strv& suffix = DEFAULT_UI) {
+	void BaseStrings::loadUIStrings(unmap<str, str>& res, const strv& suffix) {
 		glz::read_file_json(res, getPathForLanguage(suffix).string(), str{});
 	}
 }

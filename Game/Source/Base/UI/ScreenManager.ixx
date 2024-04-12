@@ -27,12 +27,12 @@ export namespace fbc::screenManager {
 	}
 
 	// Add an overlay to the top of the screen
-	void openOverlay(uptr<fbc::UIBase> target) {
+	void openOverlay(uptr<fbc::UIBase>&& target) {
 		overlays.push_front(std::move(target));
 	}
 
 	// Add a screen to the history of opened screens and open that screen
-	void openScreen(uptr<fbc::UIBase> screen) {
+	void openScreen(uptr<fbc::UIBase>&& screen) {
 		screens.push_front(std::move(screen));
 		screens.front()->open();
 		if (!overlays.empty()) {
@@ -52,7 +52,7 @@ export namespace fbc::screenManager {
 	}
 
 	// Close the current screen and switch the specified screen
-	void swapScreen(uptr<fbc::UIBase> screen) {
+	void swapScreen(uptr<fbc::UIBase>&& screen) {
 		if (!screens.empty()) {
 			fbc::UIBase& screenFront = *screens.front();
 			screenFront.close();

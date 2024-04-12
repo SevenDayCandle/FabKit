@@ -1,4 +1,4 @@
-export module fbc.UIToggle;
+export module fbc.uiToggle;
 
 import fbc.ffont;
 import fbc.hitbox;
@@ -12,8 +12,8 @@ import sdl;
 export namespace fbc {
 	export class UIToggle : public UIImage, public TextInfo {
 	public:
-		UIToggle(Hitbox* hb, IDrawable& image, IDrawable& offImage, FFont& f): UIImage(hb, image), checkImage(offImage), TextInfo(f) {}
-		UIToggle(Hitbox* hb, IDrawable& image, IDrawable& offImage, FFont& f, str text) : UIImage(hb, image), checkImage(offImage), TextInfo(f, text) {}
+		UIToggle(Hitbox* hb, IDrawable& image, IDrawable& checkImage, FFont& f): UIImage(hb, image), checkImage(checkImage), TextInfo(f) {}
+		UIToggle(Hitbox* hb, IDrawable& image, IDrawable& checkImage, FFont& f, str text) : UIImage(hb, image), checkImage(checkImage), TextInfo(f, text) {}
 		virtual ~UIToggle() {}
 
 		bool toggled;
@@ -50,7 +50,8 @@ export namespace fbc {
 		}
 
 		float textX = hb->x + hb->w * 1.5f;
-		TextInfo::drawText(textX, hb->y);
+		float textY = hb->y + hb->h * 0.5f;
+		TextInfo::drawText(textX, textY);
 	}
 
 	void UIToggle::toggle(bool val)
@@ -76,8 +77,9 @@ export namespace fbc {
 				}
 			}
 			else if (screenManager::activeElement == this) {
-				if (sdl::mouseIsLeftJustReleased() && this->onClick) {
+				if (sdl::mouseIsLeftJustReleased()) {
 					toggle(!toggled);
+					screenManager::activeElement = nullptr;
 				}
 			}
 		}

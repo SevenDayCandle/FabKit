@@ -3,7 +3,6 @@ export module fbc.ffont;
 import fbc.ftexture;
 import fbc.futil;
 import sdl;
-import std;
 
 export namespace fbc {
     const str FONT_REGULAR = "Resources/Fonts/Rubik-Regular.ttf";

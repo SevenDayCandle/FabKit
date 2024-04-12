@@ -225,9 +225,9 @@
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Content\Core\CoreConfig.ixx" />
-    <ClCompile Include="Source\Content\Core\CoreImages.ixx" />
-    <ClCompile Include="Source\Content\Core\CoreStrings.ixx" />
+    <ClCompile Include="Source\Core\CoreConfig.ixx" />
+    <ClCompile Include="Source\Core\CoreImages.ixx" />
+    <ClCompile Include="Source\Core\CoreStrings.ixx" />
     <ClCompile Include="Source\Base\UI\Component\UIBase.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
@@ -289,20 +289,21 @@
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Source\Content\Core\CoreContent.ixx">
+    <ClCompile Include="Source\Core\CoreContent.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Source\Content\Core\Screens\SetupScreen.ixx">
+    <ClCompile Include="Source\Game\Screens\SetupScreen.ixx">
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Content\Core\Screens\TitleScreen.ixx" />
+    <ClCompile Include="Source\Game\Screens\TitleScreen.ixx" />
     <ClCompile Include="Source\Main.cpp">
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Resources\Images\UI\ExpandArrow.png" />
     <Image Include="Resources\Images\UI\Panel_Border_B.png" />
     <Image Include="Resources\Images\UI\Panel_Border_L.png" />
     <Image Include="Resources\Images\UI\Panel_Border_R.png" />

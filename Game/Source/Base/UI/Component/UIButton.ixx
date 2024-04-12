@@ -52,9 +52,11 @@ export namespace fbc {
 			else if (screenManager::activeElement == this) {
 				if (sdl::mouseIsLeftJustReleased() && this->onClick) {
 					this->onClick(*this);
+					screenManager::activeElement = nullptr;
 				}
 				else if (sdl::mouseIsRightJustReleased() && this->onRightClick) {
 					this->onRightClick(*this);
+					screenManager::activeElement = nullptr;
 				}
 			}
 		}

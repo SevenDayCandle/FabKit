@@ -15,7 +15,9 @@ export namespace fbc {
 
 		inline str screen_setup_header() { return uiStrings["screen_setup_header"]; };
 		inline str screen_title_header() { return uiStrings["screen_title_header"]; };
+		inline str ui_cancel() { return uiStrings["ui_cancel"]; };
 		inline str ui_close() { return uiStrings["ui_close"]; };
+		inline str ui_confirm() { return uiStrings["ui_confirm"]; };
 	private:
 		unmap<str, KeywordStrings> keywordStrings;
 		unmap<str, str> uiStrings;

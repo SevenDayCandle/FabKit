@@ -14,9 +14,9 @@ export namespace fbc {
 
 		inline void clear() { elements.clear(); }
 
-		template<typename T> requires std::is_base_of_v<UIHoverable, T> T& addElement(uptr<T> element);
-		template<typename T> requires std::is_base_of_v<UIHoverable, T> T& stackElementXDir(uptr<T> element, float spacing = 0, float start = 0);
-		template<typename T> requires std::is_base_of_v<UIHoverable, T> T& stackElementYDir(uptr<T> element, float spacing = 0, float start = 0);
+		template<typename T> requires std::is_base_of_v<UIHoverable, T> T& addElement(uptr<T>&& element);
+		template<typename T> requires std::is_base_of_v<UIHoverable, T> T& stackElementXDir(uptr<T>&& element, float spacing = 0, float start = 0);
+		template<typename T> requires std::is_base_of_v<UIHoverable, T> T& stackElementYDir(uptr<T>&& element, float spacing = 0, float start = 0);
 		virtual bool isHovered() override;
 		virtual void renderImpl() override;
 		virtual void updateImpl() override;
@@ -24,7 +24,7 @@ export namespace fbc {
 		vec<uptr<UIHoverable>> elements;
 	};
 
-	template<typename T> requires std::is_base_of_v<UIHoverable, T> T& UICanvas::addElement(uptr<T> element)
+	template<typename T> requires std::is_base_of_v<UIHoverable, T> T& UICanvas::addElement(uptr<T>&& element)
 	{
 		T& ref = *element;
 		elements.push_back(std::move(element));
@@ -47,7 +47,7 @@ export namespace fbc {
 	 * If the element's X endpoint would exceed the width of this hb, it gets moved below the last element at the X offset defined by start
 	 * Spacing and start should both be scaled by renderScale
 	 */
-	template<typename T> requires std::is_base_of_v<UIHoverable, T> T& UICanvas::stackElementXDir(uptr<T> element, float spacing, float start) {
+	template<typename T> requires std::is_base_of_v<UIHoverable, T> T& UICanvas::stackElementXDir(uptr<T>&& element, float spacing, float start) {
 		T& ref = *element;
 		elements.push_back(std::move(element));
 		// Only actually do positioning if there is a previous element to reference
@@ -71,7 +71,7 @@ export namespace fbc {
 	 * If the element's Y endpoint would exceed the height of this hb, it gets moved to the right of the last element at the Y offset defined by start
 	 * Spacing and start should both be scaled by renderScale
 	 */
-	template<typename T> requires std::is_base_of_v<UIHoverable, T> T& UICanvas::stackElementYDir(uptr<T> element, float spacing, float start) {
+	template<typename T> requires std::is_base_of_v<UIHoverable, T> T& UICanvas::stackElementYDir(uptr<T>&& element, float spacing, float start) {
 		T& ref = *element;
 		elements.push_back(std::move(element));
 		// Only actually do positioning if there is a previous element to reference

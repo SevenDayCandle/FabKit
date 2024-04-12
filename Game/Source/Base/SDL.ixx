@@ -84,9 +84,11 @@ export namespace sdl {
 	export bool mouseIsLeftClicked() { return mouse == SDL_BUTTON_LEFT; }
 	export bool mouseIsLeftJustClicked() { return mouse == SDL_BUTTON_LEFT && mouseLast != SDL_BUTTON_LEFT; }
 	export bool mouseIsLeftJustReleased() { return mouse != SDL_BUTTON_LEFT && mouseLast == SDL_BUTTON_LEFT; }
+	export bool mouseIsLeftReleased() { return mouse != SDL_BUTTON_LEFT; }
 	export bool mouseIsRightClicked() { return mouse == SDL_BUTTON_RIGHT; }
 	export bool mouseIsRightJustClicked() { return mouse == SDL_BUTTON_RIGHT && mouseLast != SDL_BUTTON_RIGHT; }
 	export bool mouseIsRightJustReleased() { return mouse != SDL_BUTTON_RIGHT && mouseLast == SDL_BUTTON_RIGHT; }
+	export bool mouseIsRightReleased() { return mouse != SDL_BUTTON_RIGHT; }
 
 	/* Rendering functions */
 	export void renderClear() { SDL_RenderClear(renderer); }

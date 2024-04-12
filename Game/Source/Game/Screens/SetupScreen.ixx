@@ -7,6 +7,7 @@ import fbc.screenSizeHitbox;
 import fbc.screenManager;
 import fbc.uiButton;
 import fbc.uiTextButton;
+import fbc.uiToggle;
 import fbc.uiVerticalCanvas;
 import std;
 
@@ -15,13 +16,20 @@ export namespace fbc {
 	public:
 		SetupScreen(): UIVerticalCanvas(new ScreenSizeHitbox()) {
 			UITextButton& b = addElement(std::make_unique<UITextButton>(
-				new RelativeHitbox(*hb, 130, 500, 130, 100),
+				new RelativeHitbox(*hb, 190, 500, 170, 150),
 				cct.images.smallPanel(),
 				cct.fontRegular(),
 				cct.strings.ui_close()));
 			b.setOnClick([](UIButton& i) {
 				screenManager::closeCurrentScreen();
 			});
+
+			UIToggle& f = addElement(std::make_unique<UIToggle>(
+				new RelativeHitbox(*hb, 190, 800, 100, 100),
+				cct.images.checkboxEmpty(),
+				cct.images.checkboxFilled(),
+				cct.fontRegular(),
+				cct.strings.ui_confirm()));
 		}
 	};
 }

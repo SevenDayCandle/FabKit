@@ -3,6 +3,7 @@ export module fbc.baseImages;
 import fbc.baseContent;
 import fbc.futil;
 import fbc.ftexture;
+import std;
 
 export namespace fbc {
 	constexpr strv IMAGE_PATH = "Images";
