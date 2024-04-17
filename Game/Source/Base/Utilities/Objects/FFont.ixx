@@ -9,8 +9,8 @@ export namespace fbc {
 
     export struct FFontRender {
         sdl::Texture* texture;
-        int w;
-        int h;
+        float w;
+        float h;
     };
 
 	export class FFont {
@@ -32,10 +32,8 @@ export namespace fbc {
 
         FFont& setOutlineSize(int size);
         FFont& setSize(int size);
-        FFontRender makeOutline(strv text, uint32 w, sdl::Color color);
-        FFontRender makeText(strv text, uint32 w, sdl::Color color);
+        FFontRender makeTexture(strv text, uint32 w, sdl::Color color, sdl::Color outlineColor);
         void dispose();
-        void draw(strv text, float x, float y, uint32 w, sdl::Color color, sdl::Color outlineColor);
     private:
         sdl::Font* font;
         str path;
@@ -61,25 +59,20 @@ export namespace fbc {
         return *this;
     }
 
-    // Create a texture snapshot of the text outline rendered with this font in the given color. Text must NOT be empty
-    FFontRender FFont::makeOutline(strv text, uint32 w, sdl::Color color)
+    // Create a texture snapshot of the text rendered with this font in the given colors. Text must NOT be empty
+    FFontRender FFont::makeTexture(strv text, uint32 w, sdl::Color color = sdl::WHITE, sdl::Color outlineColor = sdl::BLACK)
     {
         sdl::fontOutlineSet(font, outlineSize);
-        sdl::Surface* outlineSurf = sdl::textRenderUTF8BlendedWrapped(font, text.data(), color, w);
+        sdl::Surface* outlineSurf = sdl::textRenderUTF8BlendedWrapped(font, text.data(), outlineColor, w);
+        sdl::fontOutlineSet(font, 0);
+
+        sdl::Surface* textSurf = sdl::textRenderUTF8BlendedWrapped(font, text.data(), color, w);
+        sdl::RectI targetRect = { outlineSize, outlineSize, textSurf->w, textSurf->h };
+        sdl::surfaceBlit(textSurf, nullptr, outlineSurf, &targetRect);
+
         sdl::Texture* outlineTex = sdl::textureCreateFromSurface(outlineSurf);
         FFontRender f = { outlineTex, outlineSurf->w, outlineSurf->h };
         sdl::surfaceDestroy(outlineSurf);
-        sdl::fontOutlineSet(font, 0);
-        return f;
-    }
-
-    // Create a texture snapshot of the text rendered with this font in the given color. Text must NOT be empty
-    FFontRender FFont::makeText(strv text, uint32 w, sdl::Color color)
-    {
-        sdl::Surface* textSurf = sdl::textRenderUTF8BlendedWrapped(font, text.data(), color, w);
-        sdl::Texture* textTex = sdl::textureCreateFromSurface(textSurf);
-        FFontRender f = { textTex, textSurf->w, textSurf->h };
-        sdl::surfaceDestroy(textSurf);
         return f;
     }
 
@@ -88,31 +81,6 @@ export namespace fbc {
     {
         sdl::fontClose(font);
         font = nullptr;
-    }
-
-    // TODO return the textures created instead to be cached in a textinfo object
-    /* Draw the font at the given x/y coordinates. */
-    void FFont::draw(strv text, float x, float y, uint32 w = 0, sdl::Color color = sdl::WHITE, sdl::Color outlineColor = sdl::BLACK)
-    {
-        if (!text.empty()) {
-            // Render outline
-            sdl::fontOutlineSet(font, outlineSize);
-            sdl::Surface* outlineSurf = sdl::textRenderUTF8BlendedWrapped(font, text.data(), outlineColor, w);
-            sdl::Texture* outlineTex = sdl::textureCreateFromSurface(outlineSurf);
-            sdl::RectF outlineRect = { x - outlineSize, y - outlineSize, outlineSurf->w, outlineSurf->h };
-            sdl::renderCopy(outlineTex, nullptr, &outlineRect);
-            sdl::surfaceDestroy(outlineSurf);
-            sdl::textureDestroy(outlineTex);
-
-            // Render the text
-            sdl::fontOutlineSet(font, 0);
-            sdl::Surface* textSurf = sdl::textRenderUTF8BlendedWrapped(font, text.data(), color, w);
-            sdl::Texture* textTex = sdl::textureCreateFromSurface(textSurf);
-            sdl::RectF textRect = { x, y, textSurf->w, textSurf->h };
-            sdl::renderCopy(textTex, nullptr, &textRect);
-            sdl::surfaceDestroy(textSurf);
-            sdl::textureDestroy(textTex);
-        }
     }
 
     /* Refreshes the font to match its size */

@@ -202,18 +202,17 @@
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Base\Utilities\Objects\BorderedDrawable.ixx">
+    <ClCompile Include="Source\Base\Utilities\Objects\Drawables\BorderedDrawable.ixx">
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Base\Utilities\Objects\FShader.ixx" />
     <ClCompile Include="Source\Base\Utilities\Objects\FMusic.ixx" />
     <ClCompile Include="Source\Base\Utilities\Objects\FSound.ixx" />
-    <ClCompile Include="Source\Base\Utilities\Objects\HorizontalDrawable.ixx">
+    <ClCompile Include="Source\Base\Utilities\Objects\Drawables\HorizontalDrawable.ixx">
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Base\Utilities\Objects\IDrawable.ixx">
+    <ClCompile Include="Source\Base\Utilities\Objects\Drawables\IDrawable.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -221,7 +220,7 @@
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Base\Utilities\Objects\VerticalDrawable.ixx">
+    <ClCompile Include="Source\Base\Utilities\Objects\Drawables\VerticalDrawable.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -280,7 +279,7 @@
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Source\Base\Utilities\Objects\FTexture.ixx">
+    <ClCompile Include="Source\Base\Utilities\Objects\Drawables\FTexture.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>

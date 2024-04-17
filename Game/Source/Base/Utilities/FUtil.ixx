@@ -6,6 +6,7 @@ import std;
 // std shorthands
 export template <typename T> using deque = std::deque<T>;
 export template <typename T> using list = std::list<T>;
+export template <typename T> using opt = std::optional<T>;
 export template <typename T> using set = std::set<T>;
 export template <typename T> using span = std::span<T>;
 export template <typename T> using sptr = std::shared_ptr<T>;
@@ -36,6 +37,9 @@ export template<typename T> concept Map = requires {
 		requires std::is_default_constructible_v<T>;
 };
 export template<typename T> concept Num = std::is_arithmetic_v<T>;
+export template<typename T, typename It> concept SetOf = IterOf<T,It> && requires(It a, T v) {
+	{ a.find(v) } -> std::convertible_to<typename It::iterator>;
+};
 export template<typename T> concept Strv = requires(T t) {
 	std::string_view{ t };
 };
@@ -60,15 +64,62 @@ export namespace fbc::futil {
 		return std::any_of(container.begin(), container.end(), predicate);
 	}
 
+	// Create an lowercase version of a string-like
+	export str toLowerCase(strv input) {
+		str res;
+		std::transform(input.begin(), input.end(), res.begin(),
+			[](unsigned char c) { return std::tolower(c); });
+		return res;
+	}
+
+	// Modify an existing string to be lowercase
+	export str& toLowerCaseInPlace(str& input) {
+		std::transform(input.begin(), input.end(), input.begin(),
+			[](unsigned char c) { return std::tolower(c); });
+		return input;
+	}
+
+	// Create an uppercase version of a string-like
+	export str toUpperCase(strv input) {
+		str res;
+		std::transform(input.begin(), input.end(), res.begin(),
+			[](unsigned char c) { return std::toupper(c); });
+		return res;
+	}
+
+	// Modify an existing string to be uppercase
+	export str& toUpperCaseInPlace(str& input) {
+		std::transform(input.begin(), input.end(), input.begin(),
+			[](unsigned char c) { return std::toupper(c); });
+		return input;
+	}
+
+	// Find the first item in the container that matches the given value
+	template<typename T, IterOf<T> TCo>
+	opt<T> find(const TCo& container, const T& value) {
+		if constexpr (SetOf<T, TCo>) {
+			auto it = container.find(value);
+			if (it != container.end()) {
+				return *it;
+			}
+		}
+		else {
+			auto it = std::find(container.begin(), container.end(), value);
+			if (it != container.end()) {
+				return *it;
+			}
+		}
+		return std::nullopt;
+	}
+
 	// Attempt to parse a string into an object
+	// TODO handle iterables and maps
 	export template <typename T> T fromString(strv input) {
 		if constexpr (std::is_same_v<T, str>) {
 			return str(input);
 		}
 		else if constexpr (std::is_same_v<T, bool> ) {
-			str toLower;
-			std::transform(input.begin(), input.end(), toLower.begin(),
-				[](unsigned char c) { return std::tolower(c); });
+			str toLower = toLowerCase(input);
 			if (toLower == VAL_TRUE || toLower == "1") {
 				return true;
 			}
@@ -113,26 +164,17 @@ export namespace fbc::futil {
 		return T();
 	}
 
+	// Check whether the given container contains the given value
+	template<typename T, IterOf<T> TCo>
+	bool has(const TCo& container, const T& value) {
+		return find(container, value) != std::nullopt;
+	}
+
 	// Transform each of the values in the container into a new value and store the results in a list
 	export template <typename T, typename U, IterOf<T> TCo> vec<U> map(const TCo& container, func<U(T)> mapFunc) {
 		vec<U> res(container.size());
 		std::transform(container.begin(), container.end(), res.begin(), mapFunc);
 		return res;
-	}
-
-	// Create an lowercase version of a string-like
-	export str toLowerCase(strv input) {
-		str res;
-		std::transform(input.begin(), input.end(), res.begin(),
-			[](unsigned char c) { return std::tolower(c); });
-		return res;
-	}
-
-	// Modify an existing string to be lowercase
-	export str& toLowerCaseInPlace(str& input) {
-		std::transform(input.begin(), input.end(), input.begin(),
-			[](unsigned char c) { return std::tolower(c); });
-		return input;
 	}
 
 	// Attempt to convert an arbitrary object into its string representation
@@ -181,20 +223,5 @@ export namespace fbc::futil {
 		std::ostringstream oss;
 		oss << obj;
 		return oss.str();
-	}
-
-	// Create an uppercase version of a string-like
-	export str toUpperCase(strv input) {
-		str res;
-		std::transform(input.begin(), input.end(), res.begin(),
-			[](unsigned char c) { return std::toupper(c); });
-		return res;
-	}
-
-	// Modify an existing string to be uppercase
-	export str& toUpperCaseInPlace(str& input) {
-		std::transform(input.begin(), input.end(), input.begin(),
-			[](unsigned char c) { return std::toupper(c); });
-		return input;
 	}
 }

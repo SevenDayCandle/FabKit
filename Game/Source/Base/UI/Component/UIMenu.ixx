@@ -20,9 +20,9 @@ export namespace fbc {
 
 			UIMenu<T>& menu;
 
-			inline void close() override {};
 			inline void renderImpl() override { menu.renderImpl(); };
 
+			void close() override;
 			void updateImpl() override;
 		};
 
@@ -34,6 +34,8 @@ export namespace fbc {
 		UIHoverable(hb), entryFunc(entryFunc), labelFunc(labelFunc), itemFont(itemFont), scrollbar(new RelativeHitbox(*hb)) {}
 		~UIMenu() override {}
 
+		inline void clearItems() { setItems(); }
+		inline bool isOpen() { return proxy != nullptr; }
 		inline int size() { return rows.size(); }
 
 		static uptr<UIEntry<T>> multiSelectFunc(T item, Hitbox& hb, str& name, FFont& itemFont, int index);
@@ -45,12 +47,11 @@ export namespace fbc {
 		UIMenu& setMaxRows(int rows);
 		vec<T&> getAllItems();
 		vec<T&> getSelectedItems();
-		void clearItems();
 		void clearSelection();
 		void forceClosePopup();
 		void openPopup();
 		void renderImpl() override;
-		void select(uset<T>& items);
+		template <IterOf<T> Iterable> void select(Iterable& items);
 		template <IterOf<int> Iterable> void selectIndices(Iterable& indices);
 		void updateImpl() override;
 		template <IterOf<int> Iterable> void updateIndices(Iterable& indices);
@@ -89,15 +90,37 @@ export namespace fbc {
 	UIMenu<T>& UIMenu<T>::addItems(Iterable& items) {
 		for (const T item : items) { makeRow(item); }
 		syncRowsForRender();
+		autosize();
 		return *this;
 	}
 
-	// Replaces the current rows with rows for each item in the provided list
+	// Replaces the current rows with rows for each item in the provided list. Clears any selections in the process, but does NOT invoke the change callback.
 	template <typename T> template <IterOf<T> Iterable>
 	UIMenu<T>& UIMenu<T>::setItems(Iterable& items) {
 		currentIndices.clear();
 		rows.clear();
+		topVisibleRowIndex = 0;
 		return addItems(items);
+	}
+
+	// Updates the selected indexes based on the given items. DOES invoke the change callback.
+	template<typename T> template<IterOf<T> Iterable>
+	void UIMenu<T>::select(Iterable& items)
+	{
+		updateSelection(items);
+		if (onChange) {
+			onChange(getSelectedItems());
+		}
+	}
+
+	// Updates the selected indexes. DOES invoke the change callback.
+	template<typename T> template<IterOf<int> Iterable>
+	void UIMenu<T>::selectIndices(Iterable& indices)
+	{
+		updateIndices(indices);
+		if (onChange) {
+			onChange(getSelectedItems());
+		}
 	}
 
 	// Updates the selected indexes. Does NOT invoke the change callback.
@@ -114,7 +137,25 @@ export namespace fbc {
 	void UIMenu<T>::updateSelection(Iterable& items)
 	{
 		currentIndices.clear();
-		// TODO
+		for (const uptr<UIEntry<T>>& row : rows) {
+			opt<T> res = futil::find(items, row->item);
+			if (res != std::nullopt) {
+				currentIndices.insert(row.index);
+			}
+		}
+		updateForSelection();
+	}
+
+	// Updates the menu font used by rows. This will update existing rows to use the new font, and will resize the menu as necessary
+	template<typename T>
+	UIMenu<T>& UIMenu<T>::setItemFont(FFont& itemFont)
+	{
+		this->itemFont = itemFont;
+		for (const uptr<UIEntry<T>>& row : rows) {
+			row.setFont(itemFont);
+		}
+		autosize();
+		return *this;
 	}
 
 	// Change the maximum number of rows that can show up at once when viewing the menu
@@ -124,9 +165,12 @@ export namespace fbc {
 		return *this;
 	}
 
-	// Unselects all items
+	// Unselects all items. DOES invoke the change callback
 	template <typename T> void UIMenu<T>::clearSelection() {
 		currentIndices.clear();
+		if (onChange) {
+			onChange(getSelectedItems());
+		}
 	}
 
 	// Get all items in the menu regardless of whether they are visible or selected

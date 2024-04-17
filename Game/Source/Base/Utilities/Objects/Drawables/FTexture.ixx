@@ -19,7 +19,7 @@ export namespace fbc {
             dim.h = h;
         }
         FTexture(const FTexture&) = delete;
-        ~FTexture() {
+        ~FTexture() override {
             // Unload texture when destroyed
             if (texture) {
                 sdl::textureDestroy(texture);
