@@ -10,6 +10,7 @@
 #include <type_traits>
 #include <vector>
 
+#include "glaze/concepts/container_concepts.hpp"
 #include "glaze/core/context.hpp"
 #include "glaze/core/meta.hpp"
 #include "glaze/util/bit_array.hpp"
@@ -17,6 +18,7 @@
 #include "glaze/util/expected.hpp"
 #include "glaze/util/for_each.hpp"
 #include "glaze/util/hash_map.hpp"
+#include "glaze/util/help.hpp"
 #include "glaze/util/string_literal.hpp"
 #include "glaze/util/tuple.hpp"
 #include "glaze/util/type_traits.hpp"
@@ -32,17 +34,6 @@ namespace glz
       using value_type = T;
       T& val;
    };
-
-   // Allows developers to add `static constexpr auto custom_read = true;` to their glz::meta to prevent ambiguous
-   // partial specialization for custom parsers
-   template <class T>
-   concept custom_read = requires { meta<T>::custom_read == true; };
-
-   template <class T>
-   concept custom_write = requires { meta<T>::custom_write == true; };
-
-   template <class T>
-   concept partial_read = requires { meta<T>::partial_read == true; };
 
    template <class... T>
    struct obj final
@@ -148,7 +139,7 @@ namespace glz
 
       constexpr decltype(auto) operator()(auto&& value) const noexcept
       {
-         return includer<std::decay_t<decltype(value)>>{value};
+         return includer<decay_keep_volatile_t<decltype(value)>>{value};
       }
    };
 
@@ -196,67 +187,11 @@ namespace glz
 #endif
    }
 
-   template <class Map, class Key>
-   concept findable = requires(Map& map, const Key& key) { map.find(key); };
-
    template <class T>
    concept is_member_function_pointer = std::is_member_function_pointer_v<T>;
 
    namespace detail
    {
-      template <int... I>
-      using is = std::integer_sequence<int, I...>;
-      template <int N>
-      using make_is = std::make_integer_sequence<int, N>;
-
-      constexpr auto size(const char* s) noexcept
-      {
-         int i = 0;
-         while (*s != 0) {
-            ++i;
-            ++s;
-         }
-         return i;
-      }
-
-      template <const char*, typename, const char*, typename>
-      struct concat_impl;
-
-      template <const char* S1, int... I1, const char* S2, int... I2>
-      struct concat_impl<S1, is<I1...>, S2, is<I2...>>
-      {
-         static constexpr const char value[]{S1[I1]..., S2[I2]..., 0};
-      };
-
-      template <const char* S1, const char* S2>
-      constexpr auto concat_char()
-      {
-         return concat_impl<S1, make_is<size(S1)>, S2, make_is<size(S2)>>::value;
-      }
-
-      template <size_t... Is>
-      struct seq
-      {};
-      template <size_t N, size_t... Is>
-      struct gen_seq : gen_seq<N - 1, N - 1, Is...>
-      {};
-      template <size_t... Is>
-      struct gen_seq<0, Is...> : seq<Is...>
-      {};
-
-      template <size_t N1, size_t... I1, size_t N2, size_t... I2>
-      constexpr std::array<const char, N1 + N2 - 1> concat(const char (&a1)[N1], const char (&a2)[N2], seq<I1...>,
-                                                           seq<I2...>)
-      {
-         return {{a1[I1]..., a2[I2]...}};
-      }
-
-      template <size_t N1, size_t N2>
-      constexpr std::array<const char, N1 + N2 - 1> concat_arrays(const char (&a1)[N1], const char (&a2)[N2])
-      {
-         return concat(a1, a2, gen_seq<N1 - 1>{}, gen_seq<N2>{});
-      }
-
       template <uint32_t Format>
       struct read
       {};
@@ -345,31 +280,6 @@ namespace glz
       template <class T>
       concept num_t = std::floating_point<std::decay_t<T>> || int_t<T>;
 
-      template <typename T>
-      concept complex_t = requires(T a, T b) {
-         {
-            a.real()
-         } -> std::convertible_to<typename T::value_type>;
-         {
-            a.imag()
-         } -> std::convertible_to<typename T::value_type>;
-         {
-            T(a.real(), a.imag())
-         } -> std::same_as<T>;
-         {
-            a + b
-         } -> std::same_as<T>;
-         {
-            a - b
-         } -> std::same_as<T>;
-         {
-            a* b
-         } -> std::same_as<T>;
-         {
-            a / b
-         } -> std::same_as<T>;
-      };
-
       template <class T>
       concept constructible = requires { meta<std::decay_t<T>>::construct; } || local_construct_t<std::decay_t<T>>;
 
@@ -378,12 +288,6 @@ namespace glz
 
       template <class T>
       concept str_t = !std::same_as<std::nullptr_t, T> && std::convertible_to<std::decay_t<T>, std::string_view>;
-
-      template <class T>
-      concept has_push_back = requires(T t, typename T::value_type v) { t.push_back(v); };
-
-      template <class T>
-      concept has_reserve = requires(T t) { t.reserve(size_t(1)); };
 
       // this concept requires that T is string and copies the string in json
       template <class T>
@@ -395,23 +299,6 @@ namespace glz
       // this concept requires that T is just a view
       template <class T>
       concept str_view_t = std::same_as<std::decay_t<T>, std::string_view>;
-
-      template <class T>
-      concept pair_t = requires(T pair) {
-         {
-            pair.first
-         } -> std::same_as<typename T::first_type&>;
-         {
-            pair.second
-         } -> std::same_as<typename T::second_type&>;
-      };
-
-      template <class T>
-      concept map_subscriptable = requires(T container) {
-         {
-            container[std::declval<typename T::key_type>()]
-         } -> std::same_as<typename T::mapped_type&>;
-      };
 
       template <class T>
       concept readable_map_t = !custom_read<T> && !meta_value_t<T> && !str_t<T> && range<T> &&
@@ -433,64 +320,16 @@ namespace glz
       concept array_t = (!meta_value_t<T> && !str_t<T> && !(readable_map_t<T> || writable_map_t<T>)&&range<T>);
 
       template <class T>
-      concept readable_array_t = (!custom_read<T> && !meta_value_t<T> && !str_t<T> && !readable_map_t<T> && range<T>);
+      concept readable_array_t =
+         (range<T> && !custom_read<T> && !meta_value_t<T> && !str_t<T> && !readable_map_t<T> && !filesystem_path<T>);
 
       template <class T>
-      concept writable_array_t = (!custom_write<T> && !meta_value_t<T> && !str_t<T> && !writable_map_t<T> && range<T>);
-
-      template <class T>
-      concept emplace_backable = requires(T container) {
-         {
-            container.emplace_back()
-         } -> std::same_as<typename T::reference>;
-      };
-
-      template <class T>
-      concept emplaceable = requires(T container) {
-         {
-            container.emplace(std::declval<typename T::value_type>())
-         };
-      };
-
-      template <class T>
-      concept push_backable = requires(T container) {
-         {
-            container.push_back(std::declval<typename T::value_type>())
-         };
-      };
-
-      template <class T>
-      concept resizeable = requires(T container) { container.resize(0); };
-
-      template <class T>
-      concept erasable = requires(T container) { container.erase(container.cbegin(), container.cend()); };
+      concept writable_array_t =
+         (range<T> && !custom_write<T> && !meta_value_t<T> && !str_t<T> && !writable_map_t<T> && !filesystem_path<T>);
 
       template <class T>
       concept fixed_array_value_t = array_t<std::decay_t<decltype(std::declval<T>()[0])>> &&
                                     !resizeable<std::decay_t<decltype(std::declval<T>()[0])>>;
-
-      template <class T>
-      concept has_size = requires(T container) { container.size(); };
-
-      template <class T>
-      concept has_empty = requires(T container) {
-         {
-            container.empty()
-         } -> std::convertible_to<bool>;
-      };
-
-      template <class T>
-      concept has_data = requires(T container) { container.data(); };
-
-      template <class T>
-      concept contiguous = has_size<T> && has_data<T>;
-
-      template <class T>
-      concept accessible = requires(T container) {
-         {
-            container[size_t{}]
-         } -> std::same_as<typename T::reference>;
-      };
 
       template <class T>
       concept boolean_like = std::same_as<T, bool> || std::same_as<T, std::vector<bool>::reference> ||
@@ -500,16 +339,7 @@ namespace glz
       concept vector_like = resizeable<T> && accessible<T> && has_data<T>;
 
       template <class T>
-      concept is_span = requires(T t) {
-         T::extent;
-         typename T::element_type;
-      };
-
-      template <class T>
       concept is_no_reflect = requires(T t) { requires T::glaze_reflect == false; };
-
-      template <class T>
-      concept is_dynamic_span = T::extent == static_cast<size_t>(-1);
 
       template <class T>
       concept has_static_size = (is_span<T> && !is_dynamic_span<T>) || (requires(T container) {
@@ -517,18 +347,6 @@ namespace glz
                                       std::bool_constant<(std::decay_t<T>{}.size(), true)>()
                                    } -> std::same_as<std::true_type>;
                                 } && std::decay_t<T>{}.size() > 0);
-
-      template <typename T>
-      concept is_bitset = requires(T bitset) {
-         bitset.flip();
-         bitset.set(0);
-         {
-            bitset.to_string()
-         } -> std::same_as<std::string>;
-         {
-            bitset.count()
-         } -> std::same_as<std::size_t>;
-      };
 
       template <class T>
       concept is_float128 = requires(T x) {
@@ -656,7 +474,7 @@ namespace glz
       template <class Tuple, size_t I>
       struct member_type
       {
-         using T0 = std::decay_t<std::tuple_element_t<0, std::tuple_element_t<I, Tuple>>>;
+         using T0 = decay_keep_volatile_t<std::tuple_element_t<0, std::tuple_element_t<I, Tuple>>>;
          using type = std::tuple_element_t<std::is_member_pointer_v<T0> ? 0 : 1, std::tuple_element_t<I, Tuple>>;
       };
 
@@ -670,18 +488,13 @@ namespace glz
       template <class Tuple>
       using value_tuple_variant_t = typename value_tuple_variant<Tuple>::type;
 
-      template <class T, size_t... I>
-      inline constexpr auto make_array_impl(std::index_sequence<I...>)
-      {
-         using value_t = typename tuple_variant<meta_t<T>>::type;
-         return std::array<value_t, std::tuple_size_v<meta_t<T>>>{glz::get<I>(meta_v<T>)...};
-      }
-
       template <class T>
       inline constexpr auto make_array()
       {
-         constexpr auto indices = std::make_index_sequence<std::tuple_size_v<meta_t<T>>>{};
-         return make_array_impl<T>(indices);
+         return []<size_t... I>(std::index_sequence<I...>) {
+            using value_t = typename tuple_variant<meta_t<T>>::type;
+            return std::array<value_t, std::tuple_size_v<meta_t<T>>>{glz::get<I>(meta_v<T>)...};
+         }(std::make_index_sequence<std::tuple_size_v<meta_t<T>>>{});
       }
 
       template <class Tuple, std::size_t... Is>
@@ -786,34 +599,39 @@ namespace glz
          }
          else if constexpr (n < 64) // don't even attempt a first character hash if we have too many keys
          {
-            constexpr auto front_desc = single_char_hash<n>(std::array<sv, n>{get_key<T, I>()...});
+            constexpr std::array<sv, n> keys{get_key<T, I>()...};
+            constexpr auto front_desc = single_char_hash<n>(keys);
 
             if constexpr (front_desc.valid) {
                return make_single_char_map<value_t, front_desc>({key_value<T, I>()...});
             }
             else {
-               constexpr auto back_desc = single_char_hash<n, false>(std::array<sv, n>{get_key<T, I>()...});
+               constexpr single_char_hash_opts rear_hash{.is_front_hash = false};
+               constexpr auto back_desc = single_char_hash<n, rear_hash>(keys);
 
                if constexpr (back_desc.valid) {
                   return make_single_char_map<value_t, back_desc>({key_value<T, I>()...});
                }
                else {
-                  if constexpr (n <= 20) {
-                     return glz::detail::naive_map<value_t, n, use_hash_comparison>({key_value<T, I>()...});
+                  constexpr single_char_hash_opts sum_hash{.is_front_hash = true, .is_sum_hash = true};
+                  constexpr auto sum_desc = single_char_hash<n, sum_hash>(keys);
+
+                  if constexpr (sum_desc.valid) {
+                     return make_single_char_map<value_t, sum_desc>({key_value<T, I>()...});
                   }
                   else {
-                     return glz::detail::normal_map<sv, value_t, n, use_hash_comparison>({key_value<T, I>()...});
+                     if constexpr (n <= naive_map_max_size) {
+                        return glz::detail::naive_map<value_t, n, use_hash_comparison>({key_value<T, I>()...});
+                     }
+                     else {
+                        return glz::detail::normal_map<sv, value_t, n, use_hash_comparison>({key_value<T, I>()...});
+                     }
                   }
                }
             }
          }
          else {
-            if constexpr (n <= 20) {
-               return glz::detail::naive_map<value_t, n, use_hash_comparison>({key_value<T, I>()...});
-            }
-            else {
-               return glz::detail::normal_map<sv, value_t, n, use_hash_comparison>({key_value<T, I>()...});
-            }
+            return glz::detail::normal_map<sv, value_t, n, use_hash_comparison>({key_value<T, I>()...});
          }
       }
 
@@ -822,73 +640,46 @@ namespace glz
       constexpr auto make_map()
       {
          constexpr auto indices = std::make_index_sequence<std::tuple_size_v<meta_t<T>>>{};
-         return make_map_impl<std::decay_t<T>, use_hash_comparison>(indices);
-      }
-
-      /*template <class T, size_t... I>
-      constexpr auto make_int_storage_impl(std::index_sequence<I...>)
-      {
-         using value_t = value_tuple_variant_t<meta_t<T>>;
-         return std::array<value_t, std::tuple_size_v<meta_t<T>>>({glz::get<1>(glz::get<I>(meta_v<T>))...});
-      }
-
-      template <class T>
-      constexpr auto make_int_storage()
-      {
-         constexpr auto indices = std::make_index_sequence<std::tuple_size_v<meta_t<T>>>{};
-         return make_int_storage_impl<T>(indices);
-      }*/
-
-      template <class T, size_t... I>
-      constexpr auto make_key_int_map_impl(std::index_sequence<I...>)
-      {
-         return normal_map<sv, size_t, std::tuple_size_v<meta_t<T>>>(
-            {std::make_pair<sv, size_t>(get_enum_key<T, I>(), I)...});
+         return make_map_impl<decay_keep_volatile_t<T>, use_hash_comparison>(indices);
       }
 
       template <class T>
       constexpr auto make_key_int_map()
       {
-         constexpr auto indices = std::make_index_sequence<std::tuple_size_v<meta_t<T>>>{};
-         return make_key_int_map_impl<T>(indices);
-      }
-
-      template <class T, size_t... I>
-      constexpr auto make_enum_to_string_map_impl(std::index_sequence<I...>)
-      {
-         using key_t = std::underlying_type_t<T>;
-         return normal_map<key_t, sv, std::tuple_size_v<meta_t<T>>>(
-            {std::make_pair<key_t, sv>(static_cast<key_t>(get_enum_value<T, I>()), get_enum_key<T, I>())...});
+         constexpr auto N = std::tuple_size_v<meta_t<T>>;
+         return [&]<size_t... I>(std::index_sequence<I...>) {
+            return normal_map<sv, size_t, std::tuple_size_v<meta_t<T>>>(
+               {std::make_pair<sv, size_t>(get_enum_key<T, I>(), I)...});
+         }(std::make_index_sequence<N>{});
       }
 
       template <class T>
       constexpr auto make_enum_to_string_map()
       {
-         constexpr auto indices = std::make_index_sequence<std::tuple_size_v<meta_t<T>>>{};
-         return make_enum_to_string_map_impl<T>(indices);
+         constexpr auto N = std::tuple_size_v<meta_t<T>>;
+         return [&]<size_t... I>(std::index_sequence<I...>) {
+            using key_t = std::underlying_type_t<T>;
+            return normal_map<key_t, sv, N>(
+               {std::make_pair<key_t, sv>(static_cast<key_t>(get_enum_value<T, I>()), get_enum_key<T, I>())...});
+         }(std::make_index_sequence<N>{});
       }
 
       // TODO: This faster approach can be used if the enum has an integer type base and sequential numbering
       template <class T>
-      constexpr auto make_enum_to_string_array()
+      constexpr auto make_enum_to_string_array() noexcept
       {
-         std::array<sv, std::tuple_size_v<meta_t<T>>> arr;
-         for_each<std::tuple_size_v<meta_t<T>>>([&](auto I) { arr[I] = get_enum_key<T, I>(); });
-         return arr;
-      }
-
-      template <class T, size_t... I>
-      constexpr auto make_string_to_enum_map_impl(std::index_sequence<I...>)
-      {
-         return normal_map<sv, T, std::tuple_size_v<meta_t<T>>>(
-            {std::make_pair<sv, T>(get_enum_key<T, I>(), T(get_enum_value<T, I>()))...});
+         return []<size_t... I>(std::index_sequence<I...>) {
+            return std::array<sv, sizeof...(I)>{get_enum_key<T, I>()...};
+         }(std::make_index_sequence<std::tuple_size_v<meta_t<T>>>{});
       }
 
       template <class T>
-      constexpr auto make_string_to_enum_map()
+      constexpr auto make_string_to_enum_map() noexcept
       {
-         constexpr auto indices = std::make_index_sequence<std::tuple_size_v<meta_t<T>>>{};
-         return make_string_to_enum_map_impl<T>(indices);
+         constexpr auto N = std::tuple_size_v<meta_t<T>>;
+         return [&]<size_t... I>(std::index_sequence<I...>) {
+            return normal_map<sv, T, N>({std::pair<sv, T>{get_enum_key<T, I>(), T(get_enum_value<T, I>())}...});
+         }(std::make_index_sequence<N>{});
       }
 
       // get a std::string_view from an enum value
@@ -973,7 +764,7 @@ namespace glz
 
          constexpr auto N = std::variant_size_v<T>;
          for_each<N>([&](auto I) {
-            using V = std::decay_t<std::variant_alternative_t<I, T>>;
+            using V = decay_keep_volatile_t<std::variant_alternative_t<I, T>>;
             if constexpr (reflectable<V>) {
                for_each<std::tuple_size_v<decltype(member_names<V>)>>(
                   [&](auto J) { deduction_map.find(get<J>(member_names<V>))->second[I] = true; });
@@ -1105,32 +896,37 @@ namespace glz
       }
    }
 
-   constexpr auto array(auto&&... args) { return detail::Array{glz::tuplet::make_copy_tuple(conv_sv(args)...)}; }
+   constexpr auto array(auto&&... args) noexcept { return detail::Array{glz::tuplet::tuple{conv_sv(args)...}}; }
 
-   constexpr auto object(auto&&... args)
+   constexpr auto object(auto&&... args) noexcept
    {
       if constexpr (sizeof...(args) == 0) {
          return glz::detail::Object{glz::tuplet::tuple{}};
       }
       else {
-         return glz::detail::Object{
-            group_builder<std::decay_t<decltype(glz::tuplet::make_copy_tuple(conv_sv(args)...))>>::op(
-               glz::tuplet::make_copy_tuple(conv_sv(args)...))};
+         using Tuple = std::decay_t<decltype(glz::tuplet::tuple{conv_sv(args)...})>;
+         return glz::detail::Object{group_builder<Tuple>::op(glz::tuplet::tuple{conv_sv(args)...})};
       }
    }
 
-   constexpr auto enumerate(auto&&... args)
+   constexpr auto enumerate(auto&&... args) noexcept
    {
-      return glz::detail::Enum{
-         group_builder<std::decay_t<decltype(glz::tuplet::make_copy_tuple(conv_sv(args)...))>>::op(
-            glz::tuplet::make_copy_tuple(conv_sv(args)...))};
+      using Tuple = std::decay_t<decltype(glz::tuplet::tuple{conv_sv(args)...})>;
+      return glz::detail::Enum{group_builder<Tuple>::op(glz::tuplet::tuple{conv_sv(args)...})};
    }
 
-   constexpr auto flags(auto&&... args)
+   // A faster compiling version of enumerate that does not support reflection
+   constexpr auto enumerate_no_reflect(auto&&... args) noexcept
    {
-      return glz::detail::Flags{
-         group_builder<std::decay_t<decltype(glz::tuplet::make_copy_tuple(conv_sv(args)...))>>::op(
-            glz::tuplet::make_copy_tuple(conv_sv(args)...))};
+      return [t = glz::tuplet::tuple{args...}]<size_t... I>(std::index_sequence<I...>) noexcept {
+         return glz::detail::Enum{std::array{std::pair{conv_sv(get<2 * I>(t)), get<2 * I + 1>(t)}...}};
+      }(std::make_index_sequence<sizeof...(args) / 2>{});
+   }
+
+   constexpr auto flags(auto&&... args) noexcept
+   {
+      using Tuple = std::decay_t<decltype(glz::tuplet::tuple{conv_sv(args)...})>;
+      return glz::detail::Flags{group_builder<Tuple>::op(glz::tuplet::tuple{conv_sv(args)...})};
    }
 }
 
@@ -1151,55 +947,57 @@ template <>
 struct glz::meta<glz::error_code>
 {
    static constexpr sv name = "glz::error_code";
+   using enum glz::error_code;
    static constexpr auto value =
-      enumerate("none", glz::error_code::none, //
-                "no_read_input", glz::error_code::no_read_input, //
-                "data_must_be_null_terminated", glz::error_code::data_must_be_null_terminated, //
-                "parse_number_failure", glz::error_code::parse_number_failure, //
-                "expected_brace", glz::error_code::expected_brace, //
-                "expected_bracket", glz::error_code::expected_bracket, //
-                "expected_quote", glz::error_code::expected_quote, //
-                "exceeded_static_array_size", glz::error_code::exceeded_static_array_size, //
-                "unexpected_end", glz::error_code::unexpected_end, //
-                "expected_end_comment", glz::error_code::expected_end_comment, //
-                "syntax_error", glz::error_code::syntax_error, //
-                "key_not_found", glz::error_code::key_not_found, //
-                "unexpected_enum", glz::error_code::unexpected_enum, //
-                "attempt_const_read", glz::error_code::attempt_const_read, //
-                "attempt_member_func_read", glz::error_code::attempt_member_func_read, //
-                "attempt_read_hidden", glz::error_code::attempt_read_hidden, //
-                "invalid_nullable_read", glz::error_code::invalid_nullable_read, //
-                "invalid_variant_object", glz::error_code::invalid_variant_object, //
-                "invalid_variant_array", glz::error_code::invalid_variant_array, //
-                "invalid_variant_string", glz::error_code::invalid_variant_string, //
-                "no_matching_variant_type", glz::error_code::no_matching_variant_type, //
-                "expected_true_or_false", glz::error_code::expected_true_or_false, //
-                "unknown_key", glz::error_code::unknown_key, //
-                "invalid_flag_input", glz::error_code::invalid_flag_input, //
-                "invalid_escape", glz::error_code::invalid_escape, //
-                "u_requires_hex_digits", glz::error_code::u_requires_hex_digits, //
-                "file_extension_not_supported", glz::error_code::file_extension_not_supported, //
-                "could_not_determine_extension", glz::error_code::could_not_determine_extension, //
-                "seek_failure", glz::error_code::seek_failure, //
-                "unicode_escape_conversion_failure", glz::error_code::unicode_escape_conversion_failure, //
-                "file_open_failure", glz::error_code::file_open_failure, //
-                "file_include_error", glz::error_code::file_include_error, //
-                "dump_int_error", glz::error_code::dump_int_error, //
-                "get_nonexistent_json_ptr", glz::error_code::get_nonexistent_json_ptr, //
-                "get_wrong_type", glz::error_code::get_wrong_type, //
-                "cannot_be_referenced", glz::error_code::cannot_be_referenced, //
-                "invalid_get", glz::error_code::invalid_get, //
-                "invalid_get_fn", glz::error_code::invalid_get_fn, //
-                "invalid_call", glz::error_code::invalid_call, //
-                "invalid_partial_key", glz::error_code::invalid_partial_key, //
-                "name_mismatch", glz::error_code::name_mismatch, //
-                "array_element_not_found", glz::error_code::array_element_not_found, //
-                "elements_not_convertible_to_design", glz::error_code::elements_not_convertible_to_design, //
-                "unknown_distribution", glz::error_code::unknown_distribution, //
-                "invalid_distribution_elements", glz::error_code::invalid_distribution_elements, //
-                "missing_key", glz::error_code::missing_key, //
-                "hostname_failure", glz::error_code::hostname_failure, //
-                "includer_error", glz::error_code::includer_error //
+      enumerate_no_reflect("none", none, //
+                           "no_read_input", no_read_input, //
+                           "data_must_be_null_terminated", data_must_be_null_terminated, //
+                           "parse_number_failure", parse_number_failure, //
+                           "expected_brace", expected_brace, //
+                           "expected_bracket", expected_bracket, //
+                           "expected_quote", expected_quote, //
+                           "exceeded_static_array_size", exceeded_static_array_size, //
+                           "unexpected_end", unexpected_end, //
+                           "expected_end_comment", expected_end_comment, //
+                           "syntax_error", syntax_error, //
+                           "key_not_found", key_not_found, //
+                           "unexpected_enum", unexpected_enum, //
+                           "attempt_const_read", attempt_const_read, //
+                           "attempt_member_func_read", attempt_member_func_read, //
+                           "attempt_read_hidden", attempt_read_hidden, //
+                           "invalid_nullable_read", invalid_nullable_read, //
+                           "invalid_variant_object", invalid_variant_object, //
+                           "invalid_variant_array", invalid_variant_array, //
+                           "invalid_variant_string", invalid_variant_string, //
+                           "no_matching_variant_type", no_matching_variant_type, //
+                           "expected_true_or_false", expected_true_or_false, //
+                           "unknown_key", unknown_key, //
+                           "invalid_flag_input", invalid_flag_input, //
+                           "invalid_escape", invalid_escape, //
+                           "u_requires_hex_digits", u_requires_hex_digits, //
+                           "file_extension_not_supported", file_extension_not_supported, //
+                           "could_not_determine_extension", could_not_determine_extension, //
+                           "seek_failure", seek_failure, //
+                           "unicode_escape_conversion_failure", unicode_escape_conversion_failure, //
+                           "file_open_failure", file_open_failure, //
+                           "file_close_failure", file_close_failure, //
+                           "file_include_error", file_include_error, //
+                           "dump_int_error", dump_int_error, //
+                           "get_nonexistent_json_ptr", get_nonexistent_json_ptr, //
+                           "get_wrong_type", get_wrong_type, //
+                           "cannot_be_referenced", cannot_be_referenced, //
+                           "invalid_get", invalid_get, //
+                           "invalid_get_fn", invalid_get_fn, //
+                           "invalid_call", invalid_call, //
+                           "invalid_partial_key", invalid_partial_key, //
+                           "name_mismatch", name_mismatch, //
+                           "array_element_not_found", array_element_not_found, //
+                           "elements_not_convertible_to_design", elements_not_convertible_to_design, //
+                           "unknown_distribution", unknown_distribution, //
+                           "invalid_distribution_elements", invalid_distribution_elements, //
+                           "missing_key", missing_key, //
+                           "hostname_failure", hostname_failure, //
+                           "includer_error", includer_error //
       );
 };
 

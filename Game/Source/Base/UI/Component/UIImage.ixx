@@ -3,6 +3,7 @@ export module fbc.uiImage;
 import fbc.futil;
 import fbc.hitbox;
 import fbc.iDrawable;
+import fbc.textInfo;
 import fbc.tooltip;
 import fbc.uiTipHoverable;
 import sdl;

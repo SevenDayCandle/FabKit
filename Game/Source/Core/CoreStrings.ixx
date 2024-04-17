@@ -19,8 +19,8 @@ export namespace fbc {
 		inline str ui_close() { return uiStrings["ui_close"]; };
 		inline str ui_confirm() { return uiStrings["ui_confirm"]; };
 	private:
-		unmap<str, KeywordStrings> keywordStrings;
-		unmap<str, str> uiStrings;
+		umap<str, KeywordStrings> keywordStrings;
+		umap<str, str> uiStrings;
 	};
 
 	// Core contains UI strings, keyword strings

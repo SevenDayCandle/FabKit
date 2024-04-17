@@ -37,6 +37,25 @@ namespace glz::detail
    };
    // clang-format on
 
+   constexpr std::array<bool, 128> ascii_whitespace_table = [] {
+      std::array<bool, 128> t{};
+      t['\n'] = true;
+      t['\t'] = true;
+      t['\r'] = true;
+      t[' '] = true;
+      return t;
+   }();
+
+   constexpr std::array<bool, 128> ascii_whitespace_comment_table = [] {
+      std::array<bool, 128> t{};
+      t['\n'] = true;
+      t['\t'] = true;
+      t['\r'] = true;
+      t[' '] = true;
+      t['/'] = true;
+      return t;
+   }();
+
    // assumes null terminated
    template <char c>
    GLZ_ALWAYS_INLINE void match(is_context auto&& ctx, auto&& it) noexcept
@@ -75,10 +94,6 @@ namespace glz::detail
 
    GLZ_ALWAYS_INLINE void skip_comment(is_context auto&& ctx, auto&& it, auto&& end) noexcept
    {
-      if (bool(ctx.error)) [[unlikely]] {
-         return;
-      }
-
       ++it;
       if (it == end) [[unlikely]] {
          ctx.error = error_code::unexpected_end;
@@ -158,38 +173,21 @@ namespace glz::detail
    GLZ_ALWAYS_INLINE void skip_ws_no_pre_check(is_context auto&& ctx, auto&& it, auto&& end) noexcept
    {
       if constexpr (!Opts.force_conformance) {
-         while (true) {
-            switch (*it) {
-            case '\t':
-            case '\n':
-            case '\r':
-            case ' ':
-               ++it;
-               break;
-            case '/': {
+         while (ascii_whitespace_comment_table[*it]) {
+            if (*it == '/') [[unlikely]] {
                skip_comment(ctx, it, end);
                if (bool(ctx.error)) [[unlikely]] {
                   return;
                }
-               break;
             }
-            default:
-               return;
+            else [[likely]] {
+               ++it;
             }
          }
       }
       else {
-         while (true) {
-            switch (*it) {
-            case '\t':
-            case '\n':
-            case '\r':
-            case ' ':
-               ++it;
-               break;
-            default:
-               return;
-            }
+         while (ascii_whitespace_table[*it]) {
+            ++it;
          }
       }
    }
@@ -253,7 +251,7 @@ namespace glz::detail
             uint64_t chunk;
             std::memcpy(&chunk, it, 8);
             uint64_t test_chars = has_quote(chunk);
-            escaped |= has_escape(chunk);
+            escaped |= static_cast<bool>(has_escape(chunk));
             if (test_chars) {
                it += (std::countr_zero(test_chars) >> 3);
 

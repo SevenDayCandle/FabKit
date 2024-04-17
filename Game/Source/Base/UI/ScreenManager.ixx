@@ -26,6 +26,14 @@ export namespace fbc::screenManager {
 		queuedCloseOverlay = target;
 	}
 
+	// Get the active overlay
+	UIBase* getActiveOverlay() {
+		if (overlays.empty()) {
+			return nullptr;
+		}
+		return overlays.front().get();
+	}
+
 	// Add an overlay to the top of the screen
 	void openOverlay(uptr<fbc::UIBase>&& target) {
 		overlays.push_front(std::move(target));

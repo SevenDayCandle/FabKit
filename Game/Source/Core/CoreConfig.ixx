@@ -60,8 +60,7 @@ export namespace fbc {
 
 
 	// Sets up render scale. Resolution uses the height of a 4k screen as a base
-	void CoreConfig::postInitialize()
-	{
+	void CoreConfig::postInitialize() {
 		renderScalePrivate = cfg.graphicsResolutionY.get() / BASE_DENOMINATOR;
 	}
 }

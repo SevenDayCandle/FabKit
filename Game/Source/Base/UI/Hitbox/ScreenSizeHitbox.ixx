@@ -10,6 +10,9 @@ export namespace fbc {
 		ScreenSizeHitbox() : Hitbox(0, 0, 1, 1) {
 			ScreenSizeHitbox::refreshSize();
 		}
+		ScreenSizeHitbox(float screenXPercentSize, float screenYPercentSize) : Hitbox(screenXPercentSize, screenYPercentSize) {
+			ScreenSizeHitbox::refreshSize();
+		}
 		ScreenSizeHitbox(float screenXPercentPos, float screenYPercentPos, float screenXPercentSize, float screenYPercentSize) : Hitbox(screenXPercentPos, screenYPercentPos, screenXPercentSize, screenYPercentSize) {
 			ScreenSizeHitbox::refreshSize();
 		}

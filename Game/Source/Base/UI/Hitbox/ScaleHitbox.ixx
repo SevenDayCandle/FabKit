@@ -7,6 +7,9 @@ export namespace fbc {
 	export class ScaleHitbox : public Hitbox {
 	public:
 		ScaleHitbox() {}
+		ScaleHitbox(float offsetWidth, float offsetHeight) : Hitbox(offsetWidth, offsetHeight) {
+			ScaleHitbox::refreshSize();
+		}
 		ScaleHitbox(float offsetX, float offsetY, float offsetWidth, float offsetHeight): Hitbox(offsetX, offsetY, offsetWidth, offsetHeight) {
 			ScaleHitbox::refreshSize();
 		}

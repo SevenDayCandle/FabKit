@@ -18,6 +18,12 @@ namespace glz
    struct meta
    {};
 
+   template <>
+   struct meta<std::string_view>
+   {
+      static constexpr std::string_view name = "std::string_view";
+   };
+
    template <class T>
    struct json_schema
    {};
@@ -123,13 +129,13 @@ namespace glz
    }();
 
    template <class T>
-   inline constexpr auto meta_v = meta_wrapper_v<std::decay_t<T>>.value;
+   inline constexpr auto meta_v = meta_wrapper_v<decay_keep_volatile_t<T>>.value;
 
    template <class T>
-   using meta_t = std::decay_t<decltype(meta_v<T>)>;
+   using meta_t = decay_keep_volatile_t<decltype(meta_v<T>)>;
 
    template <class T>
-   using meta_wrapper_t = std::decay_t<decltype(meta_wrapper_v<std::decay_t<T>>)>;
+   using meta_wrapper_t = decay_keep_volatile_t<decltype(meta_wrapper_v<std::decay_t<T>>)>;
 
    template <class T>
    struct remove_meta_wrapper
@@ -276,4 +282,27 @@ namespace glz
 
    template <class T>
    using json_schema_type = std::decay_t<decltype(json_schema_v<T>)>;
+
+   // Allows developers to add `static constexpr auto custom_read = true;` to their glz::meta to prevent ambiguous
+   // partial specialization for custom parsers
+   template <class T>
+   concept custom_read = requires { meta<T>::custom_read == true; };
+
+   template <class T>
+   concept custom_write = requires { meta<T>::custom_write == true; };
+
+   template <class T>
+   concept partial_read = requires { meta<T>::partial_read == true; };
+
+   template <typename T>
+   concept specialized_with_custom_write = requires {
+      meta<T>::custom_write;
+      requires(meta<T>::custom_write == true);
+   };
+
+   template <typename T>
+   concept specialized_with_custom_read = requires {
+      meta<T>::custom_write;
+      requires(meta<T>::custom_read == true);
+   };
 }

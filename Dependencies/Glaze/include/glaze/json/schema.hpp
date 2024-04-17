@@ -141,8 +141,10 @@ namespace glz
 {
    namespace detail
    {
+      // The reflection schema map makes a map of all schema types within a glz::json_schema
+      // and returns a map of these schemas with their reflected names.
       template <class T>
-      consteval auto make_reflection_schema_array()
+      consteval auto make_reflection_schema_map()
       {
          auto schema_instance = json_schema_v<T>;
          auto tuple = to_tuple(schema_instance);
@@ -150,33 +152,14 @@ namespace glz
          constexpr auto N = std::tuple_size_v<V>;
          if constexpr (N > 0) {
             constexpr auto& names = member_names<json_schema_type<T>>;
-
-            std::array<std::pair<sv, schema>, N> ret{};
-
-            for_each<N>([&](auto I) { ret[I] = std::pair{names[I], std::get<I>(tuple)}; });
-
-            return ret;
+            return [&]<size_t... I>(std::index_sequence<I...>) {
+               return detail::normal_map<sv, schema, N>(
+                  std::array<std::pair<sv, schema>, N>{std::pair{names[I], std::get<I>(tuple)}...});
+            }(std::make_index_sequence<N>{});
          }
          else {
-            return std::array<std::pair<sv, schema>, 0>{};
+            return detail::normal_map<sv, schema, 0>(std::array<std::pair<sv, schema>, 0>{});
          }
-      };
-
-      template <size_t N, size_t... I>
-      constexpr auto make_reflection_schema_map_impl(auto& arr, std::index_sequence<I...>)
-      {
-         return glz::detail::normal_map<sv, schema, N>({std::get<I>(arr)...});
-      }
-
-      // The reflection schema map makes a map of all schema types within a glz::json_schema
-      // and returns a map of these schemas with their reflected names.
-      template <class T>
-      constexpr auto make_reflection_schema_map()
-      {
-         constexpr auto arr = make_reflection_schema_array<T>();
-         constexpr auto N = arr.size();
-         constexpr auto indices = std::make_index_sequence<N>{};
-         return make_reflection_schema_map_impl<N>(arr, indices);
       }
 
       template <class T = void>
@@ -251,13 +234,13 @@ namespace glz
             // s.enumeration = std::vector<std::string_view>(N);
             // for_each<N>([&](auto I) {
             //    static constexpr auto item = std::get<I>(meta_v<V>);
-            //    (*s.enumeration)[I.value] = std::get<0>(item);
+            //    (*s.enumeration)[I] = std::get<0>(item);
             // });
             s.oneOf = std::vector<schematic>(N);
             for_each<N>([&](auto I) {
                static constexpr auto item = get<I>(meta_v<V>);
                using T0 = std::decay_t<decltype(get<0>(item))>;
-               auto& enumeration = (*s.oneOf)[I.value];
+               auto& enumeration = (*s.oneOf)[I];
                enumeration.constant = get_enum_key<V, I>();
                static constexpr size_t member_index = std::is_enum_v<T0> ? 0 : 1;
                static constexpr size_t comment_index = member_index + 1;
@@ -358,7 +341,7 @@ namespace glz
 
             for_each<N>([&](auto I) {
                using V = std::decay_t<std::variant_alternative_t<I, T>>;
-               auto& schema_val = (*s.oneOf)[I.value];
+               auto& schema_val = (*s.oneOf)[I];
                to_json_schema<V>::template op<Opts>(schema_val, defs);
                if constexpr ((glaze_object_t<V> || reflectable<V>)&&!tag_v<T>.empty()) {
                   if (!schema_val.required) {

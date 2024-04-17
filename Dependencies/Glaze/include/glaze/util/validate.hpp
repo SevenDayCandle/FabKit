@@ -21,6 +21,17 @@ namespace glz
          size_t rear_truncation{};
       };
 
+      // We convert to only single spaces for error messages in order to keep the source info
+      // calculation more efficient and avoid needing to allocate more memory.
+      inline void convert_tabs_to_single_spaces(std::string& input) noexcept
+      {
+         for (auto& c : input) {
+            if (c == '\t') {
+               c = ' ';
+            }
+         }
+      }
+
       inline std::optional<source_info> get_source_info(const std::string_view buffer, const size_t index)
       {
          if (index >= buffer.size()) {
@@ -60,15 +71,18 @@ namespace glz
             }
          }
 
-         if constexpr (std::same_as<V, std::byte>) {
-            std::string context{reinterpret_cast<const char*>(&(*context_begin)),
-                                reinterpret_cast<const char*>(&(*context_end))};
-            return source_info{line, column, context, index, front_truncation, rear_truncation};
-         }
-         else {
-            std::string context{context_begin, context_end};
-            return source_info{line, column, context, index, front_truncation, rear_truncation};
-         }
+         std::string context = [&]() -> std::string {
+            if constexpr (std::same_as<V, std::byte>) {
+               return {reinterpret_cast<const char*>(&(*context_begin)),
+                       reinterpret_cast<const char*>(&(*context_end))};
+            }
+            else {
+               return {context_begin, context_end};
+            }
+         }();
+
+         convert_tabs_to_single_spaces(context);
+         return source_info{line, column, context, index, front_truncation, rear_truncation};
       }
 
       inline std::string generate_error_string(const std::string_view error, const source_info& info,
@@ -99,7 +113,7 @@ namespace glz
          for (size_t i = 0; i < info.column - 1 - info.front_truncation; ++i) {
             s += " ";
          }
-         s += "^\n";
+         s += "^";
 
          return s;
       }

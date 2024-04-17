@@ -8,7 +8,7 @@
 #include <ostream>
 #include <variant>
 
-#include "glaze/core/format.hpp"
+#include "glaze/core/opts.hpp"
 #include "glaze/core/write.hpp"
 #include "glaze/core/write_chars.hpp"
 #include "glaze/json/ptr.hpp"
@@ -21,33 +21,19 @@ namespace glz
 {
    namespace detail
    {
-      template <class T = void>
-      struct to_json
-      {};
-
-      template <auto Opts, class T, class Ctx, class B, class IX>
-      concept write_json_invocable = requires(T&& value, Ctx&& ctx, B&& b, IX&& ix) {
-         to_json<std::remove_cvref_t<T>>::template op<Opts>(std::forward<T>(value), std::forward<Ctx>(ctx),
-                                                            std::forward<B>(b), std::forward<IX>(ix));
-      };
-
       template <>
       struct write<json>
       {
          template <auto Opts, class T, is_context Ctx, class B, class IX>
          GLZ_ALWAYS_INLINE static void op(T&& value, Ctx&& ctx, B&& b, IX&& ix) noexcept
          {
-            if constexpr (write_json_invocable<Opts, T, Ctx, B, IX>) {
-               to_json<std::remove_cvref_t<T>>::template op<Opts>(std::forward<T>(value), std::forward<Ctx>(ctx),
-                                                                  std::forward<B>(b), std::forward<IX>(ix));
-            }
-            else {
-               static_assert(false_v<T>, "Glaze metadata is probably needed for your type");
-            }
+            to_json<std::remove_cvref_t<T>>::template op<Opts>(std::forward<T>(value), std::forward<Ctx>(ctx),
+                                                               std::forward<B>(b), std::forward<IX>(ix));
          }
       };
 
-      template <glaze_value_t T>
+      template <class T>
+         requires(glaze_value_t<T> && !specialized_with_custom_write<T>)
       struct to_json<T>
       {
          template <auto Opts, class Value, is_context Ctx, class B, class IX>
@@ -187,25 +173,19 @@ namespace glz
          }
       };
 
-      constexpr uint16_t combine(const char chars[2]) noexcept
-      {
-         return uint16_t(chars[0]) | (uint16_t(chars[1]) << 8);
-      }
+      constexpr std::array<uint16_t, 256> char_escape_table = [] {
+         auto combine = [](const char chars[2]) -> uint16_t { return uint16_t(chars[0]) | (uint16_t(chars[1]) << 8); };
 
-      // clang-format off
-      constexpr std::array<uint16_t, 256> char_escape_table = { //
-         0, 0, 0, 0, 0, 0, 0, 0, combine(R"(\b)"), combine(R"(\t)"), //
-         combine(R"(\n)"), 0, combine(R"(\f)"), combine(R"(\r)"), 0, 0, 0, 0, 0, 0, //
-         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //
-         0, 0, 0, 0, combine(R"(\")"), 0, 0, 0, 0, 0, //
-         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //
-         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //
-         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //
-         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //
-         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //
-         0, 0, combine(R"(\\)") //
-      };
-      // clang-format on
+         std::array<uint16_t, 256> t{};
+         t['\b'] = combine(R"(\b)");
+         t['\t'] = combine(R"(\t)");
+         t['\n'] = combine(R"(\n)");
+         t['\f'] = combine(R"(\f)");
+         t['\r'] = combine(R"(\r)");
+         t['\"'] = combine(R"(\")");
+         t['\\'] = combine(R"(\\)");
+         return t;
+      }();
 
       template <size_t Bytes>
          requires(Bytes == 8)
@@ -245,7 +225,6 @@ namespace glz
          GLZ_ALWAYS_INLINE static void op(auto&& value, is_context auto&&, B&& b, auto&& ix) noexcept
          {
             if constexpr (Opts.number) {
-               // TODO: Should we check if the string number is valid?
                dump(value, b, ix);
             }
             else if constexpr (char_t<T>) {
@@ -253,45 +232,30 @@ namespace glz
                   dump(value, b, ix);
                }
                else {
-                  dump<'"'>(b, ix);
-
-                  switch (value) {
-                  case '"':
-                     dump<"\\\"">(b, ix);
-                     break;
-                  case '\\':
-                     dump<"\\\\">(b, ix);
-                     break;
-                  case '\b':
-                     dump<"\\b">(b, ix);
-                     break;
-                  case '\f':
-                     dump<"\\f">(b, ix);
-                     break;
-                  case '\n':
-                     dump<"\\n">(b, ix);
-                     break;
-                  case '\r':
-                     dump<"\\r">(b, ix);
-                     break;
-                  case '\t':
-                     dump<"\\t">(b, ix);
-                     break;
-                  case '\0':
-                     // escape character treated as empty string
-                     break;
-                  default:
-                     // Hiding warning for build, this is an error with wider char types
-                     dump(static_cast<char>(value), b,
-                          ix); // TODO: This warning is an error We need to be able to dump wider char types
+                  if constexpr (resizeable<B>) {
+                     const auto k = ix + 4; // 4 characters is enough for quotes and escaped character
+                     if (k >= b.size()) [[unlikely]] {
+                        b.resize((std::max)(b.size() * 2, k));
+                     }
                   }
 
-                  dump<'"'>(b, ix);
+                  dump_unchecked<'"'>(b, ix);
+                  if (const auto escaped = char_escape_table[uint8_t(value)]; escaped) {
+                     std::memcpy(data_ptr(b) + ix, &escaped, 2);
+                     ix += 2;
+                  }
+                  else if (value == '\0') {
+                     // null character treated as empty string
+                  }
+                  else {
+                     dump_unchecked(value, b, ix);
+                  }
+                  dump_unchecked<'"'>(b, ix);
                }
             }
             else {
                if constexpr (Opts.raw_string) {
-                  const sv str = [&]() -> sv {
+                  const sv str = [&]() -> const sv {
                      if constexpr (!char_array_t<T> && std::is_pointer_v<std::decay_t<T>>) {
                         return value ? value : "";
                      }
@@ -315,7 +279,7 @@ namespace glz
                   dump_unchecked<'"'>(b, ix);
                }
                else {
-                  const sv str = [&]() -> sv {
+                  const sv str = [&]() -> const sv {
                      if constexpr (!char_array_t<T> && std::is_pointer_v<std::decay_t<T>>) {
                         return value ? value : "";
                      }
@@ -338,7 +302,7 @@ namespace glz
                   // now we don't have to check writing
 
                   if constexpr (Opts.raw) {
-                     dump(str, b, ix);
+                     dump_unchecked(str, b, ix);
                   }
                   else {
                      dump_unchecked<'"'>(b, ix);
@@ -363,20 +327,23 @@ namespace glz
                         const auto* c = str.data();
                         const auto* const e = c + n;
 
-                        if (str.size() > 7) {
+                        if (n > 7) {
+                           const auto data = data_ptr(b);
                            for (const auto end_m7 = e - 7; c < end_m7;) {
-                              std::memcpy(data_ptr(b) + ix, c, 8);
+                              std::memcpy(data + ix, c, 8);
                               uint64_t chunk;
                               std::memcpy(&chunk, c, 8);
+                              // We don't check for writing out invalid characters as this can be tested by the user if
+                              // necessary. In the case of invalid JSON characters we write out null characters to
+                              // showcase the error and make the JSON invalid. These would then be detected upon reading
+                              // the JSON.
                               const uint64_t test_chars = has_quote(chunk) | has_escape(chunk) | is_less_16(chunk);
                               if (test_chars) {
                                  const auto length = (std::countr_zero(test_chars) >> 3);
                                  c += length;
                                  ix += length;
 
-                                 if (const auto escaped = char_escape_table[uint8_t(*c)]; escaped) [[likely]] {
-                                    std::memcpy(data_ptr(b) + ix, &escaped, 2);
-                                 }
+                                 std::memcpy(data + ix, &char_escape_table[uint8_t(*c)], 2);
                                  ix += 2;
                                  ++c;
                               }
@@ -388,13 +355,13 @@ namespace glz
                         }
 
                         // Tail end of buffer. Uncommon for long strings.
-                        for (; c < e; ++c) {
+                        for (const auto data = data_ptr(b); c < e; ++c) {
                            if (const auto escaped = char_escape_table[uint8_t(*c)]; escaped) {
-                              std::memcpy(data_ptr(b) + ix, &escaped, 2);
+                              std::memcpy(data + ix, &escaped, 2);
                               ix += 2;
                            }
                            else {
-                              std::memcpy(data_ptr(b) + ix, c, 1);
+                              std::memcpy(data + ix, c, 1);
                               ++ix;
                            }
                         }
@@ -407,7 +374,18 @@ namespace glz
          }
       };
 
-      template <glaze_enum_t T>
+      template <filesystem_path T>
+      struct to_json<T>
+      {
+         template <auto Opts, class... Args>
+         GLZ_ALWAYS_INLINE static void op(auto&& value, is_context auto&& ctx, Args&&... args) noexcept
+         {
+            to_json<decltype(value.string())>::template op<Opts>(value.string(), ctx, args...);
+         }
+      };
+
+      template <class T>
+         requires(glaze_enum_t<T> && !specialized_with_custom_write<T>)
       struct to_json<T>
       {
          template <auto Opts, class... Args>
@@ -432,7 +410,7 @@ namespace glz
       };
 
       template <class T>
-         requires(std::is_enum_v<std::decay_t<T>> && !glaze_enum_t<T>)
+         requires(std::is_enum_v<std::decay_t<T>> && !glaze_enum_t<T> && !specialized_with_custom_write<T>)
       struct to_json<T>
       {
          template <auto Opts, class... Args>
@@ -719,8 +697,20 @@ namespace glz
          }
       };
 
+      // for C style arrays
       template <nullable_t T>
-         requires(!is_expected<T>)
+         requires(std::is_array_v<T>)
+      struct to_json<T>
+      {
+         template <auto Opts, class V, size_t N, class... Args>
+         GLZ_ALWAYS_INLINE static void op(const V (&value)[N], is_context auto&& ctx, Args&&... args) noexcept
+         {
+            write<json>::op<Opts>(std::span{value, N}, ctx, std::forward<Args>(args)...);
+         }
+      };
+
+      template <nullable_t T>
+         requires(!is_expected<T> && !std::is_array_v<T>)
       struct to_json<T>
       {
          template <auto Opts, class... Args>
@@ -1000,7 +990,7 @@ namespace glz
 
             bool first = true;
             for_each<N>([&](auto I) {
-               static constexpr auto Opts = opening_and_closing_handled_off<ws_handled_off<Options>()>();
+               constexpr auto Opts = opening_and_closing_handled_off<ws_handled_off<Options>()>();
                decltype(auto) item = glz::get<2 * I + 1>(value.value);
                using val_t = std::decay_t<decltype(item)>;
 
@@ -1130,25 +1120,25 @@ namespace glz
 
             using Info = object_type_info<Options, T>;
 
-            using V = std::decay_t<T>;
             static constexpr auto N = Info::N;
 
             [[maybe_unused]] decltype(auto) t = [&]() -> decltype(auto) {
                if constexpr (reflectable<T>) {
+                  using V = decay_keep_volatile_t<decltype(value)>;
                   if constexpr (std::is_const_v<std::remove_reference_t<decltype(value)>>) {
 #if ((defined _MSC_VER) && (!defined __clang__))
-                     static thread_local auto tuple_of_ptrs = make_const_tuple_from_struct<T>();
+                     static thread_local auto tuple_of_ptrs = make_const_tuple_from_struct<V>();
 #else
-                     static thread_local constinit auto tuple_of_ptrs = make_const_tuple_from_struct<T>();
+                     static thread_local constinit auto tuple_of_ptrs = make_const_tuple_from_struct<V>();
 #endif
                      populate_tuple_ptr(value, tuple_of_ptrs);
                      return tuple_of_ptrs;
                   }
                   else {
 #if ((defined _MSC_VER) && (!defined __clang__))
-                     static thread_local auto tuple_of_ptrs = make_tuple_from_struct<T>();
+                     static thread_local auto tuple_of_ptrs = make_tuple_from_struct<V>();
 #else
-                     static thread_local constinit auto tuple_of_ptrs = make_tuple_from_struct<T>();
+                     static thread_local constinit auto tuple_of_ptrs = make_tuple_from_struct<V>();
 #endif
                      populate_tuple_ptr(value, tuple_of_ptrs);
                      return tuple_of_ptrs;
@@ -1162,7 +1152,7 @@ namespace glz
             [[maybe_unused]] bool first = true;
             static constexpr auto first_is_written = Info::first_will_be_written;
             for_each<N>([&](auto I) {
-               static constexpr auto Opts = opening_and_closing_handled_off<ws_handled_off<Options>()>();
+               constexpr auto Opts = opening_and_closing_handled_off<ws_handled_off<Options>()>();
 
                using Element = glaze_tuple_element<I, N, T>;
                static constexpr size_t member_index = Element::member_index;
@@ -1174,7 +1164,7 @@ namespace glz
                      return std::get<I>(t);
                   }
                   else {
-                     return get<member_index>(get<I>(meta_v<V>));
+                     return get<member_index>(get<I>(meta_v<std::decay_t<T>>));
                   }
                }();
 
@@ -1236,7 +1226,7 @@ namespace glz
                   static constexpr size_t comment_index = member_index + 1;
                   static constexpr auto S = std::tuple_size_v<typename Element::Item>;
                   if constexpr (Opts.comments && S > comment_index) {
-                     static constexpr auto i = glz::get<I>(meta_v<V>);
+                     static constexpr auto i = glz::get<I>(meta_v<std::decay_t<T>>);
                      if constexpr (std::is_convertible_v<decltype(get<comment_index>(i)), sv>) {
                         static constexpr sv comment = get<comment_index>(i);
                         if constexpr (comment.size() > 0) {
@@ -1363,7 +1353,7 @@ namespace glz
                      static constexpr auto group = glz::get<I>(groups);
 
                      static constexpr auto key = std::get<0>(group);
-                     static constexpr auto mem_it = std::find(members.begin(), members.end(), key);
+                     constexpr auto mem_it = std::find(members.begin(), members.end(), key);
                      static_assert(mem_it != members.end(), "Invalid key passed to partial write");
 
                      static constexpr auto quoted_key = join_v < chars<"\"">, key,
@@ -1445,13 +1435,13 @@ namespace glz
       };
    } // namespace detail
 
-   template <class T, class Buffer>
+   template <write_json_supported T, class Buffer>
    [[nodiscard]] inline auto write_json(T&& value, Buffer&& buffer) noexcept
    {
       return write<opts{}>(std::forward<T>(value), std::forward<Buffer>(buffer));
    }
 
-   template <class T>
+   template <write_json_supported T>
    [[nodiscard]] inline auto write_json(T&& value) noexcept
    {
       std::string buffer{};
@@ -1459,19 +1449,19 @@ namespace glz
       return buffer;
    }
 
-   template <auto& Partial, class T, class Buffer>
+   template <auto& Partial, write_json_supported T, class Buffer>
    [[nodiscard]] inline auto write_json(T&& value, Buffer&& buffer) noexcept
    {
       return write<Partial, opts{}>(std::forward<T>(value), std::forward<Buffer>(buffer));
    }
 
-   template <class T, class Buffer>
+   template <write_json_supported T, class Buffer>
    inline void write_jsonc(T&& value, Buffer&& buffer) noexcept
    {
       write<opts{.comments = true}>(std::forward<T>(value), std::forward<Buffer>(buffer));
    }
 
-   template <class T>
+   template <write_json_supported T>
    [[nodiscard]] inline auto write_jsonc(T&& value) noexcept
    {
       std::string buffer{};
@@ -1479,7 +1469,7 @@ namespace glz
       return buffer;
    }
 
-   template <opts Opts = opts{}, class T>
+   template <opts Opts = opts{}, write_json_supported T>
    [[nodiscard]] inline write_error write_file_json(T&& value, const std::string& file_name, auto&& buffer) noexcept
    {
       write<set_json<Opts>()>(std::forward<T>(value), buffer);

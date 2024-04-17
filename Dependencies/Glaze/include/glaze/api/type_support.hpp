@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <string_view>
 
+#include "glaze/core/meta.hpp"
 #include "glaze/util/for_each.hpp"
 
 namespace glz
@@ -19,7 +20,7 @@ namespace glz
 
    specialize(bool) specialize(char) specialize(char16_t) specialize(char32_t) specialize(wchar_t) specialize(int8_t)
       specialize(uint8_t) specialize(int16_t) specialize(uint16_t) specialize(int32_t) specialize(uint32_t)
-         specialize(int64_t) specialize(uint64_t) specialize(float) specialize(double) specialize(std::string_view)
+         specialize(int64_t) specialize(uint64_t) specialize(float) specialize(double)
 #undef specialize
 
             template <std::same_as<long long> long_long_t>

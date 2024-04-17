@@ -64,7 +64,7 @@ namespace glz
                return std::string{};
             }
          }();
-         using key_t = decltype(key);
+         using key_t = std::decay_t<decltype(key)>;
          static_assert(std::is_same_v<key_t, std::string> || num_t<key_t>);
 
          if constexpr (std::is_same_v<key_t, std::string>) {
@@ -90,7 +90,7 @@ namespace glz
          }
          else if constexpr (std::is_floating_point_v<key_t>) {
             auto it = reinterpret_cast<const uint8_t*>(json_ptr.data());
-            auto s = parse_float(key, it);
+            auto s = parse_float<key_t>(key, it);
             if (!s) return false;
             json_ptr = json_ptr.substr(reinterpret_cast<const char*>(it) - json_ptr.data());
          }
@@ -151,7 +151,7 @@ namespace glz
          json_ptr = json_ptr.substr(p - json_ptr.data());
 
          if constexpr (glaze_array_t<std::decay_t<T>>) {
-            static constexpr auto member_array = glz::detail::make_array<std::decay_t<T>>();
+            static constexpr auto member_array = glz::detail::make_array<decay_keep_volatile_t<T>>();
             if (index >= member_array.size()) return false;
             return std::visit(
                [&](auto&& member_ptr) {
@@ -273,7 +273,7 @@ namespace glz
       error_code ec{};
       detail::seek_impl(
          [&](auto&& val) {
-            if constexpr (!std::is_same_v<V, std::decay_t<decltype(val)>>) {
+            if constexpr (!std::is_same_v<V, decay_keep_volatile_t<decltype(val)>>) {
                ec = error_code::get_wrong_type;
             }
             else if constexpr (!std::is_lvalue_reference_v<decltype(val)>) {

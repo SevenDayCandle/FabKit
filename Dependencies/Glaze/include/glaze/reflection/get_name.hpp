@@ -8,7 +8,6 @@
 #include <string_view>
 
 #include "glaze/reflection/to_tuple.hpp"
-#include "glaze/tuplet/tuple.hpp"
 #include "glaze/util/string_literal.hpp"
 
 #if defined(__clang__) || defined(__GNUC__)
@@ -42,14 +41,14 @@ namespace glz::detail
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Weverything"
    template <auto N, class T>
-   constexpr std::string_view get_name_impl = mangled_name<get_ptr<N>(external<T>)>();
+   constexpr std::string_view get_name_impl = mangled_name<get_ptr<N>(external<std::remove_volatile_t<T>>)>();
 #pragma clang diagnostic pop
 #elif __GNUC__
    template <auto N, class T>
-   constexpr std::string_view get_name_impl = mangled_name<get_ptr<N>(external<T>)>();
+   constexpr std::string_view get_name_impl = mangled_name<get_ptr<N>(external<std::remove_volatile_t<T>>)>();
 #else
    template <auto N, class T>
-   constexpr std::string_view get_name_impl = mangled_name<get_ptr<N>(external<T>)>();
+   constexpr std::string_view get_name_impl = mangled_name<get_ptr<N>(external<std::remove_volatile_t<T>>)>();
 #endif
 
    struct GLAZE_REFLECTOR
@@ -79,15 +78,21 @@ namespace glz::detail
 namespace glz
 {
    template <auto N, class T>
-   static constexpr auto nameof = [] {
-      constexpr auto name = detail::get_name_impl<N, T>;
-      constexpr auto begin = name.find(detail::reflect_field::end);
-      constexpr auto tmp = name.substr(0, begin);
-      return tmp.substr(tmp.find_last_of(detail::reflect_field::begin) + 1);
-   }();
+   struct nameof_impl
+   {
+      static constexpr auto name = detail::get_name_impl<N, T>;
+      static constexpr auto begin = name.find(detail::reflect_field::end);
+      static constexpr auto tmp = name.substr(0, begin);
+      static constexpr auto stripped = tmp.substr(tmp.find_last_of(detail::reflect_field::begin) + 1);
+      // making static memory to stripped to help the compiler optimize away prettified function signature
+      static constexpr std::string_view stripped_literal = join_v<stripped>;
+   };
+
+   template <auto N, class T>
+   constexpr auto nameof = []() constexpr { return nameof_impl<N, T>::stripped_literal; }();
 
    template <class T>
-   static constexpr auto type_name = [] {
+   constexpr auto type_name = [] {
       constexpr std::string_view name = detail::mangled_name<T>();
       constexpr auto begin = name.find(detail::reflect_type::end);
       constexpr auto tmp = name.substr(0, begin);

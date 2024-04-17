@@ -13,7 +13,7 @@
 #include <type_traits>
 
 #include "glaze/core/common.hpp"
-#include "glaze/core/format.hpp"
+#include "glaze/core/opts.hpp"
 #include "glaze/core/read.hpp"
 #include "glaze/file/file_ops.hpp"
 #include "glaze/json/json_t.hpp"
@@ -48,16 +48,6 @@ namespace glz
          return buffer;
       }
 
-      template <class T = void>
-      struct from_json
-      {};
-
-      template <auto Opts, class T, class Ctx, class It0, class It1>
-      concept read_json_invocable = requires(T&& value, Ctx&& ctx, It0&& it, It1&& end) {
-         from_json<std::remove_cvref_t<T>>::template op<Opts>(std::forward<T>(value), std::forward<Ctx>(ctx),
-                                                              std::forward<It0>(it), std::forward<It1>(end));
-      };
-
       template <>
       struct read<json>
       {
@@ -74,14 +64,9 @@ namespace glz
                }
             }
             else {
-               if constexpr (read_json_invocable<Opts, T, Ctx, It0, It1>) {
-                  using V = std::remove_cvref_t<T>;
-                  from_json<V>::template op<Opts>(std::forward<T>(value), std::forward<Ctx>(ctx), std::forward<It0>(it),
-                                                  std::forward<It1>(end));
-               }
-               else {
-                  static_assert(false_v<T>, "Glaze metadata is probably needed for your type");
-               }
+               using V = std::remove_cvref_t<T>;
+               from_json<V>::template op<Opts>(std::forward<T>(value), std::forward<Ctx>(ctx), std::forward<It0>(it),
+                                               std::forward<It1>(end));
             }
          }
 
@@ -131,7 +116,8 @@ namespace glz
          }
       };
 
-      template <glaze_value_t T>
+      template <class T>
+         requires(glaze_value_t<T> && !specialized_with_custom_read<T>)
       struct from_json<T>
       {
          template <auto Opts, class Value, is_context Ctx, class It0, class It1>
@@ -359,10 +345,24 @@ namespace glz
                      static_assert(sizeof(*it) == sizeof(char));
                      const char* cur = reinterpret_cast<const char*>(&*it);
                      const char* beg = cur;
-                     auto s = parse_int<V, Options.force_conformance>(value, cur);
-                     if (!s) [[unlikely]] {
-                        ctx.error = error_code::parse_number_failure;
-                        return;
+                     if constexpr (std::is_volatile_v<decltype(value)>) {
+                        // Hardware may interact with value changes, so we parse into a temporary and assign in one
+                        // place
+                        uint64_t i{};
+                        auto s = parse_int<uint64_t, Options.force_conformance>(i, cur);
+                        if (!s) [[unlikely]] {
+                           ctx.error = error_code::parse_number_failure;
+                           return;
+                        }
+                        value = i;
+                     }
+                     else {
+                        auto s =
+                           parse_int<decay_keep_volatile_t<decltype(value)>, Options.force_conformance>(value, cur);
+                        if (!s) [[unlikely]] {
+                           ctx.error = error_code::parse_number_failure;
+                           return;
+                        }
                      }
 
                      it += (cur - beg);
@@ -402,7 +402,7 @@ namespace glz
                   static_assert(sizeof(*it) == sizeof(char));
                   const char* cur = reinterpret_cast<const char*>(&*it);
                   const char* beg = cur;
-                  auto s = parse_int<std::decay_t<decltype(i)>, Options.force_conformance>(i, cur);
+                  auto s = parse_int<decay_keep_volatile_t<decltype(i)>, Options.force_conformance>(i, cur);
                   if (!s) [[unlikely]] {
                      ctx.error = error_code::parse_number_failure;
                      return;
@@ -436,10 +436,22 @@ namespace glz
                   it += std::distance(it, ptr);
                }
                else {
-                  auto s = parse_float<V, Options.force_conformance>(value, it);
-                  if (!s) [[unlikely]] {
-                     ctx.error = error_code::parse_number_failure;
-                     return;
+                  if constexpr (std::is_volatile_v<decltype(value)>) {
+                     // Hardware may interact with value changes, so we parse into a temporary and assign in one place
+                     V temp;
+                     auto s = parse_float<V, Options.force_conformance>(value, it);
+                     if (!s) [[unlikely]] {
+                        ctx.error = error_code::parse_number_failure;
+                        return;
+                     }
+                     value = temp;
+                  }
+                  else {
+                     auto s = parse_float<V, Options.force_conformance>(value, it);
+                     if (!s) [[unlikely]] {
+                        ctx.error = error_code::parse_number_failure;
+                        return;
+                     }
                   }
                }
             }
@@ -797,7 +809,8 @@ namespace glz
          }
       };
 
-      template <glaze_enum_t T>
+      template <class T>
+         requires(glaze_enum_t<T> && !specialized_with_custom_read<T>)
       struct from_json<T>
       {
          template <auto Opts>
@@ -825,7 +838,7 @@ namespace glz
       };
 
       template <class T>
-         requires(std::is_enum_v<T> && !glaze_enum_t<T>)
+         requires(std::is_enum_v<T> && !glaze_enum_t<T> && !specialized_with_custom_read<T>)
       struct from_json<T>
       {
          template <auto Opts>
@@ -936,12 +949,13 @@ namespace glz
          }
       };
 
+      // for types like std::vector, std::array, std::deque, etc.
       template <class T>
          requires(readable_array_t<T> && (emplace_backable<T> || !resizeable<T>) && !emplaceable<T>)
       struct from_json<T>
       {
          template <auto Options>
-         GLZ_FLATTEN static void op(auto& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
+         GLZ_FLATTEN static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
          {
             if constexpr (!Options.ws_handled) {
                skip_ws<Options>(ctx, it, end);
@@ -1006,26 +1020,121 @@ namespace glz
 
             // growing
             if constexpr (emplace_backable<T>) {
-               while (it < end) {
-                  read<json>::op<ws_handled<Opts>()>(value.emplace_back(), ctx, it, end);
-                  if (bool(ctx.error)) [[unlikely]]
-                     return;
-                  skip_ws_no_pre_check<Opts>(ctx, it, end);
-                  if (bool(ctx.error)) [[unlikely]]
-                     return;
-                  if (*it == ',') [[likely]] {
-                     ++it;
+               if constexpr (has_reserve<T> && has_capacity<T>) {
+                  // If we can reserve memmory, like std::vector, then we want to check the capacity
+                  // and use a temporary buffer if the capacity needs to grow
+                  if (value.capacity() == 0) {
+                     value.reserve(1); // we want to directly use our vector for the first element
+                  }
+                  const auto capacity = value.capacity();
+                  for (size_t i = value.size(); i < capacity; ++i) {
+                     // emplace_back while we have capacity
+                     read<json>::op<ws_handled<Opts>()>(value.emplace_back(), ctx, it, end);
+                     if (bool(ctx.error)) [[unlikely]]
+                        return;
                      skip_ws_no_pre_check<Opts>(ctx, it, end);
                      if (bool(ctx.error)) [[unlikely]]
                         return;
+                     if (*it == ',') [[likely]] {
+                        ++it;
+                        skip_ws_no_pre_check<Opts>(ctx, it, end);
+                        if (bool(ctx.error)) [[unlikely]]
+                           return;
+                     }
+                     else if (*it == ']') {
+                        ++it;
+                        return;
+                     }
+                     else [[unlikely]] {
+                        ctx.error = error_code::expected_bracket;
+                        return;
+                     }
                   }
-                  else if (*it == ']') {
-                     ++it;
-                     return;
+
+                  using value_type = typename T::value_type;
+
+                  std::vector<std::vector<value_type>> intermediate;
+                  intermediate.reserve(48);
+                  auto* active = &intermediate.emplace_back();
+                  active->reserve(2);
+                  while (it < end) {
+                     if (active->size() == active->capacity()) {
+                        // we want to populate the next vector
+                        const auto former_capacity = active->capacity();
+                        active = &intermediate.emplace_back();
+                        active->reserve(2 * former_capacity);
+                     }
+
+                     read<json>::op<ws_handled<Opts>()>(active->emplace_back(), ctx, it, end);
+                     if (bool(ctx.error)) [[unlikely]]
+                        return;
+                     skip_ws_no_pre_check<Opts>(ctx, it, end);
+                     if (bool(ctx.error)) [[unlikely]]
+                        return;
+                     if (*it == ',') [[likely]] {
+                        ++it;
+                        skip_ws_no_pre_check<Opts>(ctx, it, end);
+                        if (bool(ctx.error)) [[unlikely]]
+                           return;
+                     }
+                     else if (*it == ']') {
+                        ++it;
+                        break;
+                     }
+                     else [[unlikely]] {
+                        ctx.error = error_code::expected_bracket;
+                        return;
+                     }
                   }
-                  else [[unlikely]] {
-                     ctx.error = error_code::expected_bracket;
-                     return;
+
+                  const auto intermediate_size = intermediate.size();
+                  size_t reserve_size = value.size();
+                  for (size_t i = 0; i < intermediate_size; ++i) {
+                     reserve_size += intermediate[i].size();
+                  }
+
+                  if constexpr (std::is_trivially_copyable_v<value_type> && !std::same_as<T, std::vector<bool>>) {
+                     const auto original_size = value.size();
+                     value.resize(reserve_size);
+                     auto* dest = value.data() + original_size;
+                     for (const auto& vector : intermediate) {
+                        const auto vector_size = vector.size();
+                        std::memcpy(dest, vector.data(), vector_size * sizeof(value_type));
+                        dest += vector_size;
+                     }
+                  }
+                  else {
+                     value.reserve(reserve_size);
+                     for (const auto& vector : intermediate) {
+                        const auto inter_end = vector.end();
+                        for (auto inter = vector.begin(); inter < inter_end; ++inter) {
+                           value.emplace_back(std::move(*inter));
+                        }
+                     }
+                  }
+               }
+               else {
+                  while (it < end) {
+                     read<json>::op<ws_handled<Opts>()>(value.emplace_back(), ctx, it, end);
+                     if (bool(ctx.error)) [[unlikely]]
+                        return;
+                     skip_ws_no_pre_check<Opts>(ctx, it, end);
+                     if (bool(ctx.error)) [[unlikely]]
+                        return;
+                     if (*it == ',') [[likely]] {
+                        ++it;
+                        skip_ws_no_pre_check<Opts>(ctx, it, end);
+                        if (bool(ctx.error)) [[unlikely]]
+                           return;
+                     }
+                     else if (*it == ']') {
+                        ++it;
+                        return;
+                     }
+                     else [[unlikely]] {
+                        ctx.error = error_code::expected_bracket;
+                        return;
+                     }
                   }
                }
             }
@@ -1560,10 +1669,11 @@ namespace glz
 
                decltype(auto) frozen_map = [&]() -> decltype(auto) {
                   if constexpr (reflectable<T> && num_members > 0) {
+                     using V = decay_keep_volatile_t<decltype(value)>;
 #if ((defined _MSC_VER) && (!defined __clang__))
-                     static thread_local auto cmap = make_map<T, Opts.use_hash_comparison>();
+                     static thread_local auto cmap = make_map<V, Opts.use_hash_comparison>();
 #else
-                     static thread_local constinit auto cmap = make_map<T, Opts.use_hash_comparison>();
+                     static thread_local constinit auto cmap = make_map<V, Opts.use_hash_comparison>();
 #endif
                      // We want to run this populate outside of the while loop
                      populate_map(value, cmap); // Function required for MSVC to build
@@ -1644,6 +1754,7 @@ namespace glz
                         return;
                   }
                   else if constexpr (glaze_object_t<T> || reflectable<T>) {
+                     static_assert(!std::same_as<std::decay_t<decltype(frozen_map)>, std::nullptr_t>);
                      std::conditional_t<Opts.error_on_unknown_keys, const sv, sv> key =
                         parse_object_key<T, ws_handled<Opts>(), tag>(ctx, it, end);
                      if (bool(ctx.error)) [[unlikely]]
@@ -2545,7 +2656,18 @@ namespace glz
       };
 
       template <nullable_t T>
-         requires(!is_expected<T>)
+         requires(std::is_array_v<T>)
+      struct from_json<T>
+      {
+         template <auto Opts, class V, size_t N>
+         GLZ_ALWAYS_INLINE static void op(V (&value)[N], is_context auto&& ctx, auto&& it, auto&& end) noexcept
+         {
+            read<json>::op<Opts>(std::span{value, N}, ctx, it, end);
+         }
+      };
+
+      template <nullable_t T>
+         requires(!is_expected<T> && !std::is_array_v<T>)
       struct from_json<T>
       {
          template <auto Options>
@@ -2594,6 +2716,20 @@ namespace glz
             }
          }
       };
+
+      template <filesystem_path T>
+      struct from_json<T>
+      {
+         template <auto Opts>
+         GLZ_ALWAYS_INLINE static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
+         {
+            std::string& buffer = string_buffer();
+            read<json>::op<Opts>(buffer, ctx, it, end);
+            if (bool(ctx.error)) [[unlikely]]
+               return;
+            value = buffer;
+         }
+      };
    } // namespace detail
 
    template <class Buffer>
@@ -2612,14 +2748,14 @@ namespace glz
       return read<opts{}>(skip_value, std::forward<Buffer>(buffer), ctx);
    }
 
-   template <class T, class Buffer>
+   template <read_json_supported T, class Buffer>
    [[nodiscard]] inline parse_error read_json(T& value, Buffer&& buffer) noexcept
    {
       context ctx{};
       return read<opts{}>(value, std::forward<Buffer>(buffer), ctx);
    }
 
-   template <class T, class Buffer>
+   template <read_json_supported T, class Buffer>
    [[nodiscard]] inline expected<T, parse_error> read_json(Buffer&& buffer) noexcept
    {
       T value{};
@@ -2631,7 +2767,7 @@ namespace glz
       return value;
    }
 
-   template <auto Opts = opts{}, class T>
+   template <auto Opts = opts{}, read_json_supported T>
    inline parse_error read_file_json(T& value, const sv file_name, auto&& buffer) noexcept
    {
       context ctx{};

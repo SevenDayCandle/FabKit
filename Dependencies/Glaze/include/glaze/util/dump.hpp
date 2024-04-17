@@ -4,6 +4,7 @@
 #pragma once
 
 #include <bit>
+#include <cstring>
 #include <span>
 
 #include "glaze/core/write.hpp"
@@ -70,6 +71,18 @@ namespace glz::detail
       ++ix;
    }
 
+   GLZ_ALWAYS_INLINE void dump_unchecked(const char c, auto* b, auto& ix) noexcept
+   {
+      b[ix] = c;
+      ++ix;
+   }
+
+   GLZ_ALWAYS_INLINE void dump_unchecked(const char c, vector_like auto& b, auto& ix) noexcept
+   {
+      b[ix] = c;
+      ++ix;
+   }
+
    GLZ_ALWAYS_INLINE void dump_unchecked(const sv str, vector_like auto& b, auto& ix) noexcept
    {
       const auto n = str.size();
@@ -91,12 +104,6 @@ namespace glz::detail
       static constexpr auto n = s.size();
       std::memcpy(b, s.data(), n);
       b += n;
-   }
-
-   template <char c>
-   GLZ_ALWAYS_INLINE void dumpn(size_t n, char*& b) noexcept
-   {
-      std::fill_n(b, n, c);
    }
 
    template <string_literal str>
@@ -124,13 +131,19 @@ namespace glz::detail
    }
 
    template <char c>
+   GLZ_ALWAYS_INLINE void dumpn(size_t n, char*& b) noexcept
+   {
+      std::memset(b, c, n);
+   }
+
+   template <char c>
    GLZ_ALWAYS_INLINE void dumpn(size_t n, vector_like auto& b, auto& ix) noexcept
    {
       if (ix + n > b.size()) [[unlikely]] {
          b.resize((std::max)(b.size() * 2, ix + n));
       }
 
-      std::fill_n(b.data() + ix, n, c);
+      std::memset(b.data() + ix, c, n);
       ix += n;
    }
 

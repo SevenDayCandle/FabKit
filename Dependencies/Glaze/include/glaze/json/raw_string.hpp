@@ -5,7 +5,6 @@
 
 #include <type_traits>
 
-#include "glaze/core/format.hpp"
 #include "glaze/core/opts.hpp"
 #include "glaze/json/read.hpp"
 #include "glaze/json/write.hpp"
@@ -19,6 +18,7 @@ namespace glz
       T& val;
    };
 
+   // oposite of raw_string_t, turns off the option
    template <class T>
    struct escaped_t
    {

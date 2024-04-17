@@ -1,7 +1,6 @@
 // source: https://github.com/codeinred/tuplet
 
-#ifndef TUPLET_TUPLET_HPP_IMPLEMENTATION
-#define TUPLET_TUPLET_HPP_IMPLEMENTATION
+#pragma once
 
 #include <compare>
 #include <cstddef>
@@ -202,6 +201,7 @@ namespace glz
       template <class... T>
       struct tuple : tuple_base_t<T...>
       {
+         static constexpr auto glaze_reflect = false;
          constexpr static size_t N = sizeof...(T);
          using super = tuple_base_t<T...>;
          using super::operator[];
@@ -611,13 +611,6 @@ namespace glz
          return tuple<unwrap_ref_decay_t<Ts>...>{{{std::forward<Ts>(args)}...}};
       }
 
-      // TODO: This version is needed for older versions of gcc, fixed in 12.2
-      template <class... Ts>
-      constexpr auto make_copy_tuple(Ts... args)
-      {
-         return tuple<Ts...>{{{args}...}};
-      }
-
       template <typename... T>
       constexpr auto forward_as_tuple(T&&... a) noexcept
       {
@@ -660,4 +653,3 @@ namespace std
       using type = std::conditional_t<I == 0, A, B>;
    };
 } // namespace std
-#endif

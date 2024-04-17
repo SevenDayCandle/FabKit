@@ -3,6 +3,7 @@ export module fbc.horizontalDrawable;
 import fbc.ftexture;
 import fbc.futil;
 import fbc.iDrawable;
+import sdl;
 
 export namespace fbc {
 	export class HorizontalDrawable : public IDrawable {

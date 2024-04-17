@@ -11,6 +11,9 @@ export namespace fbc {
 		RelativeHitbox(Hitbox& parent) : parent(parent) {
 			RelativeHitbox::refreshSize();
 		}
+		RelativeHitbox(Hitbox& parent, float offsetWidth, float offsetHeight) : parent(parent), Hitbox(offsetWidth, offsetHeight) {
+			RelativeHitbox::refreshSize();
+		}
 		RelativeHitbox(Hitbox& parent, float parentOffsetX, float parentOffsetY, float offsetWidth, float offsetHeight) : parent(parent), Hitbox(parentOffsetX, parentOffsetY, offsetWidth, offsetHeight) {
 			RelativeHitbox::refreshSize();
 		}

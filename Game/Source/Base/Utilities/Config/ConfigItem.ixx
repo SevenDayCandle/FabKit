@@ -2,6 +2,7 @@ export module fbc.configItem;
 
 import fbc.config;
 import fbc.futil;
+import sdl;
 
 export namespace fbc {
     export template<typename T> class ConfigItem {
@@ -31,23 +32,27 @@ export namespace fbc {
     template<typename T>
     T ConfigItem<T>::parseValue(const str& input)
     {
-        // TODO implement this once the template issues are resolved
-        //return glz::read_json(input);
-        return T();
+        try {
+            // TODO use glz::read_json when it is ready to use with modules
+            return futil::fromString<T>(input);
+        }
+        catch (const exception& e) {
+            sdl::logError("Config item with ID %s to parse input %s", ID, input);
+            return defaultValue;
+        }
     }
 
     // Reset this config's values to whatever is in the config file
     template<typename T>
-    void ConfigItem<T>::reload()
-    {
+    void ConfigItem<T>::reload() {
         this->value = parseValue(config.getValue(ID));
     }
 
     // Set the value for this config item, write it back to the file, and broadcast this change to all listeners
     template<typename T> void ConfigItem<T>::set(const T& newValue) {
         this->value = newValue;
-        // TODO implement this once the template issues are resolved
-        //config->set(ID, glz::write_json(newValue));
+        // TODO use glz::write_json when it is ready to use with modules
+        config.set(ID, futil::toString(newValue));
         for (func<void(const T&)> callback : onChange) {
             callback(newValue);
         }

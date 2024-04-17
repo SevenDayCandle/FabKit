@@ -8,6 +8,9 @@ export namespace fbc {
 	export class ScreenPosHitbox : public Hitbox {
 	public:
 		ScreenPosHitbox() {}
+		ScreenPosHitbox(float offsetWidth, float offsetHeight) : Hitbox(offsetWidth, offsetHeight) {
+			ScreenPosHitbox::refreshSize();
+		}
 		ScreenPosHitbox(float screenXPercent, float screenYPercent, float offsetWidth, float offsetHeight): Hitbox(screenXPercent, screenYPercent, offsetWidth, offsetHeight) {
 			ScreenPosHitbox::refreshSize();
 		}

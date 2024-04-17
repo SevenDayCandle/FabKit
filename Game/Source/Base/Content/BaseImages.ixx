@@ -23,7 +23,7 @@ export namespace fbc {
 		virtual void postInitialize() {}
 	private:
 		FTexture& loadTexture(const strv& path);
-		unmap<strv, uptr<FTexture>> textures;
+		umap<strv, uptr<FTexture>> textures;
 	};
 
 	// Attempt to fetch a cached texture. If none are found, generate one and put it into the map

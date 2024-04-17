@@ -33,24 +33,24 @@ export namespace fbc {
 			path p = content.contentFolder;
 			return (p / LOCALIZATION_PATH / langToStr(lang) / suffix).replace_extension(futil::JSON_EXT);
 		};
-		void loadKeywordStrings(unmap<str, KeywordStrings>& res, const strv& suffix = DEFAULT_KEYWORDS);
-		void loadObjectStrings(unmap<str, ObjectStrings>& res, const strv& suffix);
-		void loadUIStrings(unmap<str, str>& res, const strv& suffix = DEFAULT_UI);
+		void loadKeywordStrings(umap<str, KeywordStrings>& res, const strv& suffix = DEFAULT_KEYWORDS);
+		void loadObjectStrings(umap<str, ObjectStrings>& res, const strv& suffix);
+		void loadUIStrings(umap<str, str>& res, const strv& suffix = DEFAULT_UI);
 	};
 
-	void BaseStrings::loadKeywordStrings(unmap<str, KeywordStrings>& res, const strv& suffix)
+	void BaseStrings::loadKeywordStrings(umap<str, KeywordStrings>& res, const strv& suffix)
 	{
 		glz::read_file_json(res, getPathForLanguage(suffix).string(), str{});
 	}
 
 	// TODO
-	void BaseStrings::loadObjectStrings(unmap<str, ObjectStrings>& res, const strv& suffix)
+	void BaseStrings::loadObjectStrings(umap<str, ObjectStrings>& res, const strv& suffix)
 	{
 		glz::read_file_json(res, getPathForLanguage(suffix).string(), str{});
 	}
 
 	// TODO
-	void BaseStrings::loadUIStrings(unmap<str, str>& res, const strv& suffix) {
+	void BaseStrings::loadUIStrings(umap<str, str>& res, const strv& suffix) {
 		glz::read_file_json(res, getPathForLanguage(suffix).string(), str{});
 	}
 }

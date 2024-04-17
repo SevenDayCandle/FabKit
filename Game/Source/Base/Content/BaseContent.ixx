@@ -19,10 +19,10 @@ export namespace fbc {
 		virtual void initialize() = 0;
 		virtual void postInitialize() = 0;
 
-		template <typename T> requires std::is_base_of_v<BaseContent, T> static T registerContent(const strv& ID, const str& contentFolder);
+		template <Ext<BaseContent> T> static T registerContent(const strv& ID, const str& contentFolder);
 	};
 
-	template<typename T> requires std::is_base_of_v<BaseContent, T> T BaseContent::registerContent(const strv& ID, const str& contentFolder)
+	template<Ext<BaseContent> T> T BaseContent::registerContent(const strv& ID, const str& contentFolder)
 	{
 		T content = T(ID, contentFolder);
 		registeredContents[content.ID] = content;

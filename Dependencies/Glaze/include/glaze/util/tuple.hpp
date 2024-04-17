@@ -126,25 +126,26 @@ namespace glz
    constexpr auto make_group(Tuple&& t, std::index_sequence<Is...>)
    {
       auto get_elem = [&](auto I) {
-         using type = decltype(glz::get<Start + I>(t));
+         constexpr auto Index = Start + I;
+         using type = decltype(glz::get<Index>(t));
          using T = std::decay_t<type>;
          if constexpr (std::convertible_to<type, std::string_view>) {
-            return std::string_view(glz::get<Start + I>(t));
+            return std::string_view(glz::get<Index>(t));
          }
          else if constexpr (std::same_as<T, comment>) {
-            return glz::get<Start + I>(t).value;
+            return glz::get<Index>(t).value;
          }
          else {
-            return glz::get<Start + I>(t);
+            return glz::get<Index>(t);
          }
       };
-      return glz::tuplet::make_copy_tuple(get_elem(std::integral_constant<size_t, Is>{})...);
+      return glz::tuplet::tuple{get_elem(std::integral_constant<size_t, Is>{})...};
    }
 
    template <auto& GroupStartArr, auto& GroupSizeArr, class Tuple, size_t... GroupNumber>
    constexpr auto make_groups_impl(Tuple&& t, std::index_sequence<GroupNumber...>)
    {
-      return glz::tuplet::make_copy_tuple(make_group<get<GroupNumber>(GroupStartArr)>(
+      return glz::tuplet::make_tuple(make_group<get<GroupNumber>(GroupStartArr)>(
          t, std::make_index_sequence<std::get<GroupNumber>(GroupSizeArr)>{})...);
    }
 

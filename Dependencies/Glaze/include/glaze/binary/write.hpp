@@ -76,29 +76,14 @@ namespace glz
          }
       }
 
-      template <class T = void>
-      struct to_binary
-      {};
-
-      template <auto Opts, class T, class Ctx, class B, class IX>
-      concept write_binary_invocable = requires(T&& value, Ctx&& ctx, B&& b, IX&& ix) {
-         to_binary<std::remove_cvref_t<T>>::template op<Opts>(std::forward<T>(value), std::forward<Ctx>(ctx),
-                                                              std::forward<B>(b), std::forward<IX>(ix));
-      };
-
       template <>
       struct write<binary>
       {
          template <auto Opts, class T, is_context Ctx, class B, class IX>
          GLZ_ALWAYS_INLINE static void op(T&& value, Ctx&& ctx, B&& b, IX&& ix) noexcept
          {
-            if constexpr (write_binary_invocable<Opts, T, Ctx, B, IX>) {
-               to_binary<std::remove_cvref_t<T>>::template op<Opts>(std::forward<T>(value), std::forward<Ctx>(ctx),
-                                                                    std::forward<B>(b), std::forward<IX>(ix));
-            }
-            else {
-               static_assert(false_v<T>, "Glaze metadata is probably needed for your type");
-            }
+            to_binary<std::remove_cvref_t<T>>::template op<Opts>(std::forward<T>(value), std::forward<Ctx>(ctx),
+                                                                 std::forward<B>(b), std::forward<IX>(ix));
          }
 
          template <auto Opts, class T, is_context Ctx, class B, class IX>
@@ -226,14 +211,10 @@ namespace glz
          }
       };
 
-      template <class T, class V, size_t... Is>
-      constexpr std::size_t variant_index_impl(std::index_sequence<Is...>)
-      {
-         return ((std::is_same_v<T, std::variant_alternative_t<Is, V>> * Is) + ...);
-      }
-
       template <class T, class V>
-      constexpr size_t variant_index_v = variant_index_impl<T, V>(std::make_index_sequence<std::variant_size_v<V>>{});
+      constexpr size_t variant_index_v = []<size_t... I>(std::index_sequence<I...>) {
+         return ((std::is_same_v<T, std::variant_alternative_t<I, V>> * I) + ...);
+      }(std::make_index_sequence<std::variant_size_v<V>>{});
 
       template <is_variant T>
       struct to_binary<T> final
@@ -522,6 +503,18 @@ namespace glz
       };
 
       template <nullable_t T>
+         requires(std::is_array_v<T>)
+      struct to_binary<T>
+      {
+         template <auto Opts, class V, size_t N, class... Args>
+         GLZ_ALWAYS_INLINE static void op(const V (&value)[N], is_context auto&& ctx, Args&&... args) noexcept
+         {
+            write<binary>::op<Opts>(std::span{value, N}, ctx, std::forward<Args>(args)...);
+         }
+      };
+
+      template <nullable_t T>
+         requires(!std::is_array_v<T>)
       struct to_binary<T> final
       {
          template <auto Opts, class... Args>
@@ -540,18 +533,21 @@ namespace glz
          requires is_specialization_v<T, glz::obj> || is_specialization_v<T, glz::obj_copy>
       struct to_binary<T>
       {
-         template <auto Opts>
+         template <auto Options>
          GLZ_FLATTEN static void op(auto&& value, is_context auto&& ctx, auto&&... args) noexcept
          {
-            constexpr uint8_t type = 0; // string key
-            constexpr uint8_t tag = tag::object | type;
-            dump_type(tag, args...);
-
             using V = std::decay_t<decltype(value.value)>;
             static constexpr auto N = std::tuple_size_v<V> / 2;
-            dump_compressed_int<N>(args...);
+
+            if constexpr (!Options.opening_handled) {
+               constexpr uint8_t type = 0; // string key
+               constexpr uint8_t tag = tag::object | type;
+               dump_type(tag, args...);
+               dump_compressed_int<N>(args...);
+            }
 
             for_each<N>([&](auto I) {
+               constexpr auto Opts = opening_handled_off<Options>();
                write<binary>::no_header<Opts>(get<2 * I>(value.value), ctx, args...);
                write<binary>::op<Opts>(get<2 * I + 1>(value.value), ctx, args...);
             });
@@ -559,7 +555,46 @@ namespace glz
       };
 
       template <class T>
-         requires glaze_object_t<T> || reflectable<T>
+         requires is_specialization_v<T, glz::merge>
+      consteval size_t merge_element_count()
+      {
+         size_t count{};
+         using Tuple = std::decay_t<decltype(std::declval<T>().value)>;
+         for_each<std::tuple_size_v<Tuple>>([&](auto I) constexpr {
+            using Value = std::decay_t<std::tuple_element_t<I, Tuple>>;
+            if constexpr (is_specialization_v<Value, glz::obj> || is_specialization_v<Value, glz::obj_copy>) {
+               count += std::tuple_size_v<decltype(std::declval<Value>().value)> / 2;
+            }
+            else {
+               count += reflection_count<Value>;
+            }
+         });
+         return count;
+      }
+
+      template <class T>
+         requires is_specialization_v<T, glz::merge>
+      struct to_binary<T>
+      {
+         template <auto Opts>
+         GLZ_FLATTEN static void op(auto&& value, is_context auto&& ctx, auto&& b, auto&& ix) noexcept
+         {
+            using V = std::decay_t<decltype(value.value)>;
+            static constexpr auto N = std::tuple_size_v<V>;
+
+            constexpr uint8_t type = 0; // string key
+            constexpr uint8_t tag = tag::object | type;
+            dump_type(tag, b, ix);
+            dump_compressed_int<merge_element_count<T>()>(b, ix);
+
+            [&]<size_t... I>(std::index_sequence<I...>) {
+               (write<binary>::op<opening_handled<Opts>()>(glz::get<I>(value.value), ctx, b, ix), ...);
+            }(std::make_index_sequence<N>{});
+         }
+      };
+
+      template <class T>
+         requires(glaze_object_t<T> || reflectable<T>)
       struct to_binary<T> final
       {
          template <auto Opts, class... Args>
@@ -587,21 +622,23 @@ namespace glz
             }
          }
 
-         template <auto Opts, class... Args>
-            requires(Opts.structs_as_arrays == false)
+         template <auto Options, class... Args>
+            requires(Options.structs_as_arrays == false)
          GLZ_FLATTEN static void op(auto&& value, is_context auto&& ctx, Args&&... args) noexcept
          {
-            constexpr uint8_t type = 0; // string key
-            constexpr uint8_t tag = tag::object | type;
-            dump_type(tag, args...);
-
             using V = std::decay_t<T>;
             static constexpr auto N = reflection_count<T>;
 
-            dump_compressed_int<N>(args...);
+            if constexpr (!Options.opening_handled) {
+               constexpr uint8_t type = 0; // string key
+               constexpr uint8_t tag = tag::object | type;
+               dump_type(tag, args...);
+               dump_compressed_int<N>(args...);
+            }
+            constexpr auto Opts = opening_handled_off<Options>();
 
             if constexpr (reflectable<T>) {
-               static constexpr auto members = member_names<T>;
+               constexpr auto members = member_names<T>;
                const auto t = to_tuple(value);
                for_each<N>([&](auto I) {
                   write<binary>::no_header<Opts>(get<I>(members), ctx, args...);
@@ -645,7 +682,7 @@ namespace glz
       };
 
       template <class T>
-         requires is_std_tuple<std::decay_t<T>>
+         requires(tuple_t<T> || is_std_tuple<T>)
       struct to_binary<T> final
       {
          template <auto Opts, class... Args>
@@ -656,8 +693,26 @@ namespace glz
             static constexpr auto N = std::tuple_size_v<T>;
             dump_compressed_int<N>(args...);
 
-            using V = std::decay_t<T>;
-            for_each<std::tuple_size_v<V>>([&](auto I) { write<binary>::op<Opts>(std::get<I>(value), ctx, args...); });
+            if constexpr (is_std_tuple<T>) {
+               [&]<size_t... I>(std::index_sequence<I...>) {
+                  (write<binary>::op<Opts>(std::get<I>(value), ctx, args...), ...);
+               }(std::make_index_sequence<N>{});
+            }
+            else {
+               [&]<size_t... I>(std::index_sequence<I...>) {
+                  (write<binary>::op<Opts>(glz::get<I>(value), ctx, args...), ...);
+               }(std::make_index_sequence<N>{});
+            }
+         }
+      };
+
+      template <filesystem_path T>
+      struct to_binary<T>
+      {
+         template <auto Opts, class... Args>
+         GLZ_ALWAYS_INLINE static void op(auto&& value, Args&&... args) noexcept
+         {
+            to_binary<decltype(value.string())>::template op<Opts>(value.string(), std::forward<Args>(args)...);
          }
       };
 
@@ -772,13 +827,13 @@ namespace glz
       };
    }
 
-   template <class T, class Buffer>
+   template <write_binary_supported T, class Buffer>
    inline void write_binary(T&& value, Buffer&& buffer) noexcept
    {
       write<opts{.format = binary}>(std::forward<T>(value), std::forward<Buffer>(buffer));
    }
 
-   template <opts Opts = opts{}, class T>
+   template <opts Opts = opts{}, write_binary_supported T>
    inline auto write_binary(T&& value) noexcept
    {
       std::string buffer{};
@@ -786,14 +841,14 @@ namespace glz
       return buffer;
    }
 
-   template <auto& Partial, class T, class Buffer>
+   template <auto& Partial, write_binary_supported T, class Buffer>
    inline auto write_binary(T&& value, Buffer&& buffer) noexcept
    {
       return write<Partial, opts{.format = binary}>(std::forward<T>(value), std::forward<Buffer>(buffer));
    }
 
    // std::string file_name needed for std::ofstream
-   template <opts Opts = opts{}, class T>
+   template <opts Opts = opts{}, write_binary_supported T>
    [[nodiscard]] inline write_error write_file_binary(T&& value, const std::string& file_name, auto&& buffer) noexcept
    {
       static_assert(sizeof(decltype(*buffer.data())) == 1);
@@ -812,13 +867,13 @@ namespace glz
       return {};
    }
 
-   template <class T, class Buffer>
+   template <write_binary_supported T, class Buffer>
    inline void write_binary_untagged(T&& value, Buffer&& buffer) noexcept
    {
       write<opts{.format = binary, .structs_as_arrays = true}>(std::forward<T>(value), std::forward<Buffer>(buffer));
    }
 
-   template <class T>
+   template <write_binary_supported T>
    inline auto write_binary_untagged(T&& value) noexcept
    {
       std::string buffer{};
@@ -826,7 +881,7 @@ namespace glz
       return buffer;
    }
 
-   template <opts Opts = opts{}, class T>
+   template <opts Opts = opts{}, write_binary_supported T>
    [[nodiscard]] inline write_error write_file_binary_untagged(T&& value, const std::string& file_name,
                                                                auto&& buffer) noexcept
    {

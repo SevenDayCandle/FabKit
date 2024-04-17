@@ -10,7 +10,7 @@ export namespace fbc {
 	export class UIVerticalScrollbar : public UIScrollbar {
 	public:
 		UIVerticalScrollbar(Hitbox* hb): UIScrollbar(hb, cct.images.scrollbar(), cct.images.scrollbutton()) {
-			updateDropzoneSize(0.05f);
+			UIVerticalScrollbar::updateDropzoneSize(0.05f);
 		}
 		virtual ~UIVerticalScrollbar() {}
 

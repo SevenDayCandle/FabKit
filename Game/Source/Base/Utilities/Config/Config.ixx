@@ -25,11 +25,11 @@ export namespace fbc {
         str getValue(const str& key);
         void initialize();
         void reload();
+        void set(const str& key, const str& value);
     protected:
         str getConfigPath();
-        void set(const str& key, const str& value);
     private:
-        unmap<str, str> values_map = unmap<str,str>();
+        umap<str, str> values_map = umap<str,str>();
         vec<func<void()>> items;
     };
 

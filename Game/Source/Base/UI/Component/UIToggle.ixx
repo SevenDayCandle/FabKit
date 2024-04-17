@@ -1,5 +1,6 @@
 export module fbc.uiToggle;
 
+import fbc.coreContent;
 import fbc.ffont;
 import fbc.hitbox;
 import fbc.iDrawable;
@@ -14,9 +15,13 @@ export namespace fbc {
 	public:
 		UIToggle(Hitbox* hb, IDrawable& image, IDrawable& checkImage, FFont& f): UIImage(hb, image), checkImage(checkImage), TextInfo(f) {}
 		UIToggle(Hitbox* hb, IDrawable& image, IDrawable& checkImage, FFont& f, str text) : UIImage(hb, image), checkImage(checkImage), TextInfo(f, text) {}
+		UIToggle(Hitbox* hb, FFont& f) : UIToggle(hb, cct.images.checkboxEmpty(), cct.images.checkboxFilled(), f) {}
+		UIToggle(Hitbox* hb, FFont& f, str text) : UIToggle(hb, cct.images.checkboxEmpty(), cct.images.checkboxFilled(), f, text) {}
+		UIToggle(Hitbox* hb) : UIToggle(hb, cct.images.checkboxEmpty(), cct.images.checkboxFilled(), cct.fontRegular()) {}
+		UIToggle(Hitbox* hb, str text) : UIToggle(hb, cct.images.checkboxEmpty(), cct.images.checkboxFilled(), cct.fontRegular(), text) {}
 		virtual ~UIToggle() {}
 
-		bool toggled;
+		bool toggled = false;
 		IDrawable& checkImage;
 
 		inline bool isInteractable() { return interactable; }
