@@ -15,7 +15,7 @@ export namespace fbc {
 
 	export class FFont {
     public:
-        FFont(str path, int size, int outlineSize): path(path), size(size), outlineSize(outlineSize) {
+        FFont(str path, int size, int outlineSize = 0, int shadowSize = 0): path(path), size(size), outlineSize(outlineSize), shadowSize(shadowSize) {
             reloadFont();
         }
         FFont(const FFont&) = delete;
@@ -28,16 +28,18 @@ export namespace fbc {
         }
 
         inline int getOutlineSize() { return outlineSize; }
+        inline int getShadowSize() { return outlineSize; }
         inline int getSize() { return size; }
 
         FFont& setOutlineSize(int size);
         FFont& setSize(int size);
-        FFontRender makeTexture(strv text, uint32 w, sdl::Color color, sdl::Color outlineColor);
+        FFontRender makeTexture(strv text, uint32 w, sdl::Color color, sdl::Color outlineColor, sdl::Color shadowColor);
         void dispose();
     private:
         sdl::Font* font;
         str path;
         int outlineSize;
+        int shadowSize;
         int size;
 
         void reloadFont();
@@ -60,19 +62,33 @@ export namespace fbc {
     }
 
     // Create a texture snapshot of the text rendered with this font in the given colors. Text must NOT be empty
-    FFontRender FFont::makeTexture(strv text, uint32 w, sdl::Color color = sdl::WHITE, sdl::Color outlineColor = sdl::BLACK)
+    FFontRender FFont::makeTexture(strv text, uint32 w, sdl::Color color = sdl::WHITE, sdl::Color outlineColor = sdl::BLACK, sdl::Color shadowColor = sdl::BLACK_SHADOW)
     {
-        sdl::fontOutlineSet(font, outlineSize);
-        sdl::Surface* outlineSurf = sdl::textRenderUTF8BlendedWrapped(font, text.data(), outlineColor, w);
-        sdl::fontOutlineSet(font, 0);
+        sdl::Surface* targetSurf = sdl::textRenderUTF8BlendedWrapped(font, text.data(), color, w);
 
-        sdl::Surface* textSurf = sdl::textRenderUTF8BlendedWrapped(font, text.data(), color, w);
-        sdl::RectI targetRect = { outlineSize, outlineSize, textSurf->w, textSurf->h };
-        sdl::surfaceBlit(textSurf, nullptr, outlineSurf, &targetRect);
+        if (outlineSize > 0) {
+            sdl::fontOutlineSet(font, outlineSize);
+            sdl::Surface* outlineSurf = sdl::textRenderUTF8BlendedWrapped(font, text.data(), outlineColor, w);
+            sdl::fontOutlineSet(font, 0);
+            sdl::RectI targetRect = { outlineSize, outlineSize, targetSurf->w, targetSurf->h };
+            sdl::surfaceBlit(targetSurf, nullptr, outlineSurf, &targetRect);
+            sdl::Surface* origSurf = targetSurf;
+            targetSurf = outlineSurf;
+            sdl::surfaceDestroy(origSurf);
+        }
 
-        sdl::Texture* outlineTex = sdl::textureCreateFromSurface(outlineSurf);
-        FFontRender f = { outlineTex, outlineSurf->w, outlineSurf->h };
-        sdl::surfaceDestroy(outlineSurf);
+        if (shadowSize > 0) {
+            sdl::Surface* shadowSurf = sdl::textRenderUTF8BlendedWrapped(font, text.data(), shadowColor, w);
+            sdl::RectI targetRect = { -shadowSize, -shadowSize, targetSurf->w, targetSurf->h };
+            sdl::surfaceBlit(targetSurf, nullptr, shadowSurf, &targetRect);
+            sdl::Surface* origSurf = targetSurf;
+            targetSurf = shadowSurf;
+            sdl::surfaceDestroy(origSurf);
+        }
+
+        sdl::Texture* tex = sdl::textureCreateFromSurface(targetSurf);
+        FFontRender f = { tex, targetSurf->w, targetSurf->h };
+        sdl::surfaceDestroy(targetSurf);
         return f;
     }
 

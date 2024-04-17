@@ -37,7 +37,7 @@ export namespace fbc {
             return futil::fromString<T>(input);
         }
         catch (const exception& e) {
-            sdl::logError("Config item with ID %s to parse input %s", ID, input);
+            sdl::logError("Config item with ID %s failed to parse input %s: %s", ID, input, e);
             return defaultValue;
         }
     }
