@@ -13,11 +13,11 @@ export namespace fbc {
 
 		void initialize() override;
 
-		inline str screen_setup_header() { return uiStrings["screen_setup_header"]; };
-		inline str screen_title_header() { return uiStrings["screen_title_header"]; };
-		inline str ui_cancel() { return uiStrings["ui_cancel"]; };
-		inline str ui_close() { return uiStrings["ui_close"]; };
-		inline str ui_confirm() { return uiStrings["ui_confirm"]; };
+		inline str screen_setup_header() const { return uiStrings.at("screen_setup_header"); };
+		inline str screen_title_header() const { return uiStrings.at("screen_title_header"); };
+		inline str ui_cancel() const { return uiStrings.at("ui_cancel"); };
+		inline str ui_close() const { return uiStrings.at("ui_close"); };
+		inline str ui_confirm() const { return uiStrings.at("ui_confirm"); };
 	private:
 		umap<str, KeywordStrings> keywordStrings;
 		umap<str, str> uiStrings;

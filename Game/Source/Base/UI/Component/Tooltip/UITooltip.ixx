@@ -1,7 +1,7 @@
-export module fbc.tooltip;
+export module fbc.uiTooltip;
 
-export namespace fbc::tooltip {
-	export class Tooltip {
+export namespace fbc {
+	export class UITooltip {
 	public:
 		virtual void dispose();
 		virtual void render();

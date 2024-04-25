@@ -42,22 +42,22 @@ export namespace fbc {
 	// Draw the base stretched around destRec, then draw the corners and edges around destRec
 	// Assumes that corner and border textures have the exact same size
 	void BorderedDrawable::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip) {
-		float width = cornerTL.getWidth();
-		float height = cornerTL.getHeight();
-		float left = destRec->x - width;
-		float top = destRec->y - height;
-		float right = destRec->x + destRec->w;
-		float bottom = destRec->y + destRec->h;
-		sdl::RectF ctl = { left, top, width, height };
-		sdl::RectF ctr = { right, top, width, height };
-		sdl::RectF cbl = { left, bottom, width, height };
-		sdl::RectF cbr = { right, bottom, width, height };
-		sdl::RectF bt = { destRec->x, top, destRec->w, height };
-		sdl::RectF bl = { left, destRec->y, width, destRec->h };
-		sdl::RectF br = { right, destRec->y, width, destRec->h };
-		sdl::RectF bb = { destRec->x, bottom, destRec->w, height };
+		float cwidth = cornerTL.getWidth();
+		float cheight = cornerTL.getHeight();
+		sdl::RectF center = {destRec->x + cwidth, destRec->y + cheight, destRec->w - (cwidth * 2), destRec->h - (cheight * 2)};
 
-		base.draw(destRec, origin, rotation, flip);
+		float right = center.x + center.w;
+		float bottom = center.y + center.h;
+		sdl::RectF ctl = { destRec->x,  destRec->y, cwidth, cheight };
+		sdl::RectF ctr = { right,  destRec->y, cwidth, cheight };
+		sdl::RectF cbl = { destRec->x, bottom, cwidth, cheight };
+		sdl::RectF cbr = { right, bottom, cwidth, cheight };
+		sdl::RectF bt = { center.x,  destRec->y, center.w, cheight };
+		sdl::RectF bl = { destRec->x, center.y, cwidth, center.h };
+		sdl::RectF br = { right, center.y, cwidth, center.h };
+		sdl::RectF bb = { center.x, bottom, center.w, cheight };
+
+		base.draw(&center, origin, rotation, flip);
 		cornerTL.draw(&ctl, origin, rotation, flip);
 		cornerTR.draw(&ctr, origin, rotation, flip);
 		cornerBL.draw(&cbl ,origin, rotation, flip);

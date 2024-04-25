@@ -71,7 +71,7 @@ export namespace fbc {
     // Refresh the config (reloadInternal) and then update all listeners with the new config values
     void Config::reload() {
         initialize();
-        for (func<void()> callback : items) {
+        for (func<void()>& callback : items) {
             callback();
         }
     }

@@ -18,6 +18,7 @@ export namespace fbc {
 		inline bool justClicked() { return hovered && sdl::mouseIsLeftJustClicked(); };
 		inline bool justClickedRight() { return hovered && sdl::mouseIsRightJustClicked(); };
 		inline bool justHovered() const { return hovered && just; }
+		inline bool justUnhovered() const { return !hovered && just; }
 		inline float cX() { return x + (w / 2); }
 		inline float cY() { return y + (h / 2); }
 		inline float getOffsetHeight() { return offsetHeight; }
@@ -53,7 +54,8 @@ export namespace fbc {
 		return sdl::mouseIsHovering(*this);
 	}
 
-	// Move the bottom-left corner of the ui
+	// Move the top-left corner of the hitbox to the exact given coordinates.
+	// If you want to manipulate the positions of hitboxes relative to some other reference (e.g. changing the distance of a RelativeHitbox from its parent), you should use setOffsetPos instead
 	Hitbox& Hitbox::move(const float x, const float y)
 	{
 		this->x = x;
@@ -69,7 +71,8 @@ export namespace fbc {
 		return *this;
 	}
 
-	// Change the x/y offset ratio
+	// Change the x/y position offset ratio relative to some reference
+	// If you want to move the hitbox to an exact position, you should use move instead
 	Hitbox& Hitbox::setOffsetPos(const float x, const float y)
 	{
 		offsetX = x;
@@ -78,7 +81,7 @@ export namespace fbc {
 		return *this;
 	}
 
-	// Change the width/height offset ratio
+	// Change the width/height offset ratio relative to some reference
 	Hitbox& Hitbox::setOffsetSize(const float x, const float y)
 	{
 		offsetWidth = x;
@@ -130,6 +133,9 @@ export namespace fbc {
 		}
 		else {
 			hovered = isMouseInHoverRange();
+			if (!hovered) {
+				just = true;
+			}
 		}
 	}
 }

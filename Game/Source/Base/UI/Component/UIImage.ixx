@@ -4,7 +4,7 @@ import fbc.futil;
 import fbc.hitbox;
 import fbc.iDrawable;
 import fbc.textInfo;
-import fbc.tooltip;
+import fbc.uiTooltip;
 import fbc.uiTipHoverable;
 import sdl;
 
@@ -30,7 +30,6 @@ export namespace fbc {
 	};
 
 	void UIImage::renderImpl() {
-		this->UITipHoverable::renderImpl();
 		image.draw(hb.get(), color, origin, rotation, flip);
 	}
 

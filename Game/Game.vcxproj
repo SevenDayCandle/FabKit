@@ -165,13 +165,21 @@
     <ClCompile Include="Source\Base\Content\BaseImages.ixx" />
     <ClCompile Include="Source\Base\Content\BaseStrings.ixx" />
     <ClCompile Include="Source\Base\SDL.ixx" />
-    <ClCompile Include="Source\Base\UI\Component\UIEntry.ixx">
+    <ClCompile Include="Source\Base\UI\Component\Menu\UIDropdown.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\Menu\UIEntry.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\Menu\UIMultiEntry.ixx">
       <SubType>
       </SubType>
     </ClCompile>
     <ClCompile Include="Source\Base\UI\Component\UIButton.ixx" />
     <ClCompile Include="Source\Base\UI\Component\UICanvas.ixx" />
-    <ClCompile Include="Source\Base\UI\Component\UIMenu.ixx">
+    <ClCompile Include="Source\Base\UI\Component\Menu\UIMenu.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -199,6 +207,10 @@
     <ClCompile Include="Source\Base\UI\Component\UITextButton.ixx" />
     <ClCompile Include="Source\Base\UI\Hitbox\ScreenSizeHitbox.ixx" />
     <ClCompile Include="Source\Base\Utilities\Config\WindowMode.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Base\KeyedItem.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -251,7 +263,7 @@
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Source\Base\UI\Tooltip\Tooltip.ixx">
+    <ClCompile Include="Source\Base\UI\Component\Tooltip\UITooltip.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>

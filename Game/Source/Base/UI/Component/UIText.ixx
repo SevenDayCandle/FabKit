@@ -4,7 +4,7 @@ import fbc.ffont;
 import fbc.futil;
 import fbc.hitbox;
 import fbc.textInfo;
-import fbc.tooltip;
+import fbc.uiTooltip;
 import fbc.uiTipHoverable;
 
 export namespace fbc {
@@ -18,7 +18,6 @@ export namespace fbc {
 	};
 
 	void UIText::renderImpl() {
-		UITipHoverable::renderImpl();
 		TextInfo::drawText(hb->x, hb->y);
 	}
 }

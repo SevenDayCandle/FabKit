@@ -30,12 +30,13 @@ export namespace fbc {
 	// Assumes that corner and border textures have the exact same size
 	void VerticalDrawable::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip) {
 		float height = borderB.getHeight();
-		float top = destRec->y - height;
-		float bottom = destRec->y + destRec->h;
-		sdl::RectF bt = { destRec->x, top, destRec->w, height };
+		sdl::RectF center = { destRec->x, destRec->y + height, destRec->w, destRec->h - (height * 2) };
+
+		float bottom = center.y + center.h;
+		sdl::RectF bt = { destRec->x, destRec->y, destRec->w, height };
 		sdl::RectF bb = { destRec->x, bottom, destRec->w, height };
 
-		base.draw(destRec, origin, rotation, flip);
+		base.draw(&center, origin, rotation, flip);
 		borderT.draw(&bt, origin, rotation, flip);
 		borderB.draw(&bb, origin, rotation, flip);
 	}

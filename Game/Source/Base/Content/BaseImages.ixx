@@ -17,12 +17,12 @@ export namespace fbc {
 
 		inline void dispose() { textures.clear(); }
 
-		FTexture& getTexture(const strv& path);
+		FTexture& getTexture(const strv& key);
 
 		virtual void initialize() {};
 		virtual void postInitialize() {}
 	private:
-		FTexture& loadTexture(const strv& path);
+		FTexture& loadTexture(const strv& key);
 		umap<strv, uptr<FTexture>> textures;
 	};
 

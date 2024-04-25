@@ -9,12 +9,12 @@ export namespace fbc {
 		IDrawable() {}
 		virtual ~IDrawable() {}
 
-		inline void draw(const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip) { drawBase(getBaseRec(), destRec, origin, rotation, flip); }
-		inline void draw(const sdl::RectF* destRec, const sdl::Color& tint, const sdl::Point& origin, float rotation, sdl::RendererFlip flip) { draw(getBaseRec(), destRec, tint, origin, rotation, flip); }
-		inline void draw(const sdl::RectF* destRec, const sdl::BlendMode blend, const sdl::Color& tint, const sdl::Point& origin, float rotation, sdl::RendererFlip flip) { draw(getBaseRec(), destRec, blend, tint, origin, rotation, flip); }
+		inline void draw(const sdl::RectF* destRec, const sdl::Point& origin = { 0,0 }, float rotation = 0, sdl::RendererFlip flip = sdl::RendererFlip::SDL_FLIP_NONE) { drawBase(getBaseRec(), destRec, origin, rotation, flip); }
+		inline void draw(const sdl::RectF* destRec, const sdl::Color& tint, const sdl::Point& origin = { 0,0 }, float rotation = 0, sdl::RendererFlip flip = sdl::RendererFlip::SDL_FLIP_NONE) { draw(getBaseRec(), destRec, tint, origin, rotation, flip); }
+		inline void draw(const sdl::RectF* destRec, const sdl::BlendMode blend, const sdl::Color& tint, const sdl::Point& origin = { 0,0 }, float rotation = 0, sdl::RendererFlip flip = sdl::RendererFlip::SDL_FLIP_NONE) { draw(getBaseRec(), destRec, blend, tint, origin, rotation, flip); }
 
-		void draw(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Color& tint, const sdl::Point& origin, float rotation, sdl::RendererFlip flip);
-		void draw(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::BlendMode blend, const sdl::Color& tint, const sdl::Point& origin, float rotation, sdl::RendererFlip flip);
+		void draw(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Color& tint, const sdl::Point& origin = { 0,0 }, float rotation = 0, sdl::RendererFlip flip = sdl::RendererFlip::SDL_FLIP_NONE);
+		void draw(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::BlendMode blend, const sdl::Color& tint, const sdl::Point& origin = { 0,0 }, float rotation = 0, sdl::RendererFlip flip = sdl::RendererFlip::SDL_FLIP_NONE);
 
 		virtual void drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip) = 0;
 		virtual sdl::RectF* getBaseRec() = 0;

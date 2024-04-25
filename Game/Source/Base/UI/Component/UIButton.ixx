@@ -15,15 +15,14 @@ export namespace fbc {
 		UIButton(Hitbox* hb, IDrawable& image, sdl::Point origin) : UIImage(hb, image, origin) {}
 		~UIButton() override {}
 
-		inline bool isInteractable() { return interactable; }
+		bool interactable = true;
+
 		inline UIButton& setInteractable(bool val) { return this->interactable = val, *this; }
 		inline UIButton& setOnClick(const func<void(UIButton&)>& onClick) { return this->onClick = onClick, *this; }
 		inline UIButton& setOnRightClick(const func<void(UIButton&)>& onRightClick) { return this->onRightClick = onRightClick, *this; }
 
 		virtual void renderImpl() override;
 		virtual void updateImpl() override;
-	protected:
-		bool interactable = true;
 	private:
 		func<void(UIButton&)> onClick;
 		func<void(UIButton&)> onRightClick;
@@ -40,7 +39,7 @@ export namespace fbc {
 		UIImage::updateImpl();
 
 		if (hb->isHovered()) {
-			if (screenManager::activeElement == nullptr && isInteractable()) {
+			if (screenManager::activeElement == nullptr && interactable) {
 				if (hb->isJust()) {
 					// TODO play sound
 				}

@@ -27,11 +27,11 @@ export namespace fbc {
 		virtual void postInitialize() {}
 	protected:
 		inline path getPathForLanguage(const strv& suffix) {
-			return getPathForLanguage(cfg.textLanguage.get(), suffix);
+			return getPathForLanguage(getLanguage(), suffix);
 		};
 		inline path getPathForLanguage(const GameLanguage& lang, const strv& suffix) {
 			path p = content.contentFolder;
-			return (p / LOCALIZATION_PATH / langToStr(lang) / suffix).replace_extension(futil::JSON_EXT);
+			return (p / LOCALIZATION_PATH / lang.name / suffix).replace_extension(futil::JSON_EXT);
 		};
 		void loadKeywordStrings(umap<str, KeywordStrings>& res, const strv& suffix = DEFAULT_KEYWORDS);
 		void loadObjectStrings(umap<str, ObjectStrings>& res, const strv& suffix);
@@ -43,13 +43,11 @@ export namespace fbc {
 		glz::read_file_json(res, getPathForLanguage(suffix).string(), str{});
 	}
 
-	// TODO
 	void BaseStrings::loadObjectStrings(umap<str, ObjectStrings>& res, const strv& suffix)
 	{
 		glz::read_file_json(res, getPathForLanguage(suffix).string(), str{});
 	}
 
-	// TODO
 	void BaseStrings::loadUIStrings(umap<str, str>& res, const strv& suffix) {
 		glz::read_file_json(res, getPathForLanguage(suffix).string(), str{});
 	}

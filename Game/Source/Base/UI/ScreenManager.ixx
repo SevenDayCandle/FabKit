@@ -5,10 +5,12 @@ import fbc.hitbox;
 import fbc.uiBase;
 import std;
 
-deque<uptr<fbc::UIBase>> screens;
-deque<uptr<fbc::UIBase>> overlays;
-fbc::UIBase* queuedCloseOverlay;
-bool queuedCloseScreen;
+namespace fbc {
+	fbc::deque<fbc::uptr<fbc::UIBase>> screens;
+	fbc::deque<fbc::uptr<fbc::UIBase>> overlays;
+	fbc::UIBase* queuedCloseOverlay;
+	bool queuedCloseScreen;
+}
 
 export namespace fbc::screenManager {
 	fbc::UIBase* activeElement;
@@ -102,10 +104,13 @@ export namespace fbc::screenManager {
 		}
 		// Otherwise check if there is an overlay to be closed
 		else if (queuedCloseOverlay) {
-			while (!overlays.empty() && overlays.front().get() != queuedCloseOverlay) {
+			while (!overlays.empty()) {
 				fbc::UIBase* overlay = overlays.front().get();
 				overlay->close();
 				overlays.pop_front();
+				if (overlay == queuedCloseOverlay) {
+					break;
+				}
 			}
 			queuedCloseOverlay = nullptr;
 		}

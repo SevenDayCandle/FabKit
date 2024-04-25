@@ -1,21 +1,18 @@
 export module fbc.gameLanguage;
 
 import fbc.futil;
+import fbc.keyedItem;
 
 export namespace fbc {
-	export enum GameLanguage {
-		ENG,
-		ZHS,
-		ZHT
+	export struct GameLanguage : keyed_item<GameLanguage> {
+		GameLanguage(strv key): keyed_item(key) {}
 	};
 
-	str langToStr(GameLanguage lang) {
-		switch (lang) {
-		case ZHS:
-			return "ZHS";
-		case ZHT:
-			return "ZHT";
-		}
-		return "ENG";
+	export namespace lang {
+		export const GameLanguage ENG{ "ENG" };
+		export const GameLanguage FRA{ "FRA" };
+		export const GameLanguage SPA{ "SPA" };
+		export const GameLanguage ZHS{ "ZHS" };
+		export const GameLanguage ZHT{ "ZHT" };
 	}
 }

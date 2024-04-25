@@ -15,7 +15,7 @@ export namespace fbc {
 		}
 		virtual ~UIScrollbar() {}
 
-		inline float getScroll() { return scrollPercent; }
+		inline float getScroll() const { return scrollPercent; }
 		inline UIScrollbar& setOnScroll(const func<void(float)>& onScroll) { return this->onScroll = onScroll, *this; }
 
 		virtual void renderImpl() override;

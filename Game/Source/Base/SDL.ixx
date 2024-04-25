@@ -35,6 +35,7 @@ export namespace sdl {
 	/* Color constants */
 	export constexpr Color BLACK = { 0, 0, 0, 255 };
 	export constexpr Color BLACK_SHADOW = { 0, 0, 0, 100 };
+	export constexpr Color GOLD = { 239, 200, 81, 255 };
 	export constexpr Color GRAY = { 127, 127, 127, 255 };
 	export constexpr Color WHITE = { 255, 255, 255, 255 };
 

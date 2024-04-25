@@ -12,8 +12,8 @@ export namespace fbc {
 		}
 		virtual ~TextInfo() {}
 
-		inline float getTextHeight() { return cache.h; }
-		inline float getTextWidth() { return cache.w; }
+		inline float getTextHeight() const { return cache.h; }
+		inline float getTextWidth() const { return cache.w; }
 		inline strv getText() { return text; }
 
 		void drawText(float x, float y);

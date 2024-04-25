@@ -53,7 +53,7 @@ export namespace fbc {
         this->value = newValue;
         // TODO use glz::write_json when it is ready to use with modules
         config.set(ID, futil::toString(newValue));
-        for (func<void(const T&)> callback : onChange) {
+        for (func<void(const T&)>& callback : onChange) {
             callback(newValue);
         }
     }

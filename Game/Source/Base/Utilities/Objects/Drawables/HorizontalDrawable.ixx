@@ -29,12 +29,12 @@ export namespace fbc {
 	void HorizontalDrawable::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip)
 	{
 		float width = borderL.getWidth();
-		float left = destRec->x - width;
-		float right = destRec->x + destRec->w;
-		sdl::RectF bl = { left, destRec->y, width, destRec->h };
+		sdl::RectF center = { destRec->x + width, destRec->y, destRec->w - (width * 2), destRec->h };
+		float right = center.x + center.w;
+		sdl::RectF bl = { destRec->x, destRec->y, width, destRec->h };
 		sdl::RectF br = { right, destRec->y, width, destRec->h };
 
-		base.draw(destRec, origin, rotation, flip);
+		base.draw(&center, origin, rotation, flip);
 		borderL.draw(&bl, origin, rotation, flip);
 		borderR.draw(&br, origin, rotation, flip);
 	}

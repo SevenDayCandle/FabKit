@@ -15,6 +15,7 @@ export namespace fbc {
 	export class CoreConfig : public Config {
 	public:
 		CoreConfig(strv ID) : Config(ID) {}
+		virtual ~CoreConfig() {}
 
 		ConfigItem<int> gameActionSpeed = ConfigItem<int>(*this, "GameActionSpeed", 3);
 		ConfigItem<bool> graphicsVSync = ConfigItem<bool>(*this, "GraphicsVSync", true);
@@ -28,12 +29,23 @@ export namespace fbc {
 		ConfigItem<int> soundVolumeMusic = ConfigItem<int>(*this, "SoundVolumeMusic", 100);
 		ConfigItem<str> textFont = ConfigItem<str>(*this, "TextFont", FONT_REGULAR);
 		ConfigItem<bool> textIcons = ConfigItem<bool>(*this, "TextIcons", false);
-		ConfigItem<GameLanguage> textLanguage = ConfigItem<GameLanguage>(*this, "TextIcons", GameLanguage::ENG);
+		ConfigItem<str> textLanguage = ConfigItem<str>(*this, "TextIcons", lang::ENG);
 
 		void postInitialize() override;
 	};
 
 	export CoreConfig cfg = CoreConfig(futil::FBC);
+
+	// Get the game language, defaulting to English if it is invalid
+	export const GameLanguage& getLanguage() {
+		try {
+			return GameLanguage::get(cfg.textLanguage.get());
+		}
+		catch (exception e) {
+			sdl::logError("Language failed to load: %s. Defaulting to ENG", e);
+		}
+		return lang::ENG;
+	}
 
 	// Get the supposed window width
 	export int getScreenXSize() { return cfg.graphicsResolutionX.get(); }

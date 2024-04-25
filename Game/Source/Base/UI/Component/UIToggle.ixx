@@ -13,18 +13,14 @@ import sdl;
 export namespace fbc {
 	export class UIToggle : public UIImage, public TextInfo {
 	public:
-		UIToggle(Hitbox* hb, IDrawable& image, IDrawable& checkImage, FFont& f): UIImage(hb, image), checkImage(checkImage), TextInfo(f) {}
-		UIToggle(Hitbox* hb, IDrawable& image, IDrawable& checkImage, FFont& f, str text) : UIImage(hb, image), checkImage(checkImage), TextInfo(f, text) {}
-		UIToggle(Hitbox* hb, FFont& f) : UIToggle(hb, cct.images.checkboxEmpty(), cct.images.checkboxFilled(), f) {}
-		UIToggle(Hitbox* hb, FFont& f, str text) : UIToggle(hb, cct.images.checkboxEmpty(), cct.images.checkboxFilled(), f, text) {}
-		UIToggle(Hitbox* hb) : UIToggle(hb, cct.images.checkboxEmpty(), cct.images.checkboxFilled(), cct.fontRegular()) {}
-		UIToggle(Hitbox* hb, str text) : UIToggle(hb, cct.images.checkboxEmpty(), cct.images.checkboxFilled(), cct.fontRegular(), text) {}
+		UIToggle(Hitbox* hb, str text, IDrawable& image = cct.images.checkboxEmpty(), IDrawable& checkImage = cct.images.checkboxFilled(), FFont& f = cct.fontRegular()):
+			UIImage(hb, image), checkImage(checkImage), TextInfo(f, text) {}
 		virtual ~UIToggle() {}
 
+		bool interactable = true;
 		bool toggled = false;
 		IDrawable& checkImage;
 
-		inline bool isInteractable() { return interactable; }
 		inline UIToggle& setInteractable(bool val) { return this->interactable = val, *this; }
 		inline UIToggle& setOnClick(const func<void(UIToggle&)>& onClick) { return this->onClick = onClick, *this; }
 		inline UIToggle& setToggleState(bool val) { return this->toggled = val, *this; }
@@ -34,13 +30,10 @@ export namespace fbc {
 		void updateImpl() override;
 	private:
 		func<void(UIToggle&)> onClick;
-		bool interactable = true;
 	};
 
 	void UIToggle::renderImpl()
 	{
-		this->UITipHoverable::renderImpl();
-
 		if (toggled) {
 			checkImage.draw(hb.get(), UIImage::color, origin, rotation, flip);
 			if (hb->isHovered()) {
@@ -72,7 +65,7 @@ export namespace fbc {
 		UIImage::updateImpl();
 
 		if (hb->isHovered()) {
-			if (screenManager::activeElement == nullptr && isInteractable()) {
+			if (screenManager::activeElement == nullptr && interactable) {
 				if (hb->isJust()) {
 					// TODO play sound
 				}
@@ -81,11 +74,9 @@ export namespace fbc {
 					screenManager::activeElement = this;
 				}
 			}
-			else if (screenManager::activeElement == this) {
-				if (sdl::mouseIsLeftJustReleased()) {
-					toggle(!toggled);
-					screenManager::activeElement = nullptr;
-				}
+			else if (screenManager::activeElement == this && sdl::mouseIsLeftJustReleased()) {
+				toggle(!toggled);
+				screenManager::activeElement = nullptr;
 			}
 		}
 		else if (screenManager::activeElement == this && (sdl::mouseIsLeftJustReleased())) {

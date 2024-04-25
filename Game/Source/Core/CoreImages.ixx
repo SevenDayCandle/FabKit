@@ -20,10 +20,10 @@ export namespace fbc {
 			scrollbuttonCache = std::make_unique<Cache<VerticalDrawable>>([this]() {return VerticalDrawable(scrollbuttonCenter(), scrollbuttonBorderB(), scrollbuttonBorderT()); });
 		}
 
-		inline BorderedDrawable& panel() { return *panelCache.get(); }
-		inline BorderedDrawable& smallPanel() { return *smallPanelCache.get(); }
-		inline VerticalDrawable& scrollbar() { return *scrollbarCache.get(); }
-		inline VerticalDrawable& scrollbutton() { return *scrollbuttonCache.get(); }
+		inline BorderedDrawable& panel() const { return *panelCache.get(); }
+		inline BorderedDrawable& smallPanel() const { return *smallPanelCache.get(); }
+		inline VerticalDrawable& scrollbar() const { return *scrollbarCache.get(); }
+		inline VerticalDrawable& scrollbutton() const { return *scrollbuttonCache.get(); }
 
 		inline FTexture& checkboxEmpty() { return getTexture("UI/Checkbox_Empty.png"); };
 		inline FTexture& checkboxFilled() { return getTexture("UI/Checkbox_Filled.png"); };
