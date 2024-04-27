@@ -8,7 +8,7 @@ import fbc.gameLanguage;
 import sdl;
 import std;
 
-float renderScalePrivate = 1;
+float renderScalePrivate = 1.0;
 constexpr float BASE_DENOMINATOR = 2160;
 
 export namespace fbc {

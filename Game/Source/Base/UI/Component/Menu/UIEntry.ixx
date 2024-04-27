@@ -1,5 +1,6 @@
 export module fbc.uiEntry;
 
+import fbc.coreConfig;
 import fbc.ffont;
 import fbc.uiText;
 import fbc.futil;
@@ -11,8 +12,10 @@ export namespace fbc {
 	export template <typename T> class UIEntry : public UIText {
 	public:
 		UIEntry(T item, int index, func<void(UIEntry<T>&)> onClick, fbc::RelativeHitbox* hb, FFont& f, const str& text, sdl::Color baseColor = sdl::WHITE, sdl::Color hoverColor = sdl::GOLD):
-			item(item), index(index), onClick(onClick), baseColor(baseColor), hoverColor(hoverColor), UIText(hb, f, text) {}
-		virtual ~UIEntry() {}
+			item(item), index(index), onClick(onClick), baseColor(baseColor), hoverColor(hoverColor), UIText(hb, f, text) {
+			hb->setExactSizeY(getProjectedHeight());
+		}
+		virtual ~UIEntry() override {}
 
 		sdl::Color baseColor;
 		sdl::Color hoverColor;
@@ -20,8 +23,9 @@ export namespace fbc {
 		T item;
 		int index;
 
+		inline virtual float getProjectedHeight() { return renderScale(64); };
+		inline virtual float getProjectedWidth() { return getTextWidth(); };
 		inline virtual void updateSelectStatus(bool selected) {};
-		inline virtual float getProjectedWidthOffset() { return getTextWidth(); };
 
 		virtual void updateImpl() override;
 	};

@@ -27,9 +27,9 @@ export namespace fbc {
             }
         }
 
-        inline int getOutlineSize() { return outlineSize; }
-        inline int getShadowSize() { return outlineSize; }
-        inline int getSize() { return size; }
+        inline int getOutlineSize() const { return outlineSize; }
+        inline int getShadowSize() const { return outlineSize; }
+        inline int getSize() const { return size; }
 
         FFont& setOutlineSize(int size);
         FFont& setSize(int size);
@@ -64,11 +64,12 @@ export namespace fbc {
     // Create a texture snapshot of the text rendered with this font in the given colors. Text must NOT be empty
     FFontRender FFont::makeTexture(strv text, uint32 w, sdl::Color color = sdl::WHITE, sdl::Color outlineColor = sdl::BLACK, sdl::Color shadowColor = sdl::BLACK_SHADOW)
     {
-        sdl::Surface* targetSurf = sdl::textRenderUTF8BlendedWrapped(font, text.data(), color, w);
+        const char* texDat = text.data();
+        sdl::Surface* targetSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, color, w);
 
         if (outlineSize > 0) {
             sdl::fontOutlineSet(font, outlineSize);
-            sdl::Surface* outlineSurf = sdl::textRenderUTF8BlendedWrapped(font, text.data(), outlineColor, w);
+            sdl::Surface* outlineSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, outlineColor, w);
             sdl::fontOutlineSet(font, 0);
             sdl::RectI targetRect = { outlineSize, outlineSize, targetSurf->w, targetSurf->h };
             sdl::surfaceBlit(targetSurf, nullptr, outlineSurf, &targetRect);
@@ -78,7 +79,7 @@ export namespace fbc {
         }
 
         if (shadowSize > 0) {
-            sdl::Surface* shadowSurf = sdl::textRenderUTF8BlendedWrapped(font, text.data(), shadowColor, w);
+            sdl::Surface* shadowSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, shadowColor, w);
             sdl::RectI targetRect = { -shadowSize, -shadowSize, targetSurf->w, targetSurf->h };
             sdl::surfaceBlit(targetSurf, nullptr, shadowSurf, &targetRect);
             sdl::Surface* origSurf = targetSurf;

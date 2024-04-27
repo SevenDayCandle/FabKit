@@ -16,7 +16,7 @@ export namespace fbc {
 		inline float getTextWidth() const { return cache.w; }
 		inline strv getText() { return text; }
 
-		void drawText(float x, float y);
+		void drawText(float x, float y) const;
 		TextInfo& setColor(sdl::Color color);
 		TextInfo& setColorOutline(sdl::Color colorOutline);
 		TextInfo& setFont(FFont& font);
@@ -34,7 +34,7 @@ export namespace fbc {
 		void updateCache();
 	};
 
-	void TextInfo::drawText(float x, float y)
+	void TextInfo::drawText(float x, float y) const
 	{
 		if (cache.texture) {
 			sdl::RectF textRect = { x, y, cache.w, cache.h };
@@ -73,6 +73,11 @@ export namespace fbc {
 	// Whenever any font parameter changes, renders must be updated
 	void TextInfo::updateCache()
 	{
+		// Free existing texture
+		if (cache.texture) {
+			sdl::textureDestroy(cache.texture);
+		}
+
 		if (text.empty()) {
 			cache = FFontRender();
 		}

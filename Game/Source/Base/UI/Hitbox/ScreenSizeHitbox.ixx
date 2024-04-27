@@ -7,32 +7,21 @@ export namespace fbc {
 	/* Hitbox whose position AND size scale with screen dimensions */
 	export class ScreenSizeHitbox : public Hitbox {
 	public:
-		ScreenSizeHitbox() : Hitbox(0, 0, 1, 1) {
-			ScreenSizeHitbox::refreshSize();
-		}
-		ScreenSizeHitbox(float screenXPercentSize, float screenYPercentSize) : Hitbox(screenXPercentSize, screenYPercentSize) {
-			ScreenSizeHitbox::refreshSize();
-		}
+		ScreenSizeHitbox() : ScreenSizeHitbox(0, 0, 1, 1) {}
+		ScreenSizeHitbox(float offsetWidth, float offsetHeight) : ScreenSizeHitbox(0, 0, offsetWidth, offsetHeight) {}
 		ScreenSizeHitbox(float screenXPercentPos, float screenYPercentPos, float screenXPercentSize, float screenYPercentSize) : Hitbox(screenXPercentPos, screenYPercentPos, screenXPercentSize, screenYPercentSize) {
-			ScreenSizeHitbox::refreshSize();
+			refresh();
 		}
 		~ScreenSizeHitbox() override {}
 
 	protected:
-		void refreshSize() override;
-		void refreshPosition() override;
+		inline void refreshExactPosX() override { x = getScreenXSize() * offsetPosX; }
+		inline void refreshExactPosY() override { y = getScreenYSize() * offsetPosY; }
+		inline void refreshExactSizeX() override { w = getScreenXSize() * offsetSizeX; }
+		inline void refreshExactSizeY() override { h = getScreenYSize() * offsetSizeY; }
+		inline void refreshOffsetPosX() override { offsetPosX = x / getScreenXSize(); }
+		inline void refreshOffsetPosY() override { offsetPosY = y / getScreenYSize(); }
+		inline void refreshOffsetSizeX() override { offsetSizeX = w / getScreenXSize(); }
+		inline void refreshOffsetSizeY() override { offsetSizeY = h / getScreenYSize(); }
 	};
-
-	// Set the ui position in accordance to the screen's current size
-	void ScreenSizeHitbox::refreshPosition() {
-		x = getScreenXSize() * offsetX;
-		y = getScreenYSize() * offsetY;
-	}
-
-	// Set the ui dimensions in accordance to the screen's current size
-	void ScreenSizeHitbox::refreshSize() {
-		w = getScreenXSize() * offsetWidth;
-		h = getScreenYSize() * offsetHeight;
-		refreshPosition();
-	}
 }

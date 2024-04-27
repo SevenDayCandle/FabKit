@@ -3,7 +3,8 @@ export module fbc.keyedItem;
 import std;
 
 /*
- * A struct intended to mimic Java enums that can be expanded
+ * A struct intended to mimic Java enums that can be expanded.
+ * Every instance of a derivative class of keyed_item must have a unique name
  */
 export namespace fbc {
 	export template <typename C> struct keyed_item {
@@ -22,6 +23,7 @@ export namespace fbc {
 		std::filesystem::path operator/(const std::filesystem::path& other) const {return std::filesystem::path(name) / other;}
 		friend std::ostream& operator<<(std::ostream& os, const C& obj) { return os << obj; }
 
+		// Get every single instantiation of this class
 		static std::vector<std::reference_wrapper<C>> all() {
 			const auto& values = registered();
 			std::vector<std::reference_wrapper<C>> result;
@@ -31,6 +33,7 @@ export namespace fbc {
 			return result;
 		}
 
+		// Get a particular instantation of this class matching the given name
 		static C& get(std::string_view name) {
 			auto& values = registered();
 			auto it = values.find(name);

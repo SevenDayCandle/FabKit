@@ -38,11 +38,8 @@ export namespace fbc {
 				));
 
 			vec<ref<GameLanguage>> langs = GameLanguage::all();
-			UIDropdown<ref<GameLanguage>>& dr = addElement(std::make_unique<UIDropdown<ref<GameLanguage>>>(
-				new RelativeHitbox(*hb, 390, 1100, 400, 200),
-				new UIMenu<ref<GameLanguage>>(new ScaleHitbox(400, 200)),
-				cct.images.panel()
-			)).setItems(langs);
+			UIDropdown<ref<GameLanguage>>& dr = addElement(UIDropdown<ref<GameLanguage>>::multiMenu(new RelativeHitbox(*hb, 390, 1100, 400, 100)))
+			.setItems(langs);
 		}
 	};
 }

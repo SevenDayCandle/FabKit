@@ -3,6 +3,7 @@ export module fbc.uiHoverable;
 import fbc.futil;
 import fbc.hitbox;
 import fbc.uiBase;
+import std;
 
 export namespace fbc {
 	export class UIHoverable : public UIBase {
@@ -10,6 +11,7 @@ export namespace fbc {
 		uptr<Hitbox> hb;
 
 		UIHoverable(Hitbox* hb): hb(hb) {}
+		UIHoverable(uptr<Hitbox>&& hb) : hb(std::move(hb)) {}
 		~UIHoverable() override {}
 
 		virtual bool isHovered();

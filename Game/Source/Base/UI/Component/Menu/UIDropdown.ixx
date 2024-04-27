@@ -11,6 +11,7 @@ import fbc.textInfo;
 import fbc.uiEntry;
 import fbc.uiImage;
 import fbc.uiMenu;
+import fbc.scaleHitbox;
 import sdl;
 import std;
 
@@ -20,12 +21,21 @@ export namespace fbc {
 
 		UIDropdown(Hitbox* hb, 
 			UIMenu<T>* menu, 
-			IDrawable& image, 
-			IDrawable* arrow = &cct.images.expandArrow(), 
-			FFont& f = cct.fontRegular(), 
+			IDrawable& image = cct.images.smallPanel(),
+			IDrawable* arrow = &cct.images.arrowSmall(), 
+			FFont& textFont = cct.fontRegular(),
 			func<str(vec<UIEntry<T>*>)> buttonLabelFunc = {}
-		): UIImage(hb, image), TextInfo(f), menu(menu), buttonLabelFunc(buttonLabelFunc), arrow(arrow) {
-			menu->setOnSelectionUpdate([this](vec<UIEntry<T>*> items) { this->onSelectionUpdate(std::move(items)); });
+		): UIImage(hb, image), TextInfo(textFont), menu(menu), buttonLabelFunc(buttonLabelFunc), arrow(arrow) {
+			this->menu->setOnSelectionUpdate([this](vec<UIEntry<T>*> items) { this->onSelectionUpdate(std::move(items)); });
+		}
+		UIDropdown(Hitbox* hb,
+			uptr<UIMenu<T>> menu,
+			IDrawable& image = cct.images.smallPanel(),
+			IDrawable* arrow = &cct.images.arrowSmall(),
+			FFont& textFont = cct.fontRegular(),
+			func<str(vec<UIEntry<T>*>)> buttonLabelFunc = {}
+		): UIImage(hb, image), TextInfo(textFont), menu(std::move(menu)), buttonLabelFunc(buttonLabelFunc), arrow(arrow) {
+			this->menu->setOnSelectionUpdate([this](vec<UIEntry<T>*> items) { this->onSelectionUpdate(std::move(items)); });
 		}
 		virtual ~UIDropdown() override{}
 
@@ -56,11 +66,30 @@ export namespace fbc {
 		void openPopup();
 		void renderImpl() override;
 		void updateImpl() override;
+
+		static uptr<UIDropdown> multiMenu(Hitbox* hb, 
+			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
+			func<str(vec<UIEntry<T>*>)> buttonLabelFunc = {},
+			FFont& itemFont = cct.fontRegular(),
+			FFont& textFont = cct.fontRegular(),
+			IDrawable& background = cct.images.flatPanel(),
+			IDrawable& image = cct.images.smallPanel(),
+			IDrawable* arrow = &cct.images.arrowSmall());
+		static uptr<UIDropdown> singleMenu(Hitbox* hb, 
+			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
+			func<str(vec<UIEntry<T>*>)> buttonLabelFunc = {},
+			FFont& itemFont = cct.fontRegular(),
+			FFont& textFont = cct.fontRegular(),
+			IDrawable& background = cct.images.flatPanel(),
+			IDrawable& image = cct.images.smallPanel(),
+			IDrawable* arrow = &cct.images.arrowSmall());
 	private:
 		func<str(vec<UIEntry<T>*>)> buttonLabelFunc;
 
 		void onSelectionUpdate(vec<UIEntry<T>*> items);
 	};
+
+
 
 	// When opened, move the menu directly below this button, unless there isn't enough room (in which case it should appear above this button)
 	template<typename T> void UIDropdown<T>::openPopup() {
@@ -78,10 +107,11 @@ export namespace fbc {
 		UIImage::renderImpl();
 		if (arrow) {
 			float w = arrow->getWidth();
-			sdl::RectF arrowRect = { hb->x + hb->w - w, hb->y, w, arrow->getHeight()};
+			sdl::RectF arrowRect = { hb->x + hb->w - w * 1.5f, hb->y + hb->h * 0.25f, w, arrow->getHeight()};
 			arrow->draw(&arrowRect, UIImage::color, origin, rotation, menu->isOpen() ? sdl::RendererFlip::SDL_FLIP_VERTICAL : flip);
 		}
-		float textY = hb->y + hb->h * 0.5f;
+		float textX = hb->x + renderScale(8);
+		float textY = hb->y + hb->h * 0.25f;
 		TextInfo::drawText(hb->x, textY);
 	}
 
@@ -117,12 +147,43 @@ export namespace fbc {
 	}
 
 	// The text on the dropdown should reflect the contents of the selected menu items.
+	// If no button label function is set, this will default to joining the string representations of each entry. If this text is too long, the displayed text will instead show the number of items selected
 	template<typename T> void UIDropdown<T>::onSelectionUpdate(vec<UIEntry<T>*> items) {
 		if (buttonLabelFunc) {
 			setText(buttonLabelFunc(std::move(items)));
 		}
 		else {
-			setText(futil::joinStrMap(",", items, [](UIEntry<T>* entry) {return entry->getText(); }));
+			setText(futil::joinStrMap(", ", items, [](UIEntry<T>* entry) {return entry->getText(); }));
+			if (getTextWidth() > hb->w) {
+				
+			}
 		}
 	}
+
+	template<typename T> uptr<UIDropdown<T>> UIDropdown<T>::multiMenu(
+		Hitbox* hb, func<str(const T&)> labelFunc, func<str(vec<UIEntry<T>*>)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable* arrow)
+	{
+		return std::make_unique<UIDropdown<T>>(
+			hb,
+			UIMenu<T>::multiMenu(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), labelFunc, itemFont, background),
+			image,
+			arrow,
+			textFont,
+			buttonLabelFunc
+		);
+	}
+
+	template<typename T> uptr<UIDropdown<T>> UIDropdown<T>::singleMenu(
+		Hitbox* hb, func<str(const T&)> labelFunc, func<str(vec<UIEntry<T>*>)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable* arrow)
+	{
+		return std::make_unique<UIDropdown<T>>(
+			hb,
+			UIMenu<T>::singleMenu(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), labelFunc, itemFont, background),
+			image,
+			arrow,
+			textFont,
+			buttonLabelFunc
+		);
+	}
+
 }

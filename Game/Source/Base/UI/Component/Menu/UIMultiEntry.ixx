@@ -1,5 +1,6 @@
 export module fbc.uiMultiEntry;
 
+import fbc.coreConfig;
 import fbc.coreContent;
 import fbc.iDrawable;
 import fbc.ffont;
@@ -17,13 +18,14 @@ export namespace fbc {
 	public:
 		UIMultiEntry(T item, int index, func<void(UIEntry<T>&)> onClick, fbc::RelativeHitbox* hb, FFont& f, const str& text, IDrawable& uncheckImage = cct.images.checkboxEmpty(), IDrawable& checkImage = cct.images.checkboxFilled(), sdl::Color baseColor = sdl::WHITE, sdl::Color hoverColor = sdl::GOLD):
 			UIEntry<T>(item, index, onClick, hb, f, text, baseColor, hoverColor), checkImage(checkImage), uncheckImage(uncheckImage) {}
-		virtual ~UIMultiEntry() {}
+		virtual ~UIMultiEntry() override {}
 
 		bool toggled = false;
 		IDrawable& checkImage;
 		IDrawable& uncheckImage;
 
-		inline virtual float getProjectedWidthOffset() override { return uncheckImage.getWidth() + 8 + UIText::getTextWidth(); };
+		inline virtual float getProjectedWidth() override { return uncheckImage.getWidth() + renderScale(8) + UIText::getTextWidth(); };
+		inline virtual void updateSelectStatus(bool selected) override { toggled = selected; };
 
 		virtual void renderImpl() override;
 	};
@@ -43,8 +45,7 @@ export namespace fbc {
 				uncheckImage.draw(&check, sdl::BlendMode::SDL_BLENDMODE_ADD, sdl::WHITE);
 			}
 		}
-		float textX = check.x + check.w * 1.5f;
-		float textY = check.y + check.h * 0.5f;
-		TextInfo::drawText(textX, textY);
+		float textX = check.x + check.w * 1.25f;
+		TextInfo::drawText(textX, check.y);
 	}
 }

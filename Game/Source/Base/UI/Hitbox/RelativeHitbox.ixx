@@ -8,41 +8,32 @@ import fbc.futil;
 export namespace fbc {
 	export class RelativeHitbox : public Hitbox {
 	public:
-		RelativeHitbox(Hitbox& parent) : parent(parent) {
-			RelativeHitbox::refreshSize();
-		}
-		RelativeHitbox(Hitbox& parent, float offsetWidth, float offsetHeight) : parent(parent), Hitbox(offsetWidth, offsetHeight) {
-			RelativeHitbox::refreshSize();
-		}
+		RelativeHitbox(Hitbox& parent) : RelativeHitbox(parent, 0, 0, 0, 0) {}
+		RelativeHitbox(Hitbox& parent, float offsetWidth, float offsetHeight) : RelativeHitbox(parent, 0, 0, offsetWidth, offsetHeight) {}
 		RelativeHitbox(Hitbox& parent, float parentOffsetX, float parentOffsetY, float offsetWidth, float offsetHeight) : parent(parent), Hitbox(parentOffsetX, parentOffsetY, offsetWidth, offsetHeight) {
-			RelativeHitbox::refreshSize();
+			refresh();
 		}
 		~RelativeHitbox() override {}
 	protected:
 		Hitbox& parent;
-		void refreshPosition() override;
-		void refreshSize() override;
+
+		inline void refreshExactPosX() override { x = parent.x + renderScale() * offsetPosX; }
+		inline void refreshExactPosY() override { y = parent.y + renderScale() * offsetPosY; }
+		inline void refreshExactSizeX() override { w = renderScale() * offsetSizeX; }
+		inline void refreshExactSizeY() override { h = renderScale() * offsetSizeY; }
+		inline void refreshOffsetPosX() override { offsetPosX = (x - parent.x) / renderScale(); }
+		inline void refreshOffsetPosY() override { offsetPosY = (y - parent.y) / renderScale(); }
+		inline void refreshOffsetSizeX() override { offsetSizeX = w / renderScale(); }
+		inline void refreshOffsetSizeY() override { offsetSizeY = h / renderScale(); }
+
 		void update() override;
 	};
-
-	// Refresh coordinates starting from parent's starting coordinates
-	void RelativeHitbox::refreshPosition()
-	{
-		x = parent.x + renderScale() * offsetX;
-		y = parent.y + renderScale() * offsetY;
-	}
-
-	// Set the ui dimensions in accordance to the screen's current size
-	void RelativeHitbox::refreshSize() {
-		w = renderScale() * offsetWidth;
-		h = renderScale() * offsetHeight;
-		refreshPosition();
-	}
 
 	// Position should always remain relative to the parent
 	void RelativeHitbox::update()
 	{
 		Hitbox::update();
-		refreshPosition();
+		refreshExactPosX();
+		refreshExactPosY();
 	}
 }

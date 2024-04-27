@@ -1,5 +1,6 @@
 export module fbc.uiMenu;
 
+import fbc.coreConfig;
 import fbc.coreContent;
 import fbc.ffont;
 import fbc.hitbox;
@@ -15,20 +16,20 @@ import fbc.futil;
 import sdl;
 import std;
 
+constexpr int MARGIN = 16;
+
 export namespace fbc {
 	export template <typename T> class UIMenu : public UIHoverable {
 		using FuncEntry = func<UIEntry<T>*(UIMenu&, T&, str&, int)>;
 
 	public:
 		UIMenu(Hitbox* hb,
-		       FuncEntry entryFunc = [](UIMenu<T>& menu, T& item, str& name, int index) {
-			       return multiSelectFunc<T>(menu, item, name, index);
-		       },
+		       FuncEntry entryFunc,
 		       func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
 		       FFont& itemFont = cct.fontRegular(),
-		       IDrawable& background = cct.images.smallPanel()):
+		       IDrawable& background = cct.images.flatPanel()):
 			UIHoverable(hb), background(background), itemFont(itemFont), entryFunc(entryFunc), labelFunc(labelFunc),
-			scrollbar(new RelativeHitbox(*hb)) { scrollbar.setOnScroll([this](float f) { onScroll(f); }); }
+			scrollbar(new RelativeHitbox(*hb, 0, 0, 48, 48)) { scrollbar.setOnScroll([this](float f) { onScroll(f); }); }
 
 		~UIMenu() override {}
 
@@ -70,6 +71,8 @@ export namespace fbc {
 		template <c_itr<int> Iterable> void updateIndices(Iterable& indices);
 		template <c_itr<T> Iterable> void updateSelection(Iterable& indices);
 
+		static uptr<UIMenu> multiMenu(Hitbox* hb, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); }, FFont& itemFont = cct.fontRegular(), IDrawable& background = cct.images.flatPanel());
+		static uptr<UIMenu> singleMenu(Hitbox* hb, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); }, FFont& itemFont = cct.fontRegular(), IDrawable& background = cct.images.flatPanel());
 	protected:
 		FFont& itemFont = cct.fontRegular();
 		FuncEntry entryFunc;
@@ -78,7 +81,7 @@ export namespace fbc {
 		vec<uptr<UIEntry<T>>> rows;
 		vec<UIEntry<T>*> rowsForRender;
 
-		inline int getVisibleRowCount() const { return std::min((int)rowsForRender.size(), maxRows); }
+		inline int getVisibleRowCount() const { return std::min(static_cast<int>(rowsForRender.size()), maxRows); }
 
 		void makeRow(T item);
 		virtual void syncRowsForRender();
@@ -94,6 +97,8 @@ export namespace fbc {
 		uptr<UIHoverable> headerRow;
 		UIVerticalScrollbar scrollbar;
 		UIBase* proxy;
+
+		inline static float rMargin() { return renderScale(MARGIN); }
 
 		inline bool shouldShowSlider() { return rowsForRender.size() > maxRows; }
 
@@ -114,8 +119,8 @@ export namespace fbc {
 		void updateImpl() override;
 	};
 
-	export template <typename U> UIEntry<U>* multiSelectFunc(UIMenu<U>& menu, U& item, str& name, int index);
-	export template <typename U> UIEntry<U>* singleSelectFunc(UIMenu<U>& menu, U& item, str& name, int index);
+	export template <typename T> UIEntry<T>* multiSelectFunc(UIMenu<T>& menu, T& item, str& name, int index);
+	export template <typename T> UIEntry<T>* singleSelectFunc(UIMenu<T>& menu, T& item, str& name, int index);
 
 
 	// Create rows for each item in the provided list
@@ -242,7 +247,9 @@ export namespace fbc {
 	template <typename T> void UIMenu<T>::renderImpl() {
 		background.draw(hb.get(), backgroundColor, {0, 0}, 0, sdl::RendererFlip::SDL_FLIP_NONE);
 		int rowCount = getVisibleRowCount();
-		for (int i = topVisibleRowIndex; i < topVisibleRowIndex + rowCount; ++i) { rowsForRender[i]->renderImpl(); }
+		for (int i = topVisibleRowIndex; i < topVisibleRowIndex + rowCount; ++i) {
+			rowsForRender[i]->renderImpl();
+		}
 
 		if (headerRow) { headerRow->renderImpl(); }
 
@@ -305,27 +312,30 @@ export namespace fbc {
 	// The menu should be expanded to cover the rows as well as the scrollbar
 	template <typename T>
 	void UIMenu<T>::autosize() {
+		int rowCount = getVisibleRowCount();
+		float rMarg = rMargin();
+		float sizeY = rowCount * (rows.size() > 0 ? rows[0]->hb->h : 0);
 		if (canAutosize) {
 			float maxWidth = std::transform_reduce(rows.begin(), rows.end(), 0,
 			                                       [](float a, float b) { return std::max(a, b); },
 			                                       [](const uptr<UIEntry<T>>& row) {
-				                                       return row->getProjectedWidthOffset();
+				                                       return row->getProjectedWidth();
 			                                       });
-			for (const uptr<UIEntry<T>>& row : rows) { row->hb->setOffsetWidth(maxWidth); }
+			for (const uptr<UIEntry<T>>& row : rows) { row->hb->setExactSizeX(maxWidth); }
 
-			int rowCount = getVisibleRowCount();
-			scrollbar.hb->setOffsetX(maxWidth + 1);
-			scrollbar.hb->setOffsetHeight(rowCount * rows.size() > 0 ? rows[0]->hb->getOffsetHeight() : 0);
-			hb->setOffsetSize(maxWidth + scrollbar.hb->getOffsetWidth(), scrollbar.hb->getOffsetHeight());
+			scrollbar.hb->setExactPos(hb->x + maxWidth + rMarg, hb->y + rMarg);
+			scrollbar.hb->setExactSizeY(sizeY);
+			hb->setExactSize(maxWidth + scrollbar.hb->w, sizeY + rMarg * 2);
 		}
 		else {
-			float targetWidth = hb->getOffsetWidth() - scrollbar.hb->getOffsetWidth() - 1;
-			for (const uptr<UIEntry<T>>& row : rows) { row->hb->setOffsetWidth(targetWidth); }
+			float targetWidth = hb->w - scrollbar.hb->w - rMarg;
+			for (const uptr<UIEntry<T>>& row : rows) {
+				row->hb->setExactSizeX(targetWidth);
+			}
 
-			int rowCount = getVisibleRowCount();
-			scrollbar.hb->setOffsetX(targetWidth + 1);
-			scrollbar.hb->setOffsetHeight(rowCount * rows.size() > 0 ? rows[0]->hb->getOffsetHeight() : 0);
-			hb->setOffsetHeight(scrollbar.hb->getOffsetHeight());
+			scrollbar.hb->setExactPos(hb->x + targetWidth + rMarg, hb->y + rMarg);
+			scrollbar.hb->setExactSizeY(sizeY);
+			hb->setExactSizeY(sizeY + rMarg * 2);
 		}
 
 		updateRowPositions();
@@ -353,27 +363,45 @@ export namespace fbc {
 	// Whenever the scrollbar position is changed or items are changed, we need to update the positions of each row
 	template <typename T> void UIMenu<T>::updateRowPositions() {
 		int rowCount = getVisibleRowCount();
-		float y = headerRow ? headerRow->hb->getOffsetHeight() : 0;
+		float rMarg = rMargin();
+		float x = hb->x + rMarg;
+		float y = (headerRow ? headerRow->hb->y : hb->y) + rMarg;
 		for (int i = topVisibleRowIndex; i < topVisibleRowIndex + rowCount; ++i) {
-			rowsForRender[i]->hb->setOffsetPos(0, y);
-			y += rowsForRender[i]->hb->getOffsetHeight();
+			rowsForRender[i]->hb->setExactPos(x, y);
+			y += rowsForRender[i]->hb->h;
 		}
 	}
 
 	/*
 	 * Statics
 	 */
-	template <typename U> UIEntry<U>* multiSelectFunc(UIMenu<U>& menu, U& item, str& name, int index) {
-		func<void(UIEntry<U>&)> onClick = [&menu](UIEntry<U>& p) { menu.toggleRow(p); };
-		return new UIMultiEntry<U>(item, index, onClick,
-		                           new RelativeHitbox(*menu.hb, menu.hb->getOffsetWidth(), menu.hb->getOffsetHeight()),
+
+	template<typename T> uptr<UIMenu<T>> UIMenu<T>::multiMenu(Hitbox* hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background) {
+		return std::make_unique<UIMenu<T>>(hb,
+			[](UIMenu<T>& menu, T& item, str& name, int index) {return multiSelectFunc<T>(menu, item, name, index); },
+			labelFunc, itemFont, background);
+	}
+
+	template<typename T> uptr<UIMenu<T>> UIMenu<T>::singleMenu(Hitbox* hb,
+		func<str(const T&)> labelFunc,
+		FFont& itemFont,
+		IDrawable& background) {
+		return std::make_unique<UIMenu<T>>(hb,
+			[](UIMenu<T>& menu, T& item, str& name, int index) {return singleSelectFunc<T>(menu, item, name, index); },
+			labelFunc, itemFont, background);
+	}
+
+	template <typename T> UIEntry<T>* multiSelectFunc(UIMenu<T>& menu, T& item, str& name, int index) {
+		func<void(UIEntry<T>&)> onClick = [&menu](UIEntry<T>& p) { menu.toggleRow(p); };
+		return new UIMultiEntry<T>(item, index, onClick,
+		                           new RelativeHitbox(*menu.hb),
 		                           menu.getItemFont(), name);
 	}
 
-	template <typename U> UIEntry<U>* singleSelectFunc(UIMenu<U>& menu, U& item, str& name, int index) {
-		func<void(UIEntry<U>&)> onClick = [&menu](UIEntry<U>& p) { menu.selectSingleRow(p); };
-		return new UIEntry<U>(item, index, onClick,
-		                      new RelativeHitbox(*menu.hb, menu.hb->getOffsetWidth(), menu.hb->getOffsetHeight()),
+	template <typename T> UIEntry<T>* singleSelectFunc(UIMenu<T>& menu, T& item, str& name, int index) {
+		func<void(UIEntry<T>&)> onClick = [&menu](UIEntry<T>& p) { menu.selectSingleRow(p); };
+		return new UIEntry<T>(item, index, onClick,
+		                      new RelativeHitbox(*menu.hb),
 		                      menu.getItemFont(), name);
 	}
 

@@ -10,13 +10,14 @@ export namespace fbc {
 	export class UICanvas : public UIHoverable {
 	public:
 		UICanvas(Hitbox* hb) : UIHoverable(hb) {}
+		UICanvas(uptr<Hitbox>&& hb) : UIHoverable(std::move(hb)) {}
 		~UICanvas() override {}
 
 		inline void clear() { elements.clear(); }
 
 		template<typename T> requires std::is_base_of_v<UIHoverable, T> T& addElement(uptr<T>&& element);
-		template<typename T> requires std::is_base_of_v<UIHoverable, T> T& stackElementXDir(uptr<T>&& element, float spacing = 0, float start = 0);
-		template<typename T> requires std::is_base_of_v<UIHoverable, T> T& stackElementYDir(uptr<T>&& element, float spacing = 0, float start = 0);
+		template<typename T> requires std::is_base_of_v<UIHoverable, T> T& stackElementXDir(uptr<T>&& element, float spacing = 0);
+		template<typename T> requires std::is_base_of_v<UIHoverable, T> T& stackElementYDir(uptr<T>&& element, float spacing = 0);
 		virtual bool isHovered() override;
 		virtual void renderImpl() override;
 		virtual void updateImpl() override;
@@ -47,22 +48,22 @@ export namespace fbc {
 	 * If the element's X endpoint would exceed the width of this hb, it gets moved below the last element at the X offset defined by start
 	 * Spacing and start should both be scaled by renderScale
 	 */
-	template<typename T> requires std::is_base_of_v<UIHoverable, T> T& UICanvas::stackElementXDir(uptr<T>&& element, float spacing, float start) {
+	template<typename T> requires std::is_base_of_v<UIHoverable, T> T& UICanvas::stackElementXDir(uptr<T>&& element, float spacing) {
 		T& ref = *element;
 		elements.push_back(std::move(element));
 		// Only actually do positioning if there is a previous element to reference
 		if (elements.size() > 1) {
 			UIHoverable& last = *elements[elements.size() - 2];
 			Hitbox& lhb = *(last.hb);
-			float xOff = lhb.getOffsetX() + lhb.w + spacing;
-			float yOff = lhb.getOffsetY();
+			float xPos = lhb.x + lhb.w + spacing;
+			float yPos = lhb.y;
 
-			if (xOff > hb->w) {
-				xOff = start;
-				yOff = yOff - element->hb->h - spacing;
+			if (xPos > hb->x + hb->w) {
+				xPos = hb->x;
+				yPos = lhb.y + lhb.h + spacing;
 			}
 
-			lhb.setOffsetPos(xOff, yOff);
+			lhb.setExactPos(xPos, yPos);
 		}
 		return ref;
 	}
@@ -71,22 +72,22 @@ export namespace fbc {
 	 * If the element's Y endpoint would exceed the height of this hb, it gets moved to the right of the last element at the Y offset defined by start
 	 * Spacing and start should both be scaled by renderScale
 	 */
-	template<typename T> requires std::is_base_of_v<UIHoverable, T> T& UICanvas::stackElementYDir(uptr<T>&& element, float spacing, float start) {
+	template<typename T> requires std::is_base_of_v<UIHoverable, T> T& UICanvas::stackElementYDir(uptr<T>&& element, float spacing) {
 		T& ref = *element;
 		elements.push_back(std::move(element));
 		// Only actually do positioning if there is a previous element to reference
 		if (elements.size() > 1) {
 			UIHoverable& last = *elements[elements.size() - 2];
 			Hitbox& lhb = *(last.hb);
-			float xOff = lhb.getOffsetX();
-			float yOff = lhb.getOffsetY() - element->hb->h - spacing;
+			float xPos = lhb.x;
+			float yPos = lhb.y + lhb.h + spacing;
 
-			if (yOff > hb->h) {
-				xOff = xOff + lhb.w + spacing;
-				yOff = start;
+			if (yPos > hb->y + hb->h) {
+				xPos = lhb.x + lhb.w + spacing;
+				yPos = hb->y;
 			}
 
-			lhb.setOffsetPos(xOff, yOff);
+			lhb.setExactPos(xPos, yPos);
 		}
 		return ref;
 	}
