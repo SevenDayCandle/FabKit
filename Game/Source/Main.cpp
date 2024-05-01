@@ -1,5 +1,6 @@
 import fbc.coreConfig;
 import fbc.coreContent;
+import fbc.configHotkey;
 import fbc.screenManager;
 import fbc.titleScreen;
 import sdl;
@@ -32,6 +33,7 @@ bool initialize() {
 	}
 
 	cfg.initialize();
+	fbc::Hotkey::reload();
 	cfg.postInitialize();
 	cct.initialize();
 

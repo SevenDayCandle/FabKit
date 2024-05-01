@@ -27,7 +27,7 @@ export namespace fbc {
 		virtual void postInitialize() {}
 	protected:
 		inline path getPathForLanguage(const strv& suffix) {
-			return getPathForLanguage(getLanguage(), suffix);
+			return getPathForLanguage(cfg.getLanguage(), suffix);
 		};
 		inline path getPathForLanguage(const GameLanguage& lang, const strv& suffix) {
 			path p = content.contentFolder;

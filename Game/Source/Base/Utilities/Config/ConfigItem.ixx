@@ -7,9 +7,12 @@ import sdl;
 export namespace fbc {
     export template<typename T> class ConfigItem {
     public:
-        ConfigItem(fbc::Config& config, const str& ID, const T& defaultValue) : config(config), ID(ID), defaultValue(defaultValue), value(defaultValue) {
+        ConfigItem(fbc::Config& config, strv ID, const T& defaultValue) : config(config), ID(ID), defaultValue(defaultValue), value(defaultValue) {
             config.addOnReload([this]() { this->reload(); });
         }
+
+        const str ID;
+
         inline void addSubscriber(func<void(const T&)> callback) {onChange.push_back(callback);}
         inline T get() {return value;}
         void set(const T& newValue);
@@ -23,7 +26,6 @@ export namespace fbc {
     private:
         fbc::Config& config;
         const T defaultValue;
-        const str ID;
         vec<func<void(const T&)>> onChange;
         T value;
     };

@@ -24,7 +24,7 @@ export namespace fbc {
 		IDrawable& checkImage;
 		IDrawable& uncheckImage;
 
-		inline virtual float getProjectedWidth() override { return uncheckImage.getWidth() + renderScale(8) + UIText::getTextWidth(); };
+		inline virtual float getProjectedWidth() override { return uncheckImage.getWidth() + cfg.renderScale(8) + UIText::getTextWidth(); };
 		inline virtual void updateSelectStatus(bool selected) override { toggled = selected; };
 
 		virtual void renderImpl() override;

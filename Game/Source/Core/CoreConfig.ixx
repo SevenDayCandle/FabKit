@@ -1,6 +1,7 @@
 export module fbc.coreConfig;
 
 import fbc.config;
+import fbc.configHotkey;
 import fbc.configItem;
 import fbc.ffont;
 import fbc.futil;
@@ -8,14 +9,13 @@ import fbc.gameLanguage;
 import sdl;
 import std;
 
-float renderScalePrivate = 1.0;
-constexpr float BASE_DENOMINATOR = 2160;
-
 export namespace fbc {
+	constexpr float BASE_DENOMINATOR = 2160;
+
 	export class CoreConfig : public Config {
 	public:
 		CoreConfig(strv ID) : Config(ID) {}
-		virtual ~CoreConfig() {}
+		virtual ~CoreConfig() override {}
 
 		ConfigItem<int> gameActionSpeed = ConfigItem<int>(*this, "GameActionSpeed", 3);
 		ConfigItem<bool> graphicsVSync = ConfigItem<bool>(*this, "GraphicsVSync", true);
@@ -31,15 +31,27 @@ export namespace fbc {
 		ConfigItem<bool> textIcons = ConfigItem<bool>(*this, "TextIcons", false);
 		ConfigItem<str> textLanguage = ConfigItem<str>(*this, "TextIcons", lang::ENG);
 
+		Hotkey arrowUp = Hotkey::add("ArrowUp", sdl::Keycode::SDLK_UP, 0);
+
+		inline int getScreenXSize() { return graphicsResolutionX.get(); }
+		inline int getScreenYSize() { return graphicsResolutionY.get(); };
+		inline float renderScale() const noexcept { return renderScalePrivate; }
+		inline float renderScale(float mult) const noexcept { return renderScalePrivate * mult; }
+
+		const GameLanguage& getLanguage();
+
 		void postInitialize() override;
+		void refreshWindow();
+	private:
+		float renderScalePrivate = 1.0;
 	};
 
 	export CoreConfig cfg = CoreConfig(futil::FBC);
 
 	// Get the game language, defaulting to English if it is invalid
-	export const GameLanguage& getLanguage() {
+	const GameLanguage& CoreConfig::getLanguage() {
 		try {
-			return GameLanguage::get(cfg.textLanguage.get());
+			return GameLanguage::get(textLanguage.get());
 		}
 		catch (exception e) {
 			sdl::logError("Language failed to load: %s. Defaulting to ENG", e);
@@ -47,32 +59,15 @@ export namespace fbc {
 		return lang::ENG;
 	}
 
-	// Get the supposed window width
-	export int getScreenXSize() { return cfg.graphicsResolutionX.get(); }
-
-	// Get the supposed window height
-	export int getScreenYSize() { return cfg.graphicsResolutionY.get(); }
-
 	// Update the window from the config
-	export void refreshWindow() {
-		sdl::windowSetSize(cfg.graphicsResolutionX.get(), cfg.graphicsResolutionY.get());
-		sdl::windowSetFullscreen(cfg.graphicsWindowMode.get());
-		renderScalePrivate = cfg.graphicsResolutionY.get() / BASE_DENOMINATOR;
+	void CoreConfig::refreshWindow() {
+		sdl::windowSetSize(graphicsResolutionX.get(), graphicsResolutionY.get());
+		sdl::windowSetFullscreen(graphicsWindowMode.get());
+		renderScalePrivate = graphicsResolutionY.get() / BASE_DENOMINATOR;
 	}
-
-	// Return the current render scale for the window
-	export float renderScale() {
-		return renderScalePrivate;
-	}
-
-	// Return the size scaled by renderScale
-	export float renderScale(float mult) {
-		return renderScalePrivate * mult;
-	} 
-
 
 	// Sets up render scale. Resolution uses the height of a 4k screen as a base
 	void CoreConfig::postInitialize() {
-		renderScalePrivate = cfg.graphicsResolutionY.get() / BASE_DENOMINATOR;
+		renderScalePrivate = graphicsResolutionY.get() / BASE_DENOMINATOR;
 	}
 }

@@ -3,6 +3,7 @@ export module fbc.screenManager;
 import fbc.futil;
 import fbc.hitbox;
 import fbc.uiBase;
+import sdl;
 import std;
 
 namespace fbc {
@@ -49,6 +50,7 @@ export namespace fbc::screenManager {
 			closeOverlay(overlays.back().get());
 		}
 		activeElement = nullptr;
+		sdl::keyboardInputStop();
 	}
 
 	// Render the last opened screen, as well as all overlays
@@ -73,6 +75,7 @@ export namespace fbc::screenManager {
 			closeOverlay(overlays.back().get());
 		}
 		activeElement = nullptr;
+		sdl::keyboardInputStop();
 	}
 
 	// Update the last opened overlay if it exists, otherwise update the last opened screen
@@ -99,6 +102,7 @@ export namespace fbc::screenManager {
 				}
 			}
 			activeElement = nullptr;
+			sdl::keyboardInputStop();
 			queuedCloseOverlay = nullptr;
 			queuedCloseScreen = false;
 		}

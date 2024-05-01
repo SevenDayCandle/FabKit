@@ -1,6 +1,7 @@
 export module fbc.futil;
 
 import fbc.keyedItem;
+import fbc.iserializable;
 import sdl;
 import std;
 
@@ -39,17 +40,25 @@ export namespace fbc {
 		{ f(t) } -> std::convertible_to<U>;
 	};
 	export template<typename It, typename T> concept c_itr = std::ranges::range<It> && std::same_as<std::ranges::range_value_t<It>, T>;
-	export template<typename T> concept c_keyed = std::is_base_of_v<keyed_item<T>, T>;
+	export template<typename T> concept c_keyed = std::is_base_of_v<KeyedItem<T>, T>;
 	export template<typename T> concept c_map = requires {
 		typename T::key_type;
 		typename T::mapped_type;
 			requires std::is_default_constructible_v<T>;
+	};
+	template<typename TCo, typename T, typename U> concept c_map_of = std::ranges::range<TCo> &&
+		requires {
+		typename TCo::key_type;
+		typename TCo::mapped_type;
+			requires std::same_as<typename TCo::key_type, T>;
+			requires std::same_as<typename TCo::mapped_type, U>;
 	};
 	export template<typename T> concept c_num = std::is_arithmetic_v<T>;
 	export template<typename T> concept c_ref = is_specialization_v<T, std::reference_wrapper>;
 	export template<typename It, typename T> concept c_set = c_itr<T, It>&& requires(It a, T v) {
 		{ a.find(v) } -> std::convertible_to<typename It::iterator>;
 	};
+	export template<typename T> concept c_serial = std::is_base_of_v<ISerializable, T>;
 	export template<typename T> concept c_str = requires(T t) {
 		std::string_view{ t };
 	};
@@ -212,9 +221,27 @@ export namespace fbc::futil {
 	}
 
 	// Transform each of the values in the container into a new value and store the results in a list
-	export template<typename T, typename U, c_itr<T> TCo, c_inv<T, U> Func> vec<U> map(const TCo& container, Func mapFunc) {
+	export template<typename T, typename U, c_itr<T> TCo, c_inv<T, U> Func> vec<U> transform(const TCo& container, Func mapFunc) {
 		vec<U> res(container.size());
 		std::transform(container.begin(), container.end(), res.begin(), mapFunc);
+		return res;
+	}
+
+	// Transform each of the values in the map into a new map
+	export template<typename T, typename U, typename V, c_map_of<T,U> TCo, c_inv<U, V> Func> map<T, V> transformMap(const TCo& src, Func mapFunc) {
+		map<T, V> res;
+		for (const auto& p : src) {
+			res[p.first] = mapFunc(p.second);
+		}
+		return res;
+	}
+
+	// Transform each of the values in the map into a new unordered map
+	export template<typename T, typename U, typename V, c_map_of<T, U> TCo, c_inv<U, V> Func> umap<T, V> transformUmap(const TCo& src, Func mapFunc) {
+		umap<T, V> res;
+		for (const auto& p : src) {
+			res[p.first] = mapFunc(p.second);
+		}
 		return res;
 	}
 
@@ -242,7 +269,7 @@ export namespace fbc::futil {
 				result += "\"" + toString(iter->first) + "\": " + toString(iter->second);
 				++iter;
 			}
-			for (auto iter = map.begin(); iter != map.end(); ++iter) {
+			for (auto iter = transform.begin(); iter != transform.end(); ++iter) {
 				result += ", \"" + toString(iter->first) + "\": " + toString(iter->second);
 			}
 			result += "}";

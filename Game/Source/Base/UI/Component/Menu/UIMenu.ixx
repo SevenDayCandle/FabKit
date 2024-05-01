@@ -98,7 +98,7 @@ export namespace fbc {
 		UIVerticalScrollbar scrollbar;
 		UIBase* proxy;
 
-		inline static float rMargin() { return renderScale(MARGIN); }
+		inline static float rMargin() { return cfg.renderScale(MARGIN); }
 
 		inline bool shouldShowSlider() { return rowsForRender.size() > maxRows; }
 
@@ -225,7 +225,7 @@ export namespace fbc {
 
 	// Get all items in the menu regardless of whether they are visible or selected
 	template <typename T> vec<T*> UIMenu<T>::getAllItems() {
-		return futil::map<T>(rows, [](const uptr<UIEntry<T>>& row) { return &(row->item); });
+		return futil::transform<T>(rows, [](const uptr<UIEntry<T>>& row) { return &(row->item); });
 	}
 
 	// Returns the entries corresponding with the currently selected indices
@@ -415,6 +415,6 @@ export namespace fbc {
 	// Close the menu if the user clicks outside the menu
 	template <typename T> void UIMenuProxy<T>::updateImpl() {
 		menu.updateImpl();
-		if (sdl::mouseIsLeftJustClicked() && !menu.isHovered()) { screenManager::closeOverlay(this); }
+		if ((sdl::mouseIsLeftJustClicked() && !menu.isHovered()) || sdl::keyboardJustPressedEsc()) { screenManager::closeOverlay(this); }
 	}
 }

@@ -65,7 +65,7 @@ namespace glz
          template <auto Opts>
          GLZ_ALWAYS_INLINE static void op(auto&& value, is_context auto&&, auto&& b, auto&& ix) noexcept
          {
-            static constexpr auto N = std::tuple_size_v<meta_t<T>>;
+            static constexpr auto N = glz::tuple_size_v<meta_t<T>>;
 
             dump<'['>(b, ix);
 
@@ -123,7 +123,7 @@ namespace glz
          template <auto Opts, class... Args>
          GLZ_ALWAYS_INLINE static void op(auto&& value, Args&&... args) noexcept
          {
-            using V = std::decay_t<decltype(value.get())>;
+            using V = std::remove_cvref_t<decltype(value.get())>;
             to_json<V>::template op<Opts>(value.get(), std::forward<Args>(args)...);
          }
       };
@@ -195,10 +195,10 @@ namespace glz
          while (true) {
             std::memcpy(&swar, in, Bytes);
             std::memcpy(out + ix, in, Bytes);
-            auto next = has_quote(swar) | has_escape(swar) | is_less_16(swar);
+            auto next = has_quote(swar) | has_escape(swar) | is_less_32(swar);
 
             if (next) {
-               next = std::countr_zero(next) >> 3;
+               next = countr_zero(next) >> 3;
                const auto escape_char = char_escape_table[uint32_t(in[next])];
                if (escape_char == 0) {
                   ix += next;
@@ -232,7 +232,7 @@ namespace glz
                   dump(value, b, ix);
                }
                else {
-                  if constexpr (resizeable<B>) {
+                  if constexpr (resizable<B>) {
                      const auto k = ix + 4; // 4 characters is enough for quotes and escaped character
                      if (k >= b.size()) [[unlikely]] {
                         b.resize((std::max)(b.size() * 2, k));
@@ -265,7 +265,7 @@ namespace glz
                   }();
 
                   // We need at space for quotes and the string length: 2 + n.
-                  if constexpr (resizeable<B>) {
+                  if constexpr (resizable<B>) {
                      const auto n = str.size();
                      const auto k = ix + 2 + n;
                      if (k >= b.size()) [[unlikely]] {
@@ -293,7 +293,7 @@ namespace glz
                   // For each individual character we need room for two characters to handle escapes.
                   // So, we need 2 + 2 * n characters to handle all cases.
                   // We add another 8 characters to support SWAR
-                  if constexpr (resizeable<B>) {
+                  if constexpr (resizable<B>) {
                      const auto k = ix + 10 + 2 * n;
                      if (k >= b.size()) [[unlikely]] {
                         b.resize((std::max)(b.size() * 2, k));
@@ -326,45 +326,48 @@ namespace glz
                      {
                         const auto* c = str.data();
                         const auto* const e = c + n;
+                        const auto start = data_ptr(b) + ix;
+                        auto data = start;
 
                         if (n > 7) {
-                           const auto data = data_ptr(b);
                            for (const auto end_m7 = e - 7; c < end_m7;) {
-                              std::memcpy(data + ix, c, 8);
+                              std::memcpy(data, c, 8);
                               uint64_t chunk;
                               std::memcpy(&chunk, c, 8);
                               // We don't check for writing out invalid characters as this can be tested by the user if
                               // necessary. In the case of invalid JSON characters we write out null characters to
                               // showcase the error and make the JSON invalid. These would then be detected upon reading
                               // the JSON.
-                              const uint64_t test_chars = has_quote(chunk) | has_escape(chunk) | is_less_16(chunk);
+                              const uint64_t test_chars = has_quote(chunk) | has_escape(chunk) | is_less_32(chunk);
                               if (test_chars) {
-                                 const auto length = (std::countr_zero(test_chars) >> 3);
+                                 const auto length = (countr_zero(test_chars) >> 3);
                                  c += length;
-                                 ix += length;
+                                 data += length;
 
-                                 std::memcpy(data + ix, &char_escape_table[uint8_t(*c)], 2);
-                                 ix += 2;
+                                 std::memcpy(data, &char_escape_table[uint8_t(*c)], 2);
+                                 data += 2;
                                  ++c;
                               }
                               else {
-                                 ix += 8;
+                                 data += 8;
                                  c += 8;
                               }
                            }
                         }
 
                         // Tail end of buffer. Uncommon for long strings.
-                        for (const auto data = data_ptr(b); c < e; ++c) {
+                        for (; c < e; ++c) {
                            if (const auto escaped = char_escape_table[uint8_t(*c)]; escaped) {
-                              std::memcpy(data + ix, &escaped, 2);
-                              ix += 2;
+                              std::memcpy(data, &escaped, 2);
+                              data += 2;
                            }
                            else {
-                              std::memcpy(data + ix, c, 1);
-                              ++ix;
+                              std::memcpy(data, c, 1);
+                              ++data;
                            }
                         }
+
+                        ix += size_t(data - start);
                      }
 
                      dump_unchecked<'"'>(b, ix);
@@ -453,7 +456,7 @@ namespace glz
          }
       };
 
-      template <glz::opts Opts>
+      template <opts Opts>
       GLZ_ALWAYS_INLINE void write_entry_separator(is_context auto&& ctx, auto&&... args) noexcept
       {
          dump<','>(args...);
@@ -746,7 +749,7 @@ namespace glz
                   using V = std::decay_t<decltype(val)>;
 
                   if constexpr (Opts.write_type_info && !tag_v<T>.empty() && glaze_object_t<V>) {
-                     constexpr auto num_members = std::tuple_size_v<meta_t<V>>;
+                     constexpr auto num_members = glz::tuple_size_v<meta_t<V>>;
 
                      // must first write out type
                      if constexpr (Opts.prettify) {
@@ -825,7 +828,7 @@ namespace glz
          GLZ_FLATTEN static void op(auto&& value, is_context auto&& ctx, Args&&... args) noexcept
          {
             using V = std::decay_t<decltype(value.value)>;
-            static constexpr auto N = std::tuple_size_v<V>;
+            static constexpr auto N = glz::tuple_size_v<V>;
 
             dump<'['>(args...);
             if constexpr (N > 0 && Opts.prettify) {
@@ -863,10 +866,10 @@ namespace glz
          {
             static constexpr auto N = []() constexpr {
                if constexpr (glaze_array_t<std::decay_t<T>>) {
-                  return std::tuple_size_v<meta_t<std::decay_t<T>>>;
+                  return glz::tuple_size_v<meta_t<std::decay_t<T>>>;
                }
                else {
-                  return std::tuple_size_v<std::decay_t<T>>;
+                  return glz::tuple_size_v<std::decay_t<T>>;
                }
             }();
 
@@ -915,10 +918,10 @@ namespace glz
          {
             static constexpr auto N = []() constexpr {
                if constexpr (glaze_array_t<std::decay_t<T>>) {
-                  return std::tuple_size_v<meta_t<std::decay_t<T>>>;
+                  return glz::tuple_size_v<meta_t<std::decay_t<T>>>;
                }
                else {
-                  return std::tuple_size_v<std::decay_t<T>>;
+                  return glz::tuple_size_v<std::decay_t<T>>;
                }
             }();
 
@@ -986,7 +989,7 @@ namespace glz
             }
 
             using V = std::decay_t<decltype(value.value)>;
-            static constexpr auto N = std::tuple_size_v<V> / 2;
+            static constexpr auto N = glz::tuple_size_v<V> / 2;
 
             bool first = true;
             for_each<N>([&](auto I) {
@@ -1012,7 +1015,7 @@ namespace glz
                      write_entry_separator<Opts>(ctx, b, ix);
                   }
 
-                  using Key = typename std::decay_t<std::tuple_element_t<2 * I, V>>;
+                  using Key = typename std::decay_t<glz::tuple_element_t<2 * I, V>>;
 
                   if constexpr (str_t<Key> || char_t<Key>) {
                      const sv key = glz::get<2 * I>(value.value);
@@ -1060,7 +1063,7 @@ namespace glz
             }
 
             using V = std::decay_t<decltype(value.value)>;
-            static constexpr auto N = std::tuple_size_v<V>;
+            static constexpr auto N = glz::tuple_size_v<V>;
 
             for_each<N>([&](auto I) {
                write<json>::op<opening_and_closing_handled<Options>()>(glz::get<I>(value.value), ctx, b, ix);
@@ -1173,7 +1176,7 @@ namespace glz
                      return;
                   else {
                      auto is_null = [&]() {
-                        if constexpr (raw_nullable<val_t>) {
+                        if constexpr (nullable_wrapper<val_t>) {
                            return !bool(member(value).val);
                         }
                         else {
@@ -1224,7 +1227,7 @@ namespace glz
                   write<json>::op<Opts>(get_member(value, member), ctx, b, ix);
 
                   static constexpr size_t comment_index = member_index + 1;
-                  static constexpr auto S = std::tuple_size_v<typename Element::Item>;
+                  static constexpr auto S = glz::tuple_size_v<typename Element::Item>;
                   if constexpr (Opts.comments && S > comment_index) {
                      static constexpr auto i = glz::get<I>(meta_v<std::decay_t<T>>);
                      if constexpr (std::is_convertible_v<decltype(get<comment_index>(i)), sv>) {
@@ -1303,7 +1306,7 @@ namespace glz
 
             static constexpr auto sorted = sort_json_ptrs(Partial);
             static constexpr auto groups = glz::group_json_ptrs<sorted>();
-            static constexpr auto N = std::tuple_size_v<std::decay_t<decltype(groups)>>;
+            static constexpr auto N = glz::tuple_size_v<std::decay_t<decltype(groups)>>;
 
             static constexpr auto num_members = reflection_count<T>;
 

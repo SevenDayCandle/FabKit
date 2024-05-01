@@ -15,13 +15,13 @@ export namespace fbc {
 		~ScreenPosHitbox() override {}
 
 	protected:
-		inline void refreshExactPosX() override { x = getScreenXSize() * offsetPosX; }
-		inline void refreshExactPosY() override { y = getScreenYSize() * offsetPosY; }
-		inline void refreshExactSizeX() override { w = renderScale() * offsetSizeX; }
-		inline void refreshExactSizeY() override { h = renderScale() * offsetSizeY; }
-		inline void refreshOffsetPosX() override { offsetPosX = x / getScreenXSize(); }
-		inline void refreshOffsetPosY() override { offsetPosY = y / getScreenYSize(); }
-		inline void refreshOffsetSizeX() override { offsetSizeX = w / renderScale(); }
-		inline void refreshOffsetSizeY() override { offsetSizeY = h / renderScale(); }
+		inline void refreshExactPosX() override { x = cfg.getScreenXSize() * offsetPosX; }
+		inline void refreshExactPosY() override { y = cfg.getScreenYSize() * offsetPosY; }
+		inline void refreshExactSizeX() override { w = cfg.renderScale() * offsetSizeX; }
+		inline void refreshExactSizeY() override { h = cfg.renderScale() * offsetSizeY; }
+		inline void refreshOffsetPosX() override { offsetPosX = x / cfg.getScreenXSize(); }
+		inline void refreshOffsetPosY() override { offsetPosY = y / cfg.getScreenYSize(); }
+		inline void refreshOffsetSizeX() override { offsetSizeX = w / cfg.renderScale(); }
+		inline void refreshOffsetSizeY() override { offsetSizeY = h / cfg.renderScale(); }
 	};
 }

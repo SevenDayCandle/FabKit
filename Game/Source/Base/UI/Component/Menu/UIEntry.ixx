@@ -23,7 +23,7 @@ export namespace fbc {
 		T item;
 		int index;
 
-		inline virtual float getProjectedHeight() { return renderScale(64); };
+		inline virtual float getProjectedHeight() { return cfg.renderScale(64); };
 		inline virtual float getProjectedWidth() { return getTextWidth(); };
 		inline virtual void updateSelectStatus(bool selected) {};
 

@@ -12,7 +12,7 @@ export namespace fbc {
 	public:
 		UIVerticalCanvas(Hitbox* hb, float scrollSpeed = 1): UICanvas(hb),
 			scrollSpeed(scrollSpeed),
-			scrollbar{ new ScaleHitbox(hb->w * 0.93f / renderScale(), hb->y + hb->h * 0.05f / renderScale(), 48, hb->h * 0.9f / renderScale())},
+			scrollbar{ new ScaleHitbox(hb->w * 0.93f / cfg.renderScale(), hb->y + hb->h * 0.05f / cfg.renderScale(), 48, hb->h * 0.9f / cfg.renderScale())},
 			baseOffsetY(hb->getOffsetPosY()) {
 			scrollbar.setOnScroll([this](float f) {reposition(f); });
 		}

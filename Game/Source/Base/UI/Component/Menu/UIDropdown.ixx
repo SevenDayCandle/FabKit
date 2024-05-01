@@ -94,7 +94,7 @@ export namespace fbc {
 	// When opened, move the menu directly below this button, unless there isn't enough room (in which case it should appear above this button)
 	template<typename T> void UIDropdown<T>::openPopup() {
 		int bottom = hb->y + hb->h;
-		if (bottom + menu->hb->h > getScreenYSize()) {
+		if (bottom + menu->hb->h > cfg.getScreenYSize()) {
 			menu->hb->move(hb->x, hb->y - menu->hb->h);
 		}
 		else {
@@ -110,7 +110,7 @@ export namespace fbc {
 			sdl::RectF arrowRect = { hb->x + hb->w - w * 1.5f, hb->y + hb->h * 0.25f, w, arrow->getHeight()};
 			arrow->draw(&arrowRect, UIImage::color, origin, rotation, menu->isOpen() ? sdl::RendererFlip::SDL_FLIP_VERTICAL : flip);
 		}
-		float textX = hb->x + renderScale(8);
+		float textX = hb->x + cfg.renderScale(8);
 		float textY = hb->y + hb->h * 0.25f;
 		TextInfo::drawText(hb->x, textY);
 	}

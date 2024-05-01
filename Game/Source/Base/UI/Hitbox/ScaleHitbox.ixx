@@ -14,13 +14,13 @@ export namespace fbc {
 		~ScaleHitbox() override {}
 
 	protected:
-		inline void refreshExactPosX() override { x = renderScale() * offsetPosX; }
-		inline void refreshExactPosY() override { y = renderScale() * offsetPosY; }
-		inline void refreshExactSizeX() override { w = renderScale() * offsetSizeX; }
-		inline void refreshExactSizeY() override { h = renderScale() * offsetSizeY; }
-		inline void refreshOffsetPosX() override { offsetPosX = x / renderScale(); }
-		inline void refreshOffsetPosY() override { offsetPosY = y / renderScale(); }
-		inline void refreshOffsetSizeX() override { offsetSizeX = w / renderScale(); }
-		inline void refreshOffsetSizeY() override { offsetSizeY = h / renderScale(); }
+		inline void refreshExactPosX() override { x = cfg.renderScale() * offsetPosX; }
+		inline void refreshExactPosY() override { y = cfg.renderScale() * offsetPosY; }
+		inline void refreshExactSizeX() override { w = cfg.renderScale() * offsetSizeX; }
+		inline void refreshExactSizeY() override { h = cfg.renderScale() * offsetSizeY; }
+		inline void refreshOffsetPosX() override { offsetPosX = x / cfg.renderScale(); }
+		inline void refreshOffsetPosY() override { offsetPosY = y / cfg.renderScale(); }
+		inline void refreshOffsetSizeX() override { offsetSizeX = w / cfg.renderScale(); }
+		inline void refreshOffsetSizeY() override { offsetSizeY = h / cfg.renderScale(); }
 	};
 }

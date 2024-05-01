@@ -4,25 +4,38 @@ module;
 #include "SDL3_image/SDL_image.h"
 #include "SDL3_mixer/SDL_mixer.h"
 #include "SDL3_ttf/SDL_ttf.h"
+#include <cstring>
 
 export module sdl;
 
+import sdl.iKeyboardListener;
+
 import std;
 
-int mouse = -1;
-int mouseLast = -1;
-int mousePosX;
-int mousePosY;
-SDL_Event e;
-SDL_Renderer* renderer;
-SDL_Window* window;
-Uint32 timeStart;
+namespace sdl {
+	const Uint8* key = 0;
+	const Uint8* pad = 0;
+	int mouse = -1;
+	int mouseLast = -1;
+	int mousePosX = 0;
+	int mousePosY = 0;
+	int numKeys;
+	int numPads;
+	IKeyboardListener* kListener;
+	SDL_Event e;
+	SDL_Renderer* renderer;
+	SDL_Window* window;
+	Uint32 timeStart;
+	Uint8* keyLast = 0;
+	Uint8* padLast = 0;
+}
 
 export namespace sdl {
-
 	export using BlendMode = ::SDL_BlendMode;
 	export using Color = ::SDL_Color;
 	export using Font = ::TTF_Font;
+	export using GamepadButton = ::SDL_GamepadButton;
+	export using Keycode = ::SDL_KeyCode;
 	export using PixelFormatEnum = ::SDL_PixelFormatEnum;
 	export using Point = ::SDL_FPoint;
 	export using PointI = ::SDL_Point;
@@ -40,7 +53,7 @@ export namespace sdl {
 	export constexpr Color WHITE = { 255, 255, 255, 255 };
 
 	/* Directory stuff */
-	export char* dirBase() { return SDL_GetBasePath(); }
+	export char* dirBase() noexcept { return SDL_GetBasePath(); }
 	export char* dirPref(const char* org, const char* app) { return SDL_GetPrefPath(org, app); }
 
 	/* Font management functions */
@@ -69,10 +82,29 @@ export namespace sdl {
 	export int fontStyleIsSet(TTF_Font* font, int style) { return TTF_GetFontStyle(font) & style; }
 	export void fontStyleSet(TTF_Font* font, int style) { TTF_SetFontStyle(font, style); }
 
+	/* Gamepad functions */
+	export bool gamepadHasJustPressed(int pressed) { return pad[pressed] && !padLast[pressed]; }
+
+	/* Keyboard functions */
+	export bool keyboardInputActive() {return kListener != nullptr;}
+	export void keyboardInputStart(IKeyboardListener* listener) {
+		if (!listener) {
+			kListener = listener;
+			SDL_StartTextInput();
+		}
+	}
+	export void keyboardInputStop() {
+		kListener = nullptr;
+		SDL_StopTextInput();
+	}
+	export bool keyboardJustPressed(int pressed) { return key[pressed] && !keyLast[pressed]; }
+	export bool keyboardJustPressedEnter() { return keyboardJustPressed(SDLK_KP_ENTER); }
+	export bool keyboardJustPressedEsc() { return keyboardJustPressed(SDLK_ESCAPE); }
+	export bool keyboardtPressed(int pressed) { return key[pressed]; }
 
 	/* Mouse state functions */
-	export int mouseGetX() { return mousePosX; }
-	export int mouseGetY() { return mousePosY; }
+	export int mouseGetX() noexcept { return mousePosX; }
+	export int mouseGetY() noexcept { return mousePosY; }
 	export bool mouseIsHovering(const RectF& rect) {
 		int mx = sdl::mouseGetX();
 		int my = sdl::mouseGetY();
@@ -83,14 +115,14 @@ export namespace sdl {
 		int my = sdl::mouseGetY();
 		return mx >= rect.x && my >= rect.y && mx < rect.x + rect.w && my < rect.y + rect.h;
 	}
-	export bool mouseIsLeftClicked() { return mouse == SDL_BUTTON_LEFT; }
-	export bool mouseIsLeftJustClicked() { return mouse == SDL_BUTTON_LEFT && mouseLast != SDL_BUTTON_LEFT; }
-	export bool mouseIsLeftJustReleased() { return mouse != SDL_BUTTON_LEFT && mouseLast == SDL_BUTTON_LEFT; }
-	export bool mouseIsLeftReleased() { return mouse != SDL_BUTTON_LEFT; }
-	export bool mouseIsRightClicked() { return mouse == SDL_BUTTON_RIGHT; }
-	export bool mouseIsRightJustClicked() { return mouse == SDL_BUTTON_RIGHT && mouseLast != SDL_BUTTON_RIGHT; }
-	export bool mouseIsRightJustReleased() { return mouse != SDL_BUTTON_RIGHT && mouseLast == SDL_BUTTON_RIGHT; }
-	export bool mouseIsRightReleased() { return mouse != SDL_BUTTON_RIGHT; }
+	export bool mouseIsLeftClicked() noexcept { return mouse == SDL_BUTTON_LEFT; }
+	export bool mouseIsLeftJustClicked() noexcept { return mouse == SDL_BUTTON_LEFT && mouseLast != SDL_BUTTON_LEFT; }
+	export bool mouseIsLeftJustReleased() noexcept { return mouse != SDL_BUTTON_LEFT && mouseLast == SDL_BUTTON_LEFT; }
+	export bool mouseIsLeftReleased() noexcept { return mouse != SDL_BUTTON_LEFT; }
+	export bool mouseIsRightClicked() noexcept { return mouse == SDL_BUTTON_RIGHT; }
+	export bool mouseIsRightJustClicked() noexcept { return mouse == SDL_BUTTON_RIGHT && mouseLast != SDL_BUTTON_RIGHT; }
+	export bool mouseIsRightJustReleased() noexcept { return mouse != SDL_BUTTON_RIGHT && mouseLast == SDL_BUTTON_RIGHT; }
+	export bool mouseIsRightReleased() noexcept { return mouse != SDL_BUTTON_RIGHT; }
 
 	/* Rendering functions */
 	export void renderClear() { SDL_RenderClear(renderer); }
@@ -237,6 +269,11 @@ export namespace sdl {
 			return false;
 		}
 
+		// Initialize keyboard and pad
+		key = SDL_GetKeyboardState(&numKeys);
+		keyLast = new Uint8[numKeys];
+		memcpy(keyLast, key, numKeys);
+
 		return true;
 	}
 
@@ -266,9 +303,12 @@ export namespace sdl {
 		// Update temporary states
 		timeStart = getTicks();
 		mouseLast = mouse;
+		std::memcpy(keyLast, key, numKeys);
 
 		// Update input events
 		int res = SDL_PollEvent(&e);
+		key = SDL_GetKeyboardState(nullptr);
+
 		if (res != 0) {
 			switch (e.type) {
 			case SDL_EVENT_QUIT:
@@ -287,8 +327,27 @@ export namespace sdl {
 				mousePosX = e.button.x;
 				mousePosY = e.button.y;
 				break;
-				// TODO handling for ITextInput
+			// Key down: If a listener is present, special keys will trigger listeners.
+			case SDL_EVENT_KEY_DOWN:
+				if (kListener) {
+					switch (e.key.keysym.sym) {
+					case SDLK_BACKSPACE:
+						kListener->onBackspace();
+						break;
+					case SDLK_KP_ENTER:
+						kListener->onEnter();
+						break;
+					case SDLK_ESCAPE:
+						kListener->onEsc();
+						keyboardInputStop();
+						break;
+					}
+				}
+				break;
 			case SDL_EVENT_TEXT_INPUT:
+				if (kListener) {
+					kListener->onTextInput(e.text.text);
+				}
 				break;
 				// TODO file dialog
 			case SDL_EVENT_DROP_FILE:

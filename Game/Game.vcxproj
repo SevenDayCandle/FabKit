@@ -167,7 +167,19 @@
     </ClCompile>
     <ClCompile Include="Source\Base\Content\BaseImages.ixx" />
     <ClCompile Include="Source\Base\Content\BaseStrings.ixx" />
-    <ClCompile Include="Source\Base\SDL.ixx" />
+    <ClCompile Include="Source\Base\Utilities\Config\Hotkey.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Utilities\ISerializable.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\SDL\IKeyboardListener.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\SDL\SDL.ixx" />
     <ClCompile Include="Source\Base\UI\Component\Menu\UIDropdown.ixx">
       <SubType>
       </SubType>
@@ -203,7 +215,6 @@
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Base\UI\Hitbox\DraggableHitbox.ixx" />
     <ClCompile Include="Source\Base\UI\Hitbox\ScreenPosHitbox.ixx" />
     <ClCompile Include="Source\Base\UI\Hitbox\RelativeHitbox.ixx" />
     <ClCompile Include="Source\Base\UI\Hitbox\ScaleHitbox.ixx" />
@@ -213,7 +224,7 @@
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Base\KeyedItem.ixx">
+    <ClCompile Include="Source\Base\Utilities\KeyedItem.ixx">
       <SubType>
       </SubType>
     </ClCompile>

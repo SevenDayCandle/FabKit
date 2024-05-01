@@ -7,40 +7,28 @@
 
 #include "glaze/core/common.hpp"
 #include "glaze/core/opts.hpp"
-#include "glaze/util/validate.hpp"
 
 namespace glz
 {
    template <class Buffer>
-   concept raw_buffer = std::same_as<std::decay_t<Buffer>, char*>;
+   concept raw_buffer = std::same_as<std::decay_t<Buffer>, char*> && non_const_buffer<Buffer>;
 
    template <class Buffer>
-   concept output_buffer = range<Buffer> && (sizeof(range_value_t<Buffer>) == sizeof(char));
-
-   template <class T>
-   [[nodiscard]] GLZ_ALWAYS_INLINE auto data_ptr(T& buffer) noexcept
-   {
-      if constexpr (detail::resizeable<T>) {
-         return buffer.data();
-      }
-      else {
-         return buffer;
-      }
-   }
+   concept output_buffer = range<Buffer> && (sizeof(range_value_t<Buffer>) == sizeof(char)) && non_const_buffer<Buffer>;
 
    // For writing to a std::string, std::vector<char>, std::deque<char> and the like
    template <opts Opts, class T, output_buffer Buffer>
       requires write_supported<Opts.format, T>
    inline void write(T&& value, Buffer& buffer, is_context auto&& ctx) noexcept
    {
-      if constexpr (detail::resizeable<Buffer>) {
+      if constexpr (resizable<Buffer>) {
          if (buffer.empty()) {
             buffer.resize(128);
          }
       }
       size_t ix = 0; // overwrite index
       detail::write<Opts.format>::template op<Opts>(std::forward<T>(value), ctx, buffer, ix);
-      if constexpr (detail::resizeable<Buffer>) {
+      if constexpr (resizable<Buffer>) {
          buffer.resize(ix);
       }
    }
@@ -49,7 +37,7 @@ namespace glz
       requires write_supported<Opts.format, T>
    [[nodiscard]] inline write_error write(T&& value, Buffer& buffer) noexcept
    {
-      if constexpr (detail::resizeable<Buffer>) {
+      if constexpr (resizable<Buffer>) {
          if (buffer.empty()) {
             buffer.resize(128);
          }
@@ -58,7 +46,7 @@ namespace glz
       size_t ix = 0;
       const auto error =
          detail::write_partial<Opts.format>::template op<Partial, Opts>(std::forward<T>(value), ctx, buffer, ix);
-      if constexpr (detail::resizeable<Buffer>) {
+      if constexpr (resizable<Buffer>) {
          buffer.resize(ix);
       }
       return error;

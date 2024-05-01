@@ -9,11 +9,13 @@ import sdl;
 import std;
 
 export namespace fbc {
-    constexpr strv BASE_FILE = "config.json";
+    constexpr strv BASE_CONFIG_FILE = "config.json";
 
     export class Config {
     public:
         Config(strv ID) : ID(ID) {}
+        virtual ~Config() {}
+
         const str ID;
 
         inline void addOnReload(func<void()> callback) {
@@ -27,9 +29,9 @@ export namespace fbc {
         void reload();
         void set(const str& key, const str& value);
     protected:
-        str getConfigPath();
+        str getConfigPath() const;
     private:
-        umap<str, str> values_map = umap<str,str>();
+        map<str, str> values_map = map<str,str>();
         vec<func<void()>> items;
     };
 
@@ -39,7 +41,7 @@ export namespace fbc {
         str configPath = getConfigPath();
         glz::write_error error = glz::write_file_json(values_map, configPath, str{});
         if (error) {
-            sdl::logError("Failed to save config at path %s: %s", configPath, error.ec);
+            sdl::logError("Failed to save config at path %s", configPath.data());
         }
     }
 
@@ -49,14 +51,14 @@ export namespace fbc {
         if (std::filesystem::exists(configPath)) {
             glz::parse_error error = glz::read_file_json(values_map, configPath, str{});
             if (error) {
-                sdl::logError("Failed to read config at path %s: %s", configPath, error.ec);
+                sdl::logError("Failed to read config at path %s", configPath.data());
             }
         }
     }
 
     // Get the path to the file used to store this config's data
-    str Config::getConfigPath() {
-        return sdl::dirPref(futil::FBC.data(), ID.c_str()) + str(BASE_FILE);
+    str Config::getConfigPath() const {
+        return sdl::dirPref(futil::FBC.data(), ID.c_str()) + str(BASE_CONFIG_FILE);
     }
 
     // Get the mapped value for key

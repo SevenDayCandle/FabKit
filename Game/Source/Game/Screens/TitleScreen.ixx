@@ -16,7 +16,7 @@ export namespace fbc {
 	public:
 		TitleScreen(): UICanvas(new ScreenSizeHitbox()) {
 			UITextButton& b = addElement(std::make_unique<UITextButton>(
-				new ScreenPosHitbox(0.5f, 0.5f, 190, 100),
+				new ScreenPosHitbox(0.5f, 0.5f, 290, 170),
 				cct.images.smallPanel(),
 				cct.fontRegular(),
 				cct.strings.screen_title_header()));
