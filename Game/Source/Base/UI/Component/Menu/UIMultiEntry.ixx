@@ -16,7 +16,7 @@ import sdl;
 export namespace fbc {
 	export template <typename T> class UIMultiEntry : public UIEntry<T> {
 	public:
-		UIMultiEntry(T item, int index, func<void(UIEntry<T>&)> onClick, fbc::RelativeHitbox* hb, FFont& f, const str& text, IDrawable& uncheckImage = cct.images.checkboxEmpty(), IDrawable& checkImage = cct.images.checkboxFilled(), sdl::Color baseColor = sdl::WHITE, sdl::Color hoverColor = sdl::GOLD):
+		UIMultiEntry(T item, int index, func<void(UIEntry<T>&)> onClick, fbc::RelativeHitbox* hb, FFont& f, const str& text, IDrawable& uncheckImage = cct.images.checkboxEmpty(), IDrawable& checkImage = cct.images.checkboxFilled(), sdl::Color baseColor = sdl::COLOR_WHITE, sdl::Color hoverColor = sdl::COLOR_GOLD):
 			UIEntry<T>(item, index, onClick, hb, f, text, baseColor, hoverColor), checkImage(checkImage), uncheckImage(uncheckImage) {}
 		virtual ~UIMultiEntry() override {}
 
@@ -34,15 +34,15 @@ export namespace fbc {
 
 		sdl::RectF check = { this->hb->x, this->hb->y, this->hb->h, this->hb->h };
 		if (toggled) {
-			checkImage.draw(&check, sdl::WHITE);
+			checkImage.draw(&check, sdl::COLOR_WHITE);
 			if (this->hb->isHovered()) {
-				checkImage.draw(&check, sdl::BlendMode::SDL_BLENDMODE_ADD, sdl::WHITE);
+				checkImage.draw(&check, sdl::BlendMode::SDL_BLENDMODE_ADD, sdl::COLOR_WHITE);
 			}
 		}
 		else {
-			uncheckImage.draw(&check, sdl::WHITE);
+			uncheckImage.draw(&check, sdl::COLOR_WHITE);
 			if (this->hb->isHovered()) {
-				uncheckImage.draw(&check, sdl::BlendMode::SDL_BLENDMODE_ADD, sdl::WHITE);
+				uncheckImage.draw(&check, sdl::BlendMode::SDL_BLENDMODE_ADD, sdl::COLOR_WHITE);
 			}
 		}
 		float textX = check.x + check.w * 1.25f;

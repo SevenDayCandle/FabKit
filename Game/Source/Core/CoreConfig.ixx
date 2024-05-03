@@ -5,7 +5,7 @@ import fbc.configHotkey;
 import fbc.configItem;
 import fbc.ffont;
 import fbc.futil;
-import fbc.gameLanguage;
+import fbc.language;
 import sdl;
 import std;
 
@@ -31,14 +31,18 @@ export namespace fbc {
 		ConfigItem<bool> textIcons = ConfigItem<bool>(*this, "TextIcons", false);
 		ConfigItem<str> textLanguage = ConfigItem<str>(*this, "TextIcons", lang::ENG);
 
-		Hotkey arrowUp = Hotkey::add("ArrowUp", sdl::Keycode::SDLK_UP, 0);
+		Hotkey actDirDown = Hotkey::add("ActDirDown", sdl::KEY_DOWN, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_DOWN);
+		Hotkey actDirLeft = Hotkey::add("ActDirLeft", sdl::KEY_LEFT, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_LEFT);
+		Hotkey actDirRight = Hotkey::add("ActDirRight", sdl::KEY_RIGHT, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_RIGHT);
+		Hotkey actDirUp = Hotkey::add("ActDirUp", sdl::KEY_UP, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_UP);
+		Hotkey actEsc = Hotkey::add("ActEsc", sdl::KEY_ESC, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_INVALID);
 
 		inline int getScreenXSize() { return graphicsResolutionX.get(); }
 		inline int getScreenYSize() { return graphicsResolutionY.get(); };
 		inline float renderScale() const noexcept { return renderScalePrivate; }
 		inline float renderScale(float mult) const noexcept { return renderScalePrivate * mult; }
 
-		const GameLanguage& getLanguage();
+		const Language& getLanguage();
 
 		void postInitialize() override;
 		void refreshWindow();
@@ -49,9 +53,9 @@ export namespace fbc {
 	export CoreConfig cfg = CoreConfig(futil::FBC);
 
 	// Get the game language, defaulting to English if it is invalid
-	const GameLanguage& CoreConfig::getLanguage() {
+	const Language& CoreConfig::getLanguage() {
 		try {
-			return GameLanguage::get(textLanguage.get());
+			return Language::get(textLanguage.get());
 		}
 		catch (exception e) {
 			sdl::logError("Language failed to load: %s. Defaulting to ENG", e);

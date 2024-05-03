@@ -34,14 +34,14 @@ export namespace fbc {
 		inline float getHeight() override { return base.getHeight();}
 		inline float getWidth() override { return base.getWidth(); }
 
-		void drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip) override;
+		void drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) override;
 		void setDrawBlend(const sdl::BlendMode bl) override;
 		void setDrawColor(const sdl::Color& tint) override;
 	};
 
 	// Draw the base stretched around destRec, then draw the corners and edges around destRec
 	// Assumes that corner and border textures have the exact same size
-	void BorderedDrawable::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip) {
+	void BorderedDrawable::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) {
 		float cwidth = cornerTL.getWidth();
 		float cheight = cornerTL.getHeight();
 		sdl::RectF center = {destRec->x + cwidth, destRec->y + cheight, destRec->w - (cwidth * 2), destRec->h - (cheight * 2)};

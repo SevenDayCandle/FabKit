@@ -8,49 +8,56 @@ module;
 
 export module sdl;
 
-import sdl.iKeyboardListener;
-
+import sdl.iKeyInputListener;
 import std;
 
 namespace sdl {
-	const Uint8* key = 0;
-	const Uint8* pad = 0;
+	const Uint8* key;
+	const Uint8* pad;
 	int mouse = -1;
 	int mouseLast = -1;
 	int mousePosX = 0;
 	int mousePosY = 0;
 	int numKeys;
 	int numPads;
-	IKeyboardListener* kListener;
+	IKeyInputListener* kListener;
 	SDL_Event e;
+	SDL_Gamepad* gamepad;
 	SDL_Renderer* renderer;
 	SDL_Window* window;
 	Uint32 timeStart;
-	Uint8* keyLast = 0;
-	Uint8* padLast = 0;
-}
+	Uint8* keyLast;
+	Uint8* padLast;
 
-export namespace sdl {
 	export using BlendMode = ::SDL_BlendMode;
 	export using Color = ::SDL_Color;
+	export using FlipMode = ::SDL_FlipMode;
 	export using Font = ::TTF_Font;
 	export using GamepadButton = ::SDL_GamepadButton;
-	export using Keycode = ::SDL_KeyCode;
 	export using PixelFormatEnum = ::SDL_PixelFormatEnum;
 	export using Point = ::SDL_FPoint;
 	export using PointI = ::SDL_Point;
 	export using RectF = ::SDL_FRect;
 	export using RectI = ::SDL_Rect;
-	export using RendererFlip = ::SDL_FlipMode;
 	export using Surface = ::SDL_Surface;
 	export using Texture = ::SDL_Texture;
 
 	/* Color constants */
-	export constexpr Color BLACK = { 0, 0, 0, 255 };
-	export constexpr Color BLACK_SHADOW = { 0, 0, 0, 100 };
-	export constexpr Color GOLD = { 239, 200, 81, 255 };
-	export constexpr Color GRAY = { 127, 127, 127, 255 };
-	export constexpr Color WHITE = { 255, 255, 255, 255 };
+	export constexpr Color COLOR_BLACK = { 0, 0, 0, 255 };
+	export constexpr Color COLOR_BLACK_SHADOW = { 0, 0, 0, 100 };
+	export constexpr Color COLOR_GOLD = { 239, 200, 81, 255 };
+	export constexpr Color COLOR_GRAY = { 127, 127, 127, 255 };
+	export constexpr Color COLOR_LIME = { 76, 255, 57, 255 };
+	export constexpr Color COLOR_WHITE = { 255, 255, 255, 255 };
+
+	/* Key constants */
+	export constexpr Sint32 KEY_BACKSPACE = SDLK_BACKSPACE;
+	export constexpr Sint32 KEY_DOWN = SDLK_DOWN;
+	export constexpr Sint32 KEY_ENTER = SDLK_KP_ENTER;
+	export constexpr Sint32 KEY_ESC = SDLK_ESCAPE;
+	export constexpr Sint32 KEY_LEFT = SDLK_UP;
+	export constexpr Sint32 KEY_RIGHT = SDLK_UP;
+	export constexpr Sint32 KEY_UP = SDLK_UP;
 
 	/* Directory stuff */
 	export char* dirBase() noexcept { return SDL_GetBasePath(); }
@@ -87,8 +94,9 @@ export namespace sdl {
 
 	/* Keyboard functions */
 	export bool keyboardInputActive() {return kListener != nullptr;}
-	export void keyboardInputStart(IKeyboardListener* listener) {
-		if (!listener) {
+	export bool keyboardInputActive(IKeyInputListener* listener) { return kListener == listener; }
+	export void keyboardInputStart(IKeyInputListener* listener) {
+		if (!kListener) {
 			kListener = listener;
 			SDL_StartTextInput();
 		}
@@ -96,6 +104,12 @@ export namespace sdl {
 	export void keyboardInputStop() {
 		kListener = nullptr;
 		SDL_StopTextInput();
+	}
+	export void keyboardInputStopRequest(IKeyInputListener* listener) {
+		if (kListener == listener) {
+			kListener = nullptr;
+			SDL_StopTextInput();
+		}
 	}
 	export bool keyboardJustPressed(int pressed) { return key[pressed] && !keyLast[pressed]; }
 	export bool keyboardJustPressedEnter() { return keyboardJustPressed(SDLK_KP_ENTER); }
@@ -164,7 +178,7 @@ export namespace sdl {
 	export SDL_Surface* surfaceCopy(SDL_Surface* src) { return SDL_DuplicateSurface(src); }
 	export SDL_Surface* surfaceCreate(int width, int height, int depth, Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask) { return SDL_CreateSurface(width, height, SDL_GetPixelFormatEnumForMasks(depth, Rmask, Gmask, Bmask, Amask)); }
 	export SDL_Surface* surfaceCreateFrom(void* pixels, int width, int height, int pitch, int depth, Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask) { return SDL_CreateSurfaceFrom(pixels, width, height, pitch, SDL_GetPixelFormatEnumForMasks(depth, Rmask, Gmask, Bmask, Amask)); }
-	export SDL_Surface* surfaceLoad(const char* file) { return IMG_Load(file); } // Note: This uses SDL_image, not just SDL
+	export SDL_Surface* surfaceLoad(const char* file) { return IMG_Load(file); }
 	export void surfaceDestroy(SDL_Surface* surface) { SDL_DestroySurface(surface); }
 	export void surfaceUnlock(SDL_Surface* surface) { SDL_UnlockSurface(surface); }
 
@@ -190,6 +204,7 @@ export namespace sdl {
 	export int textureQuery(Texture* texture, SDL_PixelFormatEnum* format, int* access, int* w, int* h) { return SDL_QueryTexture(texture, format, access, w, h); }
 	export int textureSetAlphaMod(Texture* texture, Uint8 alpha) { return SDL_SetTextureAlphaMod(texture, alpha); }
 	export int textureSetBlendMode(Texture* texture, SDL_BlendMode blendMode) { return SDL_SetTextureBlendMode(texture, blendMode); }
+	export int textureSetColorMod(Texture* texture, const Color& color) { return SDL_SetTextureColorMod(texture, color.r, color.g, color.b); }
 	export int textureSetColorMod(Texture* texture, Uint8 r, Uint8 g, Uint8 b) { return SDL_SetTextureColorMod(texture, r, g, b); }
 	export int textureSetRenderTarget(Texture* texture) { return SDL_SetRenderTarget(renderer, texture); }
 	export int textureUpdate(Texture* texture, const RectI* rect, const void* pixels, int pitch) { return SDL_UpdateTexture(texture, rect, pixels, pitch); }
@@ -227,7 +242,7 @@ export namespace sdl {
 	export void windowShow() { SDL_ShowWindow(window); }
 
 	/* Misc functions */
-	export int getTicks() { return SDL_GetTicksNS(); }
+	export int ticks() { return SDL_GetTicksNS(); }
 	export const char* __cdecl getError() { return TTF_GetError(); }
 	export template <typename... Args> void log(SDL_LogPriority priority, const char* message, const Args&... args) { SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, priority, message, args...); }
 	export template <typename... Args> void log(SDL_LogPriority priority, std::string_view message, const Args&... args) { SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, priority, message.data(), args...); }
@@ -237,7 +252,7 @@ export namespace sdl {
 
 	/* When using a fixed framerate, sleep to fill up remaining time */
 	export void capFrame(int fps) {
-		Uint32 delta = SDL_GetTicks() - timeStart;
+		Uint32 delta = ticks() - timeStart;
 		Uint32 frameDur = (1000 / fps);
 		if (frameDur > delta) {
 			SDL_Delay(frameDur - delta);
@@ -274,13 +289,15 @@ export namespace sdl {
 		keyLast = new Uint8[numKeys];
 		memcpy(keyLast, key, numKeys);
 
+		// TODO pad
+
 		return true;
 	}
 
 	/* Set up window and renderer. Returns true if window and renderer were created */
 	export bool initWindow(int w, int h, Uint32 windowFlags = 0, bool vsync = false, const char* title = "Fabricate") {
 		window = windowCreate(title, w, h, windowFlags);
-		renderer = SDL_CreateRenderer(window, nullptr, vsync ? (SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC) : SDL_RENDERER_ACCELERATED);
+		renderer = SDL_CreateRenderer(window, nullptr, vsync ? SDL_RENDERER_PRESENTVSYNC : 0);
 		if (!window || !renderer) {
 			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "Window or renderer went derp");
 			SDL_Quit();
@@ -292,7 +309,7 @@ export namespace sdl {
 	/* Update the renderer with the VSync settings */
 	export void updateWindow(bool vsync) {
 		SDL_DestroyRenderer(renderer);
-		renderer = SDL_CreateRenderer(window, nullptr, vsync ? (SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC) : SDL_RENDERER_ACCELERATED);
+		renderer = SDL_CreateRenderer(window, nullptr, vsync ? SDL_RENDERER_PRESENTVSYNC : 0);
 	}
 
 	/* 
@@ -301,7 +318,7 @@ export namespace sdl {
 	*/
 	export bool poll() {
 		// Update temporary states
-		timeStart = getTicks();
+		timeStart = ticks();
 		mouseLast = mouse;
 		std::memcpy(keyLast, key, numKeys);
 
@@ -327,10 +344,22 @@ export namespace sdl {
 				mousePosX = e.button.x;
 				mousePosY = e.button.y;
 				break;
-			// Key down: If a listener is present, special keys will trigger listeners.
+			// Key down: If a listener is present, special keys will trigger listeners. These keys are independent of hotkey settings
 			case SDL_EVENT_KEY_DOWN:
 				if (kListener) {
 					switch (e.key.keysym.sym) {
+					case SDLK_DOWN:
+						kListener->onArrowUp();
+						break;
+					case SDLK_LEFT:
+						kListener->onArrowLeft();
+						break;
+					case SDLK_RIGHT:
+						kListener->onArrowRight();
+						break;
+					case SDLK_UP:
+						kListener->onArrowUp();
+						break;
 					case SDLK_BACKSPACE:
 						kListener->onBackspace();
 						break;

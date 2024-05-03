@@ -7,7 +7,7 @@ export module fbc.baseStrings;
 import fbc.baseContent;
 import fbc.coreConfig;
 import fbc.futil;
-import fbc.gameLanguage;
+import fbc.language;
 import fbc.keywordStrings;
 import fbc.objectStrings;
 
@@ -29,7 +29,7 @@ export namespace fbc {
 		inline path getPathForLanguage(const strv& suffix) {
 			return getPathForLanguage(cfg.getLanguage(), suffix);
 		};
-		inline path getPathForLanguage(const GameLanguage& lang, const strv& suffix) {
+		inline path getPathForLanguage(const Language& lang, const strv& suffix) {
 			path p = content.contentFolder;
 			return (p / LOCALIZATION_PATH / lang.name / suffix).replace_extension(futil::JSON_EXT);
 		};

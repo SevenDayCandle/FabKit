@@ -32,7 +32,7 @@ export namespace fbc {
         inline float getWidth() override { return dim.w; }
 
         void dispose();
-        void drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip) override;
+        void drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) override;
         void setDrawBlend(const sdl::BlendMode bl) override;
         void setDrawColor(const sdl::Color& tint) override;
     private:
@@ -48,7 +48,7 @@ export namespace fbc {
         texture = nullptr;
     }
 
-    void FTexture::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip)
+    void FTexture::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip)
     {
         sdl::renderCopyEx(texture, &dim, destRec, rotation, &origin, flip);
     }

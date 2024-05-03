@@ -21,12 +21,12 @@ export namespace fbc {
 		inline float getHeight() override { return base.getHeight(); }
 		inline float getWidth() override { return base.getWidth(); }
 
-		void drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip) override;
+		void drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) override;
 		void setDrawBlend(const sdl::BlendMode bl) override;
 		void setDrawColor(const sdl::Color& tint) override;
 	};
 
-	void HorizontalDrawable::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::RendererFlip flip)
+	void HorizontalDrawable::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip)
 	{
 		float width = borderL.getWidth();
 		sdl::RectF center = { destRec->x + width, destRec->y, destRec->w - (width * 2), destRec->h };

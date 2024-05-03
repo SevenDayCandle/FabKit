@@ -38,8 +38,8 @@ export namespace fbc {
 	};
 
 	void UIScrollbar::renderImpl() {
-		imageBar.draw(hb.get(), { 0.0f, 0.0f }, 0, sdl::RendererFlip::SDL_FLIP_NONE);
-		imageButton.draw(&dropzone, { 0.0f, 0.0f }, 0, sdl::RendererFlip::SDL_FLIP_NONE);
+		imageBar.draw(hb.get(), { 0.0f, 0.0f }, 0, sdl::FlipMode::SDL_FLIP_NONE);
+		imageButton.draw(&dropzone, { 0.0f, 0.0f }, 0, sdl::FlipMode::SDL_FLIP_NONE);
 	}
 
 	// Updates the scrollbar button position and triggers the scroll event at the new position

@@ -11,7 +11,7 @@ import sdl;
 export namespace fbc {
 	export template <typename T> class UIEntry : public UIText {
 	public:
-		UIEntry(T item, int index, func<void(UIEntry<T>&)> onClick, fbc::RelativeHitbox* hb, FFont& f, const str& text, sdl::Color baseColor = sdl::WHITE, sdl::Color hoverColor = sdl::GOLD):
+		UIEntry(T item, int index, func<void(UIEntry<T>&)> onClick, fbc::RelativeHitbox* hb, FFont& f, const str& text, sdl::Color baseColor = sdl::COLOR_WHITE, sdl::Color hoverColor = sdl::COLOR_GOLD):
 			item(item), index(index), onClick(onClick), baseColor(baseColor), hoverColor(hoverColor), UIText(hb, f, text) {
 			hb->setExactSizeY(getProjectedHeight());
 		}

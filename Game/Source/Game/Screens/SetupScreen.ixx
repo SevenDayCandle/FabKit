@@ -2,13 +2,13 @@ export module fbc.setupScreen;
 
 import fbc.coreContent;
 import fbc.futil;
-import fbc.gameLanguage;
+import fbc.language;
 import fbc.relativeHitbox;
 import fbc.scaleHitbox;
 import fbc.screenSizeHitbox;
 import fbc.screenManager;
 import fbc.uiButton;
-import fbc.uiDropdown;
+import fbc.uiSearchableDropdown;
 import fbc.uiEntry;
 import fbc.uiMenu;
 import fbc.uiTextButton;
@@ -37,9 +37,9 @@ export namespace fbc {
 				cct.fontRegular()
 				));
 
-			vec<ref<GameLanguage>> langs = GameLanguage::all();
-			UIDropdown<ref<GameLanguage>>& dr = addElement(UIDropdown<ref<GameLanguage>>::multiMenu(new RelativeHitbox(*hb, 390, 1100, 400, 100)))
-			.setItems(langs);
+			vec<ref<Language>> langs = Language::all();
+			UISearchableDropdown<ref<Language>>& dr = addElement(UISearchableDropdown<ref<Language>>::multiMenu(new RelativeHitbox(*hb, 390, 1100, 400, 100)));
+			dr.setItems(langs);
 		}
 	};
 }

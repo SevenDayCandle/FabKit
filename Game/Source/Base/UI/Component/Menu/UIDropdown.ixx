@@ -47,8 +47,8 @@ export namespace fbc {
 		inline bool isOpen() { return menu->isOpen(); }
 		inline UIDropdown& setEntryFunc(func<UIEntry<T>*(UIMenu<T>&, T&, str&, int)> entryFunc) { return menu->setEntryFunc(entryFunc), *this; }
 		inline UIDropdown& setOnChange(func<void(vec<T*>&)> onChange) { return menu->setOnChange(onChange), * this; }
-		inline UIDropdown& setOnClose(func<void(vec<T*>&)> onClose) { return menu->setOnClose(onClose), * this; }
-		inline UIDropdown& setOnOpen(func<void(vec<T*>&)> onOpen) { return menu->setOpen(onOpen), * this; }
+		inline virtual UIDropdown& setOnClose(func<void()> onClose) { return menu->setOnClose(onClose), * this; }
+		inline UIDropdown& setOnOpen(func<void()> onOpen) { return menu->setOpen(onOpen), * this; }
 		inline int size() { return menu->size(); }
 		inline UIDropdown& setItemFont(FFont& itemFont) { return menu->setItemFont(itemFont), * this; }
 		inline UIDropdown& setMaxRows(int rows) { return menu->setMaxRows(rows), * this; }
@@ -56,15 +56,15 @@ export namespace fbc {
 		inline vec<T*> getSelectedItems() { return menu->getSelectedItems(); }
 		inline void clearSelection() { menu->clearSelection(); }
 		inline void forceClosePopup() { menu->forceClosePopup(); }
-		template <c_itr<T> Iterable> inline UIDropdown& addItems(Iterable& items) { return menu->addItems(items), *this; }
-		template <c_itr<T> Iterable> inline UIDropdown& setItems(Iterable& items) { return menu->setItems(items), *this; }
 		template <c_itr<int> Iterable> inline void selectIndices(Iterable& indices) { return menu->selectIndices(indices), *this; }
 		template <c_itr<T> Iterable> inline void selectSelection(Iterable& items) { return menu->selectSelection(items), *this; }
 		template <c_itr<int> Iterable> inline void updateIndices(Iterable& indices) { return menu->updateIndices(indices), *this; }
 		template <c_itr<T> Iterable> inline void updateSelection(Iterable& indices) { return menu->updateSelection(indices), *this; }
 
-		void openPopup();
-		void renderImpl() override;
+		template <c_itr<T> Iterable> UIDropdown& addItems(Iterable& items);
+		template <c_itr<T> Iterable> UIDropdown& setItems(Iterable& items);
+		virtual void openPopup();
+		virtual void renderImpl() override;
 		void updateImpl() override;
 
 		static uptr<UIDropdown> multiMenu(Hitbox* hb, 
@@ -83,10 +83,11 @@ export namespace fbc {
 			IDrawable& background = cct.images.flatPanel(),
 			IDrawable& image = cct.images.smallPanel(),
 			IDrawable* arrow = &cct.images.arrowSmall());
+	protected:
+		virtual inline void onChangeItems() {}
+		virtual void onSelectionUpdate(vec<UIEntry<T>*> items);
 	private:
 		func<str(vec<UIEntry<T>*>)> buttonLabelFunc;
-
-		void onSelectionUpdate(vec<UIEntry<T>*> items);
 	};
 
 
@@ -108,11 +109,11 @@ export namespace fbc {
 		if (arrow) {
 			float w = arrow->getWidth();
 			sdl::RectF arrowRect = { hb->x + hb->w - w * 1.5f, hb->y + hb->h * 0.25f, w, arrow->getHeight()};
-			arrow->draw(&arrowRect, UIImage::color, origin, rotation, menu->isOpen() ? sdl::RendererFlip::SDL_FLIP_VERTICAL : flip);
+			arrow->draw(&arrowRect, UIImage::color, origin, rotation, menu->isOpen() ? sdl::FlipMode::SDL_FLIP_VERTICAL : flip);
 		}
-		float textX = hb->x + cfg.renderScale(8);
+		float textX = hb->x + cfg.renderScale(24);
 		float textY = hb->y + hb->h * 0.25f;
-		TextInfo::drawText(hb->x, textY);
+		TextInfo::drawText(textX, textY);
 	}
 
 	// When clicked, open the menu if not open. Otherwise, close it
@@ -184,6 +185,20 @@ export namespace fbc {
 			textFont,
 			buttonLabelFunc
 		);
+	}
+
+	template<typename T> template<c_itr<T> Iterable> UIDropdown<T>& UIDropdown<T>::addItems(Iterable& items)
+	{
+		this->menu->addItems(items);
+		onChangeItems();
+		return *this;
+	}
+
+	template<typename T> template<c_itr<T> Iterable> UIDropdown<T>& UIDropdown<T>::setItems(Iterable& items)
+	{
+		this->menu->setItems(items);
+		onChangeItems();
+		return *this;
 	}
 
 }

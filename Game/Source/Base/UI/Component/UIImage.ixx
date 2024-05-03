@@ -11,8 +11,8 @@ import sdl;
 export namespace fbc {
 	export class UIImage : public UITipHoverable {
 	public:
-		sdl::Color color = sdl::WHITE;
-		sdl::RendererFlip flip = sdl::RendererFlip::SDL_FLIP_NONE;
+		sdl::Color color = sdl::COLOR_WHITE;
+		sdl::FlipMode flip = sdl::FlipMode::SDL_FLIP_NONE;
 		float rotation = 0;
 		IDrawable& image;
 		sdl::Point origin;

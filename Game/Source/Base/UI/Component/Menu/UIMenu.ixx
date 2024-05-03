@@ -33,22 +33,22 @@ export namespace fbc {
 
 		~UIMenu() override {}
 
-		sdl::Color backgroundColor = sdl::WHITE;
+		sdl::Color backgroundColor = sdl::COLOR_WHITE;
 		IDrawable& background;
 
 		inline void clearItems() { setItems(); }
 		inline FFont& getItemFont() const { return itemFont; }
 		inline bool isOpen() const { return proxy != nullptr; }
+		inline UIMenu& setFilterFunc(func<bool(UIEntry<T>*)> filterFunc) { return this->filterFunc = filterFunc, *this; }
 		inline UIMenu& setOnChange(func<void(vec<T*>)> onChange) { return this->onChange = onChange, *this; }
-		inline UIMenu& setOnClose(func<void(vec<T*>)> onClose) { return this->onClose = onClose, *this; }
-		inline UIMenu& setOnOpen(func<void(vec<T*>)> onOpen) { return this->onOpen = onOpen, *this; }
+		inline UIMenu& setOnClose(func<void()> onClose) { return this->onClose = onClose, *this; }
+		inline UIMenu& setOnOpen(func<void()> onOpen) { return this->onOpen = onOpen, *this; }
 
 		inline UIMenu& setOnSelectionUpdate(func<void(vec<UIEntry<T>*>)> onSelectionUpdate) {
 			return this->onSelectionUpdate = onSelectionUpdate, *this;
 		}
 
 		inline int size() const { return rows.size(); }
-		inline void unsetProxy() { proxy = nullptr; }
 
 		template <c_itr<T> Iterable> UIMenu& addItems(Iterable& items);
 		template <c_itr<T> Iterable> UIMenu& setItems(Iterable& items);
@@ -62,11 +62,13 @@ export namespace fbc {
 		void clearSelection();
 		void forceClosePopup();
 		void openPopup();
+		void refilterRows();
 		void renderImpl() override;
 		template <c_itr<int> Iterable> void selectIndices(Iterable& indices);
 		template <c_itr<T> Iterable> void selectSelection(Iterable& items);
 		void selectSingleRow(UIEntry<T>& entry);
 		void toggleRow(UIEntry<T>& entry);
+		void unsetProxy();
 		void updateImpl() override;
 		template <c_itr<int> Iterable> void updateIndices(Iterable& indices);
 		template <c_itr<T> Iterable> void updateSelection(Iterable& indices);
@@ -84,15 +86,15 @@ export namespace fbc {
 		inline int getVisibleRowCount() const { return std::min(static_cast<int>(rowsForRender.size()), maxRows); }
 
 		void makeRow(T item);
-		virtual void syncRowsForRender();
 
 	private:
 		bool canAutosize;
 		int maxRows = 15;
 		int topVisibleRowIndex;
+		func<bool(UIEntry<T>*)> filterFunc;
 		func<void(vec<T*>)> onChange;
-		func<void(vec<T*>)> onClose;
-		func<void(vec<T*>)> onOpen;
+		func<void()> onClose;
+		func<void()> onOpen;
 		func<void(vec<UIEntry<T>*>)> onSelectionUpdate;
 		uptr<UIHoverable> headerRow;
 		UIVerticalScrollbar scrollbar;
@@ -104,6 +106,7 @@ export namespace fbc {
 
 		void autosize();
 		void onScroll(float percent);
+		void syncRowsForRender();
 		void updateForSelection();
 		void updateRowPositions();
 	};
@@ -182,8 +185,8 @@ export namespace fbc {
 		vec<uptr<UIEntry<T>>> originalItems = std::move(rows);
 		rows.clear();
 		for (const uptr<UIEntry<T>>& row : rows) { makeRow(row.item); }
-		autosize();
 		syncRowsForRender();
+		autosize();
 		return *this;
 	}
 
@@ -194,11 +197,19 @@ export namespace fbc {
 		return *this;
 	}
 
-	// Updates the menu font used by rows. This will update existing rows to use the new font, and will resize the menu as necessary
+	// Updates the menu font used by rows. This will update existing rows to use the new font and will resize the menu
 	template <typename T>
 	UIMenu<T>& UIMenu<T>::setItemFont(FFont& itemFont) {
 		this->itemFont = itemFont;
 		for (const uptr<UIEntry<T>>& row : rows) { row.setFont(itemFont); }
+		autosize();
+		return *this;
+	}
+
+	// Updates the label function used for row titles. This will update titles on existing rows and will resize the menu
+	template<typename T> UIMenu<T>& UIMenu<T>::setLabelFunc(func<const str(T&)> labelFunc) {
+		this->labelFunc = labelFunc;
+		for (const uptr<UIEntry<T>>& row : rows) { row->setText(labelFunc(row->item)); }
 		autosize();
 		return *this;
 	}
@@ -240,12 +251,22 @@ export namespace fbc {
 		if (proxy == nullptr) {
 			screenManager::openOverlay(std::make_unique<UIMenuProxy<T>>(*this));
 			proxy = screenManager::getActiveOverlay();
+			if (onOpen) {
+				onOpen();
+			}
 		}
+	}
+
+	// Forcibly apply the filter function on the rows and update their positions
+	template<typename T> void UIMenu<T>::refilterRows()
+	{
+		syncRowsForRender();
+		updateRowPositions();
 	}
 
 	// Render all visible rows and the scrollbar if it is shown
 	template <typename T> void UIMenu<T>::renderImpl() {
-		background.draw(hb.get(), backgroundColor, {0, 0}, 0, sdl::RendererFlip::SDL_FLIP_NONE);
+		background.draw(hb.get(), backgroundColor, {0, 0}, 0, sdl::FlipMode::SDL_FLIP_NONE);
 		int rowCount = getVisibleRowCount();
 		for (int i = topVisibleRowIndex; i < topVisibleRowIndex + rowCount; ++i) {
 			rowsForRender[i]->renderImpl();
@@ -299,12 +320,32 @@ export namespace fbc {
 		updateForSelection();
 	}
 
+	// Detach the popup proxy and call the close callback
+	template<typename T>
+	void UIMenu<T>::unsetProxy() {
+		proxy = nullptr;
+		if (onClose) {
+			onClose();
+		}
+	}
+
 	// Whenever the items contained in the menu change, we need to update the rows that will actually be rendered on the screen with the underlying rows
-	// Derivative classes may modify this logic to restrain the rows to be rendered to a certain subset
+	// If there's a filter function defined, use it to filter out the available rows to render.
 	template <typename T> void UIMenu<T>::syncRowsForRender() {
-		rowsForRender.resize(rows.size());
-		std::transform(rows.begin(), rows.end(), rowsForRender.begin(),
-		               [](const uptr<UIEntry<T>>& entry) { return entry.get(); });
+		if (filterFunc) {
+			rowsForRender.clear();
+			for (const uptr<UIEntry<T>>& row : rows) {
+				UIEntry<T>* entry = row.get();
+				if (filterFunc(entry)) {
+					rowsForRender.push_back(entry);
+				}
+			}
+		}
+		else {
+			rowsForRender.resize(rows.size());
+			std::transform(rows.begin(), rows.end(), rowsForRender.begin(),
+				[](const uptr<UIEntry<T>>& entry) { return entry.get(); });
+		}
 	}
 
 	// When the items are changed, the rows should be expanded to match the width of the longest projected row if autosizing is enabled. Otherwise, they should match the existing hitbox width minus the scrollbar width

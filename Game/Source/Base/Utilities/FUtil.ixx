@@ -6,7 +6,7 @@ import sdl;
 import std;
 
 export namespace fbc {
-	// std shorthands
+	// std shorthands. Sorry peeps
 	export template <typename T> using deque = std::deque<T>;
 	export template <typename R> using func = std::function<R>;
 	export template <typename T> using list = std::list<T>;
@@ -82,17 +82,30 @@ export namespace fbc::futil {
 		return std::any_of(container.begin(), container.end(), predicate);
 	}
 
+	// Checks if a string-like starts with another string-like
+	export bool isPrefix(strv source, strv prefix) {
+		if (prefix.size() > source.size()) {
+			return false;
+		}
+		for (int i = 0; i < prefix.size(); ++i) {
+			if (std::tolower(source[i]) != std::tolower(prefix[i])) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	// Create a lowercase version of a string-like
 	export str toLowerCase(strv input) {
 		str res;
-		std::transform(input.begin(), input.end(), res.begin(),
+		std::ranges::transform(input.begin(), input.end(), res.begin(),
 			[](unsigned char c) { return std::tolower(c); });
 		return res;
 	}
 
 	// Modify an existing string to be lowercase
 	export str& toLowerCaseInPlace(str& input) {
-		std::transform(input.begin(), input.end(), input.begin(),
+		std::ranges::transform(input.begin(), input.end(), input.begin(),
 			[](unsigned char c) { return std::tolower(c); });
 		return input;
 	}
@@ -100,14 +113,14 @@ export namespace fbc::futil {
 	// Create an uppercase version of a string-like
 	export str toUpperCase(strv input) {
 		str res;
-		std::transform(input.begin(), input.end(), res.begin(),
+		std::ranges::transform(input.begin(), input.end(), res.begin(),
 			[](unsigned char c) { return std::toupper(c); });
 		return res;
 	}
 
 	// Modify an existing string to be uppercase
 	export str& toUpperCaseInPlace(str& input) {
-		std::transform(input.begin(), input.end(), input.begin(),
+		std::ranges::transform(input.begin(), input.end(), input.begin(),
 			[](unsigned char c) { return std::toupper(c); });
 		return input;
 	}

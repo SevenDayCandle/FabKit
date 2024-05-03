@@ -167,6 +167,10 @@
     </ClCompile>
     <ClCompile Include="Source\Base\Content\BaseImages.ixx" />
     <ClCompile Include="Source\Base\Content\BaseStrings.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\Menu\UISearchableDropdown.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Base\Utilities\Config\Hotkey.ixx">
       <SubType>
       </SubType>
@@ -175,7 +179,7 @@
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\SDL\IKeyboardListener.ixx">
+    <ClCompile Include="Source\SDL\IKeyInputListener.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -309,7 +313,7 @@
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Source\Base\Utilities\Localization\GameLanguage.ixx" />
+    <ClCompile Include="Source\Base\Utilities\Localization\Language.ixx" />
     <ClCompile Include="Source\Base\UI\TextInfo.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>

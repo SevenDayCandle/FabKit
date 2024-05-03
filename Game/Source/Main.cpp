@@ -15,7 +15,7 @@ void dispose() {
 }
 
 void draw() {
-	sdl::renderSetDrawColor(sdl::BLACK);
+	sdl::renderSetDrawColor(sdl::COLOR_BLACK);
 	sdl::renderClear();
 
 	screenManager::render();

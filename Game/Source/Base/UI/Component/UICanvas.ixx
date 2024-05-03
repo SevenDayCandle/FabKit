@@ -92,9 +92,10 @@ export namespace fbc {
 		return ref;
 	}
 
-	// Update inner children; deliberately avoid updating own hb
+	// Update inner children
 	void UICanvas::updateImpl()
 	{
+		UIHoverable::updateImpl();
 		for (const uptr<UIHoverable>& element : elements) {
 			element->update();
 		}
