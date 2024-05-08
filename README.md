@@ -8,5 +8,7 @@ Requirements:
 - C++ 23 or higher
 
 Libraries Used:
-- SDL3
-- Glaze
+- SDL3: https://github.com/libsdl-org/SDL
+- SDL_image: https://github.com/libsdl-org/SDL_image
+- SDL_ttf: https://github.com/libsdl-org/SDL_ttf
+- Glaze: https://github.com/stephenberry/glaze/
