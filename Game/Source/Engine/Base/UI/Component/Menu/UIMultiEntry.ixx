@@ -5,11 +5,11 @@ import fbc.CoreContent;
 import fbc.IDrawable;
 import fbc.FFont;
 import fbc.UILabel;
-import fbc.futil;
+import fbc.FUtil;
 import fbc.RelativeHitbox;
-import fbc.screenManager;
+import fbc.ScreenManager;
 import fbc.UIEntry;
-import fbc.futil;
+import fbc.FUtil;
 import fbc.TextInfo;
 import sdl;
 

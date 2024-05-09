@@ -7,7 +7,7 @@ import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.UIInteractable;
 import fbc.TextInfo;
-import fbc.futil;
+import fbc.FUtil;
 import fbc.TextProvider;
 import sdl;
 import std;

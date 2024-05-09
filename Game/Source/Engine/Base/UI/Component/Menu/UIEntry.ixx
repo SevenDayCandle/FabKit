@@ -3,9 +3,9 @@ export module fbc.UIEntry;
 import fbc.CoreConfig;
 import fbc.FFont;
 import fbc.UILabel;
-import fbc.futil;
+import fbc.FUtil;
 import fbc.RelativeHitbox;
-import fbc.screenManager;
+import fbc.ScreenManager;
 import sdl;
 
 export namespace fbc {

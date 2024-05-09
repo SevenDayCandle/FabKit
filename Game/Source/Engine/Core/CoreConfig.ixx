@@ -4,7 +4,7 @@ import fbc.Config;
 import fbc.ConfigHotkey;
 import fbc.ConfigItem;
 import fbc.FFont;
-import fbc.futil;
+import fbc.FUtil;
 import fbc.Language;
 import sdl;
 import std;

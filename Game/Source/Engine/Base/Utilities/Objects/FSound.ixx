@@ -1,6 +1,6 @@
 export module fbc.FSound;
 
-import fbc.futil;
+import fbc.FUtil;
 import sdl;
 import std;
 

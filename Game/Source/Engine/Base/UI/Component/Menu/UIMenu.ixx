@@ -7,13 +7,13 @@ import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.IOverlay;
 import fbc.RelativeHitbox;
-import fbc.screenManager;
+import fbc.ScreenManager;
 import fbc.UIBase;
 import fbc.UIEntry;
 import fbc.UIBase;
 import fbc.UIMultiEntry;
 import fbc.UIVerticalScrollbar;
-import fbc.futil;
+import fbc.FUtil;
 import sdl;
 import std;
 

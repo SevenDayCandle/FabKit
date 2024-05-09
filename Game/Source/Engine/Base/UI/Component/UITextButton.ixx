@@ -1,7 +1,7 @@
 export module fbc.UITextButton;
 
 import fbc.FFont;
-import fbc.futil;
+import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.TextInfo;

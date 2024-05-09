@@ -1,7 +1,7 @@
 export module fbc.TextInfo;
 
 import fbc.FFont;
-import fbc.futil;
+import fbc.FUtil;
 import sdl;
 
 export namespace fbc {

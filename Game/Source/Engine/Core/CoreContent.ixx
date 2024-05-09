@@ -5,7 +5,7 @@ import fbc.CoreConfig;
 import fbc.CoreImages;
 import fbc.CoreStrings;
 import fbc.FFont;
-import fbc.futil;
+import fbc.FUtil;
 import sdl;
 import std;
 

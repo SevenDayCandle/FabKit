@@ -1,6 +1,6 @@
 export module fbc.FTexture;
 
-import fbc.futil;
+import fbc.FUtil;
 import fbc.IDrawable;
 import sdl;
 import std;

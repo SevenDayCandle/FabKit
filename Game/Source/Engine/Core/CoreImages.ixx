@@ -6,7 +6,7 @@ import fbc.BaseImages;
 import fbc.Cache;
 import fbc.CoreConfig;
 import fbc.FTexture;
-import fbc.futil;
+import fbc.FUtil;
 import fbc.VerticalDrawable;
 import std;
 

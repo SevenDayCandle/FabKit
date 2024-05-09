@@ -1,6 +1,6 @@
 export module fbc.ObjectStrings;
 
-import fbc.futil;
+import fbc.FUtil;
 
 export namespace fbc {
 	export struct ObjectStrings {

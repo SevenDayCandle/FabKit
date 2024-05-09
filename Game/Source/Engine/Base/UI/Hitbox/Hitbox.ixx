@@ -1,6 +1,6 @@
 export module fbc.Hitbox;
 
-import fbc.futil;
+import fbc.FUtil;
 import sdl;
 
 export namespace fbc {

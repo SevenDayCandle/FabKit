@@ -1,7 +1,7 @@
 import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.ConfigHotkey;
-import fbc.screenManager;
+import fbc.ScreenManager;
 import fbc.TitleScreen;
 import sdl;
 import std;

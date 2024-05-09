@@ -1,10 +1,10 @@
 export module fbc.UIImage;
 
-import fbc.futil;
+import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.TextInfo;
-import fbc.screenManager;
+import fbc.ScreenManager;
 import fbc.UITooltip;
 import fbc.UITipHoverable;
 import sdl;

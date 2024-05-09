@@ -1,7 +1,7 @@
 export module fbc.UIVerticalScrollbar;
 
 import fbc.CoreContent;
-import fbc.futil;
+import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.UIScrollbar;
 

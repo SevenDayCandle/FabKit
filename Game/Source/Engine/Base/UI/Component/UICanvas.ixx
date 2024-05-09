@@ -1,6 +1,6 @@
 export module fbc.UICanvas;
 
-import fbc.futil;
+import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.UIBase;
 import std;

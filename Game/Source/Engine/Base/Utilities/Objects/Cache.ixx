@@ -1,6 +1,6 @@
 export module fbc.Cache;
 
-import fbc.futil;
+import fbc.FUtil;
 import std;
 
 export namespace fbc {

@@ -1,7 +1,7 @@
 export module fbc.ConfigItem;
 
 import fbc.Config;
-import fbc.futil;
+import fbc.FUtil;
 import sdl;
 
 export namespace fbc {

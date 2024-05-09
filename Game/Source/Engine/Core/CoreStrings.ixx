@@ -3,7 +3,7 @@ export module fbc.CoreStrings;
 import fbc.BaseContent;
 import fbc.BaseStrings;
 import fbc.CoreConfig;
-import fbc.futil;
+import fbc.FUtil;
 import fbc.KeywordStrings;
 import std;
 

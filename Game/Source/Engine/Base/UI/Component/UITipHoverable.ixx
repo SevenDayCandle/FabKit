@@ -1,6 +1,6 @@
 export module fbc.UITipHoverable;
 
-import fbc.futil;
+import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.UITooltip;
 import fbc.UIBase;

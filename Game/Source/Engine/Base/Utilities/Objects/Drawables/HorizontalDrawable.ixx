@@ -1,7 +1,7 @@
 export module fbc.HorizontalDrawable;
 
 import fbc.FTexture;
-import fbc.futil;
+import fbc.FUtil;
 import fbc.IDrawable;
 import sdl;
 

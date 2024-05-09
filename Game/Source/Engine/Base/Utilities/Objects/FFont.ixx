@@ -1,7 +1,7 @@
 export module fbc.FFont;
 
 import fbc.FTexture;
-import fbc.futil;
+import fbc.FUtil;
 import sdl;
 
 export namespace fbc {

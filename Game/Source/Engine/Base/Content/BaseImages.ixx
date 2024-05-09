@@ -1,7 +1,7 @@
 export module fbc.BaseImages;
 
 import fbc.BaseContent;
-import fbc.futil;
+import fbc.FUtil;
 import fbc.FTexture;
 import std;
 

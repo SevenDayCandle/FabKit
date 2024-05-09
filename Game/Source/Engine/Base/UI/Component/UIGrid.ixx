@@ -4,7 +4,7 @@ import fbc.CoreConfig;
 import fbc.Hitbox;
 import fbc.UIBase;
 import fbc.UIVerticalScrollbar;
-import fbc.futil;
+import fbc.FUtil;
 import fbc.ScaleHitbox;
 import std;
 

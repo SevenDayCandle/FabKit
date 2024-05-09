@@ -4,7 +4,7 @@ module;
 
 export module fbc.Config;
 
-import fbc.futil;
+import fbc.FUtil;
 import sdl;
 import std;
 

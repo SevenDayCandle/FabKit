@@ -6,7 +6,7 @@ export module fbc.BaseStrings;
 
 import fbc.BaseContent;
 import fbc.CoreConfig;
-import fbc.futil;
+import fbc.FUtil;
 import fbc.Language;
 import fbc.KeywordStrings;
 import fbc.ObjectStrings;

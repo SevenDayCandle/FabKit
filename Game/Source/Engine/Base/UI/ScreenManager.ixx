@@ -1,6 +1,6 @@
-export module fbc.screenManager;
+export module fbc.ScreenManager;
 
-import fbc.futil;
+import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.IOverlay;
 import fbc.UIBase;

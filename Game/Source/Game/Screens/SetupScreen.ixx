@@ -1,12 +1,12 @@
 export module fbc.SetupScreen;
 
 import fbc.CoreContent;
-import fbc.futil;
+import fbc.FUtil;
 import fbc.Language;
 import fbc.RelativeHitbox;
 import fbc.ScaleHitbox;
 import fbc.ScreenSizeHitbox;
-import fbc.screenManager;
+import fbc.ScreenManager;
 import fbc.UIButton;
 import fbc.UIGrid;
 import fbc.UISearchableDropdown;

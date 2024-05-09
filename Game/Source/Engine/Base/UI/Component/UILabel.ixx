@@ -1,7 +1,7 @@
 export module fbc.UILabel;
 
 import fbc.FFont;
-import fbc.futil;
+import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.TextInfo;
 import fbc.UITooltip;

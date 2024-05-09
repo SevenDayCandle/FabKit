@@ -3,7 +3,7 @@ export module fbc.UIVerticalCanvas;
 import fbc.CoreConfig;
 import fbc.Hitbox;
 import fbc.UICanvas;
-import fbc.futil;
+import fbc.FUtil;
 import fbc.UIVerticalScrollbar;
 import fbc.ScaleHitbox;
 

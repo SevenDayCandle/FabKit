@@ -1,6 +1,6 @@
 export module fbc.Language;
 
-import fbc.futil;
+import fbc.FUtil;
 import fbc.KeyedItem;
 
 export namespace fbc {

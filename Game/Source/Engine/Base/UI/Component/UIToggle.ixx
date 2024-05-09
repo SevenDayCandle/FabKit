@@ -5,9 +5,9 @@ import fbc.FFont;
 import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.UIInteractable;
-import fbc.screenManager;
+import fbc.ScreenManager;
 import fbc.TextInfo;
-import fbc.futil;
+import fbc.FUtil;
 import sdl;
 
 export namespace fbc {

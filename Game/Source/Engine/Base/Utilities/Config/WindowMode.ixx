@@ -1,6 +1,6 @@
 export module fbc.WindowMode;
 
-import fbc.futil;
+import fbc.FUtil;
 
 export namespace fbc {
 	export enum WindowMode {

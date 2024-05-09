@@ -5,7 +5,7 @@ module;
 export module fbc.ConfigHotkey;
 
 import fbc.Config;
-import fbc.futil;
+import fbc.FUtil;
 import fbc.Iserializable;
 import sdl;
 import std;

@@ -1,7 +1,7 @@
 export module fbc.TextProvider;
 
 import fbc.FFont;
-import fbc.futil;
+import fbc.FUtil;
 import sdl;
 import sdl.IKeyInputListener;
 import std;

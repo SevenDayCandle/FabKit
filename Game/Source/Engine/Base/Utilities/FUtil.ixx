@@ -1,4 +1,4 @@
-export module fbc.futil;
+export module fbc.FUtil;
 
 import fbc.KeyedItem;
 import fbc.Iserializable;

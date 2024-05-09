@@ -3,12 +3,12 @@ export module fbc.TitleScreen;
 import fbc.CoreContent;
 import fbc.ScreenPosHitbox;
 import fbc.ScreenSizeHitbox;
-import fbc.screenManager;
+import fbc.ScreenManager;
 import fbc.SetupScreen;
 import fbc.UIButton;
 import fbc.UICanvas;
 import fbc.UITextButton;
-import fbc.futil;
+import fbc.FUtil;
 import std;
 
 export namespace fbc {
