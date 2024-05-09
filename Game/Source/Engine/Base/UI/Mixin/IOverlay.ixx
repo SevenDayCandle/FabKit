@@ -8,6 +8,8 @@ export namespace fbc {
 
 		inline virtual void close() {}
 		inline virtual void open() {}
+		inline virtual void refreshSize() {}
+
 		virtual void render() = 0;
 		virtual void update() = 0;
 	};

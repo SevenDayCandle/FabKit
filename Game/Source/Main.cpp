@@ -36,9 +36,9 @@ bool initialize() {
 	fbc::Hotkey::reload();
 	cfg.postInitialize();
 	cct.initialize();
+	cfg.setupWindow();
 
-	sdl::initWindow(cfg.graphicsResolutionX.get(), cfg.graphicsResolutionY.get(), cfg.graphicsWindowMode.get(), cfg.graphicsVSync.get());
-
+	screenManager::initialize();
 	screenManager::openScreen(std::make_unique<fbc::TitleScreen>());
 	return true;
 }

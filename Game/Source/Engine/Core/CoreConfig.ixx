@@ -41,13 +41,14 @@ export namespace fbc {
 
 		inline int getScreenXSize() { return graphicsResolutionX.get(); }
 		inline int getScreenYSize() { return graphicsResolutionY.get(); };
-		inline float renderScale() const noexcept { return renderScalePrivate; } // Gets the scale factor to resize elements by.
+		inline float renderScale() const noexcept { return renderScalePrivate; } // Gets the scale factor to resize elements by. Resolution uses the height of a 4k screen as a base
 		inline float renderScale(float mult) const noexcept { return renderScalePrivate * mult; } // Multiplies the constant by the screen scale factor. ONLY USE THIS when you need to modify offsets within methods by some constant factor or by a size variable in a class, and NOT when initializing sizes on UI components.
 
 		const Language& getLanguage();
 
 		void postInitialize() override;
-		void refreshWindow();
+		void resizeWindow();
+		void setupWindow();
 	private:
 		float renderScalePrivate = 1.0;
 	};
@@ -65,15 +66,24 @@ export namespace fbc {
 		return lang::ENG;
 	}
 
-	// Update the window from the config
-	void CoreConfig::refreshWindow() {
-		sdl::windowSetSize(graphicsResolutionX.get(), graphicsResolutionY.get());
-		sdl::windowSetFullscreen(graphicsWindowMode.get());
+	void CoreConfig::postInitialize() {
+		// Resolution uses the height of a 4k screen as a base
 		renderScalePrivate = graphicsResolutionY.get() / BASE_DENOMINATOR;
 	}
 
-	// Sets up render scale. Resolution uses the height of a 4k screen as a base
-	void CoreConfig::postInitialize() {
+	// When the window size parameters change, we should resize the window and update renderScalePrivate
+	void CoreConfig::resizeWindow()
+	{
+		sdl::windowSetSize(graphicsResolutionX.get(), graphicsResolutionY.get());
 		renderScalePrivate = graphicsResolutionY.get() / BASE_DENOMINATOR;
+	}
+
+	// Update the window from the config
+	void CoreConfig::setupWindow() {
+		sdl::initWindow(graphicsResolutionX.get(), graphicsResolutionY.get(), graphicsWindowMode.get(), graphicsVSync.get());
+		graphicsResolutionX.addSubscriber([this](const int& val) {resizeWindow(); });
+		graphicsResolutionY.addSubscriber([this](const int& val) {resizeWindow(); });
+		graphicsWindowMode.addSubscriber([this](const int& val) {sdl::windowSetFullscreen(val); });
+		graphicsVSync.addSubscriber([this](const int& val) {sdl::updateVSync(val); });
 	}
 }

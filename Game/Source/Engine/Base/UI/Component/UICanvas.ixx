@@ -20,6 +20,7 @@ export namespace fbc {
 		template<typename T> requires std::is_base_of_v<UIBase, T> T& stackElementXDir(uptr<T>&& element, float spacing = 0);
 		template<typename T> requires std::is_base_of_v<UIBase, T> T& stackElementYDir(uptr<T>&& element, float spacing = 0);
 		virtual bool isHovered() override;
+		virtual void refreshSize() override;
 		virtual void renderImpl() override;
 		virtual void updateImpl() override;
 	protected:
@@ -37,6 +38,15 @@ export namespace fbc {
 	// Is considered hovered if any child element is hovered; own hitbox is ignored
 	bool UICanvas::isHovered() {
 		return futil::any(elements, [](const uptr<UIBase>& i) { return i->isHovered(); });
+	}
+
+	// Updates the dimensions of all children too
+	void UICanvas::refreshSize()
+	{
+		UIBase::refreshSize();
+		for (const uptr<UIBase>& element : elements) {
+			element->refreshSize();
+		}
 	}
 
 	void UICanvas::renderImpl()

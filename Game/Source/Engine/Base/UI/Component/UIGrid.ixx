@@ -34,6 +34,7 @@ export namespace fbc {
 		UIGrid& setSpacingX(float spacingX);
 		UIGrid& setSpacingY(float spacingY);
 		virtual bool isHovered() override;
+		virtual void refreshSize() override;
 		virtual void renderImpl() override;
 		virtual void updateImpl() override;
 	protected:
@@ -50,6 +51,16 @@ export namespace fbc {
 	template<c_ext<UIBase> T> bool UIGrid<T>::isHovered()
 	{
 		return futil::any(items, [](const uptr<T>& i) { return i->isHovered(); });
+	}
+
+	// Updates the dimensions of all children too
+	template<c_ext<UIBase> T> void UIGrid<T>::refreshSize()
+	{
+		UIBase::refreshSize();
+		for (const uptr<T>& element : items) {
+			element->refreshSize();
+		}
+		scrollbar.refreshSize();
 	}
 
 	template<c_ext<UIBase> T> void UIGrid<T>::renderImpl()

@@ -315,7 +315,7 @@ namespace sdl {
 	}
 
 	/* Update the renderer with the VSync settings */
-	export void updateWindow(bool vsync) {
+	export void updateVSync(bool vsync) {
 		SDL_DestroyRenderer(renderer);
 		renderer = SDL_CreateRenderer(window, nullptr, vsync ? SDL_RENDERER_PRESENTVSYNC : 0);
 	}

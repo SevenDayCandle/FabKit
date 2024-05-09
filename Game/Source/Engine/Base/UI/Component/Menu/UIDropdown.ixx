@@ -63,7 +63,7 @@ export namespace fbc {
 
 		template <c_itr<T> Iterable> UIDropdown& addItems(const Iterable& items);
 		template <c_itr<T> Iterable> UIDropdown& setItems(const Iterable& items);
-	
+		void refreshSize() override;
 		virtual void openPopup();
 		virtual void renderImpl() override;
 
@@ -93,6 +93,11 @@ export namespace fbc {
 		func<str(vec<UIEntry<T>*>&)> buttonLabelFunc;
 	};
 
+
+	template<typename T> void UIDropdown<T>::refreshSize() {
+		UIInteractable::refreshSize();
+		this->menu->refreshSize();
+	}
 
 	// When opened, move the menu directly below this button, unless there isn't enough room (in which case it should appear above this button)
 	template<typename T> void UIDropdown<T>::openPopup() {

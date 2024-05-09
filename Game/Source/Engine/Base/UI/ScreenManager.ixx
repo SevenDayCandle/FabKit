@@ -1,5 +1,6 @@
 export module fbc.ScreenManager;
 
+import fbc.CoreConfig;
 import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.IOverlay;
@@ -52,6 +53,16 @@ export namespace fbc::screenManager {
 		}
 		activeElement = nullptr;
 		sdl::keyboardInputStop();
+	}
+
+	// Whenever the screen size changes, we need to resize all UI elements
+	void refreshSize() {
+		for (const uptr<UIBase>& screen : screens) {
+			screen->refreshSize();
+		}
+		for (const uptr<IOverlay>& overlay : overlays) {
+			overlay->refreshSize();
+		}
 	}
 
 	// Render the last opened screen, as well as all overlays
@@ -119,5 +130,10 @@ export namespace fbc::screenManager {
 			}
 			queuedCloseOverlay = nullptr;
 		}
+	}
+
+	void initialize() {
+		cfg.graphicsResolutionX.addSubscriber([](const int& val) {refreshSize(); });
+		cfg.graphicsResolutionY.addSubscriber([](const int& val) {refreshSize(); });
 	}
 }

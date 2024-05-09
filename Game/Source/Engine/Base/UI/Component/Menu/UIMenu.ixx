@@ -65,6 +65,7 @@ export namespace fbc {
 		void forceClosePopup();
 		void openPopup();
 		void refilterRows();
+		void refreshSize() override;
 		void renderImpl() override;
 		template <c_itr<int> Iterable> void selectIndices(Iterable& indices);
 		template <c_itr<T> Iterable> void selectSelection(Iterable& items);
@@ -262,6 +263,15 @@ export namespace fbc {
 	{
 		syncRowsForRender();
 		updateRowPositions();
+	}
+
+	// Updates the dimensions of all children too
+	template<typename T> void UIMenu<T>::refreshSize() {
+		UIBase::refreshSize();
+		scrollbar.refreshSize();
+		for (const uptr<UIEntry<T>>& row : rows) {
+			row->refreshSize();
+		}
 	}
 
 	// Render all visible rows and the scrollbar if it is shown
