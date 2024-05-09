@@ -36,7 +36,7 @@ export namespace fbc {
 
 	// Concepts
 	export template<typename T> concept c_enum = std::is_enum_v<T>;
-	export template<typename T, typename U> concept c_ext = std::is_base_of_v<T, U>;
+	export template<typename T, typename U> concept c_ext = std::is_base_of_v<U, T>;
 	export template<typename Func, typename T, typename U> concept c_inv = requires(Func f, T t) {
 		{ f(t) } -> std::convertible_to<U>;
 	};

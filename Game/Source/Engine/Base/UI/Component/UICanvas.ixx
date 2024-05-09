@@ -1,5 +1,6 @@
 export module fbc.UICanvas;
 
+import fbc.CoreConfig;
 import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.UIBase;
@@ -25,6 +26,7 @@ export namespace fbc {
 		vec<uptr<UIBase>> elements;
 	};
 
+	// Add a singular element to the canvas
 	template<typename T> requires std::is_base_of_v<UIBase, T> T& UICanvas::addElement(uptr<T>&& element)
 	{
 		T& ref = *element;
@@ -46,21 +48,22 @@ export namespace fbc {
 
 	/* Add an element to the canvas to the right of the last element placed with X offset defined by spacing.
 	 * If the element's X endpoint would exceed the width of this hb, it gets moved below the last element at the X offset defined by start
-	 * Spacing and start should both be scaled by renderScale
+	 * Spacing will automatically be scaled by renderScale
 	 */
 	template<typename T> requires std::is_base_of_v<UIBase, T> T& UICanvas::stackElementXDir(uptr<T>&& element, float spacing) {
+		float scaled = cfg.renderScale(spacing);
 		T& ref = *element;
 		elements.push_back(std::move(element));
 		// Only actually do positioning if there is a previous element to reference
 		if (elements.size() > 1) {
 			UIBase& last = *elements[elements.size() - 2];
 			Hitbox& lhb = *(last.hb);
-			float xPos = lhb.x + lhb.w + spacing;
+			float xPos = lhb.x + lhb.w + scaled;
 			float yPos = lhb.y;
 
 			if (xPos > hb->x + hb->w) {
 				xPos = hb->x;
-				yPos = lhb.y + lhb.h + spacing;
+				yPos = lhb.y + lhb.h + scaled;
 			}
 
 			lhb.setExactPos(xPos, yPos);
@@ -70,9 +73,10 @@ export namespace fbc {
 
 	/* Add an element to the canvas below the last element placed with Y offset defined by spacing.
 	 * If the element's Y endpoint would exceed the height of this hb, it gets moved to the right of the last element at the Y offset defined by start
-	 * Spacing and start should both be scaled by renderScale
+	 * Spacing will automatically be scaled by renderScale
 	 */
 	template<typename T> requires std::is_base_of_v<UIBase, T> T& UICanvas::stackElementYDir(uptr<T>&& element, float spacing) {
+		float scaled = cfg.renderScale(spacing);
 		T& ref = *element;
 		elements.push_back(std::move(element));
 		// Only actually do positioning if there is a previous element to reference
@@ -80,10 +84,10 @@ export namespace fbc {
 			UIBase& last = *elements[elements.size() - 2];
 			Hitbox& lhb = *(last.hb);
 			float xPos = lhb.x;
-			float yPos = lhb.y + lhb.h + spacing;
+			float yPos = lhb.y + lhb.h + scaled;
 
 			if (yPos > hb->y + hb->h) {
-				xPos = lhb.x + lhb.w + spacing;
+				xPos = lhb.x + lhb.w + scaled;
 				yPos = hb->y;
 			}
 

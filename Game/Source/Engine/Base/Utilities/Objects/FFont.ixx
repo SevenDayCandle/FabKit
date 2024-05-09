@@ -1,13 +1,11 @@
 export module fbc.FFont;
 
+import fbc.CoreConfig;
 import fbc.FTexture;
 import fbc.FUtil;
 import sdl;
 
 export namespace fbc {
-    const str FONT_BOLD = "Resources/Fonts/NotoSans-Bold.ttf";
-    const str FONT_REGULAR = "Resources/Fonts/NotoSans-Regular.ttf";
-
 	export class FFont {
     public:
         FFont(str path, int size, int outlineSize = 0, int shadowSize = 0): path(path), size(size), outlineSize(outlineSize), shadowSize(shadowSize) {
@@ -29,7 +27,9 @@ export namespace fbc {
         int measureH(strv text);
         int measureW(strv text);
 
+        FFont& setAllSizes(int size, int outlineSize, int shadowSize);
         FFont& setOutlineSize(int size);
+        FFont& setShadowSize(int size);
         FFont& setSize(int size);
         sdl::FontRender makeTexture(strv text, uint32 w, sdl::Color color, sdl::Color outlineColor, sdl::Color shadowColor);
         void dispose();
@@ -64,15 +64,31 @@ export namespace fbc {
         return w;
     }
 
-    // Update the font size and reload the font with the new size
-    FFont& FFont::setOutlineSize(int size)
+    // Update all sizes and reload the font with the new size. Note that sizes will be scaled by renderScale and should not be multiplied by it beforehand.
+    FFont& FFont::setAllSizes(int size, int outlineSize, int shadowSize)
     {
-        this->outlineSize = size;
+        this->size = size;
+        this->outlineSize = outlineSize;
+        this->shadowSize = shadowSize;
         reloadFont();
         return *this;
     }
 
-    // Update the font size and reload the font with the new size
+    // Update the font size and reload the font with the new size. Note that sizes will be scaled by renderScale and should not be multiplied by it beforehand.
+    FFont& FFont::setOutlineSize(int size)
+    {
+        this->outlineSize = size;
+        return *this;
+    }
+
+    // Update the font size and reload the font with the new size. Note that sizes will be scaled by renderScale and should not be multiplied by it beforehand.
+    FFont& FFont::setShadowSize(int size)
+    {
+        this->shadowSize = size;
+        return *this;
+    }
+
+    // Update the font size and reload the font with the new size. Note that sizes will be scaled by renderScale and should not be multiplied by it beforehand.
     FFont& FFont::setSize(int size)
     {
         this->size = size;
@@ -87,10 +103,11 @@ export namespace fbc {
         sdl::Surface* targetSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, color, w);
 
         if (outlineSize > 0) {
-            sdl::fontOutlineSet(font, outlineSize);
+            int res = cfg.renderScale(outlineSize);
+            sdl::fontOutlineSet(font, res);
             sdl::Surface* outlineSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, outlineColor, w);
             sdl::fontOutlineSet(font, 0);
-            sdl::RectI targetRect = { outlineSize, outlineSize, targetSurf->w, targetSurf->h };
+            sdl::RectI targetRect = { res, res, targetSurf->w, targetSurf->h };
             sdl::surfaceBlitScaled(targetSurf, nullptr, outlineSurf, &targetRect, sdl::ScaleMode::SDL_SCALEMODE_BEST);
             sdl::Surface* origSurf = targetSurf;
             targetSurf = outlineSurf;
@@ -98,8 +115,9 @@ export namespace fbc {
         }
 
         if (shadowSize > 0) {
+            int res = cfg.renderScale(shadowSize);
             sdl::Surface* shadowSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, shadowColor, w);
-            sdl::RectI targetRect = { -shadowSize, -shadowSize, targetSurf->w, targetSurf->h };
+            sdl::RectI targetRect = { -res, -res, targetSurf->w, targetSurf->h };
             sdl::surfaceBlit(targetSurf, nullptr, shadowSurf, &targetRect);
             sdl::Surface* origSurf = targetSurf;
             targetSurf = shadowSurf;
@@ -122,10 +140,11 @@ export namespace fbc {
     /* Refreshes the font to match its size */
     void FFont::reloadFont()
     {
-        font = sdl::fontOpen(path.c_str(), size);
+        int res = cfg.renderScale(size);
+        font = sdl::fontOpen(path.c_str(), res);
         if (font == nullptr) {
             sdl::logError("Failed to load font %s: %s", path.c_str(), sdl::getError());
-            font = sdl::fontOpen(FONT_REGULAR.c_str(), size);
+            font = sdl::fontOpen(FONT_REGULAR.c_str(), res);
         }
         if (font == nullptr) {
             sdl::logError("RIP even the default font failed us %s", sdl::getError());

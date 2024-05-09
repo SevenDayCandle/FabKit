@@ -43,6 +43,12 @@ export namespace fbc {
 			dr.setItems(Language::all());
 
 			UITextInput& inp = addElement(std::make_unique<UITextInput>(new RelativeHitbox(*hb, 500, 1400, 500, 100)));
+
+			UIGrid<UITextButton>& buttonGrid = addElement(std::make_unique<UIGrid<UITextButton>>(new RelativeHitbox(*hb, 1500, 1400, 300, 300)));
+			buttonGrid.addItem(std::make_unique<UITextButton>(new RelativeHitbox(*hb,100, 100), cct.images.smallPanel(), cct.fontRegular(), "A"));
+			buttonGrid.addItem(std::make_unique<UITextButton>(new RelativeHitbox(*hb, 100, 100), cct.images.smallPanel(), cct.fontRegular(), "B"));
+			buttonGrid.addItem(std::make_unique<UITextButton>(new RelativeHitbox(*hb, 100, 100), cct.images.smallPanel(), cct.fontRegular(), "C"));
+			buttonGrid.addItem(std::make_unique<UITextButton>(new RelativeHitbox(*hb, 100, 100), cct.images.smallPanel(), cct.fontRegular(), "D"));
 		}
 	};
 }

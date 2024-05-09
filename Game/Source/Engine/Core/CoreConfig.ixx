@@ -3,7 +3,6 @@ export module fbc.CoreConfig;
 import fbc.Config;
 import fbc.ConfigHotkey;
 import fbc.ConfigItem;
-import fbc.FFont;
 import fbc.FUtil;
 import fbc.Language;
 import sdl;
@@ -11,6 +10,8 @@ import std;
 
 export namespace fbc {
 	constexpr float BASE_DENOMINATOR = 2160;
+	const str FONT_BOLD = "Resources/Fonts/NotoSans-Bold.ttf";
+	const str FONT_REGULAR = "Resources/Fonts/NotoSans-Regular.ttf";
 
 	export class CoreConfig : public Config {
 	public:
@@ -40,8 +41,8 @@ export namespace fbc {
 
 		inline int getScreenXSize() { return graphicsResolutionX.get(); }
 		inline int getScreenYSize() { return graphicsResolutionY.get(); };
-		inline float renderScale() const noexcept { return renderScalePrivate; }
-		inline float renderScale(float mult) const noexcept { return renderScalePrivate * mult; }
+		inline float renderScale() const noexcept { return renderScalePrivate; } // Gets the scale factor to resize elements by.
+		inline float renderScale(float mult) const noexcept { return renderScalePrivate * mult; } // Multiplies the constant by the screen scale factor. ONLY USE THIS when you need to modify offsets within methods by some constant factor or by a size variable in a class, and NOT when initializing sizes on UI components.
 
 		const Language& getLanguage();
 

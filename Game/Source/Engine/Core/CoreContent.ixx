@@ -51,8 +51,8 @@ export namespace fbc {
 
 	void CoreContent::initializeFonts()
 	{
-		fontBoldData = std::make_unique<FFont>(cfg.textFontBold.get(), cfg.renderScale(48), cfg.renderScale(2), cfg.renderScale(3));
-		fontRegularData = std::make_unique<FFont>(cfg.textFont.get(), cfg.renderScale(48), 0, cfg.renderScale(3));
+		fontBoldData = std::make_unique<FFont>(cfg.textFontBold.get(), 48, 2, 3);
+		fontRegularData = std::make_unique<FFont>(cfg.textFont.get(), 48, 0, 3);
 	}
 
 	// TODO

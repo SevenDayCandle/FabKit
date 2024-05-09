@@ -12,7 +12,9 @@ export namespace fbc {
 
 	export template <c_ext<UIBase> T> class UIGrid : public UIBase {
 	public:
-		UIGrid(Hitbox* hb, float scrollSpeed = 1) : UIBase(hb),
+		UIGrid(Hitbox* hb, float spacingX = 100, float spacingY = 100, float scrollSpeed = 1) : UIBase(hb),
+			spacingX(spacingX),
+			spacingY(spacingY),
 			scrollSpeed(scrollSpeed),
 			scrollbar{ new ScaleHitbox(hb->w * 0.93f / cfg.renderScale(), hb->y + hb->h * 0.05f / cfg.renderScale(), 48, hb->h * 0.9f / cfg.renderScale()) } {
 			scrollbar.enabled = false;
@@ -21,18 +23,23 @@ export namespace fbc {
 
 		}
 
+		inline float getSpacingX() { return spacingX; }
+		inline float getSpacingY() { return spacingY; }
 		inline int size() { return items.size(); }
 
 		template <c_itr<uptr<T>> Iterable> UIGrid& addItems(const Iterable& added);
 		template <c_itr<uptr<T>> Iterable> UIGrid& setItems(const Iterable& items);
-		UIGrid& addItem(uptr<T> item);
+		UIGrid& addItem(uptr<T>&& item);
+		UIGrid& setSpacing(float spacingX, float spacingY);
+		UIGrid& setSpacingX(float spacingX);
+		UIGrid& setSpacingY(float spacingY);
 		virtual bool isHovered() override;
 		virtual void renderImpl() override;
 		virtual void updateImpl() override;
 	protected:
-		float scrollSpeed;
-		float spacingX;
-		float spacingY;
+		float scrollSpeed = 1;
+		float spacingX = 0;
+		float spacingY = 0;
 		UIVerticalScrollbar scrollbar;
 		vec<uptr<T>> items;
 
@@ -42,12 +49,12 @@ export namespace fbc {
 
 	template<c_ext<UIBase> T> bool UIGrid<T>::isHovered()
 	{
-		return futil::any(items, [](const uptr<UIBase>& i) { return i->isHovered(); });
+		return futil::any(items, [](const uptr<T>& i) { return i->isHovered(); });
 	}
 
 	template<c_ext<UIBase> T> void UIGrid<T>::renderImpl()
 	{
-		for (const uptr<UIBase>& item : items) {
+		for (const uptr<T>& item : items) {
 			item->render();
 		}
 		scrollbar.render();
@@ -56,7 +63,7 @@ export namespace fbc {
 	template<c_ext<UIBase> T> void UIGrid<T>::updateImpl()
 	{
 		UIBase::updateImpl();
-		for (const uptr<UIBase>& item : items) {
+		for (const uptr<T>& item : items) {
 			item->update();
 		}
 		scrollbar.update();
@@ -65,15 +72,17 @@ export namespace fbc {
 	// Updates the positions of ALL items in the grid, and shows the scrollbar if any of them would extend outside of the grid
 	template<c_ext<UIBase> T> void UIGrid<T>::updateItemOffsets()
 	{
+		float sx = cfg.renderScale(spacingX);
+		float sy = cfg.renderScale(spacingY);
 		float x = hb->x;
 		float y = hb->y;
-		for (const uptr<UIBase>& item : items) {
+		for (const uptr<T>& item : items) {
 			item->hb->setExactPos(x, y);
 
-			x += spacingX;
+			x += sx;
 			if (x >= hb->x + hb->w) {
 				x = hb->x;
-				y += spacingY;
+				y += sy;
 			}
 		}
 
@@ -82,18 +91,20 @@ export namespace fbc {
 
 	// Updates the positions of items from index begin (inclusive) to index end (exclusive), and shows the scrollbar if any of them would extend outside of the grid
 	template<c_ext<UIBase> T> void UIGrid<T>::updateItemOffsets(int begin, int end) {
-		int rowsize = hb->w / spacingX;
+		float sx = cfg.renderScale(spacingX);
+		float sy = cfg.renderScale(spacingY);
+		int rowsize = hb->w / sx;
 		int xP = begin % rowsize;
 		int yP = begin / rowsize; // Intentional integer division in parentheses to ensure that this multiplier rounds down
-		float x = hb->x + spacingX * xP;
-		float y = hb->y + spacingY * yP;
+		float x = hb->x + sx * xP;
+		float y = hb->y + sy * yP;
 		for (int i = begin; i < end; ++i) {
 			items[i]->hb->setExactPos(x, y);
 
-			x += spacingX;
+			x += sx;
 			if (x >= hb->x + hb->w) {
 				x = hb->x;
-				y += spacingY;
+				y += sy;
 			}
 		}
 
@@ -101,10 +112,32 @@ export namespace fbc {
 	}
 
 	// Add a singular item to the list
-	template<c_ext<UIBase> T> UIGrid<T>& UIGrid<T>::addItem(uptr<T> item)
+	template<c_ext<UIBase> T> UIGrid<T>& UIGrid<T>::addItem(uptr<T>&& item)
 	{
 		this->items.push_back(std::move(item));
 		updateItemOffsets(this->items.size() - 1, this->items.size());
+		return *this;
+	}
+
+	// Update the spacing between items
+	template<c_ext<UIBase> T>UIGrid<T>& UIGrid<T>::setSpacing(float spacingX, float spacingY) {
+		this->spacingX = spacingX;
+		this->spacingY = spacingY;
+		updateItemOffsets();
+		return *this;
+	}
+
+	// Update the X spacing between items
+	template<c_ext<UIBase> T>UIGrid<T>& UIGrid<T>::setSpacingX(float spacingX) {
+		this->spacingX = spacingX;
+		updateItemOffsets();
+		return *this;
+	}
+
+	// Update the Y spacing between items
+	template<c_ext<UIBase> T>UIGrid<T>& UIGrid<T>::setSpacingY(float spacingY) {
+		this->spacingY = spacingY;
+		updateItemOffsets();
 		return *this;
 	}
 
