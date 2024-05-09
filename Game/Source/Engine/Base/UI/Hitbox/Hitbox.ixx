@@ -1,4 +1,4 @@
-export module fbc.hitbox;
+export module fbc.Hitbox;
 
 import fbc.futil;
 import sdl;

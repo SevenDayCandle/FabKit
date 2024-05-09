@@ -1,7 +1,7 @@
-export module fbc.baseAudio;
+export module fbc.BaseAudio;
 
 import fbc.futil;
-import fbc.baseContent;
+import fbc.BaseContent;
 
 export namespace fbc {
 	export class BaseAudio {

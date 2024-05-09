@@ -1,10 +1,10 @@
-export module fbc.uiEntry;
+export module fbc.UIEntry;
 
-import fbc.coreConfig;
-import fbc.ffont;
-import fbc.uiLabel;
+import fbc.CoreConfig;
+import fbc.FFont;
+import fbc.UILabel;
 import fbc.futil;
-import fbc.relativeHitbox;
+import fbc.RelativeHitbox;
 import fbc.screenManager;
 import sdl;
 

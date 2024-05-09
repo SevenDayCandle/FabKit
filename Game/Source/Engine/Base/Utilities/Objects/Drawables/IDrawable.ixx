@@ -1,4 +1,4 @@
-export module fbc.iDrawable;
+export module fbc.IDrawable;
 
 import fbc.futil;
 import sdl;

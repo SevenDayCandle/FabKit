@@ -1,17 +1,17 @@
-export module fbc.uiDropdown;
+export module fbc.UIDropdown;
 
-import fbc.coreConfig;
-import fbc.coreContent;
-import fbc.ffont;
+import fbc.CoreConfig;
+import fbc.CoreContent;
+import fbc.FFont;
 import fbc.futil;
-import fbc.hitbox;
-import fbc.iDrawable;
+import fbc.Hitbox;
+import fbc.IDrawable;
 import fbc.screenManager;
-import fbc.textInfo;
-import fbc.uiEntry;
-import fbc.uiInteractable;
-import fbc.uiMenu;
-import fbc.scaleHitbox;
+import fbc.TextInfo;
+import fbc.UIEntry;
+import fbc.UIInteractable;
+import fbc.UIMenu;
+import fbc.ScaleHitbox;
 import sdl;
 import std;
 
@@ -61,8 +61,8 @@ export namespace fbc {
 		template <c_itr<int> Iterable> inline void updateIndices(Iterable& indices) { return menu->updateIndices(indices), *this; }
 		template <c_itr<T> Iterable> inline void updateSelection(Iterable& indices) { return menu->updateSelection(indices), *this; }
 
-		template <c_itr<T> Iterable> UIDropdown& addItems(Iterable& items);
-		template <c_itr<T> Iterable> UIDropdown& setItems(Iterable& items);
+		template <c_itr<T> Iterable> UIDropdown& addItems(const Iterable& items);
+		template <c_itr<T> Iterable> UIDropdown& setItems(const Iterable& items);
 	
 		virtual void openPopup();
 		virtual void renderImpl() override;
@@ -177,14 +177,14 @@ export namespace fbc {
 		}
 	}
 
-	template<typename T> template<c_itr<T> Iterable> UIDropdown<T>& UIDropdown<T>::addItems(Iterable& items)
+	template<typename T> template<c_itr<T> Iterable> UIDropdown<T>& UIDropdown<T>::addItems(const Iterable& items)
 	{
 		this->menu->addItems(items);
 		onChangeItems();
 		return *this;
 	}
 
-	template<typename T> template<c_itr<T> Iterable> UIDropdown<T>& UIDropdown<T>::setItems(Iterable& items)
+	template<typename T> template<c_itr<T> Iterable> UIDropdown<T>& UIDropdown<T>::setItems(const Iterable& items)
 	{
 		this->menu->setItems(items);
 		onChangeItems();

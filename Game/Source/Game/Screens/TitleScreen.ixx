@@ -1,13 +1,13 @@
-export module fbc.titleScreen;
+export module fbc.TitleScreen;
 
-import fbc.coreContent;
-import fbc.screenPosHitbox;
-import fbc.screenSizeHitbox;
+import fbc.CoreContent;
+import fbc.ScreenPosHitbox;
+import fbc.ScreenSizeHitbox;
 import fbc.screenManager;
-import fbc.setupScreen;
-import fbc.uiButton;
-import fbc.uiCanvas;
-import fbc.uiTextButton;
+import fbc.SetupScreen;
+import fbc.UIButton;
+import fbc.UICanvas;
+import fbc.UITextButton;
 import fbc.futil;
 import std;
 

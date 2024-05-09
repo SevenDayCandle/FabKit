@@ -1,10 +1,10 @@
-export module fbc.coreContent;
+export module fbc.CoreContent;
 
-import fbc.baseContent;
-import fbc.coreConfig;
-import fbc.coreImages;
-import fbc.coreStrings;
-import fbc.ffont;
+import fbc.BaseContent;
+import fbc.CoreConfig;
+import fbc.CoreImages;
+import fbc.CoreStrings;
+import fbc.FFont;
 import fbc.futil;
 import sdl;
 import std;

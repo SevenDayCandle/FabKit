@@ -1,8 +1,8 @@
-export module fbc.relativeHitbox;
+export module fbc.RelativeHitbox;
 
-import fbc.coreConfig;
-import fbc.hitbox;
-import fbc.hitbox;
+import fbc.CoreConfig;
+import fbc.Hitbox;
+import fbc.Hitbox;
 import fbc.futil;
 
 export namespace fbc {

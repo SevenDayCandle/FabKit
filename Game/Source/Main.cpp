@@ -1,8 +1,8 @@
-import fbc.coreConfig;
-import fbc.coreContent;
-import fbc.configHotkey;
+import fbc.CoreConfig;
+import fbc.CoreContent;
+import fbc.ConfigHotkey;
 import fbc.screenManager;
-import fbc.titleScreen;
+import fbc.TitleScreen;
 import sdl;
 import std;
 

@@ -1,7 +1,7 @@
-export module fbc.ftexture;
+export module fbc.FTexture;
 
 import fbc.futil;
-import fbc.iDrawable;
+import fbc.IDrawable;
 import sdl;
 import std;
 

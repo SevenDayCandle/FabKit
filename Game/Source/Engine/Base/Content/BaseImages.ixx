@@ -1,8 +1,8 @@
-export module fbc.baseImages;
+export module fbc.BaseImages;
 
-import fbc.baseContent;
+import fbc.BaseContent;
 import fbc.futil;
-import fbc.ftexture;
+import fbc.FTexture;
 import std;
 
 export namespace fbc {

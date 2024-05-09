@@ -1,9 +1,9 @@
-export module fbc.uiInteractable;
+export module fbc.UIInteractable;
 
 import fbc.futil;
-import fbc.hitbox;
-import fbc.iDrawable;
-import fbc.uiImage;
+import fbc.Hitbox;
+import fbc.IDrawable;
+import fbc.UIImage;
 import fbc.screenManager;
 import sdl;
 import std;

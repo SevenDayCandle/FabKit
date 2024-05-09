@@ -1,10 +1,10 @@
-export module fbc.uiButton;
+export module fbc.UIButton;
 
 import fbc.futil;
-import fbc.iDrawable;
-import fbc.hitbox;
+import fbc.IDrawable;
+import fbc.Hitbox;
 import fbc.screenManager;
-import fbc.uiInteractable;
+import fbc.UIInteractable;
 import sdl;
 
 export namespace fbc {

@@ -1,4 +1,4 @@
-export module fbc.baseContent;
+export module fbc.BaseContent;
 
 import fbc.futil;
 import std;

@@ -1,12 +1,12 @@
-export module fbc.uiImage;
+export module fbc.UIImage;
 
 import fbc.futil;
-import fbc.hitbox;
-import fbc.iDrawable;
-import fbc.textInfo;
+import fbc.Hitbox;
+import fbc.IDrawable;
+import fbc.TextInfo;
 import fbc.screenManager;
-import fbc.uiTooltip;
-import fbc.uiTipHoverable;
+import fbc.UITooltip;
+import fbc.UITipHoverable;
 import sdl;
 
 export namespace fbc {

@@ -8,7 +8,7 @@ module;
 
 export module sdl;
 
-import sdl.iKeyInputListener;
+import sdl.IKeyInputListener;
 import std;
 
 namespace sdl {
@@ -250,7 +250,7 @@ namespace sdl {
 	export void windowShow() { SDL_ShowWindow(window); }
 
 	/* Misc functions */
-	export int ticks() { return SDL_GetTicksNS(); }
+	export Uint64 ticks() { return SDL_GetTicksNS(); }
 	export const char* __cdecl getError() { return TTF_GetError(); }
 	export template <typename... Args> void log(SDL_LogPriority priority, const char* message, const Args&... args) { SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, priority, message, args...); }
 	export template <typename... Args> void log(SDL_LogPriority priority, std::string_view message, const Args&... args) { SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, priority, message.data(), args...); }

@@ -1,10 +1,10 @@
-export module fbc.coreStrings;
+export module fbc.CoreStrings;
 
-import fbc.baseContent;
-import fbc.baseStrings;
-import fbc.coreConfig;
+import fbc.BaseContent;
+import fbc.BaseStrings;
+import fbc.CoreConfig;
 import fbc.futil;
-import fbc.keywordStrings;
+import fbc.KeywordStrings;
 import std;
 
 export namespace fbc {

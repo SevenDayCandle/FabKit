@@ -2,14 +2,14 @@ module;
 
 #include "glaze/glaze.hpp"
 
-export module fbc.baseStrings;
+export module fbc.BaseStrings;
 
-import fbc.baseContent;
-import fbc.coreConfig;
+import fbc.BaseContent;
+import fbc.CoreConfig;
 import fbc.futil;
-import fbc.language;
-import fbc.keywordStrings;
-import fbc.objectStrings;
+import fbc.Language;
+import fbc.KeywordStrings;
+import fbc.ObjectStrings;
 
 export namespace fbc {
 	constexpr strv DEFAULT_KEYWORDS = "KeywordStrings";

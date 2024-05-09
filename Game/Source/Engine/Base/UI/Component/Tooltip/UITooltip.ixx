@@ -1,4 +1,4 @@
-export module fbc.uiTooltip;
+export module fbc.UITooltip;
 
 export namespace fbc {
 	export class UITooltip {

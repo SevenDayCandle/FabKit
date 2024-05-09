@@ -1,7 +1,7 @@
 export module fbc.futil;
 
-import fbc.keyedItem;
-import fbc.iserializable;
+import fbc.KeyedItem;
+import fbc.Iserializable;
 import sdl;
 import std;
 

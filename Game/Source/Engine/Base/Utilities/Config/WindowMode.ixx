@@ -1,4 +1,4 @@
-export module fbc.windowMode;
+export module fbc.WindowMode;
 
 import fbc.futil;
 

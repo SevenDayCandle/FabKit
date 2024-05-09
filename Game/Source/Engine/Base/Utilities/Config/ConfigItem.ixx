@@ -1,6 +1,6 @@
-export module fbc.configItem;
+export module fbc.ConfigItem;
 
-import fbc.config;
+import fbc.Config;
 import fbc.futil;
 import sdl;
 

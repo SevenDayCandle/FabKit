@@ -1,4 +1,4 @@
-export module fbc.objectStrings;
+export module fbc.ObjectStrings;
 
 import fbc.futil;
 

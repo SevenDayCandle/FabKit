@@ -1,25 +1,23 @@
-export module fbc.uiSearchableDropdown;
+export module fbc.UISearchableDropdown;
 
-import fbc.coreConfig;
-import fbc.coreContent;
-import fbc.ffont;
+import fbc.CoreConfig;
+import fbc.CoreContent;
+import fbc.FFont;
 import fbc.futil;
-import fbc.hitbox;
-import fbc.iDrawable;
+import fbc.Hitbox;
+import fbc.IDrawable;
 import fbc.screenManager;
-import fbc.textInfo;
-import fbc.textProvider;
-import fbc.uiDropdown;
-import fbc.uiEntry;
-import fbc.uiInteractable;
-import fbc.uiMenu;
-import fbc.scaleHitbox;
+import fbc.TextInfo;
+import fbc.TextProvider;
+import fbc.UIDropdown;
+import fbc.UIEntry;
+import fbc.UIInteractable;
+import fbc.UIMenu;
+import fbc.ScaleHitbox;
 import sdl;
 import std;
 
 export namespace fbc {
-	constexpr strv INDICATOR = "|";
-
 	export template <typename T> class UISearchableDropdown : public UIDropdown<T>, public TextProvider {
 	public:
 		UISearchableDropdown(Hitbox* hb,
@@ -76,15 +74,15 @@ export namespace fbc {
 		bool checkEntry(UIEntry<T>* entry);
 		void onBufferUpdated() override;
 		void init();
-		void releaseInput();
+		void resetBuffer() override;
 	};
 
-	// The menu onClose call should always invoke releaseInput
+	// The menu onClose call should always invoke releaseBuffer
 	template<typename T> UISearchableDropdown<T>& UISearchableDropdown<T>::setOnClose(func<void()> onClose)
 	{
 		this->menu->setOnClose([this, onClose]() {
 			onClose();
-			this->releaseInput();
+			this->releaseBuffer();
 		});
 		return *this;
 	}
@@ -109,8 +107,7 @@ export namespace fbc {
 			float textX = this->hb->x + cfg.renderScale(24);
 			float textY = this->hb->y + this->hb->h * 0.25f;
 			TextInfo::drawText(textX, textY);
-			//sdl::textureSetAlphaMod(caret.texture, 0.5f + 0.5f * std::sin(sdl::ticks()));
-			sdl::renderCopy(caret.texture, nullptr, &caretPos);
+			renderCaret();
 		}
 		else {
 			UIDropdown<T>::renderImpl();
@@ -154,22 +151,16 @@ export namespace fbc {
 	void UISearchableDropdown<T>::init()
 	{
 		this->menu->setFilterFunc([this](UIEntry<T>* item) {return this->checkEntry(item); });
-		this->menu->setOnClose([this]() {this->releaseInput(); });
-		caret = this->font.makeTexture(INDICATOR);
-		caretPos = { this->hb->x,this->hb->y + this->hb->h * 0.25f , caret.w, caret.h };
+		this->menu->setOnClose([this]() {this->releaseBuffer(); });
+		this->initCaret(this->font, this->hb->x, this->hb->y);
 	}
 
-	// Reset displayed text to original dropdown text, and release text input
-	template<typename T>
-	void UISearchableDropdown<T>::releaseInput()
+	template<typename T> void UISearchableDropdown<T>::resetBuffer()
 	{
-		sdl::keyboardInputStopRequest(this);
-		this->updateCache();
 		buffer.clear();
 		lowerBuffer.clear();
-		bufferPos = 0;
-		updateCaretPos();
 		this->menu->refilterRows();
+		this->updateCache();
 	}
 
 	template<typename T> uptr<UISearchableDropdown<T>> UISearchableDropdown<T>::multiMenu(

@@ -1,19 +1,21 @@
-export module fbc.setupScreen;
+export module fbc.SetupScreen;
 
-import fbc.coreContent;
+import fbc.CoreContent;
 import fbc.futil;
-import fbc.language;
-import fbc.relativeHitbox;
-import fbc.scaleHitbox;
-import fbc.screenSizeHitbox;
+import fbc.Language;
+import fbc.RelativeHitbox;
+import fbc.ScaleHitbox;
+import fbc.ScreenSizeHitbox;
 import fbc.screenManager;
-import fbc.uiButton;
-import fbc.uiSearchableDropdown;
-import fbc.uiEntry;
-import fbc.uiMenu;
-import fbc.uiTextButton;
-import fbc.uiToggle;
-import fbc.uiVerticalCanvas;
+import fbc.UIButton;
+import fbc.UIGrid;
+import fbc.UISearchableDropdown;
+import fbc.UIEntry;
+import fbc.UIMenu;
+import fbc.UITextButton;
+import fbc.UITextInput;
+import fbc.UIToggle;
+import fbc.UIVerticalCanvas;
 import std;
 
 export namespace fbc {
@@ -37,9 +39,10 @@ export namespace fbc {
 				cct.fontRegular()
 				));
 
-			vec<ref<Language>> langs = Language::all();
 			UISearchableDropdown<ref<Language>>& dr = addElement(UISearchableDropdown<ref<Language>>::multiMenu(new RelativeHitbox(*hb, 390, 1100, 400, 100)));
-			dr.setItems(langs);
+			dr.setItems(Language::all());
+
+			UITextInput& inp = addElement(std::make_unique<UITextInput>(new RelativeHitbox(*hb, 500, 1400, 500, 100)));
 		}
 	};
 }

@@ -1,4 +1,4 @@
-export module fbc.keywordStrings;
+export module fbc.KeywordStrings;
 
 import fbc.futil;
 

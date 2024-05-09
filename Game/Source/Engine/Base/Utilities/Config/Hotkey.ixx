@@ -2,11 +2,11 @@ module;
 
 #include "glaze/glaze.hpp"
 
-export module fbc.configHotkey;
+export module fbc.ConfigHotkey;
 
-import fbc.config;
+import fbc.Config;
 import fbc.futil;
-import fbc.iserializable;
+import fbc.Iserializable;
 import sdl;
 import std;
 

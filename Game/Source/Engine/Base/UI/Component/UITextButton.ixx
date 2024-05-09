@@ -1,11 +1,11 @@
-export module fbc.uiTextButton;
+export module fbc.UITextButton;
 
-import fbc.ffont;
+import fbc.FFont;
 import fbc.futil;
-import fbc.hitbox;
-import fbc.iDrawable;
-import fbc.textInfo;
-import fbc.uiButton;
+import fbc.Hitbox;
+import fbc.IDrawable;
+import fbc.TextInfo;
+import fbc.UIButton;
 
 export namespace fbc {
 	export class UITextButton : public UIButton, public TextInfo {

@@ -1,4 +1,4 @@
-export module fbc.iOverlay;
+export module fbc.IOverlay;
 
 export namespace fbc {
 	export class IOverlay {

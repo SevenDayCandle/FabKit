@@ -1,11 +1,14 @@
-export module fbc.textProvider;
+export module fbc.TextProvider;
 
+import fbc.FFont;
 import fbc.futil;
 import sdl;
-import sdl.iKeyInputListener;
+import sdl.IKeyInputListener;
 import std;
 
 export namespace fbc {
+	constexpr strv INDICATOR = "|";
+
 	export class TextProvider : public sdl::IKeyInputListener {
 	public:
 		TextProvider() {}
@@ -21,15 +24,19 @@ export namespace fbc {
 		sdl::FontRender caret;
 		sdl::RectF caretPos;
 
+		void initCaret(FFont& font, float x, float y);
+		void renderCaret() const;
+
 		virtual void onBufferUpdated() = 0;
+		virtual void resetBuffer() = 0;
 		virtual void updateCaretPos() = 0;
 	};
 
-	// Clears the buffer and releases text input
+	// Resets buffer and releases text input
 	void TextProvider::releaseBuffer()
 	{
-		bufferPos = 0;
-		buffer.clear();
+		resetBuffer();
+		bufferPos = buffer.size();
 		updateCaretPos();
 		sdl::keyboardInputStopRequest(this);
 	}
@@ -87,5 +94,17 @@ export namespace fbc {
 			updateCaretPos();
 			onBufferUpdated();
 		}
+	}
+
+	void TextProvider::initCaret(FFont& font, float x, float y)
+	{
+		caret = font.makeTexture(INDICATOR);
+		caretPos = { x,y, caret.w * 1.2f, caret.h * 1.25f };
+	}
+
+	// Renders the caret with a smooth fading "animation"
+	void TextProvider::renderCaret() const {
+		sdl::textureSetAlphaMod(caret.texture, 127 + 127 * std::sin(sdl::ticks() / 100000000.0f));
+		sdl::renderCopy(caret.texture, nullptr, &caretPos);
 	}
 }

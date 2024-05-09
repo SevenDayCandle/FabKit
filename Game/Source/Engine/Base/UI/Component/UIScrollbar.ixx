@@ -1,9 +1,9 @@
-export module fbc.uiScrollbar;
+export module fbc.UIScrollbar;
 
-import fbc.hitbox;
-import fbc.uiBase;
+import fbc.Hitbox;
+import fbc.UIBase;
 import fbc.futil;
-import fbc.iDrawable;
+import fbc.IDrawable;
 import fbc.screenManager;
 import sdl;
 import std;

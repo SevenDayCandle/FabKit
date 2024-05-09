@@ -1,16 +1,16 @@
-export module fbc.uiMultiEntry;
+export module fbc.UIMultiEntry;
 
-import fbc.coreConfig;
-import fbc.coreContent;
-import fbc.iDrawable;
-import fbc.ffont;
-import fbc.uiLabel;
+import fbc.CoreConfig;
+import fbc.CoreContent;
+import fbc.IDrawable;
+import fbc.FFont;
+import fbc.UILabel;
 import fbc.futil;
-import fbc.relativeHitbox;
+import fbc.RelativeHitbox;
 import fbc.screenManager;
-import fbc.uiEntry;
+import fbc.UIEntry;
 import fbc.futil;
-import fbc.textInfo;
+import fbc.TextInfo;
 import sdl;
 
 export namespace fbc {

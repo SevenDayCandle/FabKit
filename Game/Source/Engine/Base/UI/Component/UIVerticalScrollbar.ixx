@@ -1,9 +1,9 @@
-export module fbc.uiVerticalScrollbar;
+export module fbc.UIVerticalScrollbar;
 
-import fbc.coreContent;
+import fbc.CoreContent;
 import fbc.futil;
-import fbc.hitbox;
-import fbc.uiScrollbar;
+import fbc.Hitbox;
+import fbc.UIScrollbar;
 
 export namespace fbc {
 

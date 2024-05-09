@@ -1,8 +1,8 @@
-export module fbc.verticalDrawable;
+export module fbc.VerticalDrawable;
 
-import fbc.ftexture;
+import fbc.FTexture;
 import fbc.futil;
-import fbc.iDrawable;
+import fbc.IDrawable;
 import sdl;
 
 export namespace fbc {

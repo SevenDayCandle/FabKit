@@ -1,6 +1,6 @@
-export module fbc.textInfo;
+export module fbc.TextInfo;
 
-import fbc.ffont;
+import fbc.FFont;
 import fbc.futil;
 import sdl;
 

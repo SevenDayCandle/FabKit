@@ -1,4 +1,4 @@
-export module fbc.keyedItem;
+export module fbc.KeyedItem;
 
 import std;
 

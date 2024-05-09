@@ -1,4 +1,4 @@
-export module fbc.fsound;
+export module fbc.FSound;
 
 import fbc.futil;
 import sdl;

@@ -1,4 +1,4 @@
-export module fbc.iserializable;
+export module fbc.Iserializable;
 
 import std;
 

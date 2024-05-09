@@ -1,8 +1,8 @@
-export module fbc.borderedDrawable;
+export module fbc.BorderedDrawable;
 
-import fbc.ftexture;
+import fbc.FTexture;
 import fbc.futil;
-import fbc.iDrawable;
+import fbc.IDrawable;
 import sdl;
 
 export namespace fbc {

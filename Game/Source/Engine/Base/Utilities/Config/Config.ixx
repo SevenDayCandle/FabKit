@@ -2,7 +2,7 @@ module;
 
 #include "glaze/glaze.hpp"
 
-export module fbc.config;
+export module fbc.Config;
 
 import fbc.futil;
 import sdl;

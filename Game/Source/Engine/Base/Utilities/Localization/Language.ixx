@@ -1,7 +1,7 @@
-export module fbc.language;
+export module fbc.Language;
 
 import fbc.futil;
-import fbc.keyedItem;
+import fbc.KeyedItem;
 
 export namespace fbc {
 	export struct Language : KeyedItem<Language> {

@@ -1,11 +1,11 @@
-export module fbc.coreConfig;
+export module fbc.CoreConfig;
 
-import fbc.config;
-import fbc.configHotkey;
-import fbc.configItem;
-import fbc.ffont;
+import fbc.Config;
+import fbc.ConfigHotkey;
+import fbc.ConfigItem;
+import fbc.FFont;
 import fbc.futil;
-import fbc.language;
+import fbc.Language;
 import sdl;
 import std;
 

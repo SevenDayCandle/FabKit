@@ -1,11 +1,11 @@
-export module fbc.uiLabel;
+export module fbc.UILabel;
 
-import fbc.ffont;
+import fbc.FFont;
 import fbc.futil;
-import fbc.hitbox;
-import fbc.textInfo;
-import fbc.uiTooltip;
-import fbc.uiTipHoverable;
+import fbc.Hitbox;
+import fbc.TextInfo;
+import fbc.UITooltip;
+import fbc.UITipHoverable;
 
 export namespace fbc {
 	export class UILabel : public UITipHoverable, public TextInfo {

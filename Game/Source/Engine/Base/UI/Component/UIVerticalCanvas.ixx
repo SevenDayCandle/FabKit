@@ -1,11 +1,11 @@
-export module fbc.uiVerticalCanvas;
+export module fbc.UIVerticalCanvas;
 
-import fbc.coreConfig;
-import fbc.hitbox;
-import fbc.uiCanvas;
+import fbc.CoreConfig;
+import fbc.Hitbox;
+import fbc.UICanvas;
 import fbc.futil;
-import fbc.uiVerticalScrollbar;
-import fbc.scaleHitbox;
+import fbc.UIVerticalScrollbar;
+import fbc.ScaleHitbox;
 
 export namespace fbc {
 	export class UIVerticalCanvas : public UICanvas {

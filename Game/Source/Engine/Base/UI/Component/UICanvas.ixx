@@ -1,8 +1,8 @@
-export module fbc.uiCanvas;
+export module fbc.UICanvas;
 
 import fbc.futil;
-import fbc.hitbox;
-import fbc.uiBase;
+import fbc.Hitbox;
+import fbc.UIBase;
 import std;
 
 export namespace fbc {

@@ -1,4 +1,4 @@
-export module fbc.cache;
+export module fbc.Cache;
 
 import fbc.futil;
 import std;

@@ -1,4 +1,4 @@
-export module fbc.fmusic;
+export module fbc.FMusic;
 
 import fbc.futil;
 import sdl;

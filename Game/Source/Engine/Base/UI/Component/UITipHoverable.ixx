@@ -1,9 +1,9 @@
-export module fbc.uiTipHoverable;
+export module fbc.UITipHoverable;
 
 import fbc.futil;
-import fbc.hitbox;
-import fbc.uiTooltip;
-import fbc.uiBase;
+import fbc.Hitbox;
+import fbc.UITooltip;
+import fbc.UIBase;
 
 export namespace fbc {
 	export class UITipHoverable : public UIBase {

@@ -1,18 +1,18 @@
-export module fbc.uiMenu;
+export module fbc.UIMenu;
 
-import fbc.coreConfig;
-import fbc.coreContent;
-import fbc.ffont;
-import fbc.hitbox;
-import fbc.iDrawable;
-import fbc.iOverlay;
-import fbc.relativeHitbox;
+import fbc.CoreConfig;
+import fbc.CoreContent;
+import fbc.FFont;
+import fbc.Hitbox;
+import fbc.IDrawable;
+import fbc.IOverlay;
+import fbc.RelativeHitbox;
 import fbc.screenManager;
-import fbc.uiBase;
-import fbc.uiEntry;
-import fbc.uiBase;
-import fbc.uiMultiEntry;
-import fbc.uiVerticalScrollbar;
+import fbc.UIBase;
+import fbc.UIEntry;
+import fbc.UIBase;
+import fbc.UIMultiEntry;
+import fbc.UIVerticalScrollbar;
 import fbc.futil;
 import sdl;
 import std;
@@ -103,8 +103,6 @@ export namespace fbc {
 		IOverlay* proxy;
 
 		inline static float rMargin() { return cfg.renderScale(MARGIN); }
-
-		inline bool shouldShowSlider() { return rowsForRender.size() > maxRows; }
 
 		void autosize();
 		void onScroll(float percent);
@@ -276,7 +274,7 @@ export namespace fbc {
 
 		if (headerRow) { headerRow->renderImpl(); }
 
-		if (shouldShowSlider()) { scrollbar.renderImpl(); }
+		scrollbar.render();
 	}
 
 	// Update visible rows. The scrollbar should only be shown if there are enough items to warrant it
@@ -287,7 +285,7 @@ export namespace fbc {
 
 		if (headerRow) { headerRow->updateImpl(); }
 
-		if (shouldShowSlider()) { scrollbar.updateImpl(); }
+		scrollbar.update();
 
 		// TODO handle keyboard/controllers
 	}
@@ -333,6 +331,7 @@ export namespace fbc {
 
 	// Whenever the items contained in the menu change, we need to update the rows that will actually be rendered on the screen with the underlying rows
 	// If there's a filter function defined, use it to filter out the available rows to render.
+	// Then, make the scrollbar active if the number of rows exceeds the number of rows that can be shown at once
 	template <typename T> void UIMenu<T>::syncRowsForRender() {
 		if (filterFunc) {
 			rowsForRender.clear();
@@ -348,6 +347,8 @@ export namespace fbc {
 			std::transform(rows.begin(), rows.end(), rowsForRender.begin(),
 				[](const uptr<UIEntry<T>>& entry) { return entry.get(); });
 		}
+
+		scrollbar.enabled = rowsForRender.size() > maxRows;
 	}
 
 	// When the items are changed, the rows should be expanded to match the width of the longest projected row if autosizing is enabled. Otherwise, they should match the existing hitbox width minus the scrollbar width

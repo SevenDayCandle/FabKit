@@ -1,13 +1,13 @@
-export module fbc.coreImages;
+export module fbc.CoreImages;
 
-import fbc.baseContent;
-import fbc.borderedDrawable;
-import fbc.baseImages;
-import fbc.cache;
-import fbc.coreConfig;
-import fbc.ftexture;
+import fbc.BaseContent;
+import fbc.BorderedDrawable;
+import fbc.BaseImages;
+import fbc.Cache;
+import fbc.CoreConfig;
+import fbc.FTexture;
 import fbc.futil;
-import fbc.verticalDrawable;
+import fbc.VerticalDrawable;
 import std;
 
 export namespace fbc {

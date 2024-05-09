@@ -1,12 +1,12 @@
-export module fbc.uiToggle;
+export module fbc.UIToggle;
 
-import fbc.coreContent;
-import fbc.ffont;
-import fbc.hitbox;
-import fbc.iDrawable;
-import fbc.uiInteractable;
+import fbc.CoreContent;
+import fbc.FFont;
+import fbc.Hitbox;
+import fbc.IDrawable;
+import fbc.UIInteractable;
 import fbc.screenManager;
-import fbc.textInfo;
+import fbc.TextInfo;
 import fbc.futil;
 import sdl;
 
