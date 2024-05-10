@@ -26,7 +26,7 @@ export namespace fbc {
 			FFont& textFont = cct.fontRegular(),
 			func<str(vec<UIEntry<T>*>&)> buttonLabelFunc = {}
 		): UIInteractable(hb, image), TextInfo(textFont), menu(menu), buttonLabelFunc(buttonLabelFunc), arrow(arrow) {
-			this->menu->setOnSelectionUpdate([this](vec<UIEntry<T>*>& items) { this->onSelectionUpdate(items); });
+			init();
 		}
 		UIDropdown(Hitbox* hb,
 			uptr<UIMenu<T>> menu,
@@ -35,7 +35,7 @@ export namespace fbc {
 			FFont& textFont = cct.fontRegular(),
 			func<str(vec<UIEntry<T>*>&)> buttonLabelFunc = {}
 		): UIInteractable(hb, image), TextInfo(textFont), menu(std::move(menu)), buttonLabelFunc(buttonLabelFunc), arrow(arrow) {
-			this->menu->setOnSelectionUpdate([this](vec<UIEntry<T>*>& items) { this->onSelectionUpdate(items); });
+			init();
 		}
 		virtual ~UIDropdown() override{}
 
@@ -63,7 +63,8 @@ export namespace fbc {
 
 		template <c_itr<T> Iterable> UIDropdown& addItems(const Iterable& items);
 		template <c_itr<T> Iterable> UIDropdown& setItems(const Iterable& items);
-		void refreshSize() override;
+		void refreshHb() override;
+		virtual void onSizeUpdated() override;
 		virtual void openPopup();
 		virtual void renderImpl() override;
 
@@ -91,12 +92,19 @@ export namespace fbc {
 		virtual void onSelectionUpdate(vec<UIEntry<T>*>& items);
 	private:
 		func<str(vec<UIEntry<T>*>&)> buttonLabelFunc;
+		void init();
 	};
 
 
-	template<typename T> void UIDropdown<T>::refreshSize() {
-		UIInteractable::refreshSize();
-		this->menu->refreshSize();
+	template<typename T> void UIDropdown<T>::refreshHb() {
+		UIInteractable::refreshHb();
+		this->menu->refreshHb();
+	}
+
+	template<typename T>
+	void UIDropdown<T>::onSizeUpdated()
+	{
+		TextInfo::setPos(cfg.renderScale(24), hb->h * 0.25f);
 	}
 
 	// When opened, move the menu directly below this button, unless there isn't enough room (in which case it should appear above this button)
@@ -118,14 +126,18 @@ export namespace fbc {
 			sdl::RectF arrowRect = { hb->x + hb->w - w * 1.5f, hb->y + hb->h * 0.25f, w, arrow->getHeight()};
 			arrow->draw(&arrowRect, UIImage::color, origin, rotation, menu->isOpen() ? sdl::FlipMode::SDL_FLIP_VERTICAL : flip);
 		}
-		float textX = hb->x + cfg.renderScale(24);
-		float textY = hb->y + hb->h * 0.25f;
-		TextInfo::drawText(textX, textY);
+		TextInfo::drawText(hb->x, hb->y);
 	}
 
 	// Updates the text shown on the button by default, this may be overriden in derivative types
 	template<typename T> void UIDropdown<T>::onSelectionUpdate(vec<UIEntry<T>*>& items) {
 		setText(getButtonText(items));
+	}
+
+	template<typename T> void UIDropdown<T>::init()
+	{
+		this->menu->setOnSelectionUpdate([this](vec<UIEntry<T>*>& items) { this->onSelectionUpdate(items); });
+		UIDropdown<T>::onSizeUpdated();
 	}
 
 	template<typename T> uptr<UIDropdown<T>> UIDropdown<T>::multiMenu(

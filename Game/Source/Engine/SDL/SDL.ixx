@@ -43,10 +43,8 @@ namespace sdl {
 	export using Surface = ::SDL_Surface;
 	export using Texture = ::SDL_Texture;
 
-	export struct FontRender {
+	export struct FontRender : RectF {
 		sdl::Texture* texture;
-		float w;
-		float h;
 	};
 
 	/* Color constants */

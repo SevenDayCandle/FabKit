@@ -31,7 +31,7 @@ export namespace fbc {
         FFont& setOutlineSize(int size);
         FFont& setShadowSize(int size);
         FFont& setSize(int size);
-        sdl::FontRender makeTexture(strv text, uint32 w, sdl::Color color, sdl::Color outlineColor, sdl::Color shadowColor);
+        sdl::FontRender makeTexture(strv text, uint32 w, float x, float y, sdl::Color color, sdl::Color outlineColor, sdl::Color shadowColor);
         void dispose();
     private:
         sdl::Font* font;
@@ -97,7 +97,7 @@ export namespace fbc {
     }
 
     // Create a texture snapshot of the text rendered with this font in the given colors. Text must NOT be empty
-    sdl::FontRender FFont::makeTexture(strv text, uint32 w = 0, sdl::Color color = sdl::COLOR_WHITE, sdl::Color outlineColor = sdl::COLOR_BLACK, sdl::Color shadowColor = sdl::COLOR_BLACK_SHADOW)
+    sdl::FontRender FFont::makeTexture(strv text, uint32 w = 0, float x = 0, float y = 0, sdl::Color color = sdl::COLOR_WHITE, sdl::Color outlineColor = sdl::COLOR_BLACK, sdl::Color shadowColor = sdl::COLOR_BLACK_SHADOW)
     {
         const char* texDat = text.data();
         sdl::Surface* targetSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, color, w);
@@ -125,7 +125,7 @@ export namespace fbc {
         }
 
         sdl::Texture* tex = sdl::textureCreateFromSurface(targetSurf);
-        sdl::FontRender f = { tex, targetSurf->w, targetSurf->h };
+        sdl::FontRender f = {  x, y, targetSurf->w, targetSurf->h , tex };
         sdl::surfaceDestroy(targetSurf);
         return f;
     }

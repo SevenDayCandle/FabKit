@@ -7,7 +7,7 @@ import sdl;
 export namespace fbc {
 	export class TextInfo {
 	public:
-		TextInfo(FFont& font, str text = "", sdl::Color color = sdl::COLOR_WHITE, sdl::Color colorOutline = sdl::COLOR_BLACK) : font(font), text(text), color(color), colorOutline(colorOutline) {
+		TextInfo(FFont& font, strv text = "", sdl::Color color = sdl::COLOR_WHITE, sdl::Color colorOutline = sdl::COLOR_BLACK) : font(font), text(text), color(color), colorOutline(colorOutline) {
 			updateCache();
 		}
 		virtual ~TextInfo() {}
@@ -16,13 +16,15 @@ export namespace fbc {
 		inline float getTextWidth() const { return cache.w; }
 		inline strv getText() { return text; }
 
-		void drawText(float x, float y) const;
-		TextInfo& set(str text, sdl::Color color);
-		TextInfo& set(str text, sdl::Color color, sdl::Color colorOutline);
-		TextInfo& set(str text, sdl::Color color, sdl::Color colorOutline, FFont& font);
+		void drawText() const;
+		void drawText(float offX, float offY) const;
+		TextInfo& set(strv text, sdl::Color color);
+		TextInfo& set(strv text, sdl::Color color, sdl::Color colorOutline);
+		TextInfo& set(strv text, sdl::Color color, sdl::Color colorOutline, FFont& font);
 		TextInfo& setColor(sdl::Color color);
 		TextInfo& setColorOutline(sdl::Color colorOutline);
 		TextInfo& setFont(FFont& font);
+		TextInfo& setPos(float x, float y);
 		TextInfo& setText(str text);
 	protected:
 		FFont& font;
@@ -36,18 +38,25 @@ export namespace fbc {
 		inline void updateCache(strv text, const sdl::Color& color) { updateCache(text, color, this->colorOutline); }
 		void updateCache(strv text, const sdl::Color& color, const sdl::Color& colorOutline);
 	private:
-		sdl::FontRender cache;
+		sdl::FontRender cache = { 0, 0, 0, 0, nullptr };
 	};
 
-	void TextInfo::drawText(float x, float y) const
+	void TextInfo::drawText() const
 	{
 		if (cache.texture) {
-			sdl::RectF textRect = { x, y, cache.w, cache.h };
+			sdl::renderCopy(cache.texture, nullptr, &cache);
+		}
+	}
+
+	void TextInfo::drawText(float offX, float offY) const
+	{
+		if (cache.texture) {
+			sdl::RectF textRect = { cache.x + offX, cache.y + offY, cache.w, cache.h };
 			sdl::renderCopy(cache.texture, nullptr, &textRect);
 		}
 	}
 
-	TextInfo& TextInfo::set(str text, sdl::Color color)
+	TextInfo& TextInfo::set(strv text, sdl::Color color)
 	{
 		this->text = text;
 		this->color = color;
@@ -56,7 +65,7 @@ export namespace fbc {
 	}
 
 
-	TextInfo& TextInfo::set(str text, sdl::Color color, sdl::Color colorOutline)
+	TextInfo& TextInfo::set(strv text, sdl::Color color, sdl::Color colorOutline)
 	{
 		this->text = text;
 		this->color = color;
@@ -65,7 +74,7 @@ export namespace fbc {
 		return *this;
 	}
 
-	TextInfo& TextInfo::set(str text, sdl::Color color, sdl::Color colorOutline, FFont& font)
+	TextInfo& TextInfo::set(strv text, sdl::Color color, sdl::Color colorOutline, FFont& font)
 	{
 		this->text = text;
 		this->color = color;
@@ -96,6 +105,13 @@ export namespace fbc {
 		return *this;
 	}
 
+	TextInfo& TextInfo::setPos(float x, float y)
+	{
+		cache.x = x;
+		cache.y = y;
+		return *this;
+	}
+
 	TextInfo& TextInfo::setText(str text)
 	{
 		this->text = text;
@@ -112,10 +128,12 @@ export namespace fbc {
 		}
 
 		if (text.empty()) {
-			cache = sdl::FontRender();
+			cache.texture = nullptr;
+			cache.w = 0;
+			cache.h = 0;
 		}
 		else {
-			cache = font.makeTexture(text, getLimitWidth(), color, colorOutline);
+			cache = font.makeTexture(text, getLimitWidth(), cache.x, cache.y, color, colorOutline);
 		}
 	}
 }

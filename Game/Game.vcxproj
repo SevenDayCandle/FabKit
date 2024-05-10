@@ -183,11 +183,15 @@
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Base\UI\Mixin\ILabeled.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Engine\Base\UI\Mixin\IOverlay.ixx">
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\UI\Mixin\TextProvider.ixx">
+    <ClCompile Include="Source\Engine\Base\UI\Mixin\ITextInputter.ixx">
       <SubType>
       </SubType>
     </ClCompile>

@@ -13,7 +13,6 @@ export namespace fbc {
 	public:
 		UIEntry(T item, int index, func<void(UIEntry<T>&)> onClick, fbc::RelativeHitbox* hb, FFont& f, const str& text, sdl::Color baseColor = sdl::COLOR_WHITE, sdl::Color hoverColor = sdl::COLOR_GOLD):
 			item(item), index(index), onClick(onClick), baseColor(baseColor), hoverColor(hoverColor), UILabel(hb, f, text) {
-			hb->setExactSizeY(getProjectedHeight());
 		}
 		virtual ~UIEntry() override {}
 
@@ -23,7 +22,6 @@ export namespace fbc {
 		T item;
 		int index;
 
-		inline virtual float getProjectedHeight() { return cfg.renderScale(64); };
 		inline virtual float getProjectedWidth() { return getTextWidth(); };
 		inline virtual void updateSelectStatus(bool selected) {};
 

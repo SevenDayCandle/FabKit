@@ -58,10 +58,10 @@ export namespace fbc::screenManager {
 	// Whenever the screen size changes, we need to resize all UI elements
 	void refreshSize() {
 		for (const uptr<UIBase>& screen : screens) {
-			screen->refreshSize();
+			screen->refreshHb();
 		}
 		for (const uptr<IOverlay>& overlay : overlays) {
-			overlay->refreshSize();
+			overlay->refreshHb();
 		}
 	}
 

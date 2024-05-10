@@ -65,7 +65,7 @@ export namespace fbc {
 		void forceClosePopup();
 		void openPopup();
 		void refilterRows();
-		void refreshSize() override;
+		void refreshHb() override;
 		void renderImpl() override;
 		template <c_itr<int> Iterable> void selectIndices(Iterable& indices);
 		template <c_itr<T> Iterable> void selectSelection(Iterable& items);
@@ -266,11 +266,11 @@ export namespace fbc {
 	}
 
 	// Updates the dimensions of all children too
-	template<typename T> void UIMenu<T>::refreshSize() {
-		UIBase::refreshSize();
-		scrollbar.refreshSize();
+	template<typename T> void UIMenu<T>::refreshHb() {
+		UIBase::refreshHb();
+		scrollbar.refreshHb();
 		for (const uptr<UIEntry<T>>& row : rows) {
-			row->refreshSize();
+			row->refreshHb();
 		}
 	}
 
@@ -375,21 +375,21 @@ export namespace fbc {
 			                                       [](const uptr<UIEntry<T>>& row) {
 				                                       return row->getProjectedWidth();
 			                                       });
-			for (const uptr<UIEntry<T>>& row : rows) { row->hb->setExactSizeX(maxWidth); }
+			for (const uptr<UIEntry<T>>& row : rows) { row->setHbExactSizeX(maxWidth); }
 
 			scrollbar.hb->setExactPos(hb->x + maxWidth + rMarg, hb->y + rMarg);
 			scrollbar.hb->setExactSizeY(sizeY);
-			hb->setExactSize(maxWidth + scrollbar.hb->w, sizeY + rMarg * 2);
+			setHbExactSize(maxWidth + scrollbar.hb->w, sizeY + rMarg * 2);
 		}
 		else {
 			float targetWidth = hb->w - scrollbar.hb->w - rMarg;
 			for (const uptr<UIEntry<T>>& row : rows) {
-				row->hb->setExactSizeX(targetWidth);
+				row->setHbExactSizeX(targetWidth);
 			}
 
 			scrollbar.hb->setExactPos(hb->x + targetWidth + rMarg, hb->y + rMarg);
 			scrollbar.hb->setExactSizeY(sizeY);
-			hb->setExactSizeY(sizeY + rMarg * 2);
+			setHbExactSizeY(sizeY + rMarg * 2);
 		}
 
 		updateRowPositions();
@@ -447,16 +447,20 @@ export namespace fbc {
 
 	template <typename T> UIEntry<T>* multiSelectFunc(UIMenu<T>& menu, T& item, str& name, int index) {
 		func<void(UIEntry<T>&)> onClick = [&menu](UIEntry<T>& p) { menu.toggleRow(p); };
-		return new UIMultiEntry<T>(item, index, onClick,
+		UIEntry<T>* entry = new UIMultiEntry<T>(item, index, onClick,
 		                           new RelativeHitbox(*menu.hb),
 		                           menu.getItemFont(), name);
+		entry->setHbExactSizeY(cfg.renderScale(64));
+		return entry;
 	}
 
 	template <typename T> UIEntry<T>* singleSelectFunc(UIMenu<T>& menu, T& item, str& name, int index) {
 		func<void(UIEntry<T>&)> onClick = [&menu](UIEntry<T>& p) { menu.selectSingleRow(p); };
-		return new UIEntry<T>(item, index, onClick,
+		UIEntry<T>* entry = new UIEntry<T>(item, index, onClick,
 		                      new RelativeHitbox(*menu.hb),
 		                      menu.getItemFont(), name);
+		entry->setHbExactSizeY(cfg.renderScale(64));
+		return entry;
 	}
 
 	/*

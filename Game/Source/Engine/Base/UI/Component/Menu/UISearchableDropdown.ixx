@@ -8,7 +8,7 @@ import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.ScreenManager;
 import fbc.TextInfo;
-import fbc.TextProvider;
+import fbc.ITextInputter;
 import fbc.UIDropdown;
 import fbc.UIEntry;
 import fbc.UIInteractable;
@@ -18,7 +18,7 @@ import sdl;
 import std;
 
 export namespace fbc {
-	export template <typename T> class UISearchableDropdown : public UIDropdown<T>, public TextProvider {
+	export template <typename T> class UISearchableDropdown : public UIDropdown<T>, public ITextInputter {
 	public:
 		UISearchableDropdown(Hitbox* hb,
 			UIMenu<T>* menu,
@@ -27,7 +27,7 @@ export namespace fbc {
 			FFont& textFont = cct.fontRegular(),
 			func<str(vec<UIEntry<T>*>)> buttonLabelFunc = {}
 		) : UIDropdown<T>(hb, menu, image, arrow, textFont, buttonLabelFunc) {
-			init();
+			initSearchable();
 		}
 		UISearchableDropdown(Hitbox* hb,
 			uptr<UIMenu<T>> menu,
@@ -36,7 +36,7 @@ export namespace fbc {
 			FFont& textFont = cct.fontRegular(),
 			func<str(vec<UIEntry<T>*>)> buttonLabelFunc = {}
 		) : UIDropdown<T>(hb, std::move(menu), image, arrow, textFont, buttonLabelFunc) {
-			init();
+			initSearchable();
 		}
 		virtual ~UISearchableDropdown() override {
 			sdl::keyboardInputStopRequest(this);
@@ -65,15 +65,15 @@ export namespace fbc {
 			IDrawable& image = cct.images.smallPanel(),
 			IDrawable* arrow = &cct.images.arrowSmall());
 	protected:
-		inline void updateCaretPos() override { caretPos.x = this->hb->x + cfg.renderScale(9) + this->font.measureW(buffer.substr(0, bufferPos)); }
+		inline void updateCaretPos() override { caret.x = this->hb->x + cfg.renderScale(9) + this->font.measureW(buffer.substr(0, bufferPos)); }
 
 		virtual void onSelectionUpdate(vec<UIEntry<T>*>& items) override;
 	private:
 		str lowerBuffer;
 
 		bool checkEntry(UIEntry<T>* entry);
+		void initSearchable();
 		void onBufferUpdated() override;
-		void init();
 		void resetBuffer() override;
 	};
 
@@ -104,9 +104,7 @@ export namespace fbc {
 	{
 		if (sdl::keyboardInputActive(this)) {
 			UIInteractable::renderImpl();
-			float textX = this->hb->x + cfg.renderScale(24);
-			float textY = this->hb->y + this->hb->h * 0.25f;
-			TextInfo::drawText(textX, textY);
+			TextInfo::drawText(this->hb->x, this->hb->y);
 			renderCaret();
 		}
 		else {
@@ -147,8 +145,7 @@ export namespace fbc {
 		this->updateCache(buffer, sdl::COLOR_LIME);
 	}
 
-	template<typename T>
-	void UISearchableDropdown<T>::init()
+	template<typename T> void UISearchableDropdown<T>::initSearchable()
 	{
 		this->menu->setFilterFunc([this](UIEntry<T>* item) {return this->checkEntry(item); });
 		this->menu->setOnClose([this]() {this->releaseBuffer(); });

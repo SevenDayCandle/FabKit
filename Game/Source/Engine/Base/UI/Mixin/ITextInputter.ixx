@@ -1,4 +1,4 @@
-export module fbc.TextProvider;
+export module fbc.ITextInputter;
 
 import fbc.FFont;
 import fbc.FUtil;
@@ -9,10 +9,10 @@ import std;
 export namespace fbc {
 	constexpr strv INDICATOR = "|";
 
-	export class TextProvider : public sdl::IKeyInputListener {
+	export class ITextInputter : public sdl::IKeyInputListener {
 	public:
-		TextProvider() {}
-		virtual ~TextProvider() {}
+		ITextInputter() {}
+		virtual ~ITextInputter() {}
 
 		void releaseBuffer();
 		virtual void onKeyPress(int32_t c) override;
@@ -22,7 +22,6 @@ export namespace fbc {
 		int bufferPos = 0;
 		str buffer = "";
 		sdl::FontRender caret;
-		sdl::RectF caretPos;
 
 		void initCaret(FFont& font, float x, float y);
 		void renderCaret() const;
@@ -33,7 +32,7 @@ export namespace fbc {
 	};
 
 	// Resets buffer and releases text input
-	void TextProvider::releaseBuffer()
+	void ITextInputter::releaseBuffer()
 	{
 		resetBuffer();
 		bufferPos = buffer.size();
@@ -41,7 +40,7 @@ export namespace fbc {
 		sdl::keyboardInputStopRequest(this);
 	}
 
-	void TextProvider::onKeyPress(int32_t c)
+	void ITextInputter::onKeyPress(int32_t c)
 	{
 		switch (c) {
 			// Moves the caret to the end
@@ -87,7 +86,7 @@ export namespace fbc {
 	}
 
 	// Typing adds characters to the buffer
-	void TextProvider::onTextInput(char* text) {
+	void ITextInputter::onTextInput(char* text) {
 		if (bufferPos <= buffer.size()) {
 			buffer.insert(bufferPos, text);
 			bufferPos += std::strlen(text);
@@ -96,15 +95,18 @@ export namespace fbc {
 		}
 	}
 
-	void TextProvider::initCaret(FFont& font, float x, float y)
+	void ITextInputter::initCaret(FFont& font, float x, float y)
 	{
 		caret = font.makeTexture(INDICATOR);
-		caretPos = { x,y, caret.w * 1.2f, caret.h * 1.25f };
+		caret.x = x;
+		caret.y = y;
+		caret.w = caret.w * 1.2f;
+		caret.h = caret.h * 1.2f;
 	}
 
 	// Renders the caret with a smooth fading "animation"
-	void TextProvider::renderCaret() const {
+	void ITextInputter::renderCaret() const {
 		sdl::textureSetAlphaMod(caret.texture, 127 + 127 * std::sin(sdl::ticks() / 100000000.0f));
-		sdl::renderCopy(caret.texture, nullptr, &caretPos);
+		sdl::renderCopy(caret.texture, nullptr, &caret);
 	}
 }

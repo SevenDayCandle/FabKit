@@ -22,7 +22,7 @@ export namespace fbc {
 		inline void setScrollPos(float percent) { scrollbar.setScrollPos(percent); }
 
 		UIVerticalCanvas& setScrollSpeed(float scrollSpeed);
-		void refreshSize() override;
+		void refreshHb() override;
 		void renderImpl() override;
 		void updateImpl() override;
 	protected:
@@ -41,10 +41,10 @@ export namespace fbc {
 		return *this;
 	}
 
-	void UIVerticalCanvas::refreshSize()
+	void UIVerticalCanvas::refreshHb()
 	{
-		UICanvas::refreshSize();
-		scrollbar.refreshSize();
+		UICanvas::refreshHb();
+		scrollbar.refreshHb();
 	}
 
 	void UIVerticalCanvas::renderImpl()

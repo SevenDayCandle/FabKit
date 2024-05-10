@@ -14,7 +14,9 @@ export namespace fbc {
 	export class UIToggle : public UIInteractable, public TextInfo {
 	public:
 		UIToggle(Hitbox* hb, str text, IDrawable& image = cct.images.checkboxEmpty(), IDrawable& checkImage = cct.images.checkboxFilled(), FFont& f = cct.fontRegular()):
-			UIInteractable(hb, image), checkImage(checkImage), TextInfo(f, text) {}
+			UIInteractable(hb, image), checkImage(checkImage), TextInfo(f, text) {
+			UIToggle::onSizeUpdated();
+		}
 		virtual ~UIToggle() {}
 
 		bool toggled = false;
@@ -23,6 +25,7 @@ export namespace fbc {
 		inline UIToggle& setOnClick(const func<void(UIToggle&)>& onClick) { return this->onClick = onClick, *this; }
 		inline UIToggle& setToggleState(bool val) { return this->toggled = val, *this; }
 
+		virtual void onSizeUpdated() override;
 		void renderImpl() override;
 		void toggle(bool val);
 	private:
@@ -30,6 +33,11 @@ export namespace fbc {
 
 		virtual void clickLeftEvent() override;
 	};
+
+	void UIToggle::onSizeUpdated()
+	{
+		TextInfo::setPos(this->hb->w * 1.5f, this->hb->h * 0.5f);
+	}
 
 	void UIToggle::renderImpl()
 	{
@@ -46,9 +54,7 @@ export namespace fbc {
 			}
 		}
 
-		float textX = hb->x + hb->w * 1.5f;
-		float textY = hb->y + hb->h * 0.5f;
-		TextInfo::drawText(textX, textY);
+		TextInfo::drawText(hb->x, hb->y);
 	}
 
 	void UIToggle::toggle(bool val)

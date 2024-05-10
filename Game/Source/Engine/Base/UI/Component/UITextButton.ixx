@@ -10,17 +10,22 @@ import fbc.UIButton;
 export namespace fbc {
 	export class UITextButton : public UIButton, public TextInfo {
 	public:
-		UITextButton(Hitbox* hb, IDrawable& image, FFont& f) : UIButton(hb, image), TextInfo(f) {}
-		UITextButton(Hitbox* hb, IDrawable& image, FFont& f, str text) : UIButton(hb, image), TextInfo(f, text) {}
+		UITextButton(Hitbox* hb, IDrawable& image, FFont& f, strv text = "") : UIButton(hb, image), TextInfo(f, text) {
+			UITextButton::onSizeUpdated();
+		}
 		~UITextButton() override {}
 
+		virtual void onSizeUpdated() override;
 		virtual void renderImpl() override;
 	};
 
+	void UITextButton::onSizeUpdated()
+	{
+		TextInfo::setPos((this->hb->w - getTextWidth()) / 2, (this->hb->h - getTextHeight()) / 2);
+	}
+
 	void UITextButton::renderImpl() {
 		UIButton::renderImpl();
-		float textX = hb->x + (hb->w - getTextWidth()) / 2;
-		float textY = hb->cY() - (getTextHeight() / 2);
-		TextInfo::drawText(textX, textY);
+		TextInfo::drawText(hb->x, hb->y);
 	}
 }

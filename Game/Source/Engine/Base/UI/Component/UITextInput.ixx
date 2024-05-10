@@ -8,17 +8,18 @@ import fbc.IDrawable;
 import fbc.UIInteractable;
 import fbc.TextInfo;
 import fbc.FUtil;
-import fbc.TextProvider;
+import fbc.ITextInputter;
 import sdl;
 import std;
 
 export namespace fbc {
-	export class UITextInput : public UIInteractable, public TextInfo, public TextProvider {
+	export class UITextInput : public UIInteractable, public TextInfo, public ITextInputter {
 	public:
 		UITextInput(Hitbox* hb, 
 			IDrawable& image = cct.images.smallPanel(),
 			FFont& textFont = cct.fontRegular()): UIInteractable(hb, image), TextInfo(textFont) {
 			initCaret(this->font, this->hb->x, this->hb->y);
+			UITextInput::onSizeUpdated();
 		}
 		virtual ~UITextInput() {
 
@@ -28,11 +29,12 @@ export namespace fbc {
 		inline UITextInput& setOnComplete(func<void(strv)> onComplete) { return this->onComplete = onComplete, *this; }
 
 		void commit(strv text);
+		virtual void onSizeUpdated() override;
 		virtual void renderImpl() override;
 		virtual void updateImpl() override;
 	protected:
 		inline virtual int getLimitWidth() override { return this->hb->w; }
-		inline void updateCaretPos() override { caretPos.x = this->hb->x + cfg.renderScale(9) + this->font.measureW(buffer.substr(0, bufferPos)); }
+		inline void updateCaretPos() override { caret.x = this->hb->x + cfg.renderScale(9) + this->font.measureW(buffer.substr(0, bufferPos)); }
 
 		void clickLeftEvent() override;
 		void onBufferUpdated() override;
@@ -52,12 +54,15 @@ export namespace fbc {
 		}
 	}
 
+	void UITextInput::onSizeUpdated()
+	{
+		TextInfo::setPos(cfg.renderScale(24), this->hb->h * 0.25f);
+	}
+
 	void UITextInput::renderImpl()
 	{
 		UIInteractable::renderImpl();
-		float textX = this->hb->x + cfg.renderScale(24);
-		float textY = this->hb->y + this->hb->h * 0.25f;
-		TextInfo::drawText(textX, textY);
+		TextInfo::drawText(hb->x, hb->y);
 		if (sdl::keyboardInputActive(this)) {
 			renderCaret();
 		}
@@ -104,7 +109,7 @@ export namespace fbc {
 			this->updateCache();
 			releaseBuffer();
 		default:
-			TextProvider::onKeyPress(c);
+			ITextInputter::onKeyPress(c);
 		}
 	}
 
