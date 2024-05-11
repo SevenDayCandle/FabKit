@@ -3,7 +3,7 @@ export module sdl.IKeyInputListener;
 import std;
 
 export namespace sdl {
-	export class IKeyInputListener {
+	export struct IKeyInputListener {
 	public:
 		IKeyInputListener() {}
 		virtual ~IKeyInputListener() {}

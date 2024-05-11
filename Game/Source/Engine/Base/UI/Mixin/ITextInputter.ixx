@@ -9,7 +9,7 @@ import std;
 export namespace fbc {
 	constexpr strv INDICATOR = "|";
 
-	export class ITextInputter : public sdl::IKeyInputListener {
+	export struct ITextInputter : public sdl::IKeyInputListener {
 	public:
 		ITextInputter() {}
 		virtual ~ITextInputter() {}

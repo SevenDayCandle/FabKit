@@ -36,7 +36,7 @@ export namespace fbc {
 
 	void UIToggle::onSizeUpdated()
 	{
-		TextInfo::setPos(this->hb->w * 1.5f, this->hb->h * 0.5f);
+		TextInfo::setPos(this->hb->w * 1.25f, this->hb->h * 0.1f);
 	}
 
 	void UIToggle::renderImpl()

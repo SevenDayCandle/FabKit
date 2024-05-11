@@ -11,7 +11,6 @@ import fbc.ScreenManager;
 import fbc.UIBase;
 import fbc.UIEntry;
 import fbc.UIBase;
-import fbc.UIMultiEntry;
 import fbc.UIVerticalScrollbar;
 import fbc.FUtil;
 import sdl;
@@ -447,7 +446,7 @@ export namespace fbc {
 
 	template <typename T> UIEntry<T>* multiSelectFunc(UIMenu<T>& menu, T& item, str& name, int index) {
 		func<void(UIEntry<T>&)> onClick = [&menu](UIEntry<T>& p) { menu.toggleRow(p); };
-		UIEntry<T>* entry = new UIMultiEntry<T>(item, index, onClick,
+		UIEntry<T>* entry = new UIEntry<T>(item, index, onClick,
 		                           new RelativeHitbox(*menu.hb),
 		                           menu.getItemFont(), name);
 		entry->setHbExactSizeY(cfg.renderScale(64));
