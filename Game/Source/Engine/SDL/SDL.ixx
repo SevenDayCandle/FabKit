@@ -107,6 +107,7 @@ namespace sdl {
 			SDL_StartTextInput();
 		}
 	}
+
 	export void keyboardInputStop() {
 		kListener = nullptr;
 		SDL_StopTextInput();

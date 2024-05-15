@@ -108,6 +108,7 @@ export namespace fbc {
 		case sdl::KEY_ESC:
 			this->updateCache();
 			releaseBuffer();
+			return;
 		default:
 			ITextInputter::onKeyPress(c);
 		}

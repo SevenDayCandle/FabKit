@@ -203,6 +203,11 @@ export namespace fbc::futil {
 		return find(container, value) != std::nullopt;
 	}
 
+	// Check whether the text can be converted into a number
+	export bool isNumeric(strv text) {
+		return !text.empty() && std::all_of(text.begin(), text.end(), [](const char c) {return std::isdigit(c); });
+	}
+
 	// Join a collection of strings with a delimiter
 	export template<c_itr<strv> SCo> str joinStr(strv delimiter, SCo items) {
 		str res;

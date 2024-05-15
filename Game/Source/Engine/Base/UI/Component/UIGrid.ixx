@@ -23,8 +23,8 @@ export namespace fbc {
 
 		}
 
-		inline float getSpacingX() { return spacingX; }
-		inline float getSpacingY() { return spacingY; }
+		inline float getSpacingX() const { return spacingX; }
+		inline float getSpacingY() const { return spacingY; }
 		inline int size() { return items.size(); }
 
 		template <c_itr<uptr<T>> Iterable> UIGrid& addItems(const Iterable& added);

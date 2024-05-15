@@ -179,7 +179,15 @@
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Base\UI\Component\UIHorizontalScrollbar.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Engine\Base\UI\Component\UIInteractable.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Base\UI\Component\UINumberInput.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -248,10 +256,6 @@
     <ClCompile Include="Source\Engine\Base\UI\Hitbox\ScaleHitbox.ixx" />
     <ClCompile Include="Source\Engine\Base\UI\Component\UITextButton.ixx" />
     <ClCompile Include="Source\Engine\Base\UI\Hitbox\ScreenSizeHitbox.ixx" />
-    <ClCompile Include="Source\Engine\Base\Utilities\Config\WindowMode.ixx">
-      <SubType>
-      </SubType>
-    </ClCompile>
     <ClCompile Include="Source\Engine\Base\Utilities\KeyedItem.ixx">
       <SubType>
       </SubType>
