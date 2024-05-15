@@ -215,6 +215,10 @@
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\RegionTexture.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Engine\SDL\IKeyInputListener.ixx">
       <SubType>
       </SubType>

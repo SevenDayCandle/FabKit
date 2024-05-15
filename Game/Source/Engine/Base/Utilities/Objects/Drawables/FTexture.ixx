@@ -50,7 +50,7 @@ export namespace fbc {
 
     void FTexture::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip)
     {
-        sdl::renderCopyEx(texture, &dim, destRec, rotation, &origin, flip);
+        sdl::renderCopyEx(texture, sourceRec, destRec, rotation, &origin, flip);
     }
 
     void FTexture::setDrawBlend(const sdl::BlendMode bl)

@@ -8,14 +8,8 @@ import sdl;
 export namespace fbc {
 	export class VerticalDrawable : public IDrawable {
 	public:
-		VerticalDrawable(FTexture& base,
-			FTexture& borderB,
-			FTexture& borderT) : IDrawable(), base(base), borderB(borderB), borderT(borderT) {
-		}
-
-		FTexture& base;
-		FTexture& borderB;
-		FTexture& borderT;
+		VerticalDrawable(IDrawable& base) : base(base), patchSize(base.getWidth()) {}
+		VerticalDrawable(IDrawable& base, float patchSize) : base(base), patchSize(patchSize) {}
 
 		inline sdl::RectF* getBaseRec() override { return base.getBaseRec(); }
 		inline float getHeight() override { return base.getHeight(); }
@@ -24,34 +18,41 @@ export namespace fbc {
 		void drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) override;
 		void setDrawBlend(const sdl::BlendMode bl) override;
 		void setDrawColor(const sdl::Color& tint) override;
+	private:
+		IDrawable& base;
+		float patchSize;
 	};
 
 	// Draw the base stretched around destRec, then draw the corners and edges around destRec
 	// Assumes that corner and border textures have the exact same size
 	void VerticalDrawable::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) {
-		float height = borderB.getHeight();
-		sdl::RectF center = { destRec->x, destRec->y + height, destRec->w, destRec->h - (height * 2) };
+		float p1x = sourceRec->x + patchSize;
+		float p1y = sourceRec->y + patchSize;
+		float p2y = p1y + patchSize;
 
-		float bottom = center.y + center.h;
-		sdl::RectF bt = { destRec->x, destRec->y, destRec->w, height };
-		sdl::RectF bb = { destRec->x, bottom, destRec->w, height };
+		sdl::RectF st = { p1x, sourceRec->y, patchSize, patchSize };
+		sdl::RectF sc = { p1x, p1y, patchSize,patchSize };
+		sdl::RectF sb = { p1x, p2y, patchSize, patchSize };
 
-		base.draw(&center, origin, rotation, flip);
-		borderT.draw(&bt, origin, rotation, flip);
-		borderB.draw(&bb, origin, rotation, flip);
+
+		sdl::RectF dc = { destRec->x, destRec->y + patchSize, destRec->w, destRec->h - (patchSize * 2) };
+		float bottom = dc.y + dc.h;
+
+		sdl::RectF dt = { dc.x,  destRec->y, dc.w, patchSize };
+		sdl::RectF db = { dc.x, bottom, dc.w, patchSize };
+
+		base.drawBase(&st, &dt, origin, rotation, flip);
+		base.drawBase(&sc, &dc, origin, rotation, flip);
+		base.drawBase(&sb, &db, origin, rotation, flip);
 	}
 
 	void VerticalDrawable::setDrawBlend(const sdl::BlendMode bl)
 	{
 		base.setDrawBlend(bl);
-		borderT.setDrawBlend(bl);
-		borderB.setDrawBlend(bl);
 	}
 
 	void VerticalDrawable::setDrawColor(const sdl::Color& tint)
 	{
 		base.setDrawColor(tint);
-		borderT.setDrawColor(tint);
-		borderB.setDrawColor(tint);
 	}
 }
