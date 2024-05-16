@@ -8,7 +8,7 @@ import sdl;
 export namespace fbc {
 	export class VerticalDrawable : public IDrawable {
 	public:
-		VerticalDrawable(IDrawable& base) : base(base), patchSize(base.getWidth()) {}
+		VerticalDrawable(IDrawable& base) : base(base), patchSize(base.getHeight() / 2) {}
 		VerticalDrawable(IDrawable& base, float patchSize) : base(base), patchSize(patchSize) {}
 
 		inline sdl::RectF* getBaseRec() override { return base.getBaseRec(); }
@@ -23,16 +23,13 @@ export namespace fbc {
 		float patchSize;
 	};
 
-	// Draw the base stretched around destRec, then draw the corners and edges around destRec
-	// Assumes that corner and border textures have the exact same size
+	/* Assuming that the underlying base drawable consists of two seamless edges of size patchSize x patchSize stacked vertically, we infer the center to be the top-most column of the bottom edge */
 	void VerticalDrawable::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) {
-		float p1x = sourceRec->x + patchSize;
-		float p1y = sourceRec->y + patchSize;
-		float p2y = p1y + patchSize;
+		float py = sourceRec->y + patchSize;
 
-		sdl::RectF st = { p1x, sourceRec->y, patchSize, patchSize };
-		sdl::RectF sc = { p1x, p1y, patchSize,patchSize };
-		sdl::RectF sb = { p1x, p2y, patchSize, patchSize };
+		sdl::RectF st = { sourceRec->x, sourceRec->y, sourceRec->w, patchSize };
+		sdl::RectF sc = { sourceRec->x, py, sourceRec->w,1 };
+		sdl::RectF sb = { sourceRec->x, py, sourceRec->w, patchSize };
 
 
 		sdl::RectF dc = { destRec->x, destRec->y + patchSize, destRec->w, destRec->h - (patchSize * 2) };

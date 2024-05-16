@@ -21,7 +21,7 @@ export namespace fbc {
 
 		UIDropdown(Hitbox* hb, 
 			UIMenu<T>* menu, 
-			IDrawable& image = cct.images.smallPanel(),
+			IDrawable& image = cct.images.panel(),
 			IDrawable* arrow = &cct.images.arrowSmall(), 
 			FFont& textFont = cct.fontRegular(),
 			func<str(vec<UIEntry<T>*>&)> buttonLabelFunc = {}
@@ -30,7 +30,7 @@ export namespace fbc {
 		}
 		UIDropdown(Hitbox* hb,
 			uptr<UIMenu<T>> menu,
-			IDrawable& image = cct.images.smallPanel(),
+			IDrawable& image = cct.images.panel(),
 			IDrawable* arrow = &cct.images.arrowSmall(),
 			FFont& textFont = cct.fontRegular(),
 			func<str(vec<UIEntry<T>*>&)> buttonLabelFunc = {}
@@ -74,7 +74,7 @@ export namespace fbc {
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
 			IDrawable& background = cct.images.flatPanel(),
-			IDrawable& image = cct.images.smallPanel(),
+			IDrawable& image = cct.images.panel(),
 			IDrawable* arrow = &cct.images.arrowSmall());
 		static uptr<UIDropdown> singleMenu(Hitbox* hb, 
 			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
@@ -82,7 +82,7 @@ export namespace fbc {
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
 			IDrawable& background = cct.images.flatPanel(),
-			IDrawable& image = cct.images.smallPanel(),
+			IDrawable& image = cct.images.panel(),
 			IDrawable* arrow = &cct.images.arrowSmall());
 	protected:
 		str getButtonText(vec<UIEntry<T>*>& items);

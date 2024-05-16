@@ -8,7 +8,7 @@ import sdl;
 export namespace fbc {
 	export class HorizontalDrawable : public IDrawable {
 	public:
-		HorizontalDrawable(IDrawable& base) : base(base), patchSize(base.getHeight()) {}
+		HorizontalDrawable(IDrawable& base) : base(base), patchSize(base.getWidth() / 2) {}
 		HorizontalDrawable(IDrawable& base, float patchSize) : base(base), patchSize(patchSize) {}
 
 		inline sdl::RectF* getBaseRec() override { return base.getBaseRec(); }
@@ -23,16 +23,13 @@ export namespace fbc {
 		float patchSize;
 	};
 
-	void HorizontalDrawable::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip)
-	{
-		float p1x = sourceRec->x + patchSize;
-		float p2x = p1x + patchSize;
-		float p1y = sourceRec->y + patchSize;
-		float p2y = p1y + patchSize;
+	/* Assuming that the underlying base drawable consists of two seamless edges of size patchSize x patchSize stacked horizontally, we infer the center to be the left-most column of the right edge */
+	void HorizontalDrawable::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) {
+		float px = sourceRec->x + patchSize;
 
-		sdl::RectF scl = { sourceRec->x, p1y, patchSize, patchSize };
-		sdl::RectF sc = { p1x, p1y, patchSize,patchSize };
-		sdl::RectF scr = { p2x, p1y, patchSize, patchSize };
+		sdl::RectF scl = { sourceRec->x, sourceRec->y , patchSize, sourceRec->h };
+		sdl::RectF sc = { px, sourceRec->y , 1, sourceRec->h };
+		sdl::RectF scr = { px, sourceRec->y , patchSize, sourceRec->h };
 
 		sdl::RectF dc = { destRec->x + patchSize, destRec->y, destRec->w - (patchSize * 2), destRec->h };
 		float right = dc.x + dc.w;

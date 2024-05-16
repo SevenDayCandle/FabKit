@@ -7,7 +7,7 @@ import sdl;
 export namespace fbc {
 	export class BorderedDrawable : public IDrawable {
 	public:
-		BorderedDrawable(IDrawable& base) : base(base), patchSize(base.getWidth() / 3.0f) {}
+		BorderedDrawable(IDrawable& base) : base(base), patchSize(base.getWidth() / 2.0f) {}
 		BorderedDrawable(IDrawable& base, float patchSize): base(base), patchSize(patchSize) {}
 
 		inline sdl::RectF* getBaseRec() override { return base.getBaseRec(); }
@@ -22,23 +22,26 @@ export namespace fbc {
 		float patchSize;
 	};
 
-	// Draw the base stretched around destRec, then draw the corners and edges around destRec
-	// Assumes that corner and border textures have the exact same size
+	/* Assuming that the underlying base drawable consists of four seamless corners of size patchSize x patchSize, we infer the following:
+		- The top edge (st) is the left-most column of the top-right corner
+		- The left edge (scl) is the top-most row of the bottom-left corner
+		- The right edge (scr) is the top-most row of the bottom-right corner
+		- The bottom edge (sb) is the left-most column of the bottom-right corner
+		- The center (sc) is the top-left pixel of the bottom-right corner
+	*/
 	void BorderedDrawable::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) {
-		float p1x = sourceRec->x + patchSize;
-		float p2x = p1x + patchSize;
-		float p1y = sourceRec->y + patchSize;
-		float p2y = p1y + patchSize;
+		float px = sourceRec->x + patchSize;
+		float py = sourceRec->y + patchSize;
 
 		sdl::RectF stl = { sourceRec->x,  sourceRec->y, patchSize, patchSize };
-		sdl::RectF st = { p1x, sourceRec->y, patchSize, patchSize };
-		sdl::RectF str = { p2x,  sourceRec->y, patchSize, patchSize };
-		sdl::RectF scl = { sourceRec->x, p1y, patchSize, patchSize };
-		sdl::RectF sc = { p1x, p1y, patchSize,patchSize };
-		sdl::RectF scr = { p2x, p1y, patchSize, patchSize };
-		sdl::RectF sbl = { sourceRec->x, p2y, patchSize, patchSize };
-		sdl::RectF sb = { p1x, p2y, patchSize, patchSize };
-		sdl::RectF sbr = { p2x, p2y, patchSize, patchSize };
+		sdl::RectF st = { px, sourceRec->y, 1, patchSize };
+		sdl::RectF str = { px,  sourceRec->y, patchSize, patchSize };
+		sdl::RectF scl = { sourceRec->x, py, patchSize, 1 };
+		sdl::RectF sc = { px, py, 1,1 };
+		sdl::RectF scr = { px, py, patchSize, 1 };
+		sdl::RectF sbl = { sourceRec->x, py, patchSize, patchSize };
+		sdl::RectF sb = { px, py, 1, patchSize };
+		sdl::RectF sbr = { px, py, patchSize, patchSize };
 
 
 		sdl::RectF dc = {destRec->x + patchSize, destRec->y + patchSize, destRec->w - (patchSize * 2), destRec->h - (patchSize * 2)};

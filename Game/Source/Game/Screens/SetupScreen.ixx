@@ -25,7 +25,7 @@ export namespace fbc {
 		SetupScreen(): UIVerticalCanvas(new ScreenSizeHitbox()) {
 			UITextButton& b = addElement(std::make_unique<UITextButton>(
 				new RelativeHitbox(*hb, 190, 500, 170, 150),
-				cct.images.smallPanel(),
+				cct.images.panel(),
 				cct.fontRegular(),
 				cct.strings.ui_close()));
 			b.setOnClick([](UIButton& i) {
@@ -46,10 +46,10 @@ export namespace fbc {
 			UITextInput& inp = addElement(std::make_unique<UITextInput>(new RelativeHitbox(*hb, 500, 1400, 500, 100)));
 
 			UIGrid<UITextButton>& buttonGrid = addElement(std::make_unique<UIGrid<UITextButton>>(new RelativeHitbox(*hb, 1500, 1400, 300, 300)));
-			buttonGrid.addItem(std::make_unique<UITextButton>(new RelativeHitbox(*hb,100, 100), cct.images.smallPanel(), cct.fontRegular(), "A"));
-			buttonGrid.addItem(std::make_unique<UITextButton>(new RelativeHitbox(*hb, 100, 100), cct.images.smallPanel(), cct.fontRegular(), "B"));
-			buttonGrid.addItem(std::make_unique<UITextButton>(new RelativeHitbox(*hb, 100, 100), cct.images.smallPanel(), cct.fontRegular(), "C"));
-			buttonGrid.addItem(std::make_unique<UITextButton>(new RelativeHitbox(*hb, 100, 100), cct.images.smallPanel(), cct.fontRegular(), "D"));
+			buttonGrid.addItem(std::make_unique<UITextButton>(new RelativeHitbox(*hb,100, 100), cct.images.panel(), cct.fontRegular(), "A"));
+			buttonGrid.addItem(std::make_unique<UITextButton>(new RelativeHitbox(*hb, 100, 100), cct.images.panel(), cct.fontRegular(), "B"));
+			buttonGrid.addItem(std::make_unique<UITextButton>(new RelativeHitbox(*hb, 100, 100), cct.images.panel(), cct.fontRegular(), "C"));
+			buttonGrid.addItem(std::make_unique<UITextButton>(new RelativeHitbox(*hb, 100, 100), cct.images.panel(), cct.fontRegular(), "D"));
 
 			UINumberInput& ee = addElement(std::make_unique<UINumberInput>(new RelativeHitbox(*hb, 1100, 1000, 400, 100)));
 		}

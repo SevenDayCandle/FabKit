@@ -23,7 +23,7 @@ export namespace fbc {
 
 		inline BorderedDrawable& flatPanel() const { return *hoverPanelCache.get(); }
 		inline BorderedDrawable& largePanel() const { return *largePanelCache.get(); }
-		inline BorderedDrawable& smallPanel() const { return *panelCache.get(); }
+		inline BorderedDrawable& panel() const { return *panelCache.get(); }
 		inline VerticalDrawable& scrollbar() const { return *scrollbarCache.get(); }
 		inline VerticalDrawable& scrollbutton() const { return *scrollbuttonCache.get(); }
 

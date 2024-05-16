@@ -16,7 +16,7 @@ export namespace fbc {
 	export class UITextInput : public UIInteractable, public TextInfo, public ITextInputter {
 	public:
 		UITextInput(Hitbox* hb, 
-			IDrawable& image = cct.images.smallPanel(),
+			IDrawable& image = cct.images.panel(),
 			FFont& textFont = cct.fontRegular()): UIInteractable(hb, image), TextInfo(textFont) {
 			initCaret(this->font, this->hb->x, this->hb->y);
 			UITextInput::onSizeUpdated();

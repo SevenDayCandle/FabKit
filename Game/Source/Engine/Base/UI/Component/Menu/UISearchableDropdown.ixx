@@ -22,7 +22,7 @@ export namespace fbc {
 	public:
 		UISearchableDropdown(Hitbox* hb,
 			UIMenu<T>* menu,
-			IDrawable& image = cct.images.smallPanel(),
+			IDrawable& image = cct.images.panel(),
 			IDrawable* arrow = &cct.images.arrowSmall(),
 			FFont& textFont = cct.fontRegular(),
 			func<str(vec<UIEntry<T>*>)> buttonLabelFunc = {}
@@ -31,7 +31,7 @@ export namespace fbc {
 		}
 		UISearchableDropdown(Hitbox* hb,
 			uptr<UIMenu<T>> menu,
-			IDrawable& image = cct.images.smallPanel(),
+			IDrawable& image = cct.images.panel(),
 			IDrawable* arrow = &cct.images.arrowSmall(),
 			FFont& textFont = cct.fontRegular(),
 			func<str(vec<UIEntry<T>*>)> buttonLabelFunc = {}
@@ -54,7 +54,7 @@ export namespace fbc {
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
 			IDrawable& background = cct.images.flatPanel(),
-			IDrawable& image = cct.images.smallPanel(),
+			IDrawable& image = cct.images.panel(),
 			IDrawable* arrow = &cct.images.arrowSmall());
 		static uptr<UISearchableDropdown> singleMenu(Hitbox* hb,
 			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
@@ -62,7 +62,7 @@ export namespace fbc {
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
 			IDrawable& background = cct.images.flatPanel(),
-			IDrawable& image = cct.images.smallPanel(),
+			IDrawable& image = cct.images.panel(),
 			IDrawable* arrow = &cct.images.arrowSmall());
 	protected:
 		inline void updateCaretPos() override { caret.x = this->hb->x + cfg.renderScale(9) + this->font.measureW(buffer.substr(0, bufferPos)); }
