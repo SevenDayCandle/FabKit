@@ -1,15 +1,14 @@
-export module fbc.VerticalDrawable;
+export module fbc.RVertical;
 
-import fbc.FTexture;
 import fbc.FUtil;
 import fbc.IDrawable;
 import sdl;
 
 export namespace fbc {
-	export class VerticalDrawable : public IDrawable {
+	export class RVertical : public IDrawable {
 	public:
-		VerticalDrawable(IDrawable& base) : base(base), patchSize(base.getHeight() / 2) {}
-		VerticalDrawable(IDrawable& base, float patchSize) : base(base), patchSize(patchSize) {}
+		RVertical(IDrawable& base) : base(base), patchSize(base.getHeight() / 2) {}
+		RVertical(IDrawable& base, float patchSize) : base(base), patchSize(patchSize) {}
 
 		inline sdl::RectF* getBaseRec() override { return base.getBaseRec(); }
 		inline float getHeight() override { return base.getHeight(); }
@@ -24,7 +23,7 @@ export namespace fbc {
 	};
 
 	/* Assuming that the underlying base drawable consists of two seamless edges of size patchSize x patchSize stacked vertically, we infer the center to be the top-most column of the bottom edge */
-	void VerticalDrawable::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) {
+	void RVertical::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) {
 		float py = sourceRec->y + patchSize;
 
 		sdl::RectF st = { sourceRec->x, sourceRec->y, sourceRec->w, patchSize };
@@ -43,12 +42,12 @@ export namespace fbc {
 		base.drawBase(&sb, &db, origin, rotation, flip);
 	}
 
-	void VerticalDrawable::setDrawBlend(const sdl::BlendMode bl)
+	void RVertical::setDrawBlend(const sdl::BlendMode bl)
 	{
 		base.setDrawBlend(bl);
 	}
 
-	void VerticalDrawable::setDrawColor(const sdl::Color& tint)
+	void RVertical::setDrawColor(const sdl::Color& tint)
 	{
 		base.setDrawColor(tint);
 	}

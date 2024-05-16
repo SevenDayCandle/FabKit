@@ -1,4 +1,4 @@
-export module fbc.HorizontalDrawable;
+export module fbc.RHorizontal;
 
 import fbc.FTexture;
 import fbc.FUtil;
@@ -6,10 +6,10 @@ import fbc.IDrawable;
 import sdl;
 
 export namespace fbc {
-	export class HorizontalDrawable : public IDrawable {
+	export class RHorizontal : public IDrawable {
 	public:
-		HorizontalDrawable(IDrawable& base) : base(base), patchSize(base.getWidth() / 2) {}
-		HorizontalDrawable(IDrawable& base, float patchSize) : base(base), patchSize(patchSize) {}
+		RHorizontal(IDrawable& base) : base(base), patchSize(base.getWidth() / 2) {}
+		RHorizontal(IDrawable& base, float patchSize) : base(base), patchSize(patchSize) {}
 
 		inline sdl::RectF* getBaseRec() override { return base.getBaseRec(); }
 		inline float getHeight() override { return base.getHeight(); }
@@ -24,7 +24,7 @@ export namespace fbc {
 	};
 
 	/* Assuming that the underlying base drawable consists of two seamless edges of size patchSize x patchSize stacked horizontally, we infer the center to be the left-most column of the right edge */
-	void HorizontalDrawable::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) {
+	void RHorizontal::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) {
 		float px = sourceRec->x + patchSize;
 
 		sdl::RectF scl = { sourceRec->x, sourceRec->y , patchSize, sourceRec->h };
@@ -42,12 +42,12 @@ export namespace fbc {
 		base.drawBase(&scr, &dcr, origin, rotation, flip);
 	}
 
-	void HorizontalDrawable::setDrawBlend(const sdl::BlendMode bl)
+	void RHorizontal::setDrawBlend(const sdl::BlendMode bl)
 	{
 		base.setDrawBlend(bl);
 	}
 
-	void HorizontalDrawable::setDrawColor(const sdl::Color& tint)
+	void RHorizontal::setDrawColor(const sdl::Color& tint)
 	{
 		base.setDrawColor(tint);
 	}

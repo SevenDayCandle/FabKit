@@ -22,8 +22,8 @@ export namespace fbc {
 	public:
 		UISearchableDropdown(Hitbox* hb,
 			UIMenu<T>* menu,
-			IDrawable& image = cct.images.panel(),
-			IDrawable* arrow = &cct.images.arrowSmall(),
+			IDrawable& image = cct.images.panel,
+			IDrawable* arrow = &cct.images.uiArrowSmall.get(),
 			FFont& textFont = cct.fontRegular(),
 			func<str(vec<UIEntry<T>*>)> buttonLabelFunc = {}
 		) : UIDropdown<T>(hb, menu, image, arrow, textFont, buttonLabelFunc) {
@@ -31,8 +31,8 @@ export namespace fbc {
 		}
 		UISearchableDropdown(Hitbox* hb,
 			uptr<UIMenu<T>> menu,
-			IDrawable& image = cct.images.panel(),
-			IDrawable* arrow = &cct.images.arrowSmall(),
+			IDrawable& image = cct.images.panel,
+			IDrawable* arrow = &cct.images.uiArrowSmall.get(),
 			FFont& textFont = cct.fontRegular(),
 			func<str(vec<UIEntry<T>*>)> buttonLabelFunc = {}
 		) : UIDropdown<T>(hb, std::move(menu), image, arrow, textFont, buttonLabelFunc) {
@@ -53,17 +53,17 @@ export namespace fbc {
 			func<str(vec<UIEntry<T>*>)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
-			IDrawable& background = cct.images.flatPanel(),
-			IDrawable& image = cct.images.panel(),
-			IDrawable* arrow = &cct.images.arrowSmall());
+			IDrawable& background = cct.images.hoverPanel,
+			IDrawable& image = cct.images.panel,
+			IDrawable* arrow = &cct.images.uiArrowSmall.get());
 		static uptr<UISearchableDropdown> singleMenu(Hitbox* hb,
 			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
 			func<str(vec<UIEntry<T>*>)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
-			IDrawable& background = cct.images.flatPanel(),
-			IDrawable& image = cct.images.panel(),
-			IDrawable* arrow = &cct.images.arrowSmall());
+			IDrawable& background = cct.images.hoverPanel,
+			IDrawable& image = cct.images.panel,
+			IDrawable* arrow = &cct.images.uiArrowSmall.get());
 	protected:
 		inline void updateCaretPos() override { caret.x = this->hb->x + cfg.renderScale(9) + this->font.measureW(buffer.substr(0, bufferPos)); }
 
@@ -112,7 +112,7 @@ export namespace fbc {
 		}
 	}
 
-	// Directly set the textInfo text to avoid updating the display cache and hiding your text input
+	// Directly set the textInfo text to avoid updating the display textureCache and hiding your text input
 	template<typename T> void UISearchableDropdown<T>::onSelectionUpdate(vec<UIEntry<T>*>& items) {
 		if (this->isOpen()) {
 			TextInfo::text = this->getButtonText(items);

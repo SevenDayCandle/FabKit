@@ -27,7 +27,7 @@ export namespace fbc {
 		       FuncEntry entryFunc,
 		       func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
 		       FFont& itemFont = cct.fontRegular(),
-		       IDrawable& background = cct.images.flatPanel()):
+		       IDrawable& background = cct.images.hoverPanel):
 			UIBase(hb), background(background), itemFont(itemFont), entryFunc(entryFunc), labelFunc(labelFunc),
 			scrollbar(new RelativeHitbox(*hb, 0, 0, 48, 48)) { scrollbar.setOnScroll([this](float f) { onScroll(f); }); }
 
@@ -75,8 +75,8 @@ export namespace fbc {
 		template <c_itr<int> Iterable> void updateIndices(Iterable& indices);
 		template <c_itr<T> Iterable> void updateSelection(Iterable& indices);
 
-		static uptr<UIMenu> multiMenu(Hitbox* hb, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); }, FFont& itemFont = cct.fontRegular(), IDrawable& background = cct.images.flatPanel());
-		static uptr<UIMenu> singleMenu(Hitbox* hb, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); }, FFont& itemFont = cct.fontRegular(), IDrawable& background = cct.images.flatPanel());
+		static uptr<UIMenu> multiMenu(Hitbox* hb, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); }, FFont& itemFont = cct.fontRegular(), IDrawable& background = cct.images.hoverPanel);
+		static uptr<UIMenu> singleMenu(Hitbox* hb, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); }, FFont& itemFont = cct.fontRegular(), IDrawable& background = cct.images.hoverPanel);
 	protected:
 		FFont& itemFont = cct.fontRegular();
 		FuncEntry entryFunc;

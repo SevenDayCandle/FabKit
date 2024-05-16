@@ -21,8 +21,8 @@ export namespace fbc {
 
 		UIDropdown(Hitbox* hb, 
 			UIMenu<T>* menu, 
-			IDrawable& image = cct.images.panel(),
-			IDrawable* arrow = &cct.images.arrowSmall(), 
+			IDrawable& image = cct.images.panel,
+			IDrawable* arrow = &cct.images.uiArrowSmall.get(),
 			FFont& textFont = cct.fontRegular(),
 			func<str(vec<UIEntry<T>*>&)> buttonLabelFunc = {}
 		): UIInteractable(hb, image), TextInfo(textFont), menu(menu), buttonLabelFunc(buttonLabelFunc), arrow(arrow) {
@@ -30,8 +30,8 @@ export namespace fbc {
 		}
 		UIDropdown(Hitbox* hb,
 			uptr<UIMenu<T>> menu,
-			IDrawable& image = cct.images.panel(),
-			IDrawable* arrow = &cct.images.arrowSmall(),
+			IDrawable& image = cct.images.panel,
+			IDrawable* arrow = &cct.images.uiArrowSmall.get(),
 			FFont& textFont = cct.fontRegular(),
 			func<str(vec<UIEntry<T>*>&)> buttonLabelFunc = {}
 		): UIInteractable(hb, image), TextInfo(textFont), menu(std::move(menu)), buttonLabelFunc(buttonLabelFunc), arrow(arrow) {
@@ -73,17 +73,17 @@ export namespace fbc {
 			func<str(vec<UIEntry<T>*>&)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
-			IDrawable& background = cct.images.flatPanel(),
-			IDrawable& image = cct.images.panel(),
-			IDrawable* arrow = &cct.images.arrowSmall());
+			IDrawable& background = cct.images.hoverPanel,
+			IDrawable& image = cct.images.panel,
+			IDrawable* arrow = &cct.images.uiArrowSmall.get());
 		static uptr<UIDropdown> singleMenu(Hitbox* hb, 
 			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
 			func<str(vec<UIEntry<T>*>&)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
-			IDrawable& background = cct.images.flatPanel(),
-			IDrawable& image = cct.images.panel(),
-			IDrawable* arrow = &cct.images.arrowSmall());
+			IDrawable& background = cct.images.hoverPanel,
+			IDrawable& image = cct.images.panel,
+			IDrawable* arrow = &cct.images.uiArrowSmall.get());
 	protected:
 		str getButtonText(vec<UIEntry<T>*>& items);
 

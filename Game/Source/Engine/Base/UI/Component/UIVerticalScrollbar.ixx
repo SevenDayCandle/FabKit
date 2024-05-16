@@ -3,13 +3,14 @@ export module fbc.UIVerticalScrollbar;
 import fbc.CoreContent;
 import fbc.FUtil;
 import fbc.Hitbox;
+import fbc.IDrawable;
 import fbc.UIScrollbar;
 
 export namespace fbc {
 
 	export class UIVerticalScrollbar : public UIScrollbar {
 	public:
-		UIVerticalScrollbar(Hitbox* hb): UIScrollbar(hb, cct.images.scrollbar(), cct.images.scrollbutton()) {
+		UIVerticalScrollbar(Hitbox* hb, IDrawable& imageBar = cct.images.scrollbar, IDrawable& imageButton = cct.images.scrollbutton): UIScrollbar(hb, imageBar, imageButton) {
 			UIVerticalScrollbar::updateDropzoneSize(0.05f);
 		}
 		virtual ~UIVerticalScrollbar() {}

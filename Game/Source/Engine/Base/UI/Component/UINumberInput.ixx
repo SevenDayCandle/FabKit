@@ -16,7 +16,7 @@ export namespace fbc {
 	export class UINumberInput : public UIInteractable, public TextInfo, public ITextInputter {
 	public:
 		UINumberInput(Hitbox* hb,
-			IDrawable& image = cct.images.panel(),
+			IDrawable& image = cct.images.panel,
 			FFont& textFont = cct.fontRegular()) : UIInteractable(hb, image), TextInfo(textFont) {
 			initCaret(this->font, this->hb->x, this->hb->y);
 			UINumberInput::onSizeUpdated();

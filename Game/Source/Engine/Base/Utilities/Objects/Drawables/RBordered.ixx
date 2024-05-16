@@ -1,14 +1,14 @@
-export module fbc.BorderedDrawable;
+export module fbc.RBordered;
 
 import fbc.FUtil;
 import fbc.IDrawable;
 import sdl;
 
 export namespace fbc {
-	export class BorderedDrawable : public IDrawable {
+	export class RBordered : public IDrawable {
 	public:
-		BorderedDrawable(IDrawable& base) : base(base), patchSize(base.getWidth() / 2.0f) {}
-		BorderedDrawable(IDrawable& base, float patchSize): base(base), patchSize(patchSize) {}
+		RBordered(IDrawable& base) : base(base), patchSize(base.getWidth() / 2.0f) {}
+		RBordered(IDrawable& base, float patchSize): base(base), patchSize(patchSize) {}
 
 		inline sdl::RectF* getBaseRec() override { return base.getBaseRec(); }
 		inline float getHeight() override { return base.getHeight();}
@@ -29,7 +29,7 @@ export namespace fbc {
 		- The bottom edge (sb) is the left-most column of the bottom-right corner
 		- The center (sc) is the top-left pixel of the bottom-right corner
 	*/
-	void BorderedDrawable::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) {
+	void RBordered::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) {
 		float px = sourceRec->x + patchSize;
 		float py = sourceRec->y + patchSize;
 
@@ -68,12 +68,12 @@ export namespace fbc {
 		base.drawBase(&sbr, &dbr, origin, rotation, flip);
 	}
 
-	void BorderedDrawable::setDrawBlend(const sdl::BlendMode bl)
+	void RBordered::setDrawBlend(const sdl::BlendMode bl)
 	{
 		base.setDrawBlend(bl);
 	}
 
-	void BorderedDrawable::setDrawColor(const sdl::Color& tint)
+	void RBordered::setDrawColor(const sdl::Color& tint)
 	{
 		base.setDrawColor(tint);
 	}

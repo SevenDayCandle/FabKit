@@ -76,7 +76,7 @@ export namespace fbc {
 				yPos = lhb.y + lhb.h + scaled;
 			}
 
-			lhb.setExactPos(xPos, yPos);
+			ref.hb->setExactPos(xPos, yPos);
 		}
 		return ref;
 	}
@@ -101,7 +101,7 @@ export namespace fbc {
 				yPos = hb->y;
 			}
 
-			lhb.setExactPos(xPos, yPos);
+			ref.hb->setExactPos(xPos, yPos);
 		}
 		return ref;
 	}

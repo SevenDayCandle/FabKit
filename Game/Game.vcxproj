@@ -191,6 +191,10 @@
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Base\UI\Component\UISlider.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Engine\Base\UI\Component\UITextInput.ixx">
       <SubType>
       </SubType>
@@ -215,7 +219,7 @@
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\RegionTexture.ixx">
+    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\FRegion.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -264,13 +268,13 @@
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\BorderedDrawable.ixx">
+    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\RBordered.ixx">
       <SubType>
       </SubType>
     </ClCompile>
     <ClCompile Include="Source\Engine\Base\Utilities\Objects\FMusic.ixx" />
     <ClCompile Include="Source\Engine\Base\Utilities\Objects\FSound.ixx" />
-    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\HorizontalDrawable.ixx">
+    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\RHorizontal.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -278,11 +282,11 @@
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Cache.ixx">
+    <ClCompile Include="Source\Engine\Base\Utilities\Cache.ixx">
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\VerticalDrawable.ixx">
+    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\RVertical.ixx">
       <SubType>
       </SubType>
     </ClCompile>
