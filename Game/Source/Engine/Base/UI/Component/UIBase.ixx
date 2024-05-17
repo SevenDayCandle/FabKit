@@ -10,11 +10,13 @@ export namespace fbc {
 	public:
 		UIBase(Hitbox* hb) : hb(hb) {}
 		UIBase(uptr<Hitbox>&& hb) : hb(std::move(hb)) {}
-		virtual ~UIBase() {}
+		virtual ~UIBase() override {}
 
 		uptr<Hitbox> hb;
 		bool enabled = true;
 
+		inline virtual float getEndX() { return hb->x + hb->w; } // The right-most end X coordinate of this object, may be larger than hb if this has subcomponents
+		inline virtual float getEndY() { return hb->y + hb->h; } // The bottom-most end Y coordinate of this object, may be larger than hb if this has subcomponents
 		inline virtual bool isHovered() { return hb->isHovered(); }
 		inline virtual void onSizeUpdated() {}
 

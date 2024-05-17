@@ -64,7 +64,7 @@ export namespace fbc {
         return w;
     }
 
-    // Update all sizes and reload the font with the new size. Note that sizes will be scaled by renderScale and should not be multiplied by it beforehand.
+    // Update all sizes and reload the font with the new size. Note that sizes will be scaled by fontScale and should not be multiplied by it beforehand.
     FFont& FFont::setAllSizes(int size, int outlineSize, int shadowSize)
     {
         this->size = size;
@@ -74,21 +74,21 @@ export namespace fbc {
         return *this;
     }
 
-    // Update the font size and reload the font with the new size. Note that sizes will be scaled by renderScale and should not be multiplied by it beforehand.
+    // Update the font size and reload the font with the new size. Note that sizes will be scaled by fontScale and should not be multiplied by it beforehand.
     FFont& FFont::setOutlineSize(int size)
     {
         this->outlineSize = size;
         return *this;
     }
 
-    // Update the font size and reload the font with the new size. Note that sizes will be scaled by renderScale and should not be multiplied by it beforehand.
+    // Update the font size and reload the font with the new size. Note that sizes will be scaled by fontScale and should not be multiplied by it beforehand.
     FFont& FFont::setShadowSize(int size)
     {
         this->shadowSize = size;
         return *this;
     }
 
-    // Update the font size and reload the font with the new size. Note that sizes will be scaled by renderScale and should not be multiplied by it beforehand.
+    // Update the font size and reload the font with the new size. Note that sizes will be scaled by fontScale and should not be multiplied by it beforehand.
     FFont& FFont::setSize(int size)
     {
         this->size = size;
@@ -103,7 +103,7 @@ export namespace fbc {
         sdl::Surface* targetSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, color, w);
 
         if (outlineSize > 0) {
-            int res = cfg.renderScale(outlineSize);
+            int res = cfg.fontScale(outlineSize);
             sdl::fontOutlineSet(font, res);
             sdl::Surface* outlineSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, outlineColor, w);
             sdl::fontOutlineSet(font, 0);
@@ -115,7 +115,7 @@ export namespace fbc {
         }
 
         if (shadowSize > 0) {
-            int res = cfg.renderScale(shadowSize);
+            int res = cfg.fontScale(shadowSize);
             sdl::Surface* shadowSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, shadowColor, w);
             sdl::RectI targetRect = { -res, -res, targetSurf->w, targetSurf->h };
             sdl::surfaceBlit(targetSurf, nullptr, shadowSurf, &targetRect);
@@ -140,7 +140,7 @@ export namespace fbc {
     /* Refreshes the font to match its size */
     void FFont::reloadFont()
     {
-        int res = cfg.renderScale(size);
+        int res = cfg.fontScale(size);
         font = sdl::fontOpen(path.c_str(), res);
         if (font == nullptr) {
             sdl::logError("Failed to load font %s: %s", path.c_str(), sdl::getError());

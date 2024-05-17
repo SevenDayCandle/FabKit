@@ -45,8 +45,10 @@ export namespace fbc {
 		virtual UISearchableDropdown& setOnClose(func<void()> onClose) override;
 
 		virtual void onChangeItems() override;
+		virtual void onSizeUpdated() override;
 		virtual void openPopup() override;
 		virtual void renderImpl() override;
+		virtual void start() override;
 
 		static uptr<UISearchableDropdown> multiMenu(Hitbox* hb,
 			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
@@ -65,7 +67,7 @@ export namespace fbc {
 			IDrawable& image = cct.images.panel,
 			IDrawable* arrow = &cct.images.uiArrowSmall.get());
 	protected:
-		inline void updateCaretPos() override { caret.x = this->hb->x + cfg.renderScale(9) + this->font.measureW(buffer.substr(0, bufferPos)); }
+		void updateCaretPos() override;
 
 		virtual void onSelectionUpdate(vec<UIEntry<T>*>& items) override;
 	private:
@@ -92,12 +94,17 @@ export namespace fbc {
 		// TODO reserve text space equal to max entry length, or the length of the text on the first entry
 	}
 
+	template<typename T> void UISearchableDropdown<T>::onSizeUpdated()
+	{
+		UIDropdown<T>::onSizeUpdated();
+		this->initCaret(this->font, this->hb->x, this->hb->y);
+	}
+
 	// Whenever this dropdown is open, the text input buffer should be active
 	template<typename T> void UISearchableDropdown<T>::openPopup()
 	{
 		UIDropdown<T>::openPopup();
-		sdl::keyboardInputStart(this);
-		this->updateCache(buffer, sdl::COLOR_LIME);
+		this->start();
 	}
 
 	template<typename T>void UISearchableDropdown<T>::renderImpl()
@@ -110,6 +117,12 @@ export namespace fbc {
 		else {
 			UIDropdown<T>::renderImpl();
 		}
+	}
+
+	template<typename T> void UISearchableDropdown<T>::start()
+	{
+		ITextInputter::start();
+		this->updateCache(buffer, sdl::COLOR_LIME);
 	}
 
 	// Directly set the textInfo text to avoid updating the display textureCache and hiding your text input
@@ -158,6 +171,12 @@ export namespace fbc {
 		lowerBuffer.clear();
 		this->menu->refilterRows();
 		this->updateCache();
+	}
+
+	template<typename T> void UISearchableDropdown<T>::updateCaretPos()
+	{
+		caret.x = this->hb->x + cfg.renderScale(9) + this->font.measureW(buffer.substr(0, bufferPos));
+		caret.y = this->hb->y;
 	}
 
 	template<typename T> uptr<UISearchableDropdown<T>> UISearchableDropdown<T>::multiMenu(

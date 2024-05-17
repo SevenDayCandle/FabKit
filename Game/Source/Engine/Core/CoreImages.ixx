@@ -16,6 +16,7 @@ export namespace fbc {
 	public:
 		CoreImages(BaseContent& cnt) : BaseImages(cnt) {}
 
+		const Cache<FTexture> uiArrowIncrement = cacheTexture("UI/Arrow_Increment.png");
 		const Cache<FTexture> uiArrowLarge = cacheTexture("UI/Arrow_Large.png");
 		const Cache<FTexture> uiArrowSmall = cacheTexture("UI/Arrow_Small.png");
 		const Cache<FTexture> uiCheckboxEmpty = cacheTexture("UI/Checkbox_Empty.png");

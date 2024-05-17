@@ -68,12 +68,12 @@ export namespace fbc {
 		if (elements.size() > 1) {
 			UIBase& last = *elements[elements.size() - 2];
 			Hitbox& lhb = *(last.hb);
-			float xPos = lhb.x + lhb.w + scaled;
+			float xPos = last.getEndX() + scaled;
 			float yPos = lhb.y;
 
 			if (xPos > hb->x + hb->w) {
 				xPos = hb->x;
-				yPos = lhb.y + lhb.h + scaled;
+				yPos = last.getEndY() + scaled;
 			}
 
 			ref.hb->setExactPos(xPos, yPos);
@@ -94,10 +94,10 @@ export namespace fbc {
 			UIBase& last = *elements[elements.size() - 2];
 			Hitbox& lhb = *(last.hb);
 			float xPos = lhb.x;
-			float yPos = lhb.y + lhb.h + scaled;
+			float yPos = last.getEndY() + scaled;
 
 			if (yPos > hb->y + hb->h) {
-				xPos = lhb.x + lhb.w + scaled;
+				xPos = last.getEndX() + scaled;
 				yPos = hb->y;
 			}
 

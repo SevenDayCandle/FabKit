@@ -14,9 +14,10 @@ export namespace fbc {
 		ITextInputter() {}
 		virtual ~ITextInputter() {}
 
-		void releaseBuffer();
 		virtual void onKeyPress(int32_t c) override;
 		virtual void onTextInput(char* text) override;
+		void releaseBuffer();
+		virtual void start();
 
 	protected:
 		int bufferPos = 0;
@@ -35,9 +36,13 @@ export namespace fbc {
 	void ITextInputter::releaseBuffer()
 	{
 		resetBuffer();
+		sdl::keyboardInputStopRequest(this);
+	}
+
+	void ITextInputter::start() {
+		sdl::keyboardInputStart(this);
 		bufferPos = buffer.size();
 		updateCaretPos();
-		sdl::keyboardInputStopRequest(this);
 	}
 
 	void ITextInputter::onKeyPress(int32_t c)

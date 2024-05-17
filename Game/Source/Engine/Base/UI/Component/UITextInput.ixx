@@ -31,15 +31,16 @@ export namespace fbc {
 		void commit(strv text);
 		virtual void onSizeUpdated() override;
 		virtual void renderImpl() override;
+		virtual void start() override;
 		virtual void updateImpl() override;
 	protected:
 		inline virtual int getLimitWidth() override { return this->hb->w; }
-		inline void updateCaretPos() override { caret.x = this->hb->x + cfg.renderScale(9) + this->font.measureW(buffer.substr(0, bufferPos)); }
 
 		void clickLeftEvent() override;
 		void onBufferUpdated() override;
 		void onKeyPress(int32_t c) override;
 		void resetBuffer() override;
+		void updateCaretPos() override;
 	private:
 		func<void(strv)> onBufferUpdateCallback;
 		func<void(strv)> onComplete;
@@ -57,6 +58,7 @@ export namespace fbc {
 	void UITextInput::onSizeUpdated()
 	{
 		TextInfo::setPos(cfg.renderScale(24), this->hb->h * 0.25f);
+		initCaret(this->font, this->hb->x, this->hb->y);
 	}
 
 	void UITextInput::renderImpl()
@@ -66,6 +68,13 @@ export namespace fbc {
 		if (sdl::keyboardInputActive(this)) {
 			renderCaret();
 		}
+	}
+
+	void UITextInput::start() 
+	{
+		buffer = getText();
+		ITextInputter::start();
+		this->updateCache(buffer, sdl::COLOR_LIME);
 	}
 
 	// When clicking outside of the text input, commit whatever is in the input
@@ -87,12 +96,17 @@ export namespace fbc {
 		}
 	}
 
+	void UITextInput::updateCaretPos()
+	{
+		caret.x = this->hb->x + cfg.renderScale(9) + this->font.measureW(buffer.substr(0, bufferPos));
+		caret.y = this->hb->y;
+	}
+
 	// When clicked while not focused, start the text input
 	void UITextInput::clickLeftEvent()
 	{
 		if (!sdl::keyboardInputActive()) {
-			sdl::keyboardInputStart(this);
-			this->updateCache(buffer, sdl::COLOR_LIME);
+			start();
 		}
 	}
 

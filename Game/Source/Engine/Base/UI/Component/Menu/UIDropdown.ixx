@@ -40,7 +40,6 @@ export namespace fbc {
 		virtual ~UIDropdown() override{}
 
 		uptr<UIMenu<T>> menu;
-		IDrawable* arrow;
 
 		inline void clearItems() { menu->clearItems(); }
 		inline bool isOpen() { return menu->isOpen(); }
@@ -86,6 +85,7 @@ export namespace fbc {
 			IDrawable* arrow = &cct.images.uiArrowSmall.get());
 	protected:
 		str getButtonText(vec<UIEntry<T>*>& items);
+		IDrawable* arrow;
 
 		virtual void clickLeftEvent() override;
 		virtual inline void onChangeItems() {}
@@ -101,8 +101,7 @@ export namespace fbc {
 		this->menu->refreshHb();
 	}
 
-	template<typename T>
-	void UIDropdown<T>::onSizeUpdated()
+	template<typename T> void UIDropdown<T>::onSizeUpdated()
 	{
 		TextInfo::setPos(cfg.renderScale(24), hb->h * 0.25f);
 	}
@@ -123,7 +122,7 @@ export namespace fbc {
 		UIInteractable::renderImpl();
 		if (arrow) {
 			float w = arrow->getWidth();
-			sdl::RectF arrowRect = { hb->x + hb->w - w * 1.5f, hb->y + hb->h * 0.25f, w, arrow->getHeight()};
+			sdl::RectF arrowRect = { hb->x + hb->w - w * 1.4f, hb->y + hb->h * 0.25f, w, arrow->getHeight()};
 			arrow->draw(&arrowRect, UIImage::color, origin, rotation, menu->isOpen() ? sdl::FlipMode::SDL_FLIP_VERTICAL : flip);
 		}
 		TextInfo::drawText(hb->x, hb->y);

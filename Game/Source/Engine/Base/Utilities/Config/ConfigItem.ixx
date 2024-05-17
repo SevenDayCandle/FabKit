@@ -31,8 +31,7 @@ export namespace fbc {
     };
 
     // Convert a string input into the value for this config item
-    template<typename T>
-    T ConfigItem<T>::parseValue(const str& input)
+    template<typename T> T ConfigItem<T>::parseValue(const str& input)
     {
         try {
             // TODO use glz::read_json when it is ready to use with modules
@@ -45,8 +44,7 @@ export namespace fbc {
     }
 
     // Reset this config's values to whatever is in the config file
-    template<typename T>
-    void ConfigItem<T>::reload() {
+    template<typename T> void ConfigItem<T>::reload() {
         this->value = parseValue(config.getValue(ID));
     }
 

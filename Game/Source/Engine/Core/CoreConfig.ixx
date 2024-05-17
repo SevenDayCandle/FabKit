@@ -30,6 +30,7 @@ export namespace fbc {
 		ConfigItem<int> soundVolumeMusic = ConfigItem<int>(*this, "SoundVolumeMusic", 100);
 		ConfigItem<str> textFont = ConfigItem<str>(*this, "TextFont", FONT_REGULAR);
 		ConfigItem<str> textFontBold = ConfigItem<str>(*this, "TextFont", FONT_BOLD);
+		ConfigItem<int> textFontScale = ConfigItem<int>(*this, "SoundVolumeMusic", 1);
 		ConfigItem<bool> textIcons = ConfigItem<bool>(*this, "TextIcons", false);
 		ConfigItem<str> textLanguage = ConfigItem<str>(*this, "TextIcons", lang::ENG);
 
@@ -41,6 +42,8 @@ export namespace fbc {
 
 		inline int getScreenXSize() { return graphicsResolutionX.get(); }
 		inline int getScreenYSize() { return graphicsResolutionY.get(); };
+		inline float fontScale() const noexcept { return fontScalePrivate; } // Gets the scale factor to resize fonts by. Resolution uses the height of a 4k screen as a base
+		inline float fontScale(float mult) const noexcept { return fontScalePrivate * mult; } // Multiplies the constant by the screen scale factor. ONLY USE THIS when you need to modify offsets within methods by some constant factor or by a size variable in a class, and NOT when initializing sizes on UI components.
 		inline float renderScale() const noexcept { return renderScalePrivate; } // Gets the scale factor to resize elements by. Resolution uses the height of a 4k screen as a base
 		inline float renderScale(float mult) const noexcept { return renderScalePrivate * mult; } // Multiplies the constant by the screen scale factor. ONLY USE THIS when you need to modify offsets within methods by some constant factor or by a size variable in a class, and NOT when initializing sizes on UI components.
 
@@ -50,6 +53,7 @@ export namespace fbc {
 		void resizeWindow();
 		void setupWindow();
 	private:
+		float fontScalePrivate = 1.0;
 		float renderScalePrivate = 1.0;
 	};
 
@@ -69,13 +73,14 @@ export namespace fbc {
 	void CoreConfig::postInitialize() {
 		// Resolution uses the height of a 4k screen as a base
 		renderScalePrivate = graphicsResolutionY.get() / BASE_DENOMINATOR;
+		fontScalePrivate = renderScalePrivate * textFontScale.get();
 	}
 
 	// When the window size parameters change, we should resize the window and update renderScalePrivate
 	void CoreConfig::resizeWindow()
 	{
 		sdl::windowSetSize(graphicsResolutionX.get(), graphicsResolutionY.get());
-		renderScalePrivate = graphicsResolutionY.get() / BASE_DENOMINATOR;
+		postInitialize();
 	}
 
 	// Update the window from the config
