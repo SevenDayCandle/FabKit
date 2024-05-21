@@ -25,6 +25,7 @@ export namespace fbc {
 		sdl::FontRender caret;
 
 		void initCaret(FFont& font, float x, float y);
+		void movePosForCoords(float x, float y);
 		void renderCaret() const;
 
 		virtual void onBufferUpdated() = 0;

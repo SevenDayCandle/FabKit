@@ -10,6 +10,7 @@ import fbc.ScreenManager;
 import fbc.UIButton;
 import fbc.UIGrid;
 import fbc.UISearchableDropdown;
+import fbc.UISlider;
 import fbc.UIEntry;
 import fbc.UIMenu;
 import fbc.UINumberInput;
@@ -52,6 +53,8 @@ export namespace fbc {
 			buttonGrid.addItem(std::make_unique<UITextButton>(new RelativeHitbox(*hb, 100, 100), cct.images.panel, cct.fontRegular(), "D"));
 
 			UINumberInput& ee = stackElementYDir(std::make_unique<UINumberInput>(new RelativeHitbox(*hb,400, 100)));
+
+			UISlider& ree = stackElementYDir(std::make_unique<UISlider>(new RelativeHitbox(*hb, 200, 100)));
 		}
 	};
 }

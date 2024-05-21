@@ -188,15 +188,15 @@
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\UI\Component\UINumberInput.ixx">
+    <ClCompile Include="Source\Engine\Base\UI\Component\Input\UINumberInput.ixx">
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\UI\Component\Scroll\UISlider.ixx">
+    <ClCompile Include="Source\Engine\Base\UI\Component\Input\UISlider.ixx">
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\UI\Component\UITextInput.ixx">
+    <ClCompile Include="Source\Engine\Base\UI\Component\Input\UITextInput.ixx">
       <SubType>
       </SubType>
     </ClCompile>

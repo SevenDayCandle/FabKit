@@ -6,6 +6,7 @@ import fbc.FFont;
 import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.IDrawable;
+import fbc.IOverlay;
 import fbc.ScreenManager;
 import fbc.TextInfo;
 import fbc.UIEntry;
@@ -22,19 +23,21 @@ export namespace fbc {
 		UIDropdown(Hitbox* hb, 
 			UIMenu<T>* menu, 
 			IDrawable& image = cct.images.panel,
-			IDrawable* arrow = &cct.images.uiArrowSmall.get(),
+			IDrawable& arrow = cct.images.uiArrowSmall.get(),
+			IDrawable& clear = cct.images.uiClearSmall.get(),
 			FFont& textFont = cct.fontRegular(),
 			func<str(vec<UIEntry<T>*>&)> buttonLabelFunc = {}
-		): UIInteractable(hb, image), TextInfo(textFont), menu(menu), buttonLabelFunc(buttonLabelFunc), arrow(arrow) {
+		): UIInteractable(hb, image), TextInfo(textFont), menu(menu), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
 			init();
 		}
 		UIDropdown(Hitbox* hb,
 			uptr<UIMenu<T>> menu,
 			IDrawable& image = cct.images.panel,
-			IDrawable* arrow = &cct.images.uiArrowSmall.get(),
+			IDrawable& arrow = cct.images.uiArrowSmall.get(),
+			IDrawable& clear = cct.images.uiClearSmall.get(),
 			FFont& textFont = cct.fontRegular(),
 			func<str(vec<UIEntry<T>*>&)> buttonLabelFunc = {}
-		): UIInteractable(hb, image), TextInfo(textFont), menu(std::move(menu)), buttonLabelFunc(buttonLabelFunc), arrow(arrow) {
+		): UIInteractable(hb, image), TextInfo(textFont), menu(std::move(menu)), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
 			init();
 		}
 		virtual ~UIDropdown() override{}
@@ -42,19 +45,18 @@ export namespace fbc {
 		uptr<UIMenu<T>> menu;
 
 		inline void clearItems() { menu->clearItems(); }
-		inline bool isOpen() { return menu->isOpen(); }
+		inline bool isOpen() { return proxy != nullptr; }
 		inline int selectedSize() const { return menu->selectedSize(); }
 		inline UIDropdown& setEntryFunc(func<UIEntry<T>*(UIMenu<T>&, T&, str&, int)> entryFunc) { return menu->setEntryFunc(entryFunc), *this; }
 		inline UIDropdown& setOnChange(func<void(vec<T*>&)> onChange) { return menu->setOnChange(onChange), * this; }
-		inline virtual UIDropdown& setOnClose(func<void()> onClose) { return menu->setOnClose(onClose), * this; }
-		inline UIDropdown& setOnOpen(func<void()> onOpen) { return menu->setOpen(onOpen), * this; }
+		inline virtual UIDropdown& setOnClose(func<void()> onClose) { return this->onClose = onClose, *this; }
+		inline UIDropdown& setOnOpen(func<void()> onOpen) { return this->onOpen = onOpen, *this; }
 		inline int size() { return menu->size(); }
 		inline UIDropdown& setItemFont(FFont& itemFont) { return menu->setItemFont(itemFont), * this; }
 		inline UIDropdown& setMaxRows(int rows) { return menu->setMaxRows(rows), * this; }
 		inline vec<T*> getAllItems() { return menu->getAllItems(); }
 		inline vec<T*> getSelectedItems() { return menu->getSelectedItems(); }
 		inline void clearSelection() { menu->clearSelection(); }
-		inline void forceClosePopup() { menu->forceClosePopup(); }
 		template <c_itr<int> Iterable> inline void selectIndices(Iterable& indices) { return menu->selectIndices(indices), *this; }
 		template <c_itr<T> Iterable> inline void selectSelection(Iterable& items) { return menu->selectSelection(items), *this; }
 		template <c_itr<int> Iterable> inline void updateIndices(Iterable& indices) { return menu->updateIndices(indices), *this; }
@@ -62,10 +64,13 @@ export namespace fbc {
 
 		template <c_itr<T> Iterable> UIDropdown& addItems(const Iterable& items);
 		template <c_itr<T> Iterable> UIDropdown& setItems(const Iterable& items);
-		void refreshHb() override;
+		void forceClosePopup();
 		virtual void onSizeUpdated() override;
 		virtual void openPopup();
+		virtual void refreshHb() override;
 		virtual void renderImpl() override;
+		virtual void updateImpl() override;
+		virtual void unsetProxy();
 
 		static uptr<UIDropdown> multiMenu(Hitbox* hb, 
 			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
@@ -74,7 +79,8 @@ export namespace fbc {
 			FFont& textFont = cct.fontRegular(),
 			IDrawable& background = cct.images.hoverPanel,
 			IDrawable& image = cct.images.panel,
-			IDrawable* arrow = &cct.images.uiArrowSmall.get());
+			IDrawable& arrow = cct.images.uiArrowSmall.get(),
+			IDrawable& clear = cct.images.uiClearSmall.get());
 		static uptr<UIDropdown> singleMenu(Hitbox* hb, 
 			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
 			func<str(vec<UIEntry<T>*>&)> buttonLabelFunc = {},
@@ -82,18 +88,39 @@ export namespace fbc {
 			FFont& textFont = cct.fontRegular(),
 			IDrawable& background = cct.images.hoverPanel,
 			IDrawable& image = cct.images.panel,
-			IDrawable* arrow = &cct.images.uiArrowSmall.get());
+			IDrawable& arrow = cct.images.uiArrowSmall.get(),
+			IDrawable& clear = cct.images.uiClearSmall.get());
 	protected:
-		str getButtonText(vec<UIEntry<T>*>& items);
-		IDrawable* arrow;
+		IDrawable& arrow;
+		IDrawable& clear;
+		sdl::RectF arrowRect;
 
+		str getButtonText(vec<UIEntry<T>*>& items);
 		virtual void clickLeftEvent() override;
 		virtual inline void onChangeItems() {}
 		virtual void onSelectionUpdate(vec<UIEntry<T>*>& items);
 	private:
 		func<str(vec<UIEntry<T>*>&)> buttonLabelFunc;
+		func<void()> onClose;
+		func<void()> onOpen;
+		IOverlay* proxy;
+
 		void init();
 	};
+
+	export template <typename T> class UIDropdownProxy : public IOverlay {
+	public:
+		UIDropdownProxy(UIDropdown<T>& menu) : dropdown(menu) {}
+		UIDropdown<T>& dropdown;
+
+		void close() override;
+		void render() override;
+		void update() override;
+	};
+
+	template<typename T> void UIDropdown<T>::forceClosePopup() {
+		if (proxy != nullptr) { screenManager::closeOverlay(proxy); }
+	}
 
 
 	template<typename T> void UIDropdown<T>::refreshHb() {
@@ -101,9 +128,17 @@ export namespace fbc {
 		this->menu->refreshHb();
 	}
 
+	template<typename T> void UIDropdown<T>::unsetProxy() {
+		proxy = nullptr;
+		if (onClose) {
+			onClose();
+		}
+	}
+
 	template<typename T> void UIDropdown<T>::onSizeUpdated()
 	{
 		TextInfo::setPos(cfg.renderScale(24), hb->h * 0.25f);
+		arrowRect.w = arrowRect.h = hb->h * 0.5f;
 	}
 
 	// When opened, move the menu directly below this button, unless there isn't enough room (in which case it should appear above this button)
@@ -115,17 +150,30 @@ export namespace fbc {
 		else {
 			menu->hb->move(hb->x, bottom);
 		}
-		menu->openPopup();
+		if (proxy == nullptr) {
+			screenManager::openOverlay(std::make_unique<UIDropdownProxy<T>>(*this));
+			proxy = screenManager::getActiveOverlay();
+			if (onOpen) {
+				onOpen();
+			}
+		}
 	}
 
 	template<typename T> void UIDropdown<T>::renderImpl() {
 		UIInteractable::renderImpl();
-		if (arrow) {
-			float w = arrow->getWidth();
-			sdl::RectF arrowRect = { hb->x + hb->w - w * 1.4f, hb->y + hb->h * 0.25f, w, arrow->getHeight()};
-			arrow->draw(&arrowRect, UIImage::color, origin, rotation, menu->isOpen() ? sdl::FlipMode::SDL_FLIP_VERTICAL : flip);
+		if (this->selectedSize() > 0) {
+			clear.draw(&arrowRect, UIImage::color, origin, rotation);
+		}
+		else {
+			arrow.draw(&arrowRect, UIImage::color, origin, rotation, menu->isOpen() ? sdl::FlipMode::SDL_FLIP_VERTICAL : flip);
 		}
 		TextInfo::drawText(hb->x, hb->y);
+	}
+
+	template<typename T> void UIDropdown<T>::updateImpl() {
+		UIInteractable::updateImpl();
+		arrowRect.x = hb->x + hb->w - arrowRect.w * 1.5f;
+		arrowRect.y = hb->y + hb->h * 0.25f;
 	}
 
 	// Updates the text shown on the button by default, this may be overriden in derivative types
@@ -140,26 +188,28 @@ export namespace fbc {
 	}
 
 	template<typename T> uptr<UIDropdown<T>> UIDropdown<T>::multiMenu(
-		Hitbox* hb, func<str(const T&)> labelFunc, func<str(vec<UIEntry<T>*>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable* arrow)
+		Hitbox* hb, func<str(const T&)> labelFunc, func<str(vec<UIEntry<T>*>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
 	{
 		return std::make_unique<UIDropdown<T>>(
 			hb,
 			UIMenu<T>::multiMenu(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), labelFunc, itemFont, background),
 			image,
 			arrow,
+			clear,
 			textFont,
 			buttonLabelFunc
 		);
 	}
 
 	template<typename T> uptr<UIDropdown<T>> UIDropdown<T>::singleMenu(
-		Hitbox* hb, func<str(const T&)> labelFunc, func<str(vec<UIEntry<T>*>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable* arrow)
+		Hitbox* hb, func<str(const T&)> labelFunc, func<str(vec<UIEntry<T>*>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
 	{
 		return std::make_unique<UIDropdown<T>>(
 			hb,
 			UIMenu<T>::singleMenu(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), labelFunc, itemFont, background),
 			image,
 			arrow,
+			clear,
 			textFont,
 			buttonLabelFunc
 		);
@@ -185,7 +235,10 @@ export namespace fbc {
 
 	// When clicked, open the menu if closed. Otherwise, close the menu
 	template<typename T> void UIDropdown<T>::clickLeftEvent() {
-		if (menu->isOpen()) {
+		if (this->selectedSize() > 0 && sdl::mouseGetX() >= arrowRect.x) {
+			clearSelection();
+		}
+		else if (isOpen()) {
 			menu->forceClosePopup();
 		}
 		else {
@@ -205,6 +258,24 @@ export namespace fbc {
 		this->menu->setItems(items);
 		onChangeItems();
 		return *this;
+	}
+
+	/*
+	 * UIDropdownProxy Implementations
+	 */
+
+	// When closed, unlink this from its menu
+	template <typename T> void UIDropdownProxy<T>::close() { dropdown.unsetProxy(); }
+
+	template<typename T> void UIDropdownProxy<T>::render() {
+		dropdown.menu->renderImpl();
+	}
+
+	// Close the menu if the user clicks outside the menu
+	template <typename T> void UIDropdownProxy<T>::update() {
+		dropdown.updateImpl();
+		dropdown.menu->updateImpl();
+		if ((sdl::mouseIsLeftJustClicked() && !dropdown.menu->isHovered() && !dropdown.isHovered()) || sdl::keyboardJustPressedEsc()) { screenManager::closeOverlay(this); }
 	}
 
 }

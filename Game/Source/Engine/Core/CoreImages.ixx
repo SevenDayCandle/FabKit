@@ -21,6 +21,8 @@ export namespace fbc {
 		const Cache<FTexture> uiArrowSmall = cacheTexture("UI/Arrow_Small.png");
 		const Cache<FTexture> uiCheckboxEmpty = cacheTexture("UI/Checkbox_Empty.png");
 		const Cache<FTexture> uiCheckboxFilled = cacheTexture("UI/Checkbox_Filled.png");
+		const Cache<FTexture> uiClearLarge = cacheTexture("UI/Clear_Large.png");
+		const Cache<FTexture> uiClearSmall = cacheTexture("UI/Clear_Small.png");
 		const Cache<FTexture> uiHoverPanelBase = cacheTexture("UI/HoverPanelBase.png");
 		const Cache<FTexture> uiLargePanelBase = cacheTexture("UI/LargePanelBase.png");
 		const Cache<FTexture> uiLightPanelBase = cacheTexture("UI/LightPanelBase.png");

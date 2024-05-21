@@ -31,12 +31,15 @@ export namespace fbc {
 		inline UINumberInput& setOnBufferUpdate(func<void(int)> onBufferUpdateCallback) { return this->onBufferUpdateCallback = onBufferUpdateCallback, *this; }
 		inline UINumberInput& setOnComplete(func<void(int)> onComplete) { return this->onComplete = onComplete, *this; }
 
-		void commit(int num);
+		virtual void commit(int num);
 		virtual void onSizeUpdated() override;
 		virtual void renderImpl() override;
 		virtual void start() override;
 		virtual void updateImpl() override;
 	protected:
+		int limMax = std::numeric_limits<int>::max();
+		int limMin = 0;
+
 		inline virtual int getLimitWidth() override { return this->hb->w; }
 
 		void clickLeftEvent() override;
@@ -52,8 +55,6 @@ export namespace fbc {
 		sdl::RectF lessRect;
 		sdl::RectF moreRect;
 		int interval = 1;
-		int limMax = std::numeric_limits<int>::max();
-		int limMin = 0;
 		int val = 0;
 		int valTemp = 0;
 

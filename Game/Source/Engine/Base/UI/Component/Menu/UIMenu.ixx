@@ -463,7 +463,7 @@ export namespace fbc {
 	}
 
 	/*
-	 * UIMenu Implementations
+	 * UIMenuProxy Implementations
 	 */
 
 	// When closed, unlink this from its menu
