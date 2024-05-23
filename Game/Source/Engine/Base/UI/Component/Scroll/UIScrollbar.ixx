@@ -18,9 +18,9 @@ export namespace fbc {
 		inline float getScroll() const { return scrollPercent; }
 		inline UIScrollbar& setOnScroll(const func<void(float)>& onScroll) { return this->onScroll = onScroll, *this; }
 
+		virtual void refreshHb() override;
 		virtual void renderImpl() override;
 		virtual void updateImpl() override;
-
 		void scroll(float percent);
 		void setScrollPos(float percent);
 		virtual float toPercentage(float x, float y) = 0;
@@ -36,6 +36,12 @@ export namespace fbc {
 		float scrollPercent;
 		func<void(float)> onScroll;
 	};
+
+	void UIScrollbar::refreshHb()
+	{
+		UIBase::refreshHb();
+		updateDropzoneSize(dropzone.h / hb->h);
+	}
 
 	void UIScrollbar::renderImpl() {
 		imageBar.draw(hb.get());
@@ -53,11 +59,11 @@ export namespace fbc {
 	void UIScrollbar::setScrollPos(float percent)
 	{
 		scrollPercent = std::clamp(percent, 0.0f, 1.0f);
-		updateDropzonePos(scrollPercent);
 	}
 
 	void UIScrollbar::updateImpl() {
 		UIBase::updateImpl();
+		updateDropzonePos(scrollPercent);
 
 		if (hb->isHovered() && sdl::mouseIsLeftJustClicked()) {
 			screenManager::activeElement = this;

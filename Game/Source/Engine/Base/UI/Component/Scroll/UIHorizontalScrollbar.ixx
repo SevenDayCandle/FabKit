@@ -28,13 +28,12 @@ export namespace fbc {
 	void UIHorizontalScrollbar::updateDropzonePos(float percent)
 	{
 		dropzone.x = hb->x + percent * actualRange;
+		dropzone.y = hb->y;
 	}
 
 	void UIHorizontalScrollbar::updateDropzoneSize(float percent)
 	{
-		dropzone.x = hb->x;
 		dropzone.w = hb->w * percent;
-		dropzone.y = hb->y;
 		dropzone.h = hb->h;
 		actualRange = hb->w - dropzone.w;
 	}
