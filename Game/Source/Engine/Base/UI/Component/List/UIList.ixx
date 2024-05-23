@@ -59,12 +59,9 @@ export namespace fbc {
 		inline static float rMargin() { return cfg.renderScale(MARGIN); }
 
 		virtual void makeRow(T item);
-
-		virtual void syncRowsForRender() = 0;
-		virtual void updateForSelection() = 0;
-
 	private:
-		void autosize();
+		virtual void autosize();
+		virtual void rowsChangedEvent();
 		virtual void updateRowPositions();
 	};
 
@@ -75,9 +72,7 @@ export namespace fbc {
 	// Create rows for each item in the provided list
 	template <typename T> template <c_itr<T> Iterable> UIList<T>& UIList<T>::addItems(Iterable& items) {
 		for (const T item : items) { makeRow(item); }
-		syncRowsForRender();
-		autosize();
-		updateForSelection();
+		rowsChangedEvent();
 		return *this;
 	}
 
@@ -184,6 +179,11 @@ export namespace fbc {
 		}
 
 		updateRowPositions();
+	}
+
+	// Triggers whenever the available rows are changed
+	template<typename T> void UIList<T>::rowsChangedEvent() {
+		autosize();
 	}
 
 	// Whenever the scrollbar position is changed or items are changed, we need to update the positions of each row

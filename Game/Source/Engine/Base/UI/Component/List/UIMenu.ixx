@@ -31,7 +31,6 @@ export namespace fbc {
 
 		~UIMenu() override {}
 
-		inline void clearItems() { setItems(); }
 		inline bool isOpen() const { return proxy != nullptr; }
 		inline UIMenu& setFilterFunc(func<bool(UIEntry<T>*)> filterFunc) { return this->filterFunc = filterFunc, *this; }
 		inline UIMenu& setItemFont(FFont& itemFont) { return UIList<T>::setItemFont(itemFont), * this; }
@@ -40,14 +39,10 @@ export namespace fbc {
 		inline UIMenu& setOnChange(func<void(vec<T*>)> onChange) { return this->onChange = onChange, *this; }
 		inline UIMenu& setOnClose(func<void()> onClose) { return this->onClose = onClose, *this; }
 		inline UIMenu& setOnOpen(func<void()> onOpen) { return this->onOpen = onOpen, *this; }
-		inline UIMenu& setOnSelectionUpdate(func<void(vec<UIEntry<T>*>&)> onSelectionUpdate) {
-			return this->onSelectionUpdate = onSelectionUpdate, *this;
-		}
+		inline UIMenu& setOnSelectionUpdate(func<void(vec<UIEntry<T>*>&)> onSelectionUpdate) {return this->onSelectionUpdate = onSelectionUpdate, *this;}
 
 		inline int selectedSize() const { return currentIndices.size(); }
 
-		template <c_itr<T> Iterable> UIMenu& addItems(Iterable& items);
-		template <c_itr<T> Iterable> UIMenu& setItems(Iterable& items);
 		UIMenu& setSelectionLimit(int rows);
 		vec<T*> getSelectedItems();
 		void clearSelection();
@@ -57,7 +52,7 @@ export namespace fbc {
 		void refreshHb() override;
 		void renderImpl() override;
 		template <c_itr<int> Iterable> void selectIndices(Iterable& indices);
-		template <c_itr<T> Iterable> void selectSelection(Iterable& items);
+		template <c_itr<T&> Iterable> void selectSelection(Iterable& items);
 		void selectRow(UIEntry<T>& entry) override;
 		void unsetProxy();
 		void updateImpl() override;
@@ -87,6 +82,7 @@ export namespace fbc {
 		void autosize();
 		void changeEvent();
 		void onScroll(float percent);
+		void rowsChangedEvent();
 		void syncRowsForRender();
 		void updateForSelection();
 		void updateRowPositions();
@@ -103,26 +99,6 @@ export namespace fbc {
 		void update() override;
 	};
 
-
-	// Create rows for each item in the provided list
-	template <typename T> template <c_itr<T> Iterable>
-	UIMenu<T>& UIMenu<T>::addItems(Iterable& items) {
-		for (const T item : items) { this->makeRow(item); }
-		syncRowsForRender();
-		autosize();
-		updateForSelection();
-		return *this;
-	}
-
-	// Replaces the current rows with rows for each item in the provided list. Clears any selections in the process, but does NOT invoke the change callback.
-	template <typename T> template <c_itr<T> Iterable>
-	UIMenu<T>& UIMenu<T>::setItems(Iterable& items) {
-		currentIndices.clear();
-		this->rows.clear();
-		this->topVisibleRowIndex = 0;
-		return addItems(items);
-	}
-
 	// Updates the selected indexes. DOES invoke the change callback.
 	template <typename T> template <c_itr<int> Iterable> void UIMenu<T>::selectIndices(Iterable& indices) {
 		updateIndices(indices);
@@ -130,7 +106,7 @@ export namespace fbc {
 	}
 
 	// Updates the selected indexes based on the given items. DOES invoke the change callback.
-	template <typename T> template <c_itr<T> Iterable> void UIMenu<T>::selectSelection(Iterable& items) {
+	template <typename T> template <c_itr<T&> Iterable> void UIMenu<T>::selectSelection(Iterable& items) {
 		updateSelection(items);
 		changeEvent();
 	}
@@ -201,11 +177,8 @@ export namespace fbc {
 
 	// Updates the dimensions of all children too
 	template<typename T> void UIMenu<T>::refreshHb() {
-		UIBase::refreshHb();
+		UIList<T>::refreshHb();
 		scrollbar.refreshHb();
-		for (const uptr<UIEntry<T>>& row : this->rows) {
-			row->refreshHb();
-		}
 	}
 
 	// Render all visible rows and the scrollbar if it is shown
@@ -328,6 +301,14 @@ export namespace fbc {
 			this->topVisibleRowIndex = newIndex;
 			updateRowPositions();
 		}
+	}
+
+	// When the rows are changed, reposition the rows and sort them, and clear out your current selection because it will likely no longer be valid
+	template<typename T> void UIMenu<T>::rowsChangedEvent() {
+		currentIndices.clear();
+		syncRowsForRender();
+		autosize();
+		updateForSelection();
 	}
 
 	// Hook used to update dropdowns to update their display strings
