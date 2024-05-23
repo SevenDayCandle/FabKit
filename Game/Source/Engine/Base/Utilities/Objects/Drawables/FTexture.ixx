@@ -27,7 +27,7 @@ export namespace fbc {
             }
         }
 
-        inline sdl::RectF* getBaseRec() override { return &dim; }
+        inline const sdl::RectF* getBaseRec() override { return &dim; }
         inline float getHeight() override { return dim.h; }
         inline float getWidth() override { return dim.w; }
 

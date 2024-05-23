@@ -6,6 +6,7 @@ import fbc.FFont;
 import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.IDrawable;
+import fbc.ILabeled;
 import fbc.IOverlay;
 import fbc.ScreenManager;
 import fbc.TextInfo;
@@ -17,7 +18,7 @@ import sdl;
 import std;
 
 export namespace fbc {
-	export template <typename T> class UIDropdown : public UIInteractable, public TextInfo {
+	export template <typename T> class UIDropdown : public UIInteractable, public TextInfo, public ILabeled {
 	public:
 
 		UIDropdown(Hitbox* hb, 
@@ -160,6 +161,10 @@ export namespace fbc {
 	}
 
 	template<typename T> void UIDropdown<T>::renderImpl() {
+		if (label) {
+			label->drawText(hb->x, hb->y);
+		}
+
 		UIInteractable::renderImpl();
 		if (this->selectedSize() > 0) {
 			clear.draw(&arrowRect, UIImage::color, origin, rotation);

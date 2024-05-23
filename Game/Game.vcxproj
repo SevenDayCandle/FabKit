@@ -168,6 +168,10 @@
     </ClCompile>
     <ClCompile Include="Source\Engine\Base\Content\BaseImages.ixx" />
     <ClCompile Include="Source\Engine\Base\Content\BaseStrings.ixx" />
+    <ClCompile Include="Source\Engine\Base\UI\Component\Menu\UIList.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Engine\Base\UI\Component\Menu\UISearchableDropdown.ixx">
       <SubType>
       </SubType>
@@ -217,6 +221,10 @@
       </SubType>
     </ClCompile>
     <ClCompile Include="Source\Engine\Base\Utilities\ISerializable.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\EmptyDrawable.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -355,11 +363,11 @@
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Source\Game\Screens\SetupScreen.ixx">
+    <ClCompile Include="Source\Game\UI\Screens\SetupScreen.ixx">
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Game\Screens\TitleScreen.ixx" />
+    <ClCompile Include="Source\Game\UI\Screens\TitleScreen.ixx" />
     <ClCompile Include="Source\Main.cpp">
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>

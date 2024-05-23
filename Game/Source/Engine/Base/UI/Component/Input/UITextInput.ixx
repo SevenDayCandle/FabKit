@@ -9,11 +9,12 @@ import fbc.UIInteractable;
 import fbc.TextInfo;
 import fbc.FUtil;
 import fbc.ITextInputter;
+import fbc.ILabeled;
 import sdl;
 import std;
 
 export namespace fbc {
-	export class UITextInput : public UIInteractable, public TextInfo, public ITextInputter {
+	export class UITextInput : public UIInteractable, public TextInfo, public ITextInputter, public ILabeled {
 	public:
 		UITextInput(Hitbox* hb, 
 			IDrawable& image = cct.images.panel,
@@ -63,6 +64,9 @@ export namespace fbc {
 
 	void UITextInput::renderImpl()
 	{
+		if (label) {
+			label->drawText(hb->x, hb->y);
+		}
 		UIInteractable::renderImpl();
 		TextInfo::drawText(hb->x, hb->y);
 		if (sdl::keyboardInputActive(this)) {

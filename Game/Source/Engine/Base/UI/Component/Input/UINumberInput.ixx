@@ -9,12 +9,13 @@ import fbc.UIButton;
 import fbc.UIInteractable;
 import fbc.TextInfo;
 import fbc.FUtil;
+import fbc.ILabeled;
 import fbc.ITextInputter;
 import sdl;
 import std;
 
 export namespace fbc {
-	export class UINumberInput : public UIInteractable, public TextInfo, public ITextInputter {
+	export class UINumberInput : public UIInteractable, public TextInfo, public ITextInputter, public ILabeled {
 	public:
 		UINumberInput(Hitbox* hb,
 			IDrawable& image = cct.images.panel,
@@ -80,6 +81,9 @@ export namespace fbc {
 
 	void UINumberInput::renderImpl()
 	{
+		if (label) {
+			label->drawText(hb->x, hb->y);
+		}
 		UIInteractable::renderImpl();
 		TextInfo::drawText(hb->x, hb->y);
 		arrow.draw(&lessRect);

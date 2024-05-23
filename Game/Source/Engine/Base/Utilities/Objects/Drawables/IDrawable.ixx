@@ -17,7 +17,7 @@ export namespace fbc {
 		void draw(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::BlendMode blend, const sdl::Color& tint, const sdl::Point& origin = { 0,0 }, float rotation = 0, sdl::FlipMode flip = sdl::FlipMode::SDL_FLIP_NONE);
 
 		virtual void drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) = 0;
-		virtual sdl::RectF* getBaseRec() = 0;
+		virtual const sdl::RectF* getBaseRec() = 0;
 		virtual float getHeight() = 0;
 		virtual float getWidth() = 0;
 		virtual void setDrawBlend(const sdl::BlendMode bl) = 0;

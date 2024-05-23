@@ -26,8 +26,6 @@ export namespace fbc {
 		SetupScreen(): UIVerticalCanvas(new ScreenSizeHitbox()) {
 			UITextButton& b = addElement(std::make_unique<UITextButton>(
 				new RelativeHitbox(*hb, 490, 200, 170, 150),
-				cct.images.panel,
-				cct.fontRegular(),
 				cct.strings.ui_close()));
 			b.setOnClick([](UIButton& i) {
 				screenManager::closeCurrentScreen();
@@ -35,10 +33,7 @@ export namespace fbc {
 
 			UIToggle& f = stackElementXDir(std::make_unique<UIToggle>(
 				new RelativeHitbox(*hb, 100, 100),
-				cct.strings.ui_confirm(),
-				cct.images.uiCheckboxEmpty,
-				cct.images.uiCheckboxFilled,
-				cct.fontRegular()
+				cct.strings.ui_confirm()
 				));
 
 			UISearchableDropdown<ref<Language>>& dr = stackElementXDir(UISearchableDropdown<ref<Language>>::multiMenu(new RelativeHitbox(*hb, 400, 100)));
@@ -47,14 +42,15 @@ export namespace fbc {
 			UITextInput& inp = stackElementYDir(std::make_unique<UITextInput>(new RelativeHitbox(*hb, 500, 1400, 500, 100)));
 
 			UIGrid<UITextButton>& buttonGrid = stackElementYDir(std::make_unique<UIGrid<UITextButton>>(new RelativeHitbox(*hb,300, 300)));
-			buttonGrid.addItem(std::make_unique<UITextButton>(new RelativeHitbox(*hb,100, 100), cct.images.panel, cct.fontRegular(), "A"));
-			buttonGrid.addItem(std::make_unique<UITextButton>(new RelativeHitbox(*hb, 100, 100), cct.images.panel, cct.fontRegular(), "B"));
-			buttonGrid.addItem(std::make_unique<UITextButton>(new RelativeHitbox(*hb, 100, 100), cct.images.panel, cct.fontRegular(), "C"));
-			buttonGrid.addItem(std::make_unique<UITextButton>(new RelativeHitbox(*hb, 100, 100), cct.images.panel, cct.fontRegular(), "D"));
+			buttonGrid.addItem(std::make_unique<UITextButton>(new RelativeHitbox(*hb,100, 100), "A"));
+			buttonGrid.addItem(std::make_unique<UITextButton>(new RelativeHitbox(*hb, 100, 100), "B"));
+			buttonGrid.addItem(std::make_unique<UITextButton>(new RelativeHitbox(*hb, 100, 100), "C"));
+			buttonGrid.addItem(std::make_unique<UITextButton>(new RelativeHitbox(*hb, 100, 100), "D"));
 
 			UINumberInput& ee = stackElementYDir(std::make_unique<UINumberInput>(new RelativeHitbox(*hb,400, 100)));
 
-			UISlider& ree = stackElementYDir(std::make_unique<UISlider>(new RelativeHitbox(*hb, 200, 100)));
+			UISlider& ree = stackElementYDir(std::make_unique<UISlider>(new RelativeHitbox(*hb, 200, 100)), 300);
+			ree.withLabel("Test");
 		}
 	};
 }

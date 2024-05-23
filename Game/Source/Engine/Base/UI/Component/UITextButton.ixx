@@ -1,5 +1,6 @@
 export module fbc.UITextButton;
 
+import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FUtil;
 import fbc.Hitbox;
@@ -13,6 +14,7 @@ export namespace fbc {
 		UITextButton(Hitbox* hb, IDrawable& image, FFont& f, strv text = "") : UIButton(hb, image), TextInfo(f, text) {
 			UITextButton::onSizeUpdated();
 		}
+		UITextButton(Hitbox* hb, strv text) : UITextButton(hb, cct.images.panel, cct.fontRegular(), text) {}
 		~UITextButton() override {}
 
 		virtual void onSizeUpdated() override;

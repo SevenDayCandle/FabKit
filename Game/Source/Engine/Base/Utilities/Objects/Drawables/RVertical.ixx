@@ -10,7 +10,7 @@ export namespace fbc {
 		RVertical(IDrawable& base) : base(base), patchSize(base.getHeight() / 2) {}
 		RVertical(IDrawable& base, float patchSize) : base(base), patchSize(patchSize) {}
 
-		inline sdl::RectF* getBaseRec() override { return base.getBaseRec(); }
+		inline const sdl::RectF* getBaseRec() override { return base.getBaseRec(); }
 		inline float getHeight() override { return base.getHeight(); }
 		inline float getWidth() override { return base.getWidth(); }
 
