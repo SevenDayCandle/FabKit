@@ -35,7 +35,8 @@ export namespace fbc {
     {
         try {
             // TODO use glz::read_json when it is ready to use with modules
-            return futil::fromString<T>(input);
+            size_t pos = 0;
+            return futil::fromString<T>(input, pos);
         }
         catch (const exception& e) {
             sdl::logError("Config item with ID %s failed to parse input %s: %s", ID, input, e);

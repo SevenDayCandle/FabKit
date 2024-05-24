@@ -19,12 +19,12 @@ export namespace fbc {
 		virtual ~CoreConfig() override {}
 
 		ConfigItem<int> gameActionSpeed = ConfigItem<int>(*this, "GameActionSpeed", 3);
-		ConfigItem<bool> graphicsVSync = ConfigItem<bool>(*this, "GraphicsVSync", true);
 		ConfigItem<int> graphicsFPS = ConfigItem<int>(*this, "GraphicsFPS", 144);
-		ConfigItem<int> graphicsWindowMode = ConfigItem<int>(*this, "GraphicsFPS", 0);
 		ConfigItem<bool> graphicsParticleEffects = ConfigItem<bool>(*this, "GraphicsParticleEffects", true);
 		ConfigItem<int> graphicsResolutionX = ConfigItem<int>(*this, "GraphicsResolutionX", 1920);
 		ConfigItem<int> graphicsResolutionY = ConfigItem<int>(*this, "GraphicsResolutionY", 1080);
+		ConfigItem<bool> graphicsVSync = ConfigItem<bool>(*this, "GraphicsVSync", true);
+		ConfigItem<int> graphicsWindowMode = ConfigItem<int>(*this, "GraphicsFPS", 0);
 		ConfigItem<int> soundVolumeEffects = ConfigItem<int>(*this, "SoundVolumeEffects", 100);
 		ConfigItem<int> soundVolumeMaster = ConfigItem<int>(*this, "SoundVolumeMaster", 100);
 		ConfigItem<int> soundVolumeMusic = ConfigItem<int>(*this, "SoundVolumeMusic", 100);
@@ -86,7 +86,7 @@ export namespace fbc {
 	// Update the window from the config
 	void CoreConfig::setupWindow() {
 		sdl::initWindow(graphicsResolutionX.get(), graphicsResolutionY.get(), graphicsWindowMode.get(), graphicsVSync.get());
-		graphicsResolutionX.addSubscriber([this](const int& val) {resizeWindow(); });
+		graphicsResolutionX.addSubscriber([this](const int& val) {resizeWindow(); }); // TODO unify X and Y subscribers to avoid resizing window twice
 		graphicsResolutionY.addSubscriber([this](const int& val) {resizeWindow(); });
 		graphicsWindowMode.addSubscriber([this](const int& val) {sdl::windowSetFullscreen(val); });
 		graphicsVSync.addSubscriber([this](const int& val) {sdl::updateVSync(val); });

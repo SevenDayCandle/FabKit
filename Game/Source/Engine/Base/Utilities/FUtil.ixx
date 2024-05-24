@@ -31,13 +31,13 @@ export namespace fbc {
 
 	// Const stuff, adapted from https://github.com/stephenberry/glaze
 	// TODO just use the glz module version once it is available
-	template <typename, template <typename...> typename> inline constexpr bool is_specialization_v = false;
-	template <template <typename...> typename T, typename... Args> inline constexpr bool is_specialization_v<T<Args...>, T> = true;
+	export template <typename, template <typename...> typename> inline constexpr bool is_specialization_v = false;
+	export template <template <typename...> typename T, typename... Args> inline constexpr bool is_specialization_v<T<Args...>, T> = true;
 
 	// Concepts
 	export template<typename T> concept c_enum = std::is_enum_v<T>;
 	export template<typename T, typename U> concept c_ext = std::is_base_of_v<U, T>;
-	export template<typename Func, typename T, typename U> concept c_inv = requires(Func f, T t) {
+	export template<typename Func, typename T, typename U> concept c_invc = requires(Func f, T t) {
 		{ f(t) } -> std::convertible_to<U>;
 	};
 	export template<typename It, typename T> concept c_itr = std::ranges::range<It> && std::same_as<std::ranges::range_value_t<It>, T>;
@@ -47,7 +47,7 @@ export namespace fbc {
 		typename T::mapped_type;
 			requires std::is_default_constructible_v<T>;
 	};
-	template<typename TCo, typename T, typename U> concept c_map_of = std::ranges::range<TCo> &&
+	export template<typename TCo, typename T, typename U> concept c_map_of = std::ranges::range<TCo> &&
 		requires {
 		typename TCo::key_type;
 		typename TCo::mapped_type;
@@ -55,6 +55,12 @@ export namespace fbc {
 			requires std::same_as<typename TCo::mapped_type, U>;
 	};
 	export template<typename T> concept c_num = std::is_arithmetic_v<T>;
+	export template<typename T> concept c_pair = requires(T t) {
+		typename std::pair<typename T::first_type, typename T::second_type>;
+	};
+	export template<typename T> concept c_push = requires(T t, typename T::value_type v) {
+		{ t.push_back(v) } -> std::same_as<void>;
+	};
 	export template<typename T> concept c_ref = is_specialization_v<T, std::reference_wrapper>;
 	export template<typename It, typename T> concept c_set = c_itr<T, It>&& requires(It a, T v) {
 		{ a.find(v) } -> std::convertible_to<typename It::iterator>;
@@ -63,15 +69,16 @@ export namespace fbc {
 	export template<typename T> concept c_str = requires(T t) {
 		std::string_view{ t };
 	};
+	export template<typename T> concept c_vec = is_specialization_v<T, std::vector>;
 }
 
 // Utility functions
 export namespace fbc::futil {
-	constexpr strv FBC = "fbc";
-	constexpr strv JSON_EXT = ".json";
-	constexpr strv MODS = "mods";
-	constexpr strv VAL_FALSE = "false";
-	constexpr strv VAL_TRUE = "true";
+	export constexpr strv FBC = "fbc";
+	export constexpr strv JSON_EXT = ".json";
+	export constexpr strv MODS = "mods";
+	export constexpr strv VAL_FALSE = "false";
+	export constexpr strv VAL_TRUE = "true";
 
 	// Wrapper function around std::all_of to check the entire container
 	export template <typename T, typename Pred> bool all(const T& container, Pred predicate) {
@@ -143,60 +150,7 @@ export namespace fbc::futil {
 		return std::nullopt;
 	}
 
-	// Attempt to parse a string into an object
-	// TODO handle iterables and maps
-	export template <typename T> T fromString(strv input) {
-		if constexpr (std::is_same_v<T, str>) {
-			return str(input);
-		}
-		else if constexpr (std::is_same_v<T, bool> ) {
-			str toLower = toLowerCase(input);
-			if (toLower == VAL_TRUE || toLower == "1") {
-				return true;
-			}
-			else if (toLower == VAL_FALSE || toLower == "0") {
-				return false;
-			}
-			else {
-				throw std::invalid_argument("Invalid string for conversion to bool: " + toLower);
-			}
-		}
-		else if constexpr (std::is_same_v<T, int>) {
-			return std::stoi(input.data());
-		}
-		else if constexpr (std::is_same_v<T, float>) {
-			return std::stof(input.data());
-		}
-		else if constexpr (std::is_same_v<T, double>) {
-			return std::stod(input.data());
-		}
-		else if constexpr (std::is_same_v<T, long>) {
-			return std::stol(input.data());
-		}
-		else if constexpr (std::is_same_v<T, long long>) {
-			return std::stoll(input.data());
-		}
-		else if constexpr (std::is_same_v<T, long double>) {
-			return std::stold(input.data());
-		}
-		else if constexpr (std::is_same_v<T, unsigned long>) {
-			return std::stoul(input.data());
-		}
-		else if constexpr (std::is_same_v<T, unsigned long long>) {
-			return std::stoull(input.data());
-		}
-		else if constexpr (c_enum<T>) {
-			int ind = std::stoi(input.data());
-			return static_cast<T>(ind);
-		}
-		else if constexpr (c_keyed<T>) {
-			return T::get(input);
-		}
-		else {
-			static_assert(false, "Unsupported fromString type");
-		}
-		return T();
-	}
+
 
 	// Check whether the given container contains the given value
 	export template<typename T, c_itr<T> TCo> bool has(const TCo& container, const T& value) {
@@ -224,7 +178,7 @@ export namespace fbc::futil {
 
 	// Represent a collection of objects as a joined string with a delimiter
 	export template<typename TCo, typename Func> str joinStrMap(strv delimiter, const TCo& items, Func strFunc)
-		requires std::ranges::range<TCo>&& c_inv<Func, std::ranges::range_value_t<TCo>, strv>
+		requires std::ranges::range<TCo>&& c_invc<Func, std::ranges::range_value_t<TCo>, strv>
 	{
 		str res;
 		auto iter = items.begin();
@@ -239,38 +193,13 @@ export namespace fbc::futil {
 		return res;
 	}
 
-	// Transform each of the values in the container into a new value and store the results in a list
-	export template<typename T, typename U, c_itr<T> TCo, c_inv<T, U> Func> vec<U> transform(const TCo& container, Func mapFunc) {
-		vec<U> res(container.size());
-		std::transform(container.begin(), container.end(), res.begin(), mapFunc);
-		return res;
-	}
-
-	// Transform each of the values in the map into a new map
-	export template<typename T, typename U, typename V, c_map_of<T,U> TCo, c_inv<U, V> Func> map<T, V> transformMap(const TCo& src, Func mapFunc) {
-		map<T, V> res;
-		for (const auto& p : src) {
-			res[p.first] = mapFunc(p.second);
-		}
-		return res;
-	}
-
-	// Transform each of the values in the map into a new unordered map
-	export template<typename T, typename U, typename V, c_map_of<T, U> TCo, c_inv<U, V> Func> umap<T, V> transformUmap(const TCo& src, Func mapFunc) {
-		umap<T, V> res;
-		for (const auto& p : src) {
-			res[p.first] = mapFunc(p.second);
-		}
-		return res;
-	}
-
-	// Attempt to convert an arbitrary object into its string representation
+	// Attempt to convert an arbitrary object into a regular string representation
 	export template <typename T> str toString(const T& obj) {
 		if constexpr (c_num<T>) {
 			return std::to_string(obj);
 		}
 		if constexpr (std::is_same_v<T, str>) {
-			return obj; 
+			return obj; // When saved to a JSON, this gets automatically wrapped with quotes
 		}
 		if constexpr (std::is_same_v<T, bool>) {
 			return obj ? VAL_TRUE : VAL_FALSE;
@@ -281,15 +210,18 @@ export namespace fbc::futil {
 		if constexpr (c_str<T>) {
 			return str(strv(obj));
 		}
+		if constexpr (c_pair<T>) {
+			return "[" + toStringWrapped(obj.first) + ", " + toStringWrapped(obj.second) + "]";
+		}
 		if constexpr (c_map<T>) {
 			std::string result = "{";
 			auto iter = begin(obj);
 			if (iter != end(obj)) {
-				result += "\"" + toString(iter->first) + "\": " + toString(iter->second);
+				result += toStringWrapped(iter->first) + ": " + toStringWrapped(iter->second);
 				++iter;
 			}
-			for (auto iter = transform.begin(); iter != transform.end(); ++iter) {
-				result += ", \"" + toString(iter->first) + "\": " + toString(iter->second);
+			for (; iter != end(obj); ++iter) {
+				result += ", " + toStringWrapped(iter->first) + ": " + toStringWrapped(iter->second);
 			}
 			result += "}";
 			return result;
@@ -301,11 +233,11 @@ export namespace fbc::futil {
 			std::string result = "[";
 			auto iter = obj.begin();
 			if (iter != obj.end()) {
-				result += toString(*iter);
+				result += toStringWrapped(*iter);
 				++iter;
 			}
 			for (; iter != obj.end(); ++iter) {
-				result += ", " + toString(*iter);
+				result += ", " + toStringWrapped(*iter);
 			}
 			result += "]";
 			return result;
@@ -317,4 +249,207 @@ export namespace fbc::futil {
 		oss << obj;
 		return oss.str();
 	}
+
+	// Same as toString but applies string quotes on strings (used for JSON serialization)
+	export template <typename T> str toStringWrapped(const T& obj) {
+		if constexpr (std::is_same_v<T, str>) {
+			return '"' + obj + '"';
+		}
+		if constexpr (c_str<T>) {
+			return '"' + obj + '"';
+		}
+		if constexpr (c_ref<T>) {
+			return toStringWrapped(obj.get());
+		}
+		return toString(obj);
+	}
+
+	// Transform each of the values in the container into a new value and store the results in a list
+	export template<typename T, typename U, c_itr<T> TCo, c_invc<T, U> Func> vec<U> transform(const TCo& container, Func mapFunc) {
+		vec<U> res(container.size());
+		std::transform(container.begin(), container.end(), res.begin(), mapFunc);
+		return res;
+	}
+
+	// Transform each of the values in the map into a new map
+	export template<typename T, typename U, typename V, c_map_of<T,U> TCo, c_invc<U, V> Func> map<T, V> transformMap(const TCo& src, Func mapFunc) {
+		map<T, V> res;
+		for (const auto& p : src) {
+			res[p.first] = mapFunc(p.second);
+		}
+		return res;
+	}
+
+	// Transform each of the values in the map into a new unordered map
+	export template<typename T, typename U, typename V, c_map_of<T, U> TCo, c_invc<U, V> Func> umap<T, V> transformUmap(const TCo& src, Func mapFunc) {
+		umap<T, V> res;
+		for (const auto& p : src) {
+			res[p.first] = mapFunc(p.second);
+		}
+		return res;
+	}
+
+	// For types that do not use syntax characters, we can safely treat everything in between this pos and the next syntax character as being part of the object to be deserialized
+	export strv getView(strv input, size_t& pos)
+	{
+		size_t start = pos;
+		while (pos < input.size()) {
+			switch (input[pos]) {
+			case ',':
+			case ' ':
+			case ';':
+			case '}':
+				return strv(input.data() + start, pos - start);
+			default:
+				++pos;
+			}
+		}
+		return strv(input.data() + start, pos - start);
+	}
+
+	// Removes quotes and escapes from a JSON-string object
+	export str unescape(strv input, size_t& pos) {
+		std::string value;
+		bool escape = false;
+
+		if (input[pos] == '"') {
+			++pos;
+		}
+
+		while (pos < input.size()) {
+			char c = input[pos++];
+			if (escape) {
+				value += c;
+				escape = false;
+			}
+			else {
+				switch (c) {
+				case '\\':
+					escape = true;
+					break;
+				case '"':
+					return value; // End of the string view section
+				default:
+					value += c;
+				}
+			}
+		}
+		return value;
+	}
+
+	// Attempt to parse a JSON-like string into an object
+	// TODO handle iterables and maps
+	export template <typename T> T fromString(strv input) {
+		size_t pos = 0;
+		return fromString<T>(input, pos);
+	}
+
+	export template <typename T> T fromString(strv input, size_t& pos) {
+		// These use syntax characters and handle iteration by their own logic
+		if constexpr (std::is_same_v<T, str>) {
+			return unescape(input, pos);
+		}
+		else if constexpr (c_push<T>) {
+			T res;
+
+			// Lists start with bracket. Note that subsequent brackets should start parsing 
+			if (input[pos] == '[') {
+				++pos;
+			}
+
+			while (pos < input.size()) {
+				switch (input[pos]) {
+				case ' ':
+				case ',':
+					++pos;
+					break;
+				case ']':
+					++pos;
+					return res; // End of array
+				default:
+					res.push_back(fromString<auto>(input, pos));
+					break;
+				}
+			}
+
+			return res;
+		}
+		else if constexpr (c_pair<T>) {
+			pair<auto, auto> p;
+
+			// Lists start with bracket. Note that subsequent brackets should start parsing 
+			if (input[pos] == '[') {
+				++pos;
+			}
+
+			p.first = fromString<auto>(input, pos);
+
+			while (pos < input.size()) {
+				switch (input[pos]) {
+				case ' ':
+				case ',':
+					++pos;
+					break;
+				case ']':
+					++pos;
+					return p; // End of array
+				default:
+					p.second = fromString<auto>(input, pos);
+					break;
+				}
+			}
+
+			return p;
+		}
+		else {
+			// These do not use syntax characters; should advance iterator until a syntax character is hit
+			strv substr = getView(input, pos);
+
+			if constexpr (std::is_same_v<T, bool>) {
+				str toLower = futil::toLowerCase(substr);
+				if (toLower == VAL_TRUE || toLower == "1") {
+					return true;
+				}
+				else if (toLower == VAL_FALSE || toLower == "0") {
+					return false;
+				}
+				else {
+					throw std::invalid_argument("Invalid string for conversion to bool: " + toLower);
+				}
+			}
+			else if constexpr (std::is_same_v<T, int>) {
+				return std::stoi(substr.data());
+			}
+			else if constexpr (std::is_same_v<T, float>) {
+				return std::stof(substr.data());
+			}
+			else if constexpr (std::is_same_v<T, double>) {
+				return std::stod(substr.data());
+			}
+			else if constexpr (std::is_same_v<T, long>) {
+				return std::stol(substr.data());
+			}
+			else if constexpr (std::is_same_v<T, long long>) {
+				return std::stoll(substr.data());
+			}
+			else if constexpr (std::is_same_v<T, long double>) {
+				return std::stold(substr.data());
+			}
+			else if constexpr (std::is_same_v<T, unsigned long>) {
+				return std::stoul(substr.data());
+			}
+			else if constexpr (std::is_same_v<T, unsigned long long>) {
+				return std::stoull(substr.data());
+			}
+			else if constexpr (c_enum<T>) {
+				int ind = std::stoi(substr.data());
+				return static_cast<T>(ind);
+			}
+			else if constexpr (c_keyed<T>) {
+				return T::get(substr);
+			}
+		}
+		return T();
+	}
+
 }

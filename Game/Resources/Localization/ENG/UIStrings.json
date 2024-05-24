@@ -1,4 +1,12 @@
 {
+  "options_graphics_fps": "FPS",
+  "options_graphics_resolution": "Resolution",
+  "options_graphics_vsync": "VSync",
+  "options_graphics_window_mode": "Window Mode",
+  "options_text_font": "Font (Regular)",
+  "options_text_font_bold": "Font (Bold)",
+  "options_text_font_scale": "Text Size",
+  "options_text_language": "Language",
   "screen_options": "Options",
   "screen_setup_header": "Setup Run",
   "screen_title_header": "Fabricate",
