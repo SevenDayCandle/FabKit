@@ -133,7 +133,6 @@ export namespace fbc::screenManager {
 	}
 
 	void initialize() {
-		cfg.graphicsResolutionX.addSubscriber([](const int& val) {refreshSize(); });
-		cfg.graphicsResolutionY.addSubscriber([](const int& val) {refreshSize(); });
+		cfg.graphicsResolution.addSubscriber([](const pair<int,int>& val) {refreshSize(); });
 	}
 }

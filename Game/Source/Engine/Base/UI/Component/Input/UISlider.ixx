@@ -12,16 +12,18 @@ import std;
 export namespace fbc {
 	export class UISlider : public UINumberInput {
 	public:
-		UISlider(Hitbox* hb, Hitbox* scrollhb, IDrawable& imageBar = cct.images.sliderEmpty, IDrawable& imageButton = cct.images.scrollbutton): 
-			UINumberInput(hb), scrollbar(scrollhb, imageBar, imageButton) {
+		UISlider(Hitbox* hb, Hitbox* scrollhb, int limMin = 0,
+			int limMax = std::numeric_limits<int>::max(), IDrawable& imageBar = cct.images.sliderEmpty, IDrawable& imageButton = cct.images.scrollbutton, IDrawable& panelImage = cct.images.panel):
+			UINumberInput(hb, limMin, limMax, panelImage), scrollbar(scrollhb, imageBar, imageButton) {
 			scrollbar.setOnScroll([this](float scroll) {this->commitFromScroll(scroll); });
 		}
-		UISlider(Hitbox* hb, IDrawable& imageBar = cct.images.sliderEmpty, IDrawable& imageButton = cct.images.scrollbutton) : 
-			UISlider(hb, new RelativeHitbox(*hb, hb->getOffsetSizeX(), 0, hb->getOffsetSizeX() * 3, hb->getOffsetSizeY()), imageBar, imageButton) {}
+		UISlider(Hitbox* hb, int limMin = 0,
+			int limMax = std::numeric_limits<int>::max(),IDrawable& imageBar = cct.images.sliderEmpty, IDrawable& imageButton = cct.images.scrollbutton, IDrawable& panelImage = cct.images.panel) :
+			UISlider(hb, new RelativeHitbox(*hb, hb->getOffsetSizeX(), 0, hb->getOffsetSizeX() * 3, hb->getOffsetSizeY()), limMin, limMax, imageBar, imageButton, panelImage) {}
 
 		virtual ~UISlider() {}
 
-		virtual void commit(int num) override;
+		virtual UISlider& setValue(int num) override;
 		virtual void onSizeUpdated() override;
 		virtual void refreshHb() override;
 		virtual void renderImpl() override;
@@ -31,13 +33,6 @@ export namespace fbc {
 	private:
 		void commitFromScroll(float scroll);
 	};
-
-	void UISlider::commit(int num)
-	{
-		UINumberInput::commit(num);
-		float pos = limMin == limMax ? 0 : (num - limMin) / (limMax - limMin);
-		scrollbar.setScrollPos(pos);
-	}
 
 	void UISlider::onSizeUpdated()
 	{
@@ -55,6 +50,14 @@ export namespace fbc {
 	{
 		UINumberInput::renderImpl();
 		scrollbar.renderImpl();
+	}
+
+	UISlider& UISlider::setValue(int num)
+	{
+		UINumberInput::commit(num);
+		float pos = limMin == limMax ? 0 : (num - limMin) / (limMax - limMin);
+		scrollbar.setScrollPos(pos);
+		return *this;
 	}
 
 	void UISlider::updateImpl()

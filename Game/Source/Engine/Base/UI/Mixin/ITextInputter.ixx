@@ -14,7 +14,7 @@ export namespace fbc {
 		ITextInputter() {}
 		virtual ~ITextInputter() {}
 
-		virtual void onKeyPress(int32_t c) override;
+		virtual void onKeyPress(int32 c) override;
 		virtual void onTextInput(char* text) override;
 		void releaseBuffer();
 		virtual void start();
@@ -46,7 +46,7 @@ export namespace fbc {
 		updateCaretPos();
 	}
 
-	void ITextInputter::onKeyPress(int32_t c)
+	void ITextInputter::onKeyPress(int32 c)
 	{
 		switch (c) {
 			// Moves the caret to the end

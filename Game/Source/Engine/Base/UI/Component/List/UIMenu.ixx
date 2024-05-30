@@ -52,12 +52,12 @@ export namespace fbc {
 		void refreshHb() override;
 		void renderImpl() override;
 		template <c_itr<int> Iterable> void selectIndices(Iterable& indices);
-		template <c_itr<T&> Iterable> void selectSelection(Iterable& items);
+		template <c_itr<T*> Iterable> void selectSelection(Iterable& items);
 		void selectRow(UIEntry<T>& entry) override;
 		void unsetProxy();
 		void updateImpl() override;
 		template <c_itr<int> Iterable> void updateIndices(Iterable& indices);
-		template <c_itr<T> Iterable> void updateSelection(Iterable& indices);
+		template <c_itr<T*> Iterable> void updateSelection(Iterable& indices);
 
 		static uptr<UIMenu> multiMenu(Hitbox* hb, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); }, FFont& itemFont = cct.fontRegular(), IDrawable& background = cct.images.hoverPanel);
 		static uptr<UIMenu> singleMenu(Hitbox* hb, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); }, FFont& itemFont = cct.fontRegular(), IDrawable& background = cct.images.hoverPanel);
@@ -82,7 +82,7 @@ export namespace fbc {
 		void autosize();
 		void changeEvent();
 		void onScroll(float percent);
-		void rowsChangedEvent();
+		void refreshRows() override;
 		void syncRowsForRender();
 		void updateForSelection();
 		void updateRowPositions();
@@ -106,7 +106,7 @@ export namespace fbc {
 	}
 
 	// Updates the selected indexes based on the given items. DOES invoke the change callback.
-	template <typename T> template <c_itr<T&> Iterable> void UIMenu<T>::selectSelection(Iterable& items) {
+	template <typename T> template <c_itr<T*> Iterable> void UIMenu<T>::selectSelection(Iterable& items) {
 		updateSelection(items);
 		changeEvent();
 	}
@@ -120,10 +120,10 @@ export namespace fbc {
 	}
 
 	// Updates the selected indexes based on the given items. Does NOT invoke the change callback.
-	template <typename T> template <c_itr<T> Iterable> void UIMenu<T>::updateSelection(Iterable& items) {
+	template <typename T> template <c_itr<T*> Iterable> void UIMenu<T>::updateSelection(Iterable& items) {
 		currentIndices.clear();
 		for (const uptr<UIEntry<T>>& row : this->rows) {
-			opt<T> res = futil::find(items, row->item);
+			opt<T> res = futil::find(items, &row->item);
 			if (res != std::nullopt) { currentIndices.insert(row.index); }
 		}
 		for (const uptr<UIEntry<T>>& row : this->rows) { row->updateSelectStatus(currentIndices.contains(row->index)); }
@@ -304,7 +304,7 @@ export namespace fbc {
 	}
 
 	// When the rows are changed, reposition the rows and sort them, and clear out your current selection because it will likely no longer be valid
-	template<typename T> void UIMenu<T>::rowsChangedEvent() {
+	template<typename T> void UIMenu<T>::refreshRows() {
 		currentIndices.clear();
 		syncRowsForRender();
 		autosize();

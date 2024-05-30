@@ -367,6 +367,14 @@
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
+    <ClCompile Include="Source\Game\UI\Dialogs\SettingsDialog.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\UI\Dialogs\SettingsDialogPage.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Game\UI\Screens\SetupScreen.ixx">
       <SubType>
       </SubType>

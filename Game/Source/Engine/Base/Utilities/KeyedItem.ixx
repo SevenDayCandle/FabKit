@@ -24,11 +24,11 @@ export namespace fbc {
 		friend std::ostream& operator<<(std::ostream& os, const KeyedItem& obj) { return os << obj.name; }
 
 		// Get every single instantiation of this class
-		static std::vector<std::reference_wrapper<C>> all() {
+		static std::vector<C*> all() {
 			const auto& values = registered();
-			std::vector<std::reference_wrapper<C>> result;
+			std::vector<C*> result;
 			for (const auto& pair : values) {
-				result.emplace_back(*static_cast<C*>(pair.second));
+				result.emplace_back(static_cast<C*>(pair.second));
 			}
 			return result;
 		}

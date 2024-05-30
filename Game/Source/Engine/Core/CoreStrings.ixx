@@ -14,6 +14,9 @@ export namespace fbc {
 
 		void initialize() override;
 
+		inline str options_section_graphics() const { return uiStrings.at("options_section_graphics"); };
+		inline str options_section_sound() const { return uiStrings.at("options_section_sound"); };
+		inline str options_section_text() const { return uiStrings.at("options_section_text"); };
 		inline str screen_setup_header() const { return uiStrings.at("screen_setup_header"); };
 		inline str screen_title_header() const { return uiStrings.at("screen_title_header"); };
 		inline str ui_cancel() const { return uiStrings.at("ui_cancel"); };

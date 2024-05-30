@@ -43,6 +43,9 @@ export namespace fbc {
         if (error) {
             sdl::logError("Failed to save config at path %s", configPath.data());
         }
+        else {
+            sdl::logInfo("Saved config at path %s", configPath.data());
+        }
     }
 
     // Refresh the value map contents from the external file if it exists
@@ -52,6 +55,9 @@ export namespace fbc {
             glz::parse_error error = glz::read_file_json(values_map, configPath, str{});
             if (error) {
                 sdl::logError("Failed to read config at path %s", configPath.data());
+            }
+            else {
+                sdl::logInfo("Read config at path %s", configPath.data());
             }
         }
     }

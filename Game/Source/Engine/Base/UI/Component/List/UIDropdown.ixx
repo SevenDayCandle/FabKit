@@ -64,7 +64,9 @@ export namespace fbc {
 		template <c_itr<T> Iterable> inline void updateSelection(Iterable& indices) { return menu->updateSelection(indices), *this; }
 
 		template <c_itr<T> Iterable> UIDropdown& addItems(const Iterable& items);
+		template <c_itr<T*> Iterable> UIDropdown& addItems(const Iterable& items);
 		template <c_itr<T> Iterable> UIDropdown& setItems(const Iterable& items);
+		template <c_itr<T*> Iterable> UIDropdown& setItems(const Iterable& items);
 		void forceClosePopup();
 		virtual void onSizeUpdated() override;
 		virtual void openPopup();
@@ -258,7 +260,22 @@ export namespace fbc {
 		return *this;
 	}
 
+
+	template<typename T> template<c_itr<T*> Iterable> UIDropdown<T>& UIDropdown<T>::addItems(const Iterable& items)
+	{
+		this->menu->addItems(items);
+		onChangeItems();
+		return *this;
+	}
+
 	template<typename T> template<c_itr<T> Iterable> UIDropdown<T>& UIDropdown<T>::setItems(const Iterable& items)
+	{
+		this->menu->setItems(items);
+		onChangeItems();
+		return *this;
+	}
+
+	template<typename T> template<c_itr<T*> Iterable> UIDropdown<T>& UIDropdown<T>::setItems(const Iterable& items)
 	{
 		this->menu->setItems(items);
 		onChangeItems();

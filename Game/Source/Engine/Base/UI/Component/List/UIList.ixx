@@ -34,11 +34,14 @@ export namespace fbc {
 		inline int size() const { return rows.size(); }
 
 		template <c_itr<T> Iterable> UIList& addItems(Iterable& items);
+		template <c_itr<T*> Iterable> UIList& addItems(Iterable& items);
 		template <c_itr<T> Iterable> UIList& setItems(Iterable& items);
+		template <c_itr<T*> Iterable> UIList& setItems(Iterable& items);
 		UIList& setItemFont(FFont& itemFont);
 		UIList& setLabelFunc(func<str(const T&)> labelFunc);
 		UIList& setMaxRows(int rows);
 		vec<T*> getAllItems();
+		void forEach(func<void(T&)> func);
 		void refreshHb() override;
 		void renderImpl() override;
 		void updateImpl() override;
@@ -58,10 +61,10 @@ export namespace fbc {
 		inline virtual int getVisibleRowCount() const { return maxRows; }
 		inline static float rMargin() { return cfg.renderScale(MARGIN); }
 
-		virtual void makeRow(T item);
+		virtual void makeRow(T& item);
 	private:
 		virtual void autosize();
-		virtual void rowsChangedEvent();
+		virtual void refreshRows();
 		virtual void updateRowPositions();
 	};
 
@@ -71,13 +74,27 @@ export namespace fbc {
 
 	// Create rows for each item in the provided list
 	template <typename T> template <c_itr<T> Iterable> UIList<T>& UIList<T>::addItems(Iterable& items) {
-		for (const T item : items) { makeRow(item); }
-		rowsChangedEvent();
+		for (T& item : items) { makeRow(item); }
+		refreshRows();
+		return *this;
+	}
+
+	// Create rows for each item in the provided list (pointer version)
+	template <typename T> template <c_itr<T*> Iterable> UIList<T>& UIList<T>::addItems(Iterable& items) {
+		for (T* item : items) { makeRow(*item); }
+		refreshRows();
 		return *this;
 	}
 
 	// Replaces the current rows with rows for each item in the provided list. Clears any selections in the process, but does NOT invoke the change callback.
 	template <typename T> template <c_itr<T> Iterable> UIList<T>& UIList<T>::setItems(Iterable& items) {
+		rows.clear();
+		topVisibleRowIndex = 0;
+		return addItems(items);
+	}
+
+	// Replaces the current rows with rows for each item in the provided list (pointer version). Clears any selections in the process, but does NOT invoke the change callback.
+	template <typename T> template <c_itr<T*> Iterable> UIList<T>& UIList<T>::setItems(Iterable& items) {
 		rows.clear();
 		topVisibleRowIndex = 0;
 		return addItems(items);
@@ -112,6 +129,14 @@ export namespace fbc {
 		return futil::transform<T>(rows, [](const uptr<UIEntry<T>>& row) { return &(row->item); });
 	}
 
+	// Execute a function on every item in the list
+	template<typename T> void UIList<T>::forEach(func<void(T&)> func)
+	{
+		for (const uptr<UIEntry<T>>& row : rows) {
+			func(row->item);
+		}
+	}
+
 	// Updates the dimensions of all children too
 	template<typename T> void UIList<T>::refreshHb() {
 		UIBase::refreshHb();
@@ -139,7 +164,7 @@ export namespace fbc {
 	}
 
 	// Create a menu row for a new item
-	template <typename T> void UIList<T>::makeRow(T item) {
+	template <typename T> void UIList<T>::makeRow(T& item) {
 		UIEntry<T>* entry = new UIEntry<T>(item,
 			rows.size(),
 			[this](UIEntry<T>& p) { this->selectRow(p); },
@@ -182,7 +207,7 @@ export namespace fbc {
 	}
 
 	// Triggers whenever the available rows are changed
-	template<typename T> void UIList<T>::rowsChangedEvent() {
+	template<typename T> void UIList<T>::refreshRows() {
 		autosize();
 	}
 

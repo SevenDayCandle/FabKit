@@ -9,7 +9,9 @@ export namespace fbc {
 	};
 
 	export namespace lang {
-		export const Language ENG{ "ENG" };
+		export constexpr strv ENG_DEFAULT = "ENG";
+
+		export const Language ENG{ ENG_DEFAULT };
 		export const Language DEU{ "DEU" };
 		export const Language FRA{ "FRA" };
 		export const Language ITA{ "ITA" };

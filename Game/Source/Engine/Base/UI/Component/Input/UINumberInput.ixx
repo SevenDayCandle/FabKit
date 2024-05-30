@@ -18,9 +18,11 @@ export namespace fbc {
 	export class UINumberInput : public UIInteractable, public TextInfo, public ITextInputter, public ILabeled {
 	public:
 		UINumberInput(Hitbox* hb,
+			int limMin = 0,
+			int limMax = std::numeric_limits<int>::max(),
 			IDrawable& image = cct.images.panel,
 			IDrawable& arrow = cct.images.uiArrowIncrement.get(),
-			FFont& textFont = cct.fontRegular()) : UIInteractable(hb, image), TextInfo(textFont), arrow(arrow) {
+			FFont& textFont = cct.fontRegular()) : UIInteractable(hb, image), TextInfo(textFont), limMin(limMin), limMax(limMax), arrow(arrow) {
 			initCaret(this->font, this->hb->x, this->hb->y);
 			UINumberInput::onSizeUpdated();
 		}
@@ -32,7 +34,9 @@ export namespace fbc {
 		inline UINumberInput& setOnBufferUpdate(func<void(int)> onBufferUpdateCallback) { return this->onBufferUpdateCallback = onBufferUpdateCallback, *this; }
 		inline UINumberInput& setOnComplete(func<void(int)> onComplete) { return this->onComplete = onComplete, *this; }
 
-		virtual void commit(int num);
+		void commit(int num);
+		virtual UINumberInput& setLimits(int limMin, int limMax);
+		virtual UINumberInput& setValue(int num);
 		virtual void onSizeUpdated() override;
 		virtual void renderImpl() override;
 		virtual void start() override;
@@ -45,7 +49,7 @@ export namespace fbc {
 
 		void clickLeftEvent() override;
 		void onBufferUpdated() override;
-		void onKeyPress(int32_t c) override;
+		void onKeyPress(int32 c) override;
 		void onTextInput(char* text) override;
 		void resetBuffer() override;
 		void updateCaretPos() override;
@@ -66,11 +70,21 @@ export namespace fbc {
 	// Commits the number restrained to the limits and invokes the completion callback
 	void UINumberInput::commit(int num)
 	{
-		valTemp = val = std::clamp(num, limMin, limMax);
-		setText(std::to_string(num));
+		setValue(num);
 		if (onComplete) {
 			onComplete(val);
 		}
+	}
+
+	// Sets the limits to constrain inputted values
+	UINumberInput& UINumberInput::setLimits(int limMin, int limMax)
+	{
+		this->limMin = limMin;
+		this->limMax = limMax;
+		if (val < limMin || val > limMax) {
+			setValue(val);
+		}
+		return *this;
 	}
 
 	void UINumberInput::onSizeUpdated()
@@ -91,6 +105,14 @@ export namespace fbc {
 		if (sdl::keyboardInputActive(this)) {
 			renderCaret();
 		}
+	}
+
+	// Sets the number restrained to the limits WITHOUT invoking the completion callback
+	UINumberInput& UINumberInput::setValue(int num)
+	{
+		valTemp = val = std::clamp(num, limMin, limMax);
+		setText(std::to_string(num));
+		return *this;
 	}
 
 	void UINumberInput::start() {
@@ -160,7 +182,7 @@ export namespace fbc {
 		Arrow up increments by interval
 		Arrow down decrements by interval
 	*/
-	void UINumberInput::onKeyPress(int32_t c)
+	void UINumberInput::onKeyPress(int32 c)
 	{
 		switch (c) {
 		case sdl::KEY_ENTER:

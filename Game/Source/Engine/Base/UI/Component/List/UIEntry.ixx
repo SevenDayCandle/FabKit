@@ -11,11 +11,12 @@ import fbc.FUtil;
 import fbc.RelativeHitbox;
 import fbc.ScreenManager;
 import sdl;
+import std;
 
 export namespace fbc {
 	export template <typename T> class UIEntry : public UIInteractable, public TextInfo {
 	public:
-		UIEntry(T item, int index, func<void(UIEntry<T>&)> onClick, fbc::RelativeHitbox* hb, FFont& f, const str& text, IDrawable& image = cct.images.uiCheckboxEmpty, IDrawable& checkImage = cct.images.uiCheckboxFilled, sdl::Color baseColor = sdl::COLOR_WHITE, sdl::Color hoverColor = sdl::COLOR_GOLD):
+		UIEntry(T& item, int index, func<void(UIEntry<T>&)> onClick, fbc::RelativeHitbox* hb, FFont& f, const str& text, IDrawable& image = cct.images.uiCheckboxEmpty, IDrawable& checkImage = cct.images.uiCheckboxFilled, sdl::Color baseColor = sdl::COLOR_WHITE, sdl::Color hoverColor = sdl::COLOR_GOLD) :
 			item(item), index(index), onClick(onClick), baseColor(baseColor), hoverColor(hoverColor), UIInteractable(hb, image), TextInfo(f, text), checkImage(checkImage) {
 		}
 		virtual ~UIEntry() override {}
@@ -25,7 +26,7 @@ export namespace fbc {
 		bool toggled = false;
 		IDrawable& checkImage;
 		func<void(UIEntry<T>&)> onClick;
-		T item;
+		T& item;
 		int index;
 
 		inline virtual float getProjectedWidth() { return image.getWidth() + cfg.renderScale(8) + TextInfo::getTextWidth(); };

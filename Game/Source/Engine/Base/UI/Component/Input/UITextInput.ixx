@@ -39,7 +39,7 @@ export namespace fbc {
 
 		void clickLeftEvent() override;
 		void onBufferUpdated() override;
-		void onKeyPress(int32_t c) override;
+		void onKeyPress(int32 c) override;
 		void resetBuffer() override;
 		void updateCaretPos() override;
 	private:
@@ -115,7 +115,7 @@ export namespace fbc {
 	}
 
 	// Enter will commit the current text, while Esc will revert any changes
-	void UITextInput::onKeyPress(int32_t c)
+	void UITextInput::onKeyPress(int32 c)
 	{
 		switch (c) {
 		case sdl::KEY_ENTER:

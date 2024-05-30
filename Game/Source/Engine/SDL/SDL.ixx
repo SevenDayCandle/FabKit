@@ -253,6 +253,8 @@ namespace sdl {
 	export const char* __cdecl getError() { return TTF_GetError(); }
 	export template <typename... Args> void log(SDL_LogPriority priority, const char* message, const Args&... args) { SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, priority, message, args...); }
 	export template <typename... Args> void log(SDL_LogPriority priority, std::string_view message, const Args&... args) { SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, priority, message.data(), args...); }
+	export template <typename... Args> void logInfo(const char* message, const Args&... args) { log(SDL_LOG_PRIORITY_INFO, message, args...); }
+	export template <typename... Args> void logInfo(std::string_view message, const Args&... args) { log(SDL_LOG_PRIORITY_INFO, message, args...); }
 	export template <typename... Args> void logError(const char* message, const Args&... args) { log(SDL_LOG_PRIORITY_ERROR, message, args...); }
 	export template <typename... Args> void logError(std::string_view message, const Args&... args) { log(SDL_LOG_PRIORITY_ERROR, message, args...); }
 

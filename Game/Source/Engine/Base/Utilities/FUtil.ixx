@@ -7,8 +7,10 @@ import std;
 
 export namespace fbc {
 	// std shorthands. Sorry peeps
+	export template <typename T> using dec_t = std::decay_t<T>;
 	export template <typename T> using deque = std::deque<T>;
 	export template <typename R> using func = std::function<R>;
+	export template <typename T> using ilist = std::initializer_list<T>;
 	export template <typename T> using list = std::list<T>;
 	export template <typename T> using opt = std::optional<T>;
 	export template <typename T> using ref = std::reference_wrapper<T>;
@@ -22,8 +24,9 @@ export namespace fbc {
 	export template <typename T, typename U> using map = std::map<T, U>;
 	export template <typename T, typename U> using pair = std::pair<T, U>;
 	export template <typename T, typename U> using umap = std::unordered_map<T, U>;
+	export using any = std::any;
 	export using exception = std::exception;
-	export using int32_t = std::int32_t;
+	export using int32 = std::int32_t;
 	export using str = std::string;
 	export using strv = std::string_view;
 	export using uint32 = std::uint32_t;
@@ -69,6 +72,9 @@ export namespace fbc {
 	export template<typename T> concept c_str = requires(T t) {
 		std::string_view{ t };
 	};
+	export template<typename T> concept c_varg = std::is_same_v<std::decay_t<T>, T> && requires {
+		typename std::decay_t<T>;
+	};
 	export template<typename T> concept c_vec = is_specialization_v<T, std::vector>;
 }
 
@@ -88,6 +94,15 @@ export namespace fbc::futil {
 	// Wrapper function around std::any_of to check the entire container
 	export template <typename T, typename Pred> bool any(const T& container, Pred predicate) {
 		return std::any_of(container.begin(), container.end(), predicate);
+	}
+
+	// Format a pair as a dimension
+	export str dimensionString(int x, int y) {
+		return x + "x" + y;
+	}
+
+	export str dimensionString(const pair<int,int>& p) {
+		return dimensionString(p.first, p.second);
 	}
 
 	// Checks if a string-like starts with another string-like
@@ -202,7 +217,7 @@ export namespace fbc::futil {
 			return obj; // When saved to a JSON, this gets automatically wrapped with quotes
 		}
 		if constexpr (std::is_same_v<T, bool>) {
-			return obj ? VAL_TRUE : VAL_FALSE;
+			return obj ? str(VAL_TRUE) : str(VAL_FALSE);
 		}
 		if constexpr (c_enum<T>) {
 			return std::to_string(static_cast<std::underlying_type_t<T>>(obj));
@@ -309,12 +324,14 @@ export namespace fbc::futil {
 
 	// Removes quotes and escapes from a JSON-string object
 	export str unescape(strv input, size_t& pos) {
-		std::string value;
-		bool escape = false;
-
-		if (input[pos] == '"') {
-			++pos;
+		// No need to unescape string-likes that are not quoted
+		if (input[pos] != '"') {
+			return str(input);
 		}
+		++pos;
+
+		str value;
+		bool escape = false;
 
 		while (pos < input.size()) {
 			char c = input[pos++];
@@ -375,14 +392,14 @@ export namespace fbc::futil {
 			return res;
 		}
 		else if constexpr (c_pair<T>) {
-			pair<auto, auto> p;
+			pair<typename T::first_type, typename T::second_type> p;
 
 			// Lists start with bracket. Note that subsequent brackets should start parsing 
 			if (input[pos] == '[') {
 				++pos;
 			}
 
-			p.first = fromString<auto>(input, pos);
+			p.first = fromString<typename T::first_type>(input, pos);
 
 			while (pos < input.size()) {
 				switch (input[pos]) {
@@ -394,7 +411,7 @@ export namespace fbc::futil {
 					++pos;
 					return p; // End of array
 				default:
-					p.second = fromString<auto>(input, pos);
+					p.second = fromString<typename T::second_type>(input, pos);
 					break;
 				}
 			}

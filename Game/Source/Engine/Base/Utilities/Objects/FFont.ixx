@@ -144,7 +144,7 @@ export namespace fbc {
         font = sdl::fontOpen(path.c_str(), res);
         if (font == nullptr) {
             sdl::logError("Failed to load font %s: %s", path.c_str(), sdl::getError());
-            font = sdl::fontOpen(FONT_REGULAR.c_str(), res);
+            font = sdl::fontOpen(FONT_REGULAR.data(), res);
         }
         if (font == nullptr) {
             sdl::logError("RIP even the default font failed us %s", sdl::getError());

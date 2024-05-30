@@ -35,10 +35,12 @@ export namespace fbc {
 
 		const Cache<RBordered> hoverPanel = cacheBordered(uiHoverPanelBase);
 		const Cache<RBordered> largePanel = cacheBordered(uiLargePanelBase);
+		const Cache<RBordered> light = cacheBordered(uiLightPanelBase);
 		const Cache<RBordered> panel = cacheBordered(uiPanelBase);
 		const Cache<RHorizontal> sliderEmpty = cacheHorizontal(uiSliderEmptyBase);
 		const Cache<RHorizontal> sliderFilled = cacheHorizontal(uiSliderFilledBase);
 		const Cache<RVertical> scrollbar = cacheVertical(uiScrollbarBase);
 		const Cache<RVertical> scrollbutton = cacheVertical(uiScrollbuttonBase);
+		const Cache<RBordered> thickPanel = cacheBordered(uiThickPanelBase);
 	};
 }

@@ -13,7 +13,7 @@ import sdl;
 export namespace fbc {
 	export class UIToggle : public UIInteractable, public TextInfo {
 	public:
-		UIToggle(Hitbox* hb, str text, IDrawable& image = cct.images.uiCheckboxEmpty, IDrawable& checkImage = cct.images.uiCheckboxFilled, FFont& f = cct.fontRegular()):
+		UIToggle(Hitbox* hb, strv text, IDrawable& image = cct.images.uiCheckboxEmpty, IDrawable& checkImage = cct.images.uiCheckboxFilled, FFont& f = cct.fontRegular()):
 			UIInteractable(hb, image), checkImage(checkImage), TextInfo(f, text) {
 			UIToggle::onSizeUpdated();
 		}
