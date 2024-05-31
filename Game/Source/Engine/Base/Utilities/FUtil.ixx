@@ -58,9 +58,7 @@ export namespace fbc {
 			requires std::same_as<typename TCo::mapped_type, U>;
 	};
 	export template<typename T> concept c_num = std::is_arithmetic_v<T>;
-	export template<typename T> concept c_pair = requires(T t) {
-		typename std::pair<typename T::first_type, typename T::second_type>;
-	};
+	export template<typename T> concept c_pair = is_specialization_v<T, std::pair>;
 	export template<typename T> concept c_push = requires(T t, typename T::value_type v) {
 		{ t.push_back(v) } -> std::same_as<void>;
 	};
@@ -72,9 +70,7 @@ export namespace fbc {
 	export template<typename T> concept c_str = requires(T t) {
 		std::string_view{ t };
 	};
-	export template<typename T> concept c_varg = std::is_same_v<std::decay_t<T>, T> && requires {
-		typename std::decay_t<T>;
-	};
+	export template<typename T, typename... Args> concept c_varg = (std::same_as<T, Args> && ...);;
 	export template<typename T> concept c_vec = is_specialization_v<T, std::vector>;
 }
 
@@ -85,6 +81,35 @@ export namespace fbc::futil {
 	export constexpr strv MODS = "mods";
 	export constexpr strv VAL_FALSE = "false";
 	export constexpr strv VAL_TRUE = "true";
+
+	export bool isNumeric(strv text);
+	export bool isPrefix(strv source, strv prefix);
+	export str dimensionString(const pair<int, int>& p);
+	export str dimensionString(int x, int y);
+	export str toLowerCase(strv input);
+	export str toUpperCase(strv input);
+	export str unescape(strv input, size_t& pos);
+	export str& toLowerCaseInPlace(str& input);
+	export str& toUpperCaseInPlace(str& input);
+	export strv getView(strv input, size_t& pos);
+	export template <c_itr<strv> SCo> str joinStr(strv delimiter, SCo items);
+	export template <typename T, c_itr<T> TCo> bool has(const TCo& container, const T& value);
+	export template <typename T, c_itr<T> TCo> opt<T> find(const TCo& container, const T& value);
+	export template <typename T, typename Pred> bool all(const T& container, Pred predicate);
+	export template <typename T, typename Pred> bool any(const T& container, Pred predicate);
+	export template <typename T, typename U, c_itr<T> TCo, c_invc<T, U> Func> vec<U> transform(const TCo& container, Func mapFunc);
+	export template <typename T, typename U, typename V, c_map_of<T, U> TCo, c_invc<U, V> Func> map<T, V> transformMap(const TCo& src, Func mapFunc);
+	export template <typename T, typename U, typename V, c_map_of<T, U> TCo, c_invc<U, V> Func> umap<T, V> transformUmap(const TCo& src, Func mapFunc);
+	export template <typename T> str toString(const T& obj);
+	export template <typename T> str toStringWrapped(const T& obj);
+	export template <typename T> T fromString(strv input);
+	export template <typename T> T fromString(strv input, size_t& pos);
+	export template <typename TCo, typename Func> str joinStrMap(strv delimiter, const TCo& items, Func strFunc) requires std::ranges::range<TCo>&& c_invc<Func, std::ranges::range_value_t<TCo>, strv>;
+	
+	/*
+	DEFINITIONS
+	*/
+
 
 	// Wrapper function around std::all_of to check the entire container
 	export template <typename T, typename Pred> bool all(const T& container, Pred predicate) {
@@ -165,8 +190,6 @@ export namespace fbc::futil {
 		return std::nullopt;
 	}
 
-
-
 	// Check whether the given container contains the given value
 	export template<typename T, c_itr<T> TCo> bool has(const TCo& container, const T& value) {
 		return find(container, value) != std::nullopt;
@@ -213,22 +236,22 @@ export namespace fbc::futil {
 		if constexpr (c_num<T>) {
 			return std::to_string(obj);
 		}
-		if constexpr (std::is_same_v<T, str>) {
+		else if constexpr (std::is_same_v<T, str>) {
 			return obj; // When saved to a JSON, this gets automatically wrapped with quotes
 		}
-		if constexpr (std::is_same_v<T, bool>) {
+		else if constexpr (std::is_same_v<T, bool>) {
 			return obj ? str(VAL_TRUE) : str(VAL_FALSE);
 		}
-		if constexpr (c_enum<T>) {
+		else if constexpr (c_enum<T>) {
 			return std::to_string(static_cast<std::underlying_type_t<T>>(obj));
 		}
-		if constexpr (c_str<T>) {
+		else if constexpr (c_str<T>) {
 			return str(strv(obj));
 		}
-		if constexpr (c_pair<T>) {
+		else if constexpr (c_pair<T>) {
 			return "[" + toStringWrapped(obj.first) + ", " + toStringWrapped(obj.second) + "]";
 		}
-		if constexpr (c_map<T>) {
+		else if constexpr (c_map<T>) {
 			std::string result = "{";
 			auto iter = begin(obj);
 			if (iter != end(obj)) {
@@ -241,10 +264,10 @@ export namespace fbc::futil {
 			result += "}";
 			return result;
 		}
-		if constexpr (c_ref<T>) {
+		else if constexpr (c_ref<T>) {
 			return toString(obj.get());
 		}
-		if constexpr (std::ranges::range<T>) {
+		else if constexpr (std::ranges::range<T>) {
 			std::string result = "[";
 			auto iter = obj.begin();
 			if (iter != obj.end()) {
@@ -257,12 +280,14 @@ export namespace fbc::futil {
 			result += "]";
 			return result;
 		}
-		if constexpr (c_keyed<T>) {
+		else if constexpr (c_keyed<T>) {
 			return obj;
 		}
-		std::ostringstream oss;
-		oss << obj;
-		return oss.str();
+		else {
+			std::ostringstream oss;
+			oss << obj;
+			return oss.str();
+		}
 	}
 
 	// Same as toString but applies string quotes on strings (used for JSON serialization)

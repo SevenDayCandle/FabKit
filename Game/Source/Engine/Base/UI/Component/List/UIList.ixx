@@ -33,10 +33,14 @@ export namespace fbc {
 		inline FFont& getItemFont() const { return itemFont; }
 		inline int size() const { return rows.size(); }
 
-		template <c_itr<T> Iterable> UIList& addItems(Iterable& items);
-		template <c_itr<T*> Iterable> UIList& addItems(Iterable& items);
-		template <c_itr<T> Iterable> UIList& setItems(Iterable& items);
-		template <c_itr<T*> Iterable> UIList& setItems(Iterable& items);
+		template <c_itr<T> Iterable> UIList& addItems(const Iterable& items);
+		template <c_itr<T*> Iterable> UIList& addItems(const Iterable& items);
+		template <c_varg<T>... Args> UIList& addItems(Args&&... items);
+		template <c_varg<T*>... Args> UIList& addItems(Args&&... items);
+		template <c_itr<T> Iterable> UIList& setItems(const Iterable& items);
+		template <c_itr<T*> Iterable> UIList& setItems(const Iterable& items);
+		template <c_varg<T>... Args> UIList& setItems(Args&&... items);
+		template <c_varg<T*>... Args> UIList& setItems(Args&&... items);
 		UIList& setItemFont(FFont& itemFont);
 		UIList& setLabelFunc(func<str(const T&)> labelFunc);
 		UIList& setMaxRows(int rows);
@@ -55,13 +59,13 @@ export namespace fbc {
 		sdl::Color backgroundColor = sdl::COLOR_WHITE;
 		IDrawable& background;
 		FFont& itemFont = cct.fontRegular();
-		func<const str(T&)> labelFunc;
+		func<str(const T&)> labelFunc;
 		vec<uptr<UIEntry<T>>> rows;
 
-		inline virtual int getVisibleRowCount() const { return maxRows; }
+		inline virtual int getVisibleRowCount() const { return std::min(static_cast<int>(rows.size()), this->maxRows);; }
 		inline static float rMargin() { return cfg.renderScale(MARGIN); }
 
-		virtual void makeRow(T& item);
+		virtual void makeRow(const T& item);
 	private:
 		virtual void autosize();
 		virtual void refreshRows();
@@ -73,28 +77,58 @@ export namespace fbc {
 	*/
 
 	// Create rows for each item in the provided list
-	template <typename T> template <c_itr<T> Iterable> UIList<T>& UIList<T>::addItems(Iterable& items) {
-		for (T& item : items) { makeRow(item); }
+	template <typename T> template <c_itr<T> Iterable> UIList<T>& UIList<T>::addItems(const Iterable& items) {
+		for (const T& item : items) { makeRow(item); }
 		refreshRows();
 		return *this;
 	}
 
 	// Create rows for each item in the provided list (pointer version)
-	template <typename T> template <c_itr<T*> Iterable> UIList<T>& UIList<T>::addItems(Iterable& items) {
+	template <typename T> template <c_itr<T*> Iterable> UIList<T>& UIList<T>::addItems(const Iterable& items) {
+		for (T* item : items) { makeRow(*item); }
+		refreshRows();
+		return *this;
+	}
+
+	// Create rows for each item in the provided list (varargs version)
+	template<typename T> template<c_varg<T> ...Args> UIList<T>& UIList<T>::addItems(Args&&... items)
+	{
+		for (const T& item : items) { makeRow(item); }
+		refreshRows();
+		return *this;
+	}
+
+	// Create rows for each item in the provided list (varargs pointer version)
+	template<typename T> template<c_varg<T*> ...Args> UIList<T>& UIList<T>::addItems(Args&&... items)
+	{
 		for (T* item : items) { makeRow(*item); }
 		refreshRows();
 		return *this;
 	}
 
 	// Replaces the current rows with rows for each item in the provided list. Clears any selections in the process, but does NOT invoke the change callback.
-	template <typename T> template <c_itr<T> Iterable> UIList<T>& UIList<T>::setItems(Iterable& items) {
+	template <typename T> template <c_itr<T> Iterable> UIList<T>& UIList<T>::setItems(const Iterable& items) {
 		rows.clear();
 		topVisibleRowIndex = 0;
 		return addItems(items);
 	}
 
 	// Replaces the current rows with rows for each item in the provided list (pointer version). Clears any selections in the process, but does NOT invoke the change callback.
-	template <typename T> template <c_itr<T*> Iterable> UIList<T>& UIList<T>::setItems(Iterable& items) {
+	template <typename T> template <c_itr<T*> Iterable> UIList<T>& UIList<T>::setItems(const Iterable& items) {
+		rows.clear();
+		topVisibleRowIndex = 0;
+		return addItems(items);
+	}
+
+	// Replaces the current rows with rows for each item in the provided list (varargs version). Clears any selections in the process, but does NOT invoke the change callback.
+	template<typename T> template<c_varg<T> ...Args> UIList<T>& UIList<T>::setItems(Args&&... items) {
+		rows.clear();
+		topVisibleRowIndex = 0;
+		return addItems(items);
+	}
+
+	// Replaces the current rows with rows for each item in the provided list (varargs version). Clears any selections in the process, but does NOT invoke the change callback.
+	template<typename T> template<c_varg<T*> ...Args> UIList<T>& UIList<T>::setItems(Args&&... items) {
 		rows.clear();
 		topVisibleRowIndex = 0;
 		return addItems(items);
@@ -164,7 +198,7 @@ export namespace fbc {
 	}
 
 	// Create a menu row for a new item
-	template <typename T> void UIList<T>::makeRow(T& item) {
+	template <typename T> void UIList<T>::makeRow(const T& item) {
 		UIEntry<T>* entry = new UIEntry<T>(item,
 			rows.size(),
 			[this](UIEntry<T>& p) { this->selectRow(p); },

@@ -9,7 +9,7 @@ import sdl;
 import std;
 
 export namespace fbc {
-	constexpr arr<pair<int, int>, 27> RESOLUTIONS = { {
+	constexpr ilist<pair<int, int>> RESOLUTIONS = {
 		{320, 240},
 		{640, 480},
 		{800, 600},
@@ -35,7 +35,7 @@ export namespace fbc {
 		{3440, 1440},
 		{3840, 1600},
 		{3840, 2160},
-	} };
+	};
 	constexpr float BASE_DENOMINATOR = 2160;
 	constexpr strv FONT_BOLD = "Resources/Fonts/NotoSans-Bold.ttf";
 	constexpr strv FONT_REGULAR = "Resources/Fonts/NotoSans-Regular.ttf";

@@ -20,8 +20,6 @@ export namespace fbc {
 		virtual bool isHovered() override;
 		virtual void renderImpl() override;
 		virtual void updateImpl() override;
-
-		static UIDialog& create(Hitbox* hb, IDrawable& image);
 	};
 
 	bool UIDialog::isHovered()
@@ -40,13 +38,5 @@ export namespace fbc {
 		if (sdl::mouseIsLeftJustClicked() && !isHovered()) {
 			screenManager::closeOverlay(this);
 		}
-	}
-
-	UIDialog& UIDialog::create(Hitbox* hb, IDrawable& image)
-	{
-		uptr<UIDialog> ptr = std::make_unique<UIDialog>(hb, image);
-		UIDialog& res = *ptr;
-		screenManager::openOverlay(std::move(ptr));
-		return res;
 	}
 }

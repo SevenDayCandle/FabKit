@@ -32,19 +32,19 @@ export namespace fbc {
 		~UIMenu() override {}
 
 		inline bool isOpen() const { return proxy != nullptr; }
-		inline UIMenu& setFilterFunc(func<bool(UIEntry<T>*)> filterFunc) { return this->filterFunc = filterFunc, *this; }
+		inline UIMenu& setFilterFunc(func<bool(const UIEntry<T>*)> filterFunc) { return this->filterFunc = filterFunc, *this; }
 		inline UIMenu& setItemFont(FFont& itemFont) { return UIList<T>::setItemFont(itemFont), * this; }
 		inline UIMenu& setLabelFunc(func<const str(T&)> labelFunc) { return UIList<T>::setLabelFunc(labelFunc), * this; }
 		inline UIMenu& setMaxRows(int rows) { return UIList<T>::setMaxRows(rows), *this; }
-		inline UIMenu& setOnChange(func<void(vec<T*>)> onChange) { return this->onChange = onChange, *this; }
+		inline UIMenu& setOnChange(func<void(vec<const T*>)> onChange) { return this->onChange = onChange, *this; }
 		inline UIMenu& setOnClose(func<void()> onClose) { return this->onClose = onClose, *this; }
 		inline UIMenu& setOnOpen(func<void()> onOpen) { return this->onOpen = onOpen, *this; }
-		inline UIMenu& setOnSelectionUpdate(func<void(vec<UIEntry<T>*>&)> onSelectionUpdate) {return this->onSelectionUpdate = onSelectionUpdate, *this;}
+		inline UIMenu& setOnSelectionUpdate(func<void(vec<const UIEntry<T>*>&)> onSelectionUpdate) {return this->onSelectionUpdate = onSelectionUpdate, *this;}
 
 		inline int selectedSize() const { return currentIndices.size(); }
 
 		UIMenu& setSelectionLimit(int rows);
-		vec<T*> getSelectedItems();
+		vec<const T*> getSelectedItems();
 		void clearSelection();
 		void forceClosePopup();
 		void openPopup();
@@ -52,12 +52,22 @@ export namespace fbc {
 		void refreshHb() override;
 		void renderImpl() override;
 		template <c_itr<int> Iterable> void selectIndices(Iterable& indices);
+		template <c_itr<T> Iterable> void selectSelection(Iterable& items);
 		template <c_itr<T*> Iterable> void selectSelection(Iterable& items);
+		template <c_varg<T>... Args> void selectSelection(Args&&... items);
+		template <c_varg<T*>... Args> void selectSelection(Args&&... items);
+		void selectSingle(T item);
+		void selectSingle(T* item);
 		void selectRow(UIEntry<T>& entry) override;
 		void unsetProxy();
 		void updateImpl() override;
 		template <c_itr<int> Iterable> void updateIndices(Iterable& indices);
+		template <c_itr<T> Iterable> void updateSelection(Iterable& indices);
 		template <c_itr<T*> Iterable> void updateSelection(Iterable& indices);
+		template <c_varg<T>... Args> void updateSelection(Args&&... items);
+		template <c_varg<T*>... Args> void updateSelection(Args&&... items);
+		void updateSingle(T item);
+		void updateSingle(T* item);
 
 		static uptr<UIMenu> multiMenu(Hitbox* hb, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); }, FFont& itemFont = cct.fontRegular(), IDrawable& background = cct.images.hoverPanel);
 		static uptr<UIMenu> singleMenu(Hitbox* hb, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); }, FFont& itemFont = cct.fontRegular(), IDrawable& background = cct.images.hoverPanel);
@@ -69,11 +79,11 @@ export namespace fbc {
 
 	private:
 		int selectionLimit = std::numeric_limits<int>::max();
-		func<bool(UIEntry<T>*)> filterFunc;
-		func<void(vec<T*>)> onChange;
+		func<bool(const UIEntry<T>*)> filterFunc;
+		func<void(vec<const T*>)> onChange;
 		func<void()> onClose;
 		func<void()> onOpen;
-		func<void(vec<UIEntry<T>*>&)> onSelectionUpdate;
+		func<void(vec<const UIEntry<T>*>&)> onSelectionUpdate;
 		UIVerticalScrollbar scrollbar;
 		IOverlay* proxy;
 
@@ -105,9 +115,40 @@ export namespace fbc {
 		changeEvent();
 	}
 
+
+	// Updates the selected indexes based on the given items. DOES invoke the change callback.
+	template <typename T> template <c_itr<T> Iterable> void UIMenu<T>::selectSelection(Iterable& items) {
+		updateSelection(items);
+		changeEvent();
+	}
+
 	// Updates the selected indexes based on the given items. DOES invoke the change callback.
 	template <typename T> template <c_itr<T*> Iterable> void UIMenu<T>::selectSelection(Iterable& items) {
 		updateSelection(items);
+		changeEvent();
+	}
+
+	// Updates the selected indexes based on the given items. DOES invoke the change callback.
+	template<typename T> template<c_varg<T> ...Args> void UIMenu<T>::selectSelection(Args&&... items) {
+		updateSelection(items);
+		changeEvent();
+	}
+
+	// Updates the selected indexes based on the given items. DOES invoke the change callback.
+	template<typename T> template<c_varg<T*> ...Args> void UIMenu<T>::selectSelection(Args&&... items) {
+		updateSelection(items);
+		changeEvent();
+	}
+
+	// Updates the selected indexes based on the given item. DOES invoke the change callback.
+	template<typename T> void UIMenu<T>::selectSingle(T item) {
+		updateSingle(item);
+		changeEvent();
+	}
+
+	// Updates the selected indexes based on the given item. DOES invoke the change callback.
+	template<typename T> void UIMenu<T>::selectSingle(T* item) {
+		updateSingle(item);
 		changeEvent();
 	}
 
@@ -120,11 +161,62 @@ export namespace fbc {
 	}
 
 	// Updates the selected indexes based on the given items. Does NOT invoke the change callback.
+	template <typename T> template <c_itr<T> Iterable> void UIMenu<T>::updateSelection(Iterable& items) {
+		currentIndices.clear();
+		for (const uptr<UIEntry<T>>& row : this->rows) {
+			opt<T> res = futil::find(items, row->item);
+			if (res != std::nullopt) { currentIndices.insert(row->index); }
+		}
+		for (const uptr<UIEntry<T>>& row : this->rows) { row->updateSelectStatus(currentIndices.contains(row->index)); }
+		updateForSelection();
+	}
+
+	// Updates the selected indexes based on the given items. Does NOT invoke the change callback.
 	template <typename T> template <c_itr<T*> Iterable> void UIMenu<T>::updateSelection(Iterable& items) {
 		currentIndices.clear();
 		for (const uptr<UIEntry<T>>& row : this->rows) {
 			opt<T> res = futil::find(items, &row->item);
-			if (res != std::nullopt) { currentIndices.insert(row.index); }
+			if (res != std::nullopt) { currentIndices.insert(row->index); }
+		}
+		for (const uptr<UIEntry<T>>& row : this->rows) { row->updateSelectStatus(currentIndices.contains(row->index)); }
+		updateForSelection();
+	}
+
+	// Updates the selected indexes based on the given items (varargs version). Does NOT invoke the change callback.
+	template<typename T> template<c_varg<T> ...Args> void UIMenu<T>::updateSelection(Args&&... items)
+	{
+		uset<T*> set{ std::forward<Args>(items)... };
+		updateSelection(set);
+	}
+
+	// Updates the selected indexes based on the given items (varargs version). Does NOT invoke the change callback.
+	template<typename T> template<c_varg<T*> ...Args> void UIMenu<T>::updateSelection(Args&&... items)
+	{
+		uset<T*> set{ std::forward<Args>(items)... };
+		updateSelection(set);
+	}
+
+	// Updates the selected indexes based on the given single item. Does NOT invoke the change callback.
+	template<typename T> void UIMenu<T>::updateSingle(T item)
+	{
+		currentIndices.clear();
+		for (const uptr<UIEntry<T>>& row : this->rows) {
+			if (item == row->item) {
+				currentIndices.insert(row->index);
+			}
+		}
+		for (const uptr<UIEntry<T>>& row : this->rows) { row->updateSelectStatus(currentIndices.contains(row->index)); }
+		updateForSelection();
+	}
+
+	// Updates the selected indexes based on the given single item. Does NOT invoke the change callback.
+	template<typename T> void UIMenu<T>::updateSingle(T* item)
+	{
+		currentIndices.clear();
+		for (const uptr<UIEntry<T>>& row : this->rows) {
+			if (item == &row->item) {
+				currentIndices.insert(row->index);
+			}
 		}
 		for (const uptr<UIEntry<T>>& row : this->rows) { row->updateSelectStatus(currentIndices.contains(row->index)); }
 		updateForSelection();
@@ -151,8 +243,8 @@ export namespace fbc {
 	}
 
 	// Returns the entries corresponding with the currently selected indices
-	template <typename T> vec<T*> UIMenu<T>::getSelectedItems() {
-		vec<T*> items;
+	template <typename T> vec<const T*> UIMenu<T>::getSelectedItems() {
+		vec<const T*> items;
 		for (int i : currentIndices) { items.push_back(&(this->rows[i]->item)); }
 		return items;
 	}
@@ -314,7 +406,7 @@ export namespace fbc {
 	// Hook used to update dropdowns to update their display strings
 	template <typename T> void UIMenu<T>::updateForSelection() {
 		if (onSelectionUpdate) {
-			vec<UIEntry<T>*> items;
+			vec<const UIEntry<T>*> items;
 			for (int i : currentIndices) { items.push_back(this->rows[i].get()); }
 			onSelectionUpdate(items);
 		}

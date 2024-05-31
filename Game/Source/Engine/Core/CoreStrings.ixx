@@ -14,6 +14,9 @@ export namespace fbc {
 
 		void initialize() override;
 
+		inline str options_graphics_fps() const { return uiStrings.at("options_graphics_fps"); };
+		inline str options_graphics_resolution() const { return uiStrings.at("options_graphics_resolution"); };
+		inline str options_graphics_vsync() const { return uiStrings.at("options_graphics_vsync"); };
 		inline str options_section_graphics() const { return uiStrings.at("options_section_graphics"); };
 		inline str options_section_sound() const { return uiStrings.at("options_section_sound"); };
 		inline str options_section_text() const { return uiStrings.at("options_section_text"); };

@@ -20,11 +20,11 @@ export namespace fbc {
 			UIList<T>(hb, labelFunc, itemFont, background) {}
 		virtual ~UINavigation() {}
 
-		inline T* getSelectedItem() { return &this->rows[currentIndex]->item; }
+		inline const T* getSelectedItem() { return &this->rows[currentIndex]->item; }
 		inline UINavigation& setItemFont(FFont& itemFont) { return UIList<T>::setItemFont(itemFont), * this; }
 		inline UINavigation& setLabelFunc(func<const str(T&)> labelFunc) { return UIList<T>::setLabelFunc(labelFunc), * this; }
 		inline UINavigation& setMaxRows(int rows) { return UIList<T>::setMaxRows(rows), * this; }
-		inline UINavigation& setOnChange(func<void(T*)> onChange) { return this->onChange = onChange, *this; }
+		inline UINavigation& setOnChange(func<void(const T*)> onChange) { return this->onChange = onChange, *this; }
 
 		void select(int ind);
 		void select(T& item);
@@ -32,7 +32,7 @@ export namespace fbc {
 	protected:
 		int currentIndex = 0;
 	private:
-		func<void(T*)> onChange;
+		func<void(const T*)> onChange;
 
 		void changeEvent();
 	};

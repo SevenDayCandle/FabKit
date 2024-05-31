@@ -26,7 +26,7 @@ export namespace fbc {
 			IDrawable& arrow = cct.images.uiArrowSmall.get(),
 			IDrawable& clear = cct.images.uiClearSmall.get(),
 			FFont& textFont = cct.fontRegular(),
-			func<str(vec<UIEntry<T>*>)> buttonLabelFunc = {}
+			func<str(vec<const UIEntry<T>*>)> buttonLabelFunc = {}
 		) : UIDropdown<T>(hb, menu, image, arrow, clear, textFont, buttonLabelFunc) {
 			initSearchable();
 		}
@@ -36,7 +36,7 @@ export namespace fbc {
 			IDrawable& arrow = cct.images.uiArrowSmall.get(),
 			IDrawable& clear = cct.images.uiClearSmall.get(),
 			FFont& textFont = cct.fontRegular(),
-			func<str(vec<UIEntry<T>*>)> buttonLabelFunc = {}
+			func<str(vec<const UIEntry<T>*>)> buttonLabelFunc = {}
 		) : UIDropdown<T>(hb, std::move(menu), image, arrow, clear, textFont, buttonLabelFunc) {
 			initSearchable();
 		}
@@ -53,7 +53,7 @@ export namespace fbc {
 
 		static uptr<UISearchableDropdown> multiMenu(Hitbox* hb,
 			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
-			func<str(vec<UIEntry<T>*>)> buttonLabelFunc = {},
+			func<str(vec<const UIEntry<T>*>)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
 			IDrawable& background = cct.images.hoverPanel,
@@ -62,7 +62,7 @@ export namespace fbc {
 			IDrawable& clear = cct.images.uiClearSmall.get());
 		static uptr<UISearchableDropdown> singleMenu(Hitbox* hb,
 			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
-			func<str(vec<UIEntry<T>*>)> buttonLabelFunc = {},
+			func<str(vec<const UIEntry<T>*>)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
 			IDrawable& background = cct.images.hoverPanel,
@@ -72,11 +72,11 @@ export namespace fbc {
 	protected:
 		void updateCaretPos() override;
 
-		virtual void onSelectionUpdate(vec<UIEntry<T>*>& items) override;
+		virtual void onSelectionUpdate(vec<const UIEntry<T>*>& items) override;
 	private:
 		str lowerBuffer;
 
-		bool checkEntry(UIEntry<T>* entry);
+		bool checkEntry(const UIEntry<T>* entry);
 		void initSearchable();
 		void onBufferUpdated() override;
 		void resetBuffer() override;
@@ -127,7 +127,7 @@ export namespace fbc {
 	}
 
 	// Directly set the textInfo text to avoid updating the display textureCache and hiding your text input
-	template<typename T> void UISearchableDropdown<T>::onSelectionUpdate(vec<UIEntry<T>*>& items) {
+	template<typename T> void UISearchableDropdown<T>::onSelectionUpdate(vec<const UIEntry<T>*>& items) {
 		if (this->isOpen()) {
 			TextInfo::text = this->getButtonText(items);
 		}
@@ -137,7 +137,7 @@ export namespace fbc {
 	}
 
 	// An entry matches if the buffer is a prefix of the entry's text
-	template<typename T> bool UISearchableDropdown<T>::checkEntry(UIEntry<T>* entry) {
+	template<typename T> bool UISearchableDropdown<T>::checkEntry(const UIEntry<T>* entry) {
 		strv text = entry->getText();
 		if (lowerBuffer.size() > text.size()) {
 			return false;
@@ -161,7 +161,7 @@ export namespace fbc {
 
 	template<typename T> void UISearchableDropdown<T>::initSearchable()
 	{
-		this->menu->setFilterFunc([this](UIEntry<T>* item) {return this->checkEntry(item); });
+		this->menu->setFilterFunc([this](const UIEntry<T>* item) {return this->checkEntry(item); });
 		this->menu->setOnClose([this]() {this->releaseBuffer(); });
 		this->initCaret(this->font, this->hb->x, this->hb->y);
 	}
@@ -181,7 +181,7 @@ export namespace fbc {
 	}
 
 	template<typename T> uptr<UISearchableDropdown<T>> UISearchableDropdown<T>::multiMenu(
-		Hitbox* hb, func<str(const T&)> labelFunc, func<str(vec<UIEntry<T>*>)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
+		Hitbox* hb, func<str(const T&)> labelFunc, func<str(vec<const UIEntry<T>*>)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
 	{
 		return std::make_unique<UISearchableDropdown<T>>(
 			hb,
@@ -195,7 +195,7 @@ export namespace fbc {
 	}
 
 	template<typename T> uptr<UISearchableDropdown<T>> UISearchableDropdown<T>::singleMenu(
-		Hitbox* hb, func<str(const T&)> labelFunc, func<str(vec<UIEntry<T>*>)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
+		Hitbox* hb, func<str(const T&)> labelFunc, func<str(vec<const UIEntry<T>*>)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
 	{
 		return std::make_unique<UISearchableDropdown<T>>(
 			hb,

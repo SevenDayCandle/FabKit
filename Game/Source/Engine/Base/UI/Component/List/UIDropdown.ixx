@@ -27,7 +27,7 @@ export namespace fbc {
 			IDrawable& arrow = cct.images.uiArrowSmall.get(),
 			IDrawable& clear = cct.images.uiClearSmall.get(),
 			FFont& textFont = cct.fontRegular(),
-			func<str(vec<UIEntry<T>*>&)> buttonLabelFunc = {}
+			func<str(vec<const UIEntry<T>*>&)> buttonLabelFunc = {}
 		): UIInteractable(hb, image), TextInfo(textFont), menu(menu), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
 			init();
 		}
@@ -37,7 +37,7 @@ export namespace fbc {
 			IDrawable& arrow = cct.images.uiArrowSmall.get(),
 			IDrawable& clear = cct.images.uiClearSmall.get(),
 			FFont& textFont = cct.fontRegular(),
-			func<str(vec<UIEntry<T>*>&)> buttonLabelFunc = {}
+			func<str(vec<const UIEntry<T>*>&)> buttonLabelFunc = {}
 		): UIInteractable(hb, image), TextInfo(textFont), menu(std::move(menu)), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
 			init();
 		}
@@ -49,7 +49,7 @@ export namespace fbc {
 		inline bool isOpen() { return proxy != nullptr; }
 		inline int selectedSize() const { return menu->selectedSize(); }
 		inline UIDropdown& setEntryFunc(func<UIEntry<T>*(UIMenu<T>&, T&, str&, int)> entryFunc) { return menu->setEntryFunc(entryFunc), *this; }
-		inline UIDropdown& setOnChange(func<void(vec<T*>&)> onChange) { return menu->setOnChange(onChange), * this; }
+		inline UIDropdown& setOnChange(func<void(vec<const T*>)> onChange) { return menu->setOnChange(onChange), * this; }
 		inline virtual UIDropdown& setOnClose(func<void()> onClose) { return this->onClose = onClose, *this; }
 		inline UIDropdown& setOnOpen(func<void()> onOpen) { return this->onOpen = onOpen, *this; }
 		inline int size() { return menu->size(); }
@@ -58,15 +58,29 @@ export namespace fbc {
 		inline vec<T*> getAllItems() { return menu->getAllItems(); }
 		inline vec<T*> getSelectedItems() { return menu->getSelectedItems(); }
 		inline void clearSelection() { menu->clearSelection(); }
-		template <c_itr<int> Iterable> inline void selectIndices(Iterable& indices) { return menu->selectIndices(indices), *this; }
-		template <c_itr<T> Iterable> inline void selectSelection(Iterable& items) { return menu->selectSelection(items), *this; }
-		template <c_itr<int> Iterable> inline void updateIndices(Iterable& indices) { return menu->updateIndices(indices), *this; }
-		template <c_itr<T> Iterable> inline void updateSelection(Iterable& indices) { return menu->updateSelection(indices), *this; }
+		inline void selectSingle(T item) { menu->selectSingle(item); }
+		inline void selectSingle(T* item) { menu->selectSingle(item); }
+		inline void updateSingle(T item) { menu->updateSingle(item); }
+		inline void updateSingle(T* item) { menu->updateSingle(item); }
+		template <c_itr<int> Iterable> inline void selectIndices(Iterable& indices) { menu->selectIndices(indices); }
+		template <c_itr<T> Iterable> inline void selectSelection(Iterable& items) { menu->selectSelection(items); }
+		template <c_itr<T*> Iterable> inline void selectSelection(Iterable& items) { menu->selectSelection(items); }
+		template <c_varg<T>... Args> inline void selectSelection(Args&&... items) { menu->selectSelection(items); }
+		template <c_varg<T*>... Args> inline void selectSelection(Args&&... items) { menu->selectSelection(items); }
+		template <c_itr<int> Iterable> inline void updateIndices(Iterable& indices) { menu->updateIndices(indices); }
+		template <c_itr<T> Iterable> inline void updateSelection(Iterable& items) { menu->updateSelection(items); }
+		template <c_itr<T*> Iterable> inline void updateSelection(Iterable& items) { menu->updateSelection(items); }
+		template <c_varg<T>... Args> inline void updateSelection(Args&&... items) { menu->updateSelection(items); }
+		template <c_varg<T*>... Args> inline void updateSelection(Args&&... items) { menu->updateSelection(items); }
 
 		template <c_itr<T> Iterable> UIDropdown& addItems(const Iterable& items);
 		template <c_itr<T*> Iterable> UIDropdown& addItems(const Iterable& items);
+		template <c_varg<T>... Args> UIDropdown& addItems(Args&&... items);
+		template <c_varg<T*>... Args> UIDropdown& addItems(Args&&... items);
 		template <c_itr<T> Iterable> UIDropdown& setItems(const Iterable& items);
 		template <c_itr<T*> Iterable> UIDropdown& setItems(const Iterable& items);
+		template <c_varg<T>... Args> UIDropdown& setItems(Args&&... items);
+		template <c_varg<T*>... Args> UIDropdown& setItems(Args&&... items);
 		void forceClosePopup();
 		virtual void onSizeUpdated() override;
 		virtual void openPopup();
@@ -77,7 +91,7 @@ export namespace fbc {
 
 		static uptr<UIDropdown> multiMenu(Hitbox* hb, 
 			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
-			func<str(vec<UIEntry<T>*>&)> buttonLabelFunc = {},
+			func<str(vec<const UIEntry<T>*>&)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
 			IDrawable& background = cct.images.hoverPanel,
@@ -86,7 +100,7 @@ export namespace fbc {
 			IDrawable& clear = cct.images.uiClearSmall.get());
 		static uptr<UIDropdown> singleMenu(Hitbox* hb, 
 			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
-			func<str(vec<UIEntry<T>*>&)> buttonLabelFunc = {},
+			func<str(vec<const UIEntry<T>*>&)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
 			IDrawable& background = cct.images.hoverPanel,
@@ -98,12 +112,12 @@ export namespace fbc {
 		IDrawable& clear;
 		sdl::RectF arrowRect;
 
-		str getButtonText(vec<UIEntry<T>*>& items);
+		str getButtonText(vec<const UIEntry<T>*>& items);
 		virtual void clickLeftEvent() override;
 		virtual inline void onChangeItems() {}
-		virtual void onSelectionUpdate(vec<UIEntry<T>*>& items);
+		virtual void onSelectionUpdate(vec<const UIEntry<T>*>& items);
 	private:
-		func<str(vec<UIEntry<T>*>&)> buttonLabelFunc;
+		func<str(vec<const UIEntry<T>*>&)> buttonLabelFunc;
 		func<void()> onClose;
 		func<void()> onOpen;
 		IOverlay* proxy;
@@ -184,18 +198,18 @@ export namespace fbc {
 	}
 
 	// Updates the text shown on the button by default, this may be overriden in derivative types
-	template<typename T> void UIDropdown<T>::onSelectionUpdate(vec<UIEntry<T>*>& items) {
+	template<typename T> void UIDropdown<T>::onSelectionUpdate(vec<const UIEntry<T>*>& items) {
 		setText(getButtonText(items));
 	}
 
 	template<typename T> void UIDropdown<T>::init()
 	{
-		this->menu->setOnSelectionUpdate([this](vec<UIEntry<T>*>& items) { this->onSelectionUpdate(items); });
+		this->menu->setOnSelectionUpdate([this](vec<const UIEntry<T>*>& items) { this->onSelectionUpdate(items); });
 		UIDropdown<T>::onSizeUpdated();
 	}
 
 	template<typename T> uptr<UIDropdown<T>> UIDropdown<T>::multiMenu(
-		Hitbox* hb, func<str(const T&)> labelFunc, func<str(vec<UIEntry<T>*>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
+		Hitbox* hb, func<str(const T&)> labelFunc, func<str(vec<const UIEntry<T>*>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
 	{
 		return std::make_unique<UIDropdown<T>>(
 			hb,
@@ -209,7 +223,7 @@ export namespace fbc {
 	}
 
 	template<typename T> uptr<UIDropdown<T>> UIDropdown<T>::singleMenu(
-		Hitbox* hb, func<str(const T&)> labelFunc, func<str(vec<UIEntry<T>*>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
+		Hitbox* hb, func<str(const T&)> labelFunc, func<str(vec<const UIEntry<T>*>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
 	{
 		return std::make_unique<UIDropdown<T>>(
 			hb,
@@ -224,13 +238,13 @@ export namespace fbc {
 
 	// The text on the dropdown should reflect the contents of the selected menu items.
 	// If no button label function is set, this will default to joining the string representations of each entry. If this text is too long, the displayed text will instead show the number of items selected
-	template<typename T> str UIDropdown<T>::getButtonText(vec<UIEntry<T>*>& items)
+	template<typename T> str UIDropdown<T>::getButtonText(vec<const UIEntry<T>*>& items)
 	{
 		if (buttonLabelFunc) {
 			return buttonLabelFunc(items);
 		}
 		else {
-			str displayText = (futil::joinStrMap(", ", items, [](UIEntry<T>* entry) {return entry->getText(); }));
+			str displayText = (futil::joinStrMap(", ", items, [](const UIEntry<T>* entry) {return entry->getText(); }));
 			if (this->font.measureW(displayText) > hb->w) {
 				return cct.strings.ui_items(this->selectedSize());
 			}
@@ -260,8 +274,23 @@ export namespace fbc {
 		return *this;
 	}
 
-
 	template<typename T> template<c_itr<T*> Iterable> UIDropdown<T>& UIDropdown<T>::addItems(const Iterable& items)
+	{
+		this->menu->addItems(items);
+		onChangeItems();
+		return *this;
+	}
+
+
+	template<typename T> template<c_varg<T> ...Args> UIDropdown<T>& UIDropdown<T>::addItems(Args&&... items)
+	{
+		this->menu->addItems(items);
+		onChangeItems();
+		return *this;
+	}
+
+
+	template<typename T> template<c_varg<T*> ...Args> UIDropdown<T>& UIDropdown<T>::addItems(Args&&... items)
 	{
 		this->menu->addItems(items);
 		onChangeItems();
@@ -278,6 +307,21 @@ export namespace fbc {
 	template<typename T> template<c_itr<T*> Iterable> UIDropdown<T>& UIDropdown<T>::setItems(const Iterable& items)
 	{
 		this->menu->setItems(items);
+		onChangeItems();
+		return *this;
+	}
+
+	template<typename T> template<c_varg<T> ...Args> UIDropdown<T>& UIDropdown<T>::setItems(Args&&... items)
+	{
+		this->menu->addItems(items);
+		onChangeItems();
+		return *this;
+	}
+
+
+	template<typename T> template<c_varg<T*> ...Args> UIDropdown<T>& UIDropdown<T>::setItems(Args&&... items)
+	{
+		this->menu->addItems(items);
 		onChangeItems();
 		return *this;
 	}

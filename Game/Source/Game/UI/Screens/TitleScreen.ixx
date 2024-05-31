@@ -4,6 +4,7 @@ import fbc.CoreContent;
 import fbc.ScreenPosHitbox;
 import fbc.ScreenSizeHitbox;
 import fbc.ScreenManager;
+import fbc.SettingsDialog;
 import fbc.SetupScreen;
 import fbc.UIButton;
 import fbc.UICanvas;
@@ -21,7 +22,8 @@ export namespace fbc {
 				cct.fontRegular(),
 				cct.strings.screen_title_header()));
 			b.setOnClick([](UIButton& i) {
-				screenManager::openScreen(std::make_unique<SetupScreen>());
+				SettingsDialog::openNew();
+				//screenManager::openScreen(std::make_unique<SetupScreen>());
 				});
 		}
 	};
