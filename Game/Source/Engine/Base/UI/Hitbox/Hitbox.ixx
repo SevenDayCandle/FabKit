@@ -20,10 +20,13 @@ export namespace fbc {
 		inline float cX() const { return x + (w / 2); }
 		inline float cY() const { return y + (h / 2); }
 		inline float getOffsetPosX() const { return offsetPosX; }
+		inline float getOffsetPosX(float mult) const { return offsetPosX * mult; }
 		inline float getOffsetPosY() const { return offsetPosY; }
+		inline float getOffsetPosY(float mult) const { return offsetPosY * mult; }
 		inline float getOffsetSizeX() const { return offsetSizeX; }
+		inline float getOffsetSizeX(float mult) const { return offsetSizeX * mult; }
 		inline float getOffsetSizeY() const { return offsetSizeY; }
-		inline Hitbox& moveCenter(const float x, const float y) { return move(x - (w / 2), y - (h / 2)); }
+		inline float getOffsetSizeY(float mult) const { return offsetSizeY * mult; }
 
 		Hitbox& setExactPos(const float x, const float y);
 		Hitbox& setExactPosX(const float x);
@@ -38,8 +41,6 @@ export namespace fbc {
 		Hitbox& setOffsetSizeX(const float x);
 		Hitbox& setOffsetSizeY(const float y);
 		void refresh();
-		virtual Hitbox& move(const float x, const float y);
-		virtual Hitbox& resize(const float x, const float y);
 		virtual void update();
 	protected:
 		bool just = false;
@@ -66,38 +67,12 @@ export namespace fbc {
 		return sdl::mouseIsHovering(*this);
 	}
 
-	// Move the top-left corner of the hitbox to the exact given coordinates, without updating the offsets.
-	// If you want to manipulate the positions of hitboxes relative to some other reference (e.g. changing the distance of a RelativeHitbox from its parent), you should use setOffsetPos instead
-	Hitbox& Hitbox::move(const float x, const float y)
-	{
-		this->x = x;
-		this->y = y;
-		return *this;
-	}
-
-	// Resize the ui, without updating the offsets
-	Hitbox& Hitbox::resize(const float x, const float y)
-	{
-		this->w = x;
-		this->h = y;
-		return *this;
-	}
-
 	// Set the x/y position, then update the offsets based on that new position
 	Hitbox& Hitbox::setExactPos(const float x, const float y) {
 		this->x = x;
 		this->y = y;
 		refreshOffsetPosX();
 		refreshOffsetPosY();
-		return *this;
-	}
-
-	// Set the x/y size, then update the offsets based on that new size
-	Hitbox& Hitbox::setExactSize(const float x, const float y){
-		this->w = x;
-		this->h = y;
-		refreshOffsetSizeX();
-		refreshOffsetSizeY();
 		return *this;
 	}
 
@@ -112,6 +87,15 @@ export namespace fbc {
 	Hitbox& Hitbox::setExactPosY(const float y){
 		this->y = y;
 		refreshOffsetPosY();
+		return *this;
+	}
+
+	// Set the x/y size, then update the offsets based on that new size
+	Hitbox& Hitbox::setExactSize(const float x, const float y) {
+		this->w = x;
+		this->h = y;
+		refreshOffsetSizeX();
+		refreshOffsetSizeY();
 		return *this;
 	}
 

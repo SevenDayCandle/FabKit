@@ -68,9 +68,9 @@ export namespace fbc {
 
 		inline int getScreenXSize() { return graphicsResolution.get().first; }
 		inline int getScreenYSize() { return graphicsResolution.get().second; };
-		inline float fontScale() const noexcept { return fontScalePrivate; } // Gets the scale factor to resize fonts by. Resolution uses the height of a 4k screen as a base
+		inline float fontScale() const noexcept { return fontScalePrivate; } // Gets the scale factor to setExactSize fonts by. Resolution uses the height of a 4k screen as a base
 		inline float fontScale(float mult) const noexcept { return fontScalePrivate * mult; } // Multiplies the constant by the screen scale factor. ONLY USE THIS when you need to modify offsets within methods by some constant factor or by a size variable in a class, and NOT when initializing sizes on UI components.
-		inline float renderScale() const noexcept { return renderScalePrivate; } // Gets the scale factor to resize elements by. Resolution uses the height of a 4k screen as a base
+		inline float renderScale() const noexcept { return renderScalePrivate; } // Gets the scale factor to setExactSize elements by. Resolution uses the height of a 4k screen as a base
 		inline float renderScale(float mult) const noexcept { return renderScalePrivate * mult; } // Multiplies the constant by the screen scale factor. ONLY USE THIS when you need to modify offsets within methods by some constant factor or by a size variable in a class, and NOT when initializing sizes on UI components.
 
 		const Language& getLanguage();
@@ -102,7 +102,7 @@ export namespace fbc {
 		fontScalePrivate = renderScalePrivate * textFontScale.get();
 	}
 
-	// When the window size parameters change, we should resize the window and update renderScalePrivate
+	// When the window size parameters change, we should setExactSize the window and update renderScalePrivate
 	void CoreConfig::resizeWindow()
 	{
 		sdl::windowSetSize(getScreenXSize(), getScreenYSize());

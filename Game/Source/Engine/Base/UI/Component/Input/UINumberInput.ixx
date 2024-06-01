@@ -9,20 +9,20 @@ import fbc.UIButton;
 import fbc.UIInteractable;
 import fbc.TextInfo;
 import fbc.FUtil;
-import fbc.ILabeled;
+import fbc.UITitledInteractable;
 import fbc.ITextInputter;
 import sdl;
 import std;
 
 export namespace fbc {
-	export class UINumberInput : public UIInteractable, public TextInfo, public ITextInputter, public ILabeled {
+	export class UINumberInput : public UITitledInteractable, public TextInfo, public ITextInputter {
 	public:
 		UINumberInput(Hitbox* hb,
 			int limMin = 0,
 			int limMax = std::numeric_limits<int>::max(),
 			IDrawable& image = cct.images.panel,
 			IDrawable& arrow = cct.images.uiArrowIncrement.get(),
-			FFont& textFont = cct.fontRegular()) : UIInteractable(hb, image), TextInfo(textFont), limMin(limMin), limMax(limMax), arrow(arrow) {
+			FFont& textFont = cct.fontRegular()) : UITitledInteractable(hb, image), TextInfo(textFont), limMin(limMin), limMax(limMax), arrow(arrow) {
 			initCaret(this->font, this->hb->x, this->hb->y);
 			UINumberInput::onSizeUpdated();
 		}
@@ -95,10 +95,7 @@ export namespace fbc {
 
 	void UINumberInput::renderImpl()
 	{
-		if (label) {
-			label->drawText(hb->x, hb->y);
-		}
-		UIInteractable::renderImpl();
+		UITitledInteractable::renderImpl();
 		TextInfo::drawText(hb->x, hb->y);
 		arrow.draw(&lessRect);
 		arrow.draw(&moreRect, { 0,0 },  0, sdl::FlipMode::SDL_FLIP_VERTICAL);

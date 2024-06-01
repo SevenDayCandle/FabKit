@@ -1,5 +1,7 @@
 export module fbc.SettingsDialogPage;
 
+import fbc.CoreContent;
+import fbc.CoreConfig;
 import fbc.ConfigItem;
 import fbc.FUtil;
 import fbc.Hitbox;
@@ -46,8 +48,8 @@ export namespace fbc {
 
 		friend std::ostream& operator<<(std::ostream& os, const SettingsDialogPage& obj) { return os << obj.name; }
 
-		template <typename T, c_itr<T> Iterable> inline UIDropdown<T>& addDropdown(ConfigItem<T>& conf, strv name, Iterable& items, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); }) { return addDropdownImpl<T, Iterable>(conf, name, items, labelFunc); }
-		template <typename T, c_itr<T*> Iterable> inline UIDropdown<T>& addDropdown(ConfigItem<T>& conf, strv name, Iterable& items, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); }) { return addDropdownImpl<T, Iterable>(conf, name, items, labelFunc); }
+		template <typename T, c_itr<T> Iterable> inline UIDropdown<T>& addDropdown(ConfigItem<T>& conf, strv name, const Iterable& items, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); }) { return addDropdownImpl<T, Iterable>(conf, name, items, labelFunc); }
+		template <typename T, c_itr<T*> Iterable> inline UIDropdown<T>& addDropdown(ConfigItem<T>& conf, strv name, const Iterable& items, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); }) { return addDropdownImpl<T, Iterable>(conf, name, items, labelFunc); }
 		template <typename T, typename U, c_itr<U> Iterable> inline UIDropdown<U>& addDropdownMapped(ConfigItem<T>& conf, strv name, Iterable& items, func<T(const U*)> convFunc, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); }) { return addDropdownMappedImpl<T, U, Iterable>(conf, name, items, convFunc, labelFunc); }
 		template <typename T, typename U, c_itr<U*> Iterable> inline UIDropdown<U>& addDropdownMapped(ConfigItem<T>& conf, strv name, Iterable& items, func<T(const U*)> convFunc, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); }) { return addDropdownMappedImpl<T, U, Iterable>(conf, name, items, convFunc, labelFunc); }
 
@@ -59,19 +61,19 @@ export namespace fbc {
 	private:
 		vec<uptr<SettingsDialogBaseCache>> confs;
 
-		template <typename T, typename Iterable> UIDropdown<T>& addDropdownImpl(ConfigItem<T>& conf, strv name, Iterable& items, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); });
-		template <typename T, typename U, typename Iterable> UIDropdown<U>& addDropdownMappedImpl(ConfigItem<T>& conf, strv name, Iterable& items, func<T(const U*)> convFunc, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); });
+		template <typename T, typename Iterable> UIDropdown<T>& addDropdownImpl(ConfigItem<T>& conf, strv name, const Iterable& items, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); });
+		template <typename T, typename U, typename Iterable> UIDropdown<U>& addDropdownMappedImpl(ConfigItem<T>& conf, strv name, const Iterable& items, func<T(const U*)> convFunc, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); });
 	};
 
 
 	UISlider& SettingsDialogPage::addSlider(ConfigItem<int>& conf, strv name, int min, int max)
 	{
 		SettingsDialogCache<int>& cache = static_cast<SettingsDialogCache<int>&>(*confs.emplace_back(std::make_unique<SettingsDialogCache<int>>(conf)));
-		UISlider& slider = stackElementYDir(std::make_unique<UISlider>(new RelativeHitbox(*hb, 150, 100), min, max));
+		UISlider& slider = stackElementYDir(std::make_unique<UISlider>(new RelativeHitbox(*hb, 300, 0, 300, 100), min, max));
 		slider
 			.setValue(conf.get())
 			.setOnComplete([&cache](int val) {cache.value = val; })
-			.withLabel(name);
+			.withLabel(name, cct.fontBold(), cfg.renderScale(-300), 0);
 		cache.setOnReset([&slider, &conf]() {slider.setValue(conf.get()); });
 		return slider;
 	}
@@ -86,25 +88,25 @@ export namespace fbc {
 		return toggle;
 	}
 
-	template<typename T, typename Iterable> UIDropdown<T>& SettingsDialogPage::addDropdownImpl(ConfigItem<T>& conf, strv name, Iterable& items, func<str(const T&)> labelFunc)
+	template<typename T, typename Iterable> UIDropdown<T>& SettingsDialogPage::addDropdownImpl(ConfigItem<T>& conf, strv name, const Iterable& items, func<str(const T&)> labelFunc)
 	{
 		SettingsDialogCache<T>& cache = static_cast<SettingsDialogCache<T>&>(*confs.emplace_back(std::make_unique<SettingsDialogCache<T>>(conf)));
-		UIDropdown<T>& dr = stackElementYDir(UIDropdown<T>::singleMenu(new RelativeHitbox(*hb, 200, 100), labelFunc));
+		UIDropdown<T>& dr = stackElementYDir(UIDropdown<T>::singleMenu(new RelativeHitbox(*hb, 300, 0, 300, 100), labelFunc));
 		dr.setItems(items)
 			.setOnChange([&cache](vec<const T*> res) { if (res.size() > 0) cache.value = *res[0]; })
-			.withLabel(name);
+			.withLabel(name, cct.fontBold(), cfg.renderScale(-300), 0);
 		dr.updateSingle(conf.get());
 		cache.setOnReset([&dr, &conf]() {dr.selectSingle(conf.get()); });
 		return dr;
 	}
 
-	template<typename T, typename U, typename Iterable> UIDropdown<U>& SettingsDialogPage::addDropdownMappedImpl(ConfigItem<T>& conf, strv name, Iterable& items, func<T(const U*)> convFunc, func<str(const T&)> labelFunc)
+	template<typename T, typename U, typename Iterable> UIDropdown<U>& SettingsDialogPage::addDropdownMappedImpl(ConfigItem<T>& conf, strv name, const Iterable& items, func<T(const U*)> convFunc, func<str(const T&)> labelFunc)
 	{
 		SettingsDialogCache<T>& cache = static_cast<SettingsDialogCache<T>&>(*confs.emplace_back(std::make_unique<SettingsDialogCache<T>>(conf)));
-		UIDropdown<U>& dr = stackElementYDir(UIDropdown<U>::singleMenu(new RelativeHitbox(*hb, 200, 100), labelFunc));
+		UIDropdown<U>& dr = stackElementYDir(UIDropdown<U>::singleMenu(new RelativeHitbox(*hb, 300, 0, 300, 100), labelFunc));
 		dr.setItems(items)
 			.setOnChange([&cache, convFunc](vec<const U*> res) { if (res.size() > 0) cache.value = convFunc(res[0]); })
-			.withLabel(name);
+			.withLabel(name, cct.fontBold(), cfg.renderScale(-300), 0);
 		dr.updateSingle(conf.get());
 		cache.setOnReset([&dr, &conf]() {dr.selectSingle(conf.get()); });
 		return dr;

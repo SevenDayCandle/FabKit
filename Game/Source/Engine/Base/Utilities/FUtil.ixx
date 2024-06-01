@@ -123,7 +123,7 @@ export namespace fbc::futil {
 
 	// Format a pair as a dimension
 	export str dimensionString(int x, int y) {
-		return x + "x" + y;
+		return std::to_string(x) + "x" + std::to_string(x);
 	}
 
 	export str dimensionString(const pair<int,int>& p) {

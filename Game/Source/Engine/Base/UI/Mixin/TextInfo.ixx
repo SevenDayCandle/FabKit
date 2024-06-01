@@ -14,6 +14,8 @@ export namespace fbc {
 
 		inline float getTextHeight() const { return cache.h; }
 		inline float getTextWidth() const { return cache.w; }
+		inline float getTextXPos() const { return cache.x; }
+		inline float getTextYPos() const { return cache.y; }
 		inline strv getText() const { return text; }
 
 		void drawText() const;

@@ -69,7 +69,7 @@ export namespace fbc {
 			UIBase& last = *elements[elements.size() - 2];
 			Hitbox& lhb = *(last.hb);
 			float xPos = last.getEndX() + scaled;
-			float yPos = lhb.y;
+			float yPos = last.getBeginY();
 
 			if (xPos > hb->x + hb->w) {
 				xPos = hb->x;
@@ -93,7 +93,7 @@ export namespace fbc {
 		if (elements.size() > 1) {
 			UIBase& last = *elements[elements.size() - 2];
 			Hitbox& lhb = *(last.hb);
-			float xPos = lhb.x;
+			float xPos = last.getBeginX();
 			float yPos = last.getEndY() + scaled;
 
 			if (yPos > hb->y + hb->h) {

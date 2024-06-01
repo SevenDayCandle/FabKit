@@ -134,7 +134,7 @@ export namespace fbc {
 		return addItems(items);
 	}
 
-	// Updates the menu font used by rows. This will update existing rows to use the new font and will resize the menu
+	// Updates the menu font used by rows. This will update existing rows to use the new font and will setExactSize the menu
 	template <typename T>
 	UIList<T>& UIList<T>::setItemFont(FFont& itemFont) {
 		this->itemFont = itemFont;
@@ -143,7 +143,7 @@ export namespace fbc {
 		return *this;
 	}
 
-	// Updates the label function used for row titles. This will update titles on existing rows and will resize the menu
+	// Updates the label function used for row titles. This will update titles on existing rows and will setExactSize the menu
 	template<typename T> UIList<T>& UIList<T>::setLabelFunc(func<str(const T&)> labelFunc) {
 		this->labelFunc = labelFunc;
 		for (const uptr<UIEntry<T>>& row : rows) { row->setText(labelFunc(row->item)); }

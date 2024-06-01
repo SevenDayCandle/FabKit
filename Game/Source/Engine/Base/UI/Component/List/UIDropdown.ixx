@@ -6,7 +6,7 @@ import fbc.FFont;
 import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.IDrawable;
-import fbc.ILabeled;
+import fbc.UITitledInteractable;
 import fbc.IOverlay;
 import fbc.ScreenManager;
 import fbc.TextInfo;
@@ -18,7 +18,7 @@ import sdl;
 import std;
 
 export namespace fbc {
-	export template <typename T> class UIDropdown : public UIInteractable, public TextInfo, public ILabeled {
+	export template <typename T> class UIDropdown : public UITitledInteractable, public TextInfo {
 	public:
 
 		UIDropdown(Hitbox* hb, 
@@ -28,7 +28,7 @@ export namespace fbc {
 			IDrawable& clear = cct.images.uiClearSmall.get(),
 			FFont& textFont = cct.fontRegular(),
 			func<str(vec<const UIEntry<T>*>&)> buttonLabelFunc = {}
-		): UIInteractable(hb, image), TextInfo(textFont), menu(menu), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
+		): UITitledInteractable(hb, image), TextInfo(textFont), menu(menu), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
 			init();
 		}
 		UIDropdown(Hitbox* hb,
@@ -38,7 +38,7 @@ export namespace fbc {
 			IDrawable& clear = cct.images.uiClearSmall.get(),
 			FFont& textFont = cct.fontRegular(),
 			func<str(vec<const UIEntry<T>*>&)> buttonLabelFunc = {}
-		): UIInteractable(hb, image), TextInfo(textFont), menu(std::move(menu)), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
+		): UITitledInteractable(hb, image), TextInfo(textFont), menu(std::move(menu)), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
 			init();
 		}
 		virtual ~UIDropdown() override{}
@@ -162,10 +162,10 @@ export namespace fbc {
 	template<typename T> void UIDropdown<T>::openPopup() {
 		int bottom = hb->y + hb->h;
 		if (bottom + menu->hb->h > cfg.getScreenYSize()) {
-			menu->hb->move(hb->x, hb->y - menu->hb->h);
+			menu->hb->setExactPos(hb->x, hb->y - menu->hb->h);
 		}
 		else {
-			menu->hb->move(hb->x, bottom);
+			menu->hb->setExactPos(hb->x, bottom);
 		}
 		if (proxy == nullptr) {
 			screenManager::openOverlay(std::make_unique<UIDropdownProxy<T>>(*this));
@@ -177,11 +177,7 @@ export namespace fbc {
 	}
 
 	template<typename T> void UIDropdown<T>::renderImpl() {
-		if (label) {
-			label->drawText(hb->x, hb->y);
-		}
-
-		UIInteractable::renderImpl();
+		UITitledInteractable::renderImpl();
 		if (this->selectedSize() > 0) {
 			clear.draw(&arrowRect, UIImage::color, origin, rotation);
 		}
@@ -205,6 +201,7 @@ export namespace fbc {
 	template<typename T> void UIDropdown<T>::init()
 	{
 		this->menu->setOnSelectionUpdate([this](vec<const UIEntry<T>*>& items) { this->onSelectionUpdate(items); });
+		this->menu->hb->setExactPos(hb->x, hb->y);
 		UIDropdown<T>::onSizeUpdated();
 	}
 

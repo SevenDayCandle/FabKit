@@ -9,16 +9,16 @@ import fbc.UIInteractable;
 import fbc.TextInfo;
 import fbc.FUtil;
 import fbc.ITextInputter;
-import fbc.ILabeled;
+import fbc.UITitledInteractable;
 import sdl;
 import std;
 
 export namespace fbc {
-	export class UITextInput : public UIInteractable, public TextInfo, public ITextInputter, public ILabeled {
+	export class UITextInput : public UITitledInteractable, public TextInfo, public ITextInputter {
 	public:
 		UITextInput(Hitbox* hb, 
 			IDrawable& image = cct.images.panel,
-			FFont& textFont = cct.fontRegular()): UIInteractable(hb, image), TextInfo(textFont) {
+			FFont& textFont = cct.fontRegular()): UITitledInteractable(hb, image), TextInfo(textFont) {
 			initCaret(this->font, this->hb->x, this->hb->y);
 			UITextInput::onSizeUpdated();
 		}
@@ -64,10 +64,7 @@ export namespace fbc {
 
 	void UITextInput::renderImpl()
 	{
-		if (label) {
-			label->drawText(hb->x, hb->y);
-		}
-		UIInteractable::renderImpl();
+		UITitledInteractable::renderImpl();
 		TextInfo::drawText(hb->x, hb->y);
 		if (sdl::keyboardInputActive(this)) {
 			renderCaret();

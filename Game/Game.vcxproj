@@ -208,7 +208,7 @@
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\UI\Mixin\ILabeled.ixx">
+    <ClCompile Include="Source\Engine\Base\UI\Component\UITitledInteractable.ixx">
       <SubType>
       </SubType>
     </ClCompile>
