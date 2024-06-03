@@ -57,6 +57,7 @@ export namespace fbc {
 		UITextInput& addInputText(ConfigItem<str>& conf, strv name);
 		UISlider& addSlider(ConfigItem<int>& conf, strv name, int min = 0, int max = std::numeric_limits<int>::max());
 		UIToggle& addToggle(ConfigItem<bool>& conf, strv name);
+		void commit();
 		void reset();
 	private:
 		vec<uptr<SettingsDialogBaseCache>> confs;
@@ -110,6 +111,13 @@ export namespace fbc {
 		dr.updateSingle(conf.get());
 		cache.setOnReset([&dr, &conf]() {dr.selectSingle(conf.get()); });
 		return dr;
+	}
+
+	void SettingsDialogPage::commit()
+	{
+		for (const uptr<SettingsDialogBaseCache>& conf : confs) {
+			conf->commit();
+		}
 	}
 
 	void SettingsDialogPage::reset()

@@ -26,6 +26,7 @@ export namespace fbc {
 		void initialize() override;
 		void initializeFonts();
 		void postInitialize() override;
+		void reloadImages() override;
 	private:
 		uptr<FFont> fontBoldData;
 		uptr<FFont> fontRegularData;
@@ -60,5 +61,10 @@ export namespace fbc {
 	{
 		images.postInitialize();
 		strings.postInitialize();
+	}
+
+	void CoreContent::reloadImages()
+	{
+		images.initialize();
 	}
 }

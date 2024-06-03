@@ -13,8 +13,10 @@
   "screen_options": "Options",
   "screen_setup_header": "Setup Run",
   "screen_title_header": "Fabricate",
+  "ui_apply": "Apply",
   "ui_cancel": "Cancel",
   "ui_close": "Close",
   "ui_confirm": "Confirm",
-  "ui_items": "{} Items"
+  "ui_items": "{} Items",
+  "ui_save": "Save"
 }

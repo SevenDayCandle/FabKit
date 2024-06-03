@@ -112,8 +112,5 @@ export namespace fbc {
 	// Update the window from the config
 	void CoreConfig::setupWindow() {
 		sdl::initWindow(getScreenXSize(), getScreenYSize(), graphicsWindowMode.get(), graphicsVSync.get());
-		graphicsResolution.addSubscriber([this](const pair<int,int>& val) {resizeWindow(); });
-		graphicsWindowMode.addSubscriber([this](const int& val) {sdl::windowSetFullscreen(val); });
-		graphicsVSync.addSubscriber([this](const int& val) {sdl::updateVSync(val); });
 	}
 }

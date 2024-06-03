@@ -17,6 +17,7 @@ export namespace fbc {
 		inline float getTextXPos() const { return cache.x; }
 		inline float getTextYPos() const { return cache.y; }
 		inline strv getText() const { return text; }
+		inline void updateCache() { updateCache(this->text, this->color, this->colorOutline); }
 
 		void drawText() const;
 		void drawText(float offX, float offY) const;
@@ -35,7 +36,6 @@ export namespace fbc {
 		sdl::Color colorOutline = sdl::COLOR_BLACK;
 
 		inline virtual int getLimitWidth() { return 0; }
-		inline void updateCache() { updateCache(this->text, this->color, this->colorOutline); }
 		inline void updateCache(strv text) { updateCache(text, this->color, this->colorOutline); }
 		inline void updateCache(strv text, const sdl::Color& color) { updateCache(text, color, this->colorOutline); }
 		void updateCache(strv text, const sdl::Color& color, const sdl::Color& colorOutline);

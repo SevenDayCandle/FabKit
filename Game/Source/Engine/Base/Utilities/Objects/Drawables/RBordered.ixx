@@ -9,6 +9,7 @@ export namespace fbc {
 	public:
 		RBordered(IDrawable& base) : base(base), patchSize(base.getWidth() / 2.0f) {}
 		RBordered(IDrawable& base, float patchSize): base(base), patchSize(patchSize) {}
+		virtual ~RBordered() override {}
 
 		inline const sdl::RectF* getBaseRec() override { return base.getBaseRec(); }
 		inline float getHeight() override { return base.getHeight();}

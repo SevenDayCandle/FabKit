@@ -15,6 +15,8 @@ export namespace fbc {
 		const str ID;
 		const str contentFolder;
 
+		virtual void reloadImages() {}
+
 		virtual void dispose() = 0;
 		virtual void initialize() = 0;
 		virtual void postInitialize() = 0;

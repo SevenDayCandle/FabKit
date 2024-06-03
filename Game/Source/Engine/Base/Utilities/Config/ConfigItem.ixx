@@ -13,7 +13,7 @@ export namespace fbc {
 
         const str ID;
 
-        inline void addSubscriber(func<void(const T&)> callback) {onChange.push_back(callback);}
+        inline void setOnReload(func<void(const T&)> onChange) {this->onChange = onChange;}
         inline T get() {return value;}
         void set(const T& newValue);
 
@@ -26,7 +26,7 @@ export namespace fbc {
     private:
         fbc::Config& config;
         const T defaultValue;
-        vec<func<void(const T&)>> onChange;
+        func<void(const T&)> onChange;
         T value;
     };
 
@@ -54,8 +54,8 @@ export namespace fbc {
         this->value = newValue;
         // TODO use glz::write_json when it is ready to use with modules
         config.set(ID, futil::toString(newValue));
-        for (func<void(const T&)>& callback : onChange) {
-            callback(newValue);
+        if (onChange) {
+            onChange(newValue);
         }
     }
 }

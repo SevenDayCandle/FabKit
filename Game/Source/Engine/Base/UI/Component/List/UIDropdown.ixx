@@ -85,6 +85,7 @@ export namespace fbc {
 		virtual void onSizeUpdated() override;
 		virtual void openPopup();
 		virtual void refreshHb() override;
+		virtual void refreshRenderables() override;
 		virtual void renderImpl() override;
 		virtual void updateImpl() override;
 		virtual void unsetProxy();
@@ -130,7 +131,7 @@ export namespace fbc {
 		UIDropdownProxy(UIDropdown<T>& menu) : dropdown(menu) {}
 		UIDropdown<T>& dropdown;
 
-		void close() override;
+		void dispose() override;
 		void render() override;
 		void update() override;
 	};
@@ -143,6 +144,12 @@ export namespace fbc {
 	template<typename T> void UIDropdown<T>::refreshHb() {
 		UIInteractable::refreshHb();
 		this->menu->refreshHb();
+	}
+
+	template<typename T> void UIDropdown<T>::refreshRenderables() {
+		UITitledInteractable::refreshRenderables();
+		this->menu->refreshRenderables();
+		updateCache();
 	}
 
 	template<typename T> void UIDropdown<T>::unsetProxy() {
@@ -251,7 +258,7 @@ export namespace fbc {
 		}
 	}
 
-	// When clicked, open the menu if closed. Otherwise, close the menu
+	// When clicked, open the menu if closed. Otherwise, dispose the menu
 	template<typename T> void UIDropdown<T>::clickLeftEvent() {
 		if (this->selectedSize() > 0 && sdl::mouseGetX() >= arrowRect.x) {
 			clearSelection();
@@ -328,7 +335,7 @@ export namespace fbc {
 	 */
 
 	// When closed, unlink this from its menu
-	template <typename T> void UIDropdownProxy<T>::close() { dropdown.unsetProxy(); }
+	template <typename T> void UIDropdownProxy<T>::dispose() { dropdown.unsetProxy(); }
 
 	template<typename T> void UIDropdownProxy<T>::render() {
 		dropdown.menu->renderImpl();

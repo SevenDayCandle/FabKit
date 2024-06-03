@@ -10,6 +10,7 @@ using namespace fbc;
 
 void dispose() {
 	// TODO save game state as necessary
+	screenManager::dispose();
 	cct.dispose();
 	sdl::quit();
 }
@@ -38,7 +39,7 @@ bool initialize() {
 	cct.initialize();
 	cfg.setupWindow();
 
-	screenManager::initialize();
+	screenManager::subscribeToConfig();
 	screenManager::openScreen(std::make_unique<fbc::TitleScreen>());
 	return true;
 }

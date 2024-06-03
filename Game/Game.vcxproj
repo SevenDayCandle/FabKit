@@ -166,7 +166,7 @@
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Content\BaseImages.ixx" />
+    <ClCompile Include="Source\Engine\Base\Content\StaticImages.ixx" />
     <ClCompile Include="Source\Engine\Base\Content\BaseStrings.ixx" />
     <ClCompile Include="Source\Engine\Base\UI\Component\List\UIList.ixx">
       <SubType>
@@ -224,6 +224,10 @@
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Base\Utilities\ILoadable.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Engine\Base\Utilities\ISerializable.ixx">
       <SubType>
       </SubType>
@@ -236,6 +240,7 @@
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Base\Content\DynamicImages.ixx" />
     <ClCompile Include="Source\Engine\SDL\IKeyInputListener.ixx">
       <SubType>
       </SubType>

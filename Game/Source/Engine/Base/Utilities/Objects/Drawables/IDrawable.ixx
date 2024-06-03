@@ -1,10 +1,11 @@
 export module fbc.IDrawable;
 
 import fbc.FUtil;
+import fbc.ILoadable;
 import sdl;
 
 export namespace fbc {
-	export class IDrawable {
+	export class IDrawable : public ILoadable {
 	public:
 		IDrawable() {}
 		virtual ~IDrawable() {}
@@ -12,6 +13,8 @@ export namespace fbc {
 		inline void draw(const sdl::RectF* destRec, const sdl::Point& origin = { 0,0 }, float rotation = 0, sdl::FlipMode flip = sdl::FlipMode::SDL_FLIP_NONE) { drawBase(getBaseRec(), destRec, origin, rotation, flip); }
 		inline void draw(const sdl::RectF* destRec, const sdl::Color& tint, const sdl::Point& origin = { 0,0 }, float rotation = 0, sdl::FlipMode flip = sdl::FlipMode::SDL_FLIP_NONE) { draw(getBaseRec(), destRec, tint, origin, rotation, flip); }
 		inline void draw(const sdl::RectF* destRec, const sdl::BlendMode blend, const sdl::Color& tint, const sdl::Point& origin = { 0,0 }, float rotation = 0, sdl::FlipMode flip = sdl::FlipMode::SDL_FLIP_NONE) { draw(getBaseRec(), destRec, blend, tint, origin, rotation, flip); }
+		inline virtual void dispose() override {}
+		inline virtual void reload() override {}
 
 		void draw(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Color& tint, const sdl::Point& origin = { 0,0 }, float rotation = 0, sdl::FlipMode flip = sdl::FlipMode::SDL_FLIP_NONE);
 		void draw(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::BlendMode blend, const sdl::Color& tint, const sdl::Point& origin = { 0,0 }, float rotation = 0, sdl::FlipMode flip = sdl::FlipMode::SDL_FLIP_NONE);

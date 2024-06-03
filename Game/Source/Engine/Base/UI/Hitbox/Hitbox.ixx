@@ -27,6 +27,10 @@ export namespace fbc {
 		inline float getOffsetSizeX(float mult) const { return offsetSizeX * mult; }
 		inline float getOffsetSizeY() const { return offsetSizeY; }
 		inline float getOffsetSizeY(float mult) const { return offsetSizeY * mult; }
+		inline virtual float getScaleOffsetPosX() const { return offsetPosX; }
+		inline virtual float getScaleOffsetPosY() const { return offsetPosY; }
+		inline virtual float getScaleOffsetSizeX() const { return offsetSizeX; }
+		inline virtual float getScaleOffsetSizeY() const { return offsetSizeY; }
 
 		Hitbox& setExactPos(const float x, const float y);
 		Hitbox& setExactPosX(const float x);

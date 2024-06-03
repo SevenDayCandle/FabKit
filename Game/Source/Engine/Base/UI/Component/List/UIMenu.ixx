@@ -105,7 +105,7 @@ export namespace fbc {
 
 		inline void render() override { menu.renderImpl(); };
 
-		void close() override;
+		void dispose() override;
 		void update() override;
 	};
 
@@ -314,7 +314,7 @@ export namespace fbc {
 		updateForSelection();
 	}
 
-	// Detach the popup proxy and call the close callback
+	// Detach the popup proxy and call the dispose callback
 	template<typename T>
 	void UIMenu<T>::unsetProxy() {
 		proxy = nullptr;
@@ -445,7 +445,7 @@ export namespace fbc {
 	 */
 
 	// When closed, unlink this from its menu
-	template <typename T> void UIMenuProxy<T>::close() { menu.unsetProxy(); }
+	template <typename T> void UIMenuProxy<T>::dispose() { menu.unsetProxy(); }
 
 	// Close the menu if the user clicks outside the menu
 	template <typename T> void UIMenuProxy<T>::update() {

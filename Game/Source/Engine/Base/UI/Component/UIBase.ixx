@@ -29,7 +29,7 @@ export namespace fbc {
 		UIBase& setHbOffsetSizeX(const float x);
 		UIBase& setHbOffsetSizeY(const float y);
 		 
-		virtual void refreshHb();
+		virtual void refreshHb() override;
 		virtual void render() override;
 		virtual void update() override;
 		virtual void updateImpl();

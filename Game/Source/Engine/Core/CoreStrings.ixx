@@ -22,11 +22,13 @@ export namespace fbc {
 		inline str options_section_text() const { return uiStrings.at("options_section_text"); };
 		inline str screen_setup_header() const { return uiStrings.at("screen_setup_header"); };
 		inline str screen_title_header() const { return uiStrings.at("screen_title_header"); };
+		inline str ui_apply() const { return uiStrings.at("ui_apply"); };
 		inline str ui_cancel() const { return uiStrings.at("ui_cancel"); };
 		inline str ui_close() const { return uiStrings.at("ui_close"); };
 		inline str ui_confirm() const { return uiStrings.at("ui_confirm"); };
 		inline str ui_items() const { return uiStrings.at("ui_items"); };
 		inline str ui_items(int val) const { return std::vformat(ui_items(), std::make_format_args(val)); };
+		inline str ui_save() const { return uiStrings.at("ui_save"); };
 	private:
 		umap<str, KeywordStrings> keywordStrings;
 		umap<str, str> uiStrings;

@@ -1,6 +1,7 @@
 export module fbc.ScreenManager;
 
 import fbc.CoreConfig;
+import fbc.CoreContent;
 import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.IOverlay;
@@ -19,16 +20,22 @@ export namespace fbc::screenManager {
 	fbc::UIBase* activeElement;
 
 	// Close the currently opened screen and reopen the last screen opened.
-	// The screen's close method should save any screen state as necessary since the screen will get disposed of
-	// Note that the screen will close at the END of the update cycle to ensure that all screen logic for the loop is executed
+	// The screen's dispose method should save any screen state as necessary since the screen will get disposed of
+	// Note that the screen will dispose at the END of the update cycle to ensure that all screen logic for the loop is executed
 	void closeCurrentScreen() {
 		queuedCloseScreen = true;
 	}
 
 	// Close a specific overlay and all overlays above it
-	// Note that the overlay will close at the END of the update cycle to ensure that all overlay logic for the loop is executed
+	// Note that the overlay will dispose at the END of the update cycle to ensure that all overlay logic for the loop is executed
 	void closeOverlay(fbc::IOverlay* target) {
 		queuedCloseOverlay = target;
+	}
+
+	// Destroy all screens and overlays
+	void dispose() {
+		overlays.clear();
+		screens.clear();
 	}
 
 	// Get the active overlay
@@ -44,7 +51,7 @@ export namespace fbc::screenManager {
 		overlays.push_back(std::move(target));
 	}
 
-	// Add a screen to the history of opened screens and open that screen. Also close all overlays
+	// Add a screen to the history of opened screens and open that screen. Also dispose all overlays
 	void openScreen(uptr<fbc::UIBase>&& screen) {
 		screens.push_back(std::move(screen));
 		screens.back()->open();
@@ -65,6 +72,16 @@ export namespace fbc::screenManager {
 		}
 	}
 
+	// Whenever the renderer is reset, we must redraw all text
+	void refreshRenderables() {
+		for (const uptr<UIBase>& screen : screens) {
+			screen->refreshRenderables();
+		}
+		for (const uptr<IOverlay>& overlay : overlays) {
+			overlay->refreshRenderables();
+		}
+	}
+
 	// Render the last opened screen, as well as all overlays
 	void render() {
 		if (!screens.empty()) {
@@ -75,9 +92,9 @@ export namespace fbc::screenManager {
 		}
 	}
 
-	// Close the current screen and switch the specified screen. Also close all overlays
+	// Close the current screen and switch the specified screen. Also dispose all overlays
 	void swapScreen(uptr<fbc::UIBase>&& screen) {
-		// Place the screen to be swapped to right behind the last screen and then queue a close, ensuring proper disposal of screens. This also handles opening of the enxt screen
+		// Place the screen to be swapped to right behind the last screen and then queue a dispose, ensuring proper disposal of screens. This also handles opening of the enxt screen
 		if (screens.size() >= 2) {
 			queuedCloseScreen = true;
 			screens.insert(screens.end() - 2, std::move(screen));
@@ -107,14 +124,14 @@ export namespace fbc::screenManager {
 			screens.back()->updateImpl();
 		}
 
-		// Check if currently opened should close. If so, close all overlays and the screen, then reopen the last screen
+		// Check if currently opened should dispose. If so, dispose all overlays and the screen, then reopen the last screen
 		if (queuedCloseScreen) {
 			if (!screens.empty()) {
 				fbc::UIBase& screen = *screens.back();
-				screen.close();
+				screen.dispose();
 				screens.pop_back();
 				for (const uptr<IOverlay>& overlay : overlays) {
-					overlay->close();
+					overlay->dispose();
 				}
 				overlays.clear();
 				if (!screens.empty()) {
@@ -130,7 +147,7 @@ export namespace fbc::screenManager {
 		else if (queuedCloseOverlay) {
 			while (!overlays.empty()) {
 				fbc::IOverlay* overlay = overlays.back().get();
-				overlay->close();
+				overlay->dispose();
 				overlays.pop_back();
 				if (overlay == queuedCloseOverlay) {
 					break;
@@ -140,7 +157,17 @@ export namespace fbc::screenManager {
 		}
 	}
 
-	void initialize() {
-		cfg.graphicsResolution.addSubscriber([](const pair<int,int>& val) {refreshSize(); });
+	// Attach listeners to the core config to change the screen whenever graphics settings are changed
+	void subscribeToConfig() {
+		cfg.graphicsResolution.setOnReload([](const pair<int, int>& val) {
+			cfg.resizeWindow();
+			refreshSize();
+		});
+		cfg.graphicsWindowMode.setOnReload([](const int& val) {sdl::windowSetFullscreen(val); });
+		cfg.graphicsVSync.setOnReload([](const int& val) {
+			sdl::updateVSync(val);
+			cct.reloadImages();
+			refreshRenderables();
+		});
 	}
 }

@@ -31,6 +31,7 @@ export namespace fbc {
 
 		void commit(strv text);
 		virtual void onSizeUpdated() override;
+		virtual void refreshRenderables() override;
 		virtual void renderImpl() override;
 		virtual void start() override;
 		virtual void updateImpl() override;
@@ -60,6 +61,12 @@ export namespace fbc {
 	{
 		TextInfo::setPos(cfg.renderScale(24), this->hb->h * 0.25f);
 		initCaret(this->font, this->hb->x, this->hb->y);
+	}
+
+	void UITextInput::refreshRenderables()
+	{
+		UITitledInteractable::refreshRenderables();
+		TextInfo::updateCache();
 	}
 
 	void UITextInput::renderImpl()

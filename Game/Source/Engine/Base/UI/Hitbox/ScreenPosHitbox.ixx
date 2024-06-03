@@ -14,6 +14,9 @@ export namespace fbc {
 		}
 		~ScreenPosHitbox() override {}
 
+		inline virtual float getScaleOffsetPosX() const override { return cfg.getScreenXSize() * offsetPosX / cfg.renderScale(); }
+		inline virtual float getScaleOffsetPosY() const override { return cfg.getScreenYSize() * offsetPosY / cfg.renderScale(); }
+
 	protected:
 		inline void refreshExactPosX() override { x = cfg.getScreenXSize() * offsetPosX; }
 		inline void refreshExactPosY() override { y = cfg.getScreenYSize() * offsetPosY; }

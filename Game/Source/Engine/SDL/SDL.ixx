@@ -12,6 +12,7 @@ import sdl.IKeyInputListener;
 import std;
 
 namespace sdl {
+	bool enabled;
 	const Uint8* key;
 	const Uint8* pad;
 	int mouse = -1;
@@ -257,6 +258,7 @@ namespace sdl {
 	export template <typename... Args> void logInfo(std::string_view message, const Args&... args) { log(SDL_LOG_PRIORITY_INFO, message, args...); }
 	export template <typename... Args> void logError(const char* message, const Args&... args) { log(SDL_LOG_PRIORITY_ERROR, message, args...); }
 	export template <typename... Args> void logError(std::string_view message, const Args&... args) { log(SDL_LOG_PRIORITY_ERROR, message, args...); }
+	export bool sdlEnabled() { return enabled; }
 
 
 	/* When using a fixed framerate, sleep to fill up remaining time */
@@ -299,6 +301,8 @@ namespace sdl {
 		memcpy(keyLast, key, numKeys);
 
 		// TODO pad
+
+		enabled = true;
 
 		return true;
 	}
@@ -384,5 +388,6 @@ namespace sdl {
 		Mix_CloseAudio();
 		Mix_Quit();
 		SDL_Quit();
+		enabled = false;
 	}
 }

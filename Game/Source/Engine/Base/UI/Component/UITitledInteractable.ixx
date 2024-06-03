@@ -24,9 +24,18 @@ export namespace fbc {
 		inline virtual float getBeginY() override { return label ? std::min(hb->y, hb->y + label->getTextYPos()) : hb->y; }
 		inline strv getLabelText() const { return label ? label->getText() : ""; }
 
+		virtual void refreshRenderables() override;
 		virtual void renderImpl() override;
 		UITitledInteractable& withLabel(strv text, FFont& font = cct.fontBold(), float x = 0, float y = cfg.renderScale(-80), sdl::Color color = sdl::COLOR_WHITE, sdl::Color colorOutline = sdl::COLOR_BLACK);
 	};
+
+	void UITitledInteractable::refreshRenderables()
+	{
+		UIInteractable::refreshRenderables();
+		if (label) {
+			label->updateCache();
+		}
+	}
 
 	void UITitledInteractable::renderImpl()
 	{

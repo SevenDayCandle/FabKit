@@ -47,6 +47,7 @@ export namespace fbc {
 		vec<T*> getAllItems();
 		void forEach(func<void(T&)> func);
 		void refreshHb() override;
+		void refreshRenderables() override;
 		void renderImpl() override;
 		void updateImpl() override;
 
@@ -160,7 +161,7 @@ export namespace fbc {
 
 	// Get all items in the menu regardless of whether they are visible or selected
 	template <typename T> vec<T*> UIList<T>::getAllItems() {
-		return futil::transform<T>(rows, [](const uptr<UIEntry<T>>& row) { return &(row->item); });
+		return futil::transform<uptr<UIEntry<T>>, T*>(rows, [](const uptr<UIEntry<T>>& row) { return const_cast<T*>(&(row->item)); });
 	}
 
 	// Execute a function on every item in the list
@@ -176,6 +177,14 @@ export namespace fbc {
 		UIBase::refreshHb();
 		for (const uptr<UIEntry<T>>& row : rows) {
 			row->refreshHb();
+		}
+	}
+
+	// Updates the dimensions of all children too
+	template<typename T> void UIList<T>::refreshRenderables() {
+		UIBase::refreshRenderables();
+		for (const uptr<UIEntry<T>>& row : rows) {
+			row->refreshRenderables();
 		}
 	}
 
