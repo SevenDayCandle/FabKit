@@ -11,11 +11,12 @@ export namespace fbc {
 		RHorizontal(IDrawable& base) : base(base), patchSize(base.getWidth() / 2) {}
 		RHorizontal(IDrawable& base, float patchSize) : base(base), patchSize(patchSize) {}
 
-		inline const sdl::RectF* getBaseRec() override { return base.getBaseRec(); }
-		inline float getHeight() override { return base.getHeight(); }
-		inline float getWidth() override { return base.getWidth(); }
+		inline const sdl::RectF* getBaseRec() const override { return base.getBaseRec(); }
+		inline float getHeight() const override { return base.getHeight(); }
+		inline float getWidth() const override { return base.getWidth(); }
 
 		void drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) override;
+		void reload() override;
 		void setDrawBlend(const sdl::BlendMode bl) override;
 		void setDrawColor(const sdl::Color& tint) override;
 	private:
@@ -40,6 +41,15 @@ export namespace fbc {
 		base.drawBase(&scl, &dcl, origin, rotation, flip);
 		base.drawBase(&sc, &dc, origin, rotation, flip);
 		base.drawBase(&scr, &dcr, origin, rotation, flip);
+	}
+
+	// If the patch size was not manually set, automatically adjust it based on the source texture
+	// Note that this working relies on the original texture being reloaded before this; this should normally be enforced when creating drawables in StaticImages through its helper methods
+	void RHorizontal::reload()
+	{
+		if (patchSize <= 0) {
+			patchSize = base.getWidth() / 2.0f;
+		}
 	}
 
 	void RHorizontal::setDrawBlend(const sdl::BlendMode bl)

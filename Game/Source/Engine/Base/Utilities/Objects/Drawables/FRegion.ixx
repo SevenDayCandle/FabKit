@@ -11,9 +11,9 @@ export namespace fbc {
 		FRegion(FTexture& base, sdl::RectF dim): base(base), dim(dim) {}
 		virtual ~FRegion() override {}
 
-		inline const sdl::RectF* getBaseRec() override { return &dim; }
-		inline float getHeight() override { return dim.h; }
-		inline float getWidth() override { return dim.w; }
+		inline const sdl::RectF* getBaseRec() const override { return &dim; }
+		inline float getHeight() const override { return dim.h; }
+		inline float getWidth() const override { return dim.w; }
 
 		void drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) override;
 		void setDrawBlend(const sdl::BlendMode bl) override;

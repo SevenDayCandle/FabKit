@@ -24,8 +24,8 @@ export namespace fbc {
 		UIDropdown(Hitbox* hb, 
 			UIMenu<T>* menu, 
 			IDrawable& image = cct.images.panel,
-			IDrawable& arrow = cct.images.uiArrowSmall.get(),
-			IDrawable& clear = cct.images.uiClearSmall.get(),
+			IDrawable& arrow = cct.images.uiArrowSmall,
+			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
 			func<str(vec<const UIEntry<T>*>&)> buttonLabelFunc = {}
 		): UITitledInteractable(hb, image), TextInfo(textFont), menu(menu), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
@@ -34,8 +34,8 @@ export namespace fbc {
 		UIDropdown(Hitbox* hb,
 			uptr<UIMenu<T>> menu,
 			IDrawable& image = cct.images.panel,
-			IDrawable& arrow = cct.images.uiArrowSmall.get(),
-			IDrawable& clear = cct.images.uiClearSmall.get(),
+			IDrawable& arrow = cct.images.uiArrowSmall,
+			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
 			func<str(vec<const UIEntry<T>*>&)> buttonLabelFunc = {}
 		): UITitledInteractable(hb, image), TextInfo(textFont), menu(std::move(menu)), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
@@ -97,8 +97,8 @@ export namespace fbc {
 			FFont& textFont = cct.fontRegular(),
 			IDrawable& background = cct.images.hoverPanel,
 			IDrawable& image = cct.images.panel,
-			IDrawable& arrow = cct.images.uiArrowSmall.get(),
-			IDrawable& clear = cct.images.uiClearSmall.get());
+			IDrawable& arrow = cct.images.uiArrowSmall,
+			IDrawable& clear = cct.images.uiClearSmall);
 		static uptr<UIDropdown> singleMenu(Hitbox* hb, 
 			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
 			func<str(vec<const UIEntry<T>*>&)> buttonLabelFunc = {},
@@ -106,8 +106,8 @@ export namespace fbc {
 			FFont& textFont = cct.fontRegular(),
 			IDrawable& background = cct.images.hoverPanel,
 			IDrawable& image = cct.images.panel,
-			IDrawable& arrow = cct.images.uiArrowSmall.get(),
-			IDrawable& clear = cct.images.uiClearSmall.get());
+			IDrawable& arrow = cct.images.uiArrowSmall,
+			IDrawable& clear = cct.images.uiClearSmall);
 	protected:
 		IDrawable& arrow;
 		IDrawable& clear;

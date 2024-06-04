@@ -25,10 +25,10 @@ export namespace fbc {
 		virtual void dispose();
 		virtual void initialize();
 	protected:
-		inline Cache<FTexture>& cacheTexture(const strv& key) { return static_cast<Cache<FTexture>&>(*textures.emplace_back(std::make_unique<Cache<FTexture>>([this, key]() {return new FTexture(getTexturePath(key)); }))); }
-		inline Cache<RBordered>& cacheBordered(const Cache<FTexture>& texture) { return static_cast<Cache<RBordered>&>(*textures.emplace_back(std::make_unique<Cache<RBordered>>([this, texture]() { return new RBordered(texture.get()); }))); }
-		inline Cache<RHorizontal>& cacheHorizontal(const Cache<FTexture>& texture) { return static_cast<Cache<RHorizontal>&>(*textures.emplace_back(std::make_unique<Cache<RHorizontal>>([this, texture]() { return new RHorizontal(texture.get()); }))); }
-		inline Cache<RVertical>& cacheVertical(const Cache<FTexture>& texture) { return static_cast<Cache<RVertical>&>(*textures.emplace_back(std::make_unique<Cache<RVertical>>([this, texture]() { return new RVertical(texture.get()); }))); }
+		inline FTexture& cacheTexture(const strv& key) { return static_cast<FTexture&>(*textures.emplace_back(std::make_unique<FTexture>(getTexturePath(key)))); }
+		inline RBordered& cacheBordered(FTexture& texture) { return static_cast<RBordered&>(*textures.emplace_back(std::make_unique<RBordered>(texture))); }
+		inline RHorizontal& cacheHorizontal(FTexture& texture) { return static_cast<RHorizontal&>(*textures.emplace_back(std::make_unique<RHorizontal>(texture))); }
+		inline RVertical& cacheVertical(FTexture& texture) { return static_cast<RVertical&>(*textures.emplace_back(std::make_unique<RVertical>(texture))); }
 	private:
 		str getTexturePath(const strv& key) const;
 		vec<uptr<ILoadable>> textures;

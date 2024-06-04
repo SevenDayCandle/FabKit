@@ -36,8 +36,8 @@ bool initialize() {
 	cfg.initialize();
 	fbc::Hotkey::reload();
 	cfg.postInitialize();
-	cct.initialize();
 	cfg.setupWindow();
+	cct.initialize();
 
 	screenManager::subscribeToConfig();
 	screenManager::openScreen(std::make_unique<fbc::TitleScreen>());

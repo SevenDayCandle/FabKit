@@ -21,7 +21,7 @@ export namespace fbc {
 			int limMin = 0,
 			int limMax = std::numeric_limits<int>::max(),
 			IDrawable& image = cct.images.panel,
-			IDrawable& arrow = cct.images.uiArrowIncrement.get(),
+			IDrawable& arrow = cct.images.uiArrowIncrement,
 			FFont& textFont = cct.fontRegular()) : UITitledInteractable(hb, image), TextInfo(textFont), limMin(limMin), limMax(limMax), arrow(arrow) {
 			initCaret(this->font, this->hb->x, this->hb->y);
 			UINumberInput::onSizeUpdated();

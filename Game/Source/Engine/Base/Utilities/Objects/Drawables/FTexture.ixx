@@ -9,7 +9,7 @@ import std;
 export namespace fbc {
 	export class FTexture : public IDrawable {
     public:
-        FTexture(strv path) : path(path) { FTexture::reload(); }
+        FTexture(strv path) : path(path) {}
         FTexture(const FTexture&) = delete;
         ~FTexture() override {
             // Unload texture when destroyed
@@ -19,9 +19,9 @@ export namespace fbc {
             }
         }
 
-        inline const sdl::RectF* getBaseRec() override { return &dim; }
-        inline float getHeight() override { return dim.h; }
-        inline float getWidth() override { return dim.w; }
+        inline const sdl::RectF* getBaseRec() const override { return &dim; }
+        inline float getHeight() const override { return dim.h; }
+        inline float getWidth() const override { return dim.w; }
 
         void dispose() override;
         void drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) override;

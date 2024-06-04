@@ -3,6 +3,7 @@ export module fbc.RBordered;
 import fbc.FUtil;
 import fbc.IDrawable;
 import sdl;
+import std;
 
 export namespace fbc {
 	export class RBordered : public IDrawable {
@@ -11,11 +12,12 @@ export namespace fbc {
 		RBordered(IDrawable& base, float patchSize): base(base), patchSize(patchSize) {}
 		virtual ~RBordered() override {}
 
-		inline const sdl::RectF* getBaseRec() override { return base.getBaseRec(); }
-		inline float getHeight() override { return base.getHeight();}
-		inline float getWidth() override { return base.getWidth(); }
+		inline const sdl::RectF* getBaseRec() const override { return base.getBaseRec(); }
+		inline float getHeight() const override { return base.getHeight();}
+		inline float getWidth() const override { return base.getWidth(); }
 
 		void drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) override;
+		void reload() override;
 		void setDrawBlend(const sdl::BlendMode bl) override;
 		void setDrawColor(const sdl::Color& tint) override;
 	private:
@@ -67,6 +69,15 @@ export namespace fbc {
 		base.drawBase(&sbl, &dbl, origin, rotation, flip);
 		base.drawBase(&sb, &db, origin, rotation, flip);
 		base.drawBase(&sbr, &dbr, origin, rotation, flip);
+	}
+
+	// If the patch size was not manually set, automatically adjust it based on the source texture
+	// Note that this working relies on the original texture being reloaded before this; this should normally be enforced when creating drawables in StaticImages through its helper methods
+	void RBordered::reload()
+	{
+		if (patchSize <= 0) {
+			patchSize = base.getWidth() / 2.0f;
+		}
 	}
 
 	void RBordered::setDrawBlend(const sdl::BlendMode bl)

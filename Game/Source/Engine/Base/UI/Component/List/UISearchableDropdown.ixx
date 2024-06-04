@@ -23,8 +23,8 @@ export namespace fbc {
 		UISearchableDropdown(Hitbox* hb,
 			UIMenu<T>* menu,
 			IDrawable& image = cct.images.panel,
-			IDrawable& arrow = cct.images.uiArrowSmall.get(),
-			IDrawable& clear = cct.images.uiClearSmall.get(),
+			IDrawable& arrow = cct.images.uiArrowSmall,
+			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
 			func<str(vec<const UIEntry<T>*>)> buttonLabelFunc = {}
 		) : UIDropdown<T>(hb, menu, image, arrow, clear, textFont, buttonLabelFunc) {
@@ -33,8 +33,8 @@ export namespace fbc {
 		UISearchableDropdown(Hitbox* hb,
 			uptr<UIMenu<T>> menu,
 			IDrawable& image = cct.images.panel,
-			IDrawable& arrow = cct.images.uiArrowSmall.get(),
-			IDrawable& clear = cct.images.uiClearSmall.get(),
+			IDrawable& arrow = cct.images.uiArrowSmall,
+			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
 			func<str(vec<const UIEntry<T>*>)> buttonLabelFunc = {}
 		) : UIDropdown<T>(hb, std::move(menu), image, arrow, clear, textFont, buttonLabelFunc) {
@@ -58,8 +58,8 @@ export namespace fbc {
 			FFont& textFont = cct.fontRegular(),
 			IDrawable& background = cct.images.hoverPanel,
 			IDrawable& image = cct.images.panel,
-			IDrawable& arrow = cct.images.uiArrowSmall.get(),
-			IDrawable& clear = cct.images.uiClearSmall.get());
+			IDrawable& arrow = cct.images.uiArrowSmall,
+			IDrawable& clear = cct.images.uiClearSmall);
 		static uptr<UISearchableDropdown> singleMenu(Hitbox* hb,
 			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
 			func<str(vec<const UIEntry<T>*>)> buttonLabelFunc = {},
@@ -67,8 +67,8 @@ export namespace fbc {
 			FFont& textFont = cct.fontRegular(),
 			IDrawable& background = cct.images.hoverPanel,
 			IDrawable& image = cct.images.panel,
-			IDrawable& arrow = cct.images.uiArrowSmall.get(),
-			IDrawable& clear = cct.images.uiClearSmall.get());
+			IDrawable& arrow = cct.images.uiArrowSmall,
+			IDrawable& clear = cct.images.uiClearSmall);
 	protected:
 		void updateCaretPos() override;
 
