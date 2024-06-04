@@ -70,11 +70,11 @@ export namespace fbc {
 	UISlider& SettingsDialogPage::addSlider(ConfigItem<int>& conf, strv name, int min, int max)
 	{
 		SettingsDialogCache<int>& cache = static_cast<SettingsDialogCache<int>&>(*confs.emplace_back(std::make_unique<SettingsDialogCache<int>>(conf)));
-		UISlider& slider = stackElementYDir(std::make_unique<UISlider>(new RelativeHitbox(*hb, 300, 0, 300, 100), min, max));
+		UISlider& slider = stackElementYDir(std::make_unique<UISlider>(new RelativeHitbox(*hb, 300, 0, 500, 100), min, max));
 		slider
 			.setValue(conf.get())
 			.setOnComplete([&cache](int val) {cache.value = val; })
-			.withLabel(name, cct.fontBold(), cfg.renderScale(-300), 0);
+			.withLabel(name, cct.fontBold(), -300, 25);
 		cache.setOnReset([&slider, &conf]() {slider.setValue(conf.get()); });
 		return slider;
 	}
@@ -92,10 +92,10 @@ export namespace fbc {
 	template<typename T, typename Iterable> UIDropdown<T>& SettingsDialogPage::addDropdownImpl(ConfigItem<T>& conf, strv name, const Iterable& items, func<str(const T&)> labelFunc)
 	{
 		SettingsDialogCache<T>& cache = static_cast<SettingsDialogCache<T>&>(*confs.emplace_back(std::make_unique<SettingsDialogCache<T>>(conf)));
-		UIDropdown<T>& dr = stackElementYDir(UIDropdown<T>::singleMenu(new RelativeHitbox(*hb, 300, 0, 300, 100), labelFunc));
+		UIDropdown<T>& dr = stackElementYDir(UIDropdown<T>::singleMenu(new RelativeHitbox(*hb, 300, 0, 400, 100), labelFunc));
 		dr.setItems(items)
 			.setOnChange([&cache](vec<const T*> res) { if (res.size() > 0) cache.value = *res[0]; })
-			.withLabel(name, cct.fontBold(), cfg.renderScale(-300), 0);
+			.withLabel(name, cct.fontBold(), -300, 25);
 		dr.updateSingle(conf.get());
 		cache.setOnReset([&dr, &conf]() {dr.selectSingle(conf.get()); });
 		return dr;
@@ -104,10 +104,10 @@ export namespace fbc {
 	template<typename T, typename U, typename Iterable> UIDropdown<U>& SettingsDialogPage::addDropdownMappedImpl(ConfigItem<T>& conf, strv name, const Iterable& items, func<T(const U*)> convFunc, func<str(const T&)> labelFunc)
 	{
 		SettingsDialogCache<T>& cache = static_cast<SettingsDialogCache<T>&>(*confs.emplace_back(std::make_unique<SettingsDialogCache<T>>(conf)));
-		UIDropdown<U>& dr = stackElementYDir(UIDropdown<U>::singleMenu(new RelativeHitbox(*hb, 300, 0, 300, 100), labelFunc));
+		UIDropdown<U>& dr = stackElementYDir(UIDropdown<U>::singleMenu(new RelativeHitbox(*hb, 300, 0, 400, 100), labelFunc));
 		dr.setItems(items)
 			.setOnChange([&cache, convFunc](vec<const U*> res) { if (res.size() > 0) cache.value = convFunc(res[0]); })
-			.withLabel(name, cct.fontBold(), cfg.renderScale(-300), 0);
+			.withLabel(name, cct.fontBold(), -300, 25);
 		dr.updateSingle(conf.get());
 		cache.setOnReset([&dr, &conf]() {dr.selectSingle(conf.get()); });
 		return dr;

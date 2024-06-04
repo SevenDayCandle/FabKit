@@ -24,16 +24,20 @@ export namespace fbc {
 		inline virtual float getBeginY() override { return label ? std::min(hb->y, hb->y + label->getTextYPos()) : hb->y; }
 		inline strv getLabelText() const { return label ? label->getText() : ""; }
 
-		virtual void refreshRenderables() override;
+		virtual void refreshHb() override;
 		virtual void renderImpl() override;
-		UITitledInteractable& withLabel(strv text, FFont& font = cct.fontBold(), float x = 0, float y = cfg.renderScale(-80), sdl::Color color = sdl::COLOR_WHITE, sdl::Color colorOutline = sdl::COLOR_BLACK);
+		UITitledInteractable& withLabel(strv text, FFont& font = cct.fontBold(), float xOff = 0, float yOff = -80, sdl::Color color = sdl::COLOR_WHITE, sdl::Color colorOutline = sdl::COLOR_BLACK);
+	private:
+		float xOff = 0;
+		float yOff = 0;
 	};
 
-	void UITitledInteractable::refreshRenderables()
+	// Ensure that the label offsets remain in sync with the hitbox size
+	void UITitledInteractable::refreshHb()
 	{
-		UIInteractable::refreshRenderables();
+		UIInteractable::refreshHb();
 		if (label) {
-			label->updateCache();
+			label->setPos(cfg.renderScale(xOff), cfg.renderScale(yOff));
 		}
 	}
 
@@ -45,10 +49,12 @@ export namespace fbc {
 		}
 	}
 
-	UITitledInteractable& UITitledInteractable::withLabel(strv text, FFont& font, float x, float y, sdl::Color color, sdl::Color colorOutline)
+	UITitledInteractable& UITitledInteractable::withLabel(strv text, FFont& font, float xOff, float yOff, sdl::Color color, sdl::Color colorOutline)
 	{
+		this->xOff = xOff;
+		this->yOff = yOff;
 		label = std::make_unique<TextInfo>(font, text, color, colorOutline);
-		label->setPos(x, y);
+		label->setPos(cfg.renderScale(xOff), cfg.renderScale(yOff));
 		return *this;
 	}
 }

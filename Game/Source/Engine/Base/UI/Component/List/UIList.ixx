@@ -23,8 +23,9 @@ export namespace fbc {
 		UIList(Hitbox* hb,
 			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
 			FFont& itemFont = cct.fontRegular(),
-			IDrawable& background = cct.images.hoverPanel) :
-			UIBase(hb), background(background), itemFont(itemFont), labelFunc(labelFunc) {
+			IDrawable& background = cct.images.hoverPanel,
+			bool canAutosize = false) :
+			UIBase(hb), background(background), itemFont(itemFont), labelFunc(labelFunc), canAutosize(canAutosize) {
 		}
 
 		~UIList() override {}
@@ -44,10 +45,9 @@ export namespace fbc {
 		UIList& setItemFont(FFont& itemFont);
 		UIList& setLabelFunc(func<str(const T&)> labelFunc);
 		UIList& setMaxRows(int rows);
-		vec<T*> getAllItems();
-		void forEach(func<void(T&)> func);
+		vec<const T*> getAllItems();
+		void forEach(func<void(const T&)> func);
 		void refreshHb() override;
-		void refreshRenderables() override;
 		void renderImpl() override;
 		void updateImpl() override;
 
@@ -66,9 +66,9 @@ export namespace fbc {
 		inline virtual int getVisibleRowCount() const { return std::min(static_cast<int>(rows.size()), this->maxRows);; }
 		inline static float rMargin() { return cfg.renderScale(MARGIN); }
 
+		virtual void autosize();
 		virtual void makeRow(const T& item);
 	private:
-		virtual void autosize();
 		virtual void refreshRows();
 		virtual void updateRowPositions();
 	};
@@ -160,12 +160,12 @@ export namespace fbc {
 	}
 
 	// Get all items in the menu regardless of whether they are visible or selected
-	template <typename T> vec<T*> UIList<T>::getAllItems() {
-		return futil::transform<uptr<UIEntry<T>>, T*>(rows, [](const uptr<UIEntry<T>>& row) { return const_cast<T*>(&(row->item)); });
+	template <typename T> vec<const T*> UIList<T>::getAllItems() {
+		return futil::transform<uptr<UIEntry<T>>, const T*>(rows, [](const uptr<UIEntry<T>>& row) { return &(row->item); });
 	}
 
 	// Execute a function on every item in the list
-	template<typename T> void UIList<T>::forEach(func<void(T&)> func)
+	template<typename T> void UIList<T>::forEach(func<void(const T&)> func)
 	{
 		for (const uptr<UIEntry<T>>& row : rows) {
 			func(row->item);
@@ -178,14 +178,7 @@ export namespace fbc {
 		for (const uptr<UIEntry<T>>& row : rows) {
 			row->refreshHb();
 		}
-	}
-
-	// Updates the dimensions of all children too
-	template<typename T> void UIList<T>::refreshRenderables() {
-		UIBase::refreshRenderables();
-		for (const uptr<UIEntry<T>>& row : rows) {
-			row->refreshRenderables();
-		}
+		autosize();
 	}
 
 	// Render all visible rows and the scrollbar if it is shown

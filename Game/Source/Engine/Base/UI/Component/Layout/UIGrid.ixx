@@ -35,7 +35,6 @@ export namespace fbc {
 		UIGrid& setSpacingY(float spacingY);
 		virtual bool isHovered() override;
 		virtual void refreshHb() override;
-		virtual void refreshRenderables() override;
 		virtual void renderImpl() override;
 		virtual void updateImpl() override;
 	protected:
@@ -62,14 +61,6 @@ export namespace fbc {
 			element->refreshHb();
 		}
 		scrollbar.refreshHb();
-	}
-
-	template<c_ext<UIBase> T> void UIGrid<T>::refreshRenderables()
-	{
-		UIBase::refreshRenderables();
-		for (const uptr<T>& element : items) {
-			element->refreshRenderables();
-		}
 	}
 
 	template<c_ext<UIBase> T> void UIGrid<T>::renderImpl()

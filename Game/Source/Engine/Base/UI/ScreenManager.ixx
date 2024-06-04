@@ -72,16 +72,6 @@ export namespace fbc::screenManager {
 		}
 	}
 
-	// Whenever the renderer is reset, we must redraw all text
-	void refreshRenderables() {
-		for (const uptr<UIBase>& screen : screens) {
-			screen->refreshRenderables();
-		}
-		for (const uptr<IOverlay>& overlay : overlays) {
-			overlay->refreshRenderables();
-		}
-	}
-
 	// Render the last opened screen, as well as all overlays
 	void render() {
 		if (!screens.empty()) {
@@ -164,10 +154,6 @@ export namespace fbc::screenManager {
 			refreshSize();
 		});
 		cfg.graphicsWindowMode.setOnReload([](const int& val) {sdl::windowSetFullscreen(val); });
-		cfg.graphicsVSync.setOnReload([](const int& val) {
-			sdl::updateVSync(val);
-			cct.reloadImages();
-			refreshRenderables();
-		});
+		cfg.graphicsVSync.setOnReload([](const int& val) { sdl::updateVSync(val); });
 	}
 }

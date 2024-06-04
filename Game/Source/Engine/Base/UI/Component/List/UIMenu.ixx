@@ -25,8 +25,9 @@ export namespace fbc {
 		UIMenu(Hitbox* hb,
 		       func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
 		       FFont& itemFont = cct.fontRegular(),
-		       IDrawable& background = cct.images.hoverPanel):
-			UIList<T>(hb, labelFunc, itemFont, background),
+		       IDrawable& background = cct.images.hoverPanel,
+		       bool canAutosize = false):
+			UIList<T>(hb, labelFunc, itemFont, background, canAutosize),
 			scrollbar(new RelativeHitbox(*hb, 0, 0, 48, 48)) { scrollbar.setOnScroll([this](float f) { onScroll(f); }); }
 
 		~UIMenu() override {}
@@ -69,14 +70,15 @@ export namespace fbc {
 		void updateSingle(T item);
 		void updateSingle(T* item);
 
-		static uptr<UIMenu> multiMenu(Hitbox* hb, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); }, FFont& itemFont = cct.fontRegular(), IDrawable& background = cct.images.hoverPanel);
-		static uptr<UIMenu> singleMenu(Hitbox* hb, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); }, FFont& itemFont = cct.fontRegular(), IDrawable& background = cct.images.hoverPanel);
+		static uptr<UIMenu> multiMenu(Hitbox* hb, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); }, FFont& itemFont = cct.fontRegular(), IDrawable& background = cct.images.hoverPanel, bool canAutosize = false);
+		static uptr<UIMenu> singleMenu(Hitbox* hb, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); }, FFont& itemFont = cct.fontRegular(), IDrawable& background = cct.images.hoverPanel, bool canAutosize = false);
 	protected:
 		set<int> currentIndices;
 		vec<UIEntry<T>*> rowsForRender;
 
 		inline int getVisibleRowCount() const { return std::min(static_cast<int>(rowsForRender.size()), this->maxRows); }
 
+		void autosize() override;
 	private:
 		int selectionLimit = std::numeric_limits<int>::max();
 		func<bool(const UIEntry<T>*)> filterFunc;
@@ -89,7 +91,6 @@ export namespace fbc {
 
 		inline static float rMargin() { return cfg.renderScale(MARGIN); }
 
-		void autosize();
 		void changeEvent();
 		void onScroll(float percent);
 		void refreshRows() override;
@@ -362,7 +363,7 @@ export namespace fbc {
 			for (const uptr<UIEntry<T>>& row : this->rows) { row->setHbExactSizeX(maxWidth); }
 
 			scrollbar.hb->setExactPos(this->hb->x + maxWidth + rMarg, this->hb->y + rMarg);
-			scrollbar.hb->setExactSizeY(sizeY);
+			scrollbar.setHbExactSizeY(sizeY);
 			this->setHbExactSize(maxWidth + scrollbar.hb->w, sizeY + rMarg * 2);
 		}
 		else {
@@ -371,8 +372,8 @@ export namespace fbc {
 				row->setHbExactSizeX(targetWidth);
 			}
 
-			scrollbar.hb->setExactPos(this->hb->x + targetWidth + rMarg, this->hb->y + rMarg);
-			scrollbar.hb->setExactSizeY(sizeY);
+			scrollbar.hb->setExactPos(this->hb->x + targetWidth, this->hb->y + rMarg);
+			scrollbar.setHbExactSizeY(sizeY);
 			this->setHbExactSizeY(sizeY + rMarg * 2);
 		}
 
@@ -428,15 +429,16 @@ export namespace fbc {
 	 * Statics
 	 */
 
-	template<typename T> uptr<UIMenu<T>> UIMenu<T>::multiMenu(Hitbox* hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background) {
-		return std::make_unique<UIMenu<T>>(hb, labelFunc, itemFont, background);
+	template<typename T> uptr<UIMenu<T>> UIMenu<T>::multiMenu(Hitbox* hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize) {
+		return std::make_unique<UIMenu<T>>(hb, labelFunc, itemFont, background, canAutosize);
 	}
 
 	template<typename T> uptr<UIMenu<T>> UIMenu<T>::singleMenu(Hitbox* hb,
 		func<str(const T&)> labelFunc,
 		FFont& itemFont,
-		IDrawable& background) {
-		uptr<UIMenu<T>> res = std::make_unique<UIMenu<T>>(hb, labelFunc, itemFont, background);
+		IDrawable& background, 
+		bool canAutosize) {
+		uptr<UIMenu<T>> res = std::make_unique<UIMenu<T>>(hb, labelFunc, itemFont, background, canAutosize);
 		res->setSelectionLimit(1);
 		return res;
 	}

@@ -18,7 +18,7 @@ export namespace fbc {
 		inline float getScroll() const { return scrollPercent; }
 		inline UIScrollbar& setOnScroll(const func<void(float)>& onScroll) { return this->onScroll = onScroll, *this; }
 
-		virtual void refreshHb() override;
+		virtual void onSizeUpdated() override;
 		virtual void renderImpl() override;
 		virtual void updateImpl() override;
 		void scroll(float percent);
@@ -37,10 +37,11 @@ export namespace fbc {
 		func<void(float)> onScroll;
 	};
 
-	void UIScrollbar::refreshHb()
+	void UIScrollbar::onSizeUpdated()
 	{
-		UIBase::refreshHb();
-		updateDropzoneSize(dropzone.h / hb->h);
+		UIBase::onSizeUpdated();
+		updateDropzonePos(scrollPercent);
+		updateDropzoneSize(0.05f);
 	}
 
 	void UIScrollbar::renderImpl() {

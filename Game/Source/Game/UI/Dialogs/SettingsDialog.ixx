@@ -28,20 +28,20 @@ export namespace fbc {
 			selected = &graphics;
 
 			UIButton& cancel = this->addElement(std::make_unique<UITextButton>(
-				new RelativeHitbox(*hb, 0, hb->getScaleOffsetSizeY() * 0.9f, 300, 100),
-				cct.images.thickPanel,
+				new RelativeHitbox(*hb, 10, hb->getScaleOffsetSizeY() * 0.9f, 300, 100),
+				cct.images.hoverPanel,
 				cct.fontRegular(),
 				cct.strings.ui_cancel())
 			).setOnClick([this](UIButton& b) {screenManager::closeOverlay(this);});
 			UIButton& apply = this->stackElementXDir(std::make_unique<UITextButton>(
 				new RelativeHitbox(*hb, 300, 100),
-				cct.images.thickPanel,
+				cct.images.hoverPanel,
 				cct.fontRegular(),
 				cct.strings.ui_apply())
 			).setOnClick([this](UIButton& b) { applyAll(); });
 			UIButton& save = this->stackElementXDir(std::make_unique<UITextButton>(
 				new RelativeHitbox(*hb,300, 100),
-				cct.images.thickPanel,
+				cct.images.hoverPanel,
 				cct.fontRegular(),
 				cct.strings.ui_save())
 			).setOnClick([this](UIButton& b) {
@@ -94,8 +94,8 @@ export namespace fbc {
 
 	void SettingsDialog::applyAll()
 	{
-		for (SettingsDialogPage* page : navigation.getAllItems()) {
-			page->commit();
+		for (const SettingsDialogPage* page : navigation.getAllItems()) {
+			const_cast<SettingsDialogPage*>(page)->commit();
 		}
 	}
 }

@@ -26,7 +26,6 @@ export namespace fbc {
 		inline UIToggle& setToggleState(bool val) { return this->toggled = val, *this; }
 
 		virtual void onSizeUpdated() override;
-		virtual void refreshRenderables() override;
 		void renderImpl() override;
 		void toggle(bool val);
 	private:
@@ -38,12 +37,6 @@ export namespace fbc {
 	void UIToggle::onSizeUpdated()
 	{
 		TextInfo::setPos(this->hb->w * 1.25f, this->hb->h * 0.1f);
-	}
-
-	void UIToggle::refreshRenderables()
-	{
-		UIInteractable::refreshRenderables();
-		updateCache();
 	}
 
 	void UIToggle::renderImpl()

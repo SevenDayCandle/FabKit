@@ -18,19 +18,12 @@ export namespace fbc {
 		~UITextButton() override {}
 
 		virtual void onSizeUpdated() override;
-		virtual void refreshRenderables() override;
 		virtual void renderImpl() override;
 	};
 
 	void UITextButton::onSizeUpdated()
 	{
 		TextInfo::setPos((this->hb->w - getTextWidth()) / 2, (this->hb->h - getTextHeight()) / 2);
-	}
-
-	void UITextButton::refreshRenderables()
-	{
-		UIButton::refreshRenderables();
-		updateCache();
 	}
 
 	void UITextButton::renderImpl() {

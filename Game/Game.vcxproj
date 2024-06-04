@@ -180,11 +180,11 @@
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\UI\Component\UIDialog.ixx">
+    <ClCompile Include="Source\Engine\Base\UI\Component\Layout\UIDialog.ixx">
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\UI\Component\UIGrid.ixx">
+    <ClCompile Include="Source\Engine\Base\UI\Component\Layout\UIGrid.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -255,7 +255,7 @@
       </SubType>
     </ClCompile>
     <ClCompile Include="Source\Engine\Base\UI\Component\UIButton.ixx" />
-    <ClCompile Include="Source\Engine\Base\UI\Component\UICanvas.ixx" />
+    <ClCompile Include="Source\Engine\Base\UI\Component\Layout\UICanvas.ixx" />
     <ClCompile Include="Source\Engine\Base\UI\Component\List\UIMenu.ixx">
       <SubType>
       </SubType>

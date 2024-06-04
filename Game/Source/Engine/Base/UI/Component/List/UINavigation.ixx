@@ -16,8 +16,9 @@ export namespace fbc {
 		UINavigation(Hitbox* hb,
 			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
 			FFont& itemFont = cct.fontRegular(),
-			IDrawable& background = cct.images.hoverPanel) :
-			UIList<T>(hb, labelFunc, itemFont, background) {}
+			IDrawable& background = cct.images.hoverPanel,
+			bool canAutosize = false) :
+			UIList<T>(hb, labelFunc, itemFont, background, canAutosize) {}
 		virtual ~UINavigation() {}
 
 		inline const T* getSelectedItem() { return &this->rows[currentIndex]->item; }

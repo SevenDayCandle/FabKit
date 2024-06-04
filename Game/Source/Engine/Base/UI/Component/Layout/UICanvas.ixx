@@ -21,7 +21,6 @@ export namespace fbc {
 		template<typename T> requires std::is_base_of_v<UIBase, T> T& stackElementYDir(uptr<T>&& element, float spacing = 0);
 		virtual bool isHovered() override;
 		virtual void refreshHb() override;
-		virtual void refreshRenderables() override;
 		virtual void renderImpl() override;
 		virtual void updateImpl() override;
 	protected:
@@ -47,14 +46,6 @@ export namespace fbc {
 		UIBase::refreshHb();
 		for (const uptr<UIBase>& element : elements) {
 			element->refreshHb();
-		}
-	}
-
-	void UICanvas::refreshRenderables()
-	{
-		UIBase::refreshRenderables();
-		for (const uptr<UIBase>& element : elements) {
-			element->refreshRenderables();
 		}
 	}
 

@@ -21,13 +21,19 @@ export namespace fbc {
 		inline virtual float getEndY() { return hb->y + hb->h; } // The bottom-most end Y coordinate of this object, may be larger than hb if this has subcomponents
 		inline virtual bool isHovered() { return hb->isHovered(); }
 		inline virtual void onSizeUpdated() {}
+		inline virtual UIBase& setHbExactPos(const float x, const float y) { return hb->setExactPos(x, y), *this; }
+		inline virtual UIBase& setHbExactPosX(const float x) { return hb->setExactPosX(x), * this; }
+		inline virtual UIBase& setHbExactPosY(const float y) { return hb->setExactPosY(y), * this; }
+		inline virtual UIBase& setHbOffsetPos(const float x, const float y) { return hb->setOffsetPos(x, y), * this; }
+		inline virtual UIBase& setHbOffsetPosX(const float x) { return hb->setOffsetPosX(x), * this; }
+		inline virtual UIBase& setHbOffsetPosY(const float y) { return hb->setOffsetPosY(y), * this; }
 
-		UIBase& setHbExactSize(const float x, const float y);
-		UIBase& setHbExactSizeX(const float x);
-		UIBase& setHbExactSizeY(const float y);;
-		UIBase& setHbOffsetSize(const float x, const float y);
-		UIBase& setHbOffsetSizeX(const float x);
-		UIBase& setHbOffsetSizeY(const float y);
+		virtual UIBase& setHbExactSize(const float x, const float y);
+		virtual UIBase& setHbExactSizeX(const float x);
+		virtual UIBase& setHbExactSizeY(const float y);
+		virtual UIBase& setHbOffsetSize(const float x, const float y);
+		virtual UIBase& setHbOffsetSizeX(const float x);
+		virtual UIBase& setHbOffsetSizeY(const float y);
 		 
 		virtual void refreshHb() override;
 		virtual void render() override;
