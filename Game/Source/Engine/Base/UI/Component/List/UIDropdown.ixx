@@ -94,7 +94,7 @@ export namespace fbc {
 			func<str(vec<const UIEntry<T>*>&)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
-			IDrawable& background = cct.images.hoverPanel,
+			IDrawable& background = cct.images.darkPanelRound,
 			IDrawable& image = cct.images.panel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall);
@@ -103,7 +103,7 @@ export namespace fbc {
 			func<str(vec<const UIEntry<T>*>&)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
-			IDrawable& background = cct.images.hoverPanel,
+			IDrawable& background = cct.images.darkPanelRound,
 			IDrawable& image = cct.images.panel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall);

@@ -1,10 +1,12 @@
 export module fbc.UINavigation;
 
+import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.IDrawable;
+import fbc.RelativeHitbox;
 import fbc.UIEntry;
 import fbc.UIList;
 import sdl;
@@ -16,7 +18,7 @@ export namespace fbc {
 		UINavigation(Hitbox* hb,
 			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
 			FFont& itemFont = cct.fontRegular(),
-			IDrawable& background = cct.images.hoverPanel,
+			IDrawable& background = cct.images.darkPanelRound,
 			bool canAutosize = false) :
 			UIList<T>(hb, labelFunc, itemFont, background, canAutosize) {}
 		virtual ~UINavigation() {}
@@ -32,6 +34,8 @@ export namespace fbc {
 		void selectRow(UIEntry<T>& entry) override;
 	protected:
 		int currentIndex = 0;
+
+		virtual UIEntry<T>* makeRow(const T& item, int i) override;
 	private:
 		func<void(const T*)> onChange;
 
@@ -63,8 +67,22 @@ export namespace fbc {
 	template<typename T> void UINavigation<T>::selectRow(UIEntry<T>& entry)
 	{
 		currentIndex = entry.index;
-		entry.updateSelectStatus(true);
+		for (const uptr<UIEntry<T>>& row : this->rows) { row->updateSelectStatus(row->index == entry.index); }
 		changeEvent();
+	}
+
+	template<typename T> UIEntry<T>* UINavigation<T>::makeRow(const T& item, int i)
+	{
+		UIEntry<T>* entry = new UIEntry<T>(item,
+			i,
+			[this](UIEntry<T>& p) { this->selectRow(p); },
+			new RelativeHitbox(*this->hb),
+			this->getItemFont(),
+			this->labelFunc(item),
+			cct.images.none,
+			cct.images.uiArrowLarge);
+		entry->setHbExactSizeY(cfg.renderScale(64));
+		return entry;
 	}
 
 	template<typename T> void UINavigation<T>::changeEvent()

@@ -184,6 +184,7 @@ namespace sdl {
 	export int surfaceSetPalette(SDL_Surface* surface, SDL_Palette* palette) { return SDL_SetSurfacePalette(surface, palette); }
 	export SDL_Surface* surfaceConvertFormat(SDL_Surface* surface, SDL_PixelFormatEnum pixel_format) { return SDL_ConvertSurfaceFormat(surface, pixel_format); }
 	export SDL_Surface* surfaceCopy(SDL_Surface* src) { return SDL_DuplicateSurface(src); }
+	export SDL_Surface* surfaceCreate(int width, int height, SDL_PixelFormatEnum format) { return SDL_CreateSurface(width, height, format); }
 	export SDL_Surface* surfaceCreate(int width, int height, int depth, Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask) { return SDL_CreateSurface(width, height, SDL_GetPixelFormatEnumForMasks(depth, Rmask, Gmask, Bmask, Amask)); }
 	export SDL_Surface* surfaceCreateFrom(void* pixels, int width, int height, int pitch, int depth, Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask) { return SDL_CreateSurfaceFrom(pixels, width, height, pitch, SDL_GetPixelFormatEnumForMasks(depth, Rmask, Gmask, Bmask, Amask)); }
 	export SDL_Surface* surfaceLoad(const char* file) { return IMG_Load(file); }

@@ -18,7 +18,7 @@ import std;
 export namespace fbc {
 	export class SettingsDialog : public UIDialog {
 	public:
-		SettingsDialog(): UIDialog(new ScreenSizeHitbox(0.25, 0.25, 0.5, 0.5), cct.images.panel) {
+		SettingsDialog(): UIDialog(new ScreenSizeHitbox(0.25, 0.25, 0.5, 0.5), cct.images.darkPanelRound) {
 			graphics.addDropdown<pair<int,int>, ilist<pair<int,int>>>(cfg.graphicsResolution, cct.strings.options_graphics_resolution(), RESOLUTIONS, [](const pair<int,int>& item) { return futil::dimensionString(item); });
 			graphics.addToggle(cfg.graphicsVSync, cct.strings.options_graphics_vsync());
 
@@ -29,19 +29,19 @@ export namespace fbc {
 
 			UIButton& cancel = this->addElement(std::make_unique<UITextButton>(
 				new RelativeHitbox(*hb, 10, hb->getScaleOffsetSizeY() * 0.9f, 300, 100),
-				cct.images.hoverPanel,
+				cct.images.panelRound,
 				cct.fontRegular(),
 				cct.strings.ui_cancel())
 			).setOnClick([this](UIButton& b) {screenManager::closeOverlay(this);});
 			UIButton& apply = this->stackElementXDir(std::make_unique<UITextButton>(
 				new RelativeHitbox(*hb, 300, 100),
-				cct.images.hoverPanel,
+				cct.images.panelRound,
 				cct.fontRegular(),
 				cct.strings.ui_apply())
 			).setOnClick([this](UIButton& b) { applyAll(); });
 			UIButton& save = this->stackElementXDir(std::make_unique<UITextButton>(
 				new RelativeHitbox(*hb,300, 100),
-				cct.images.hoverPanel,
+				cct.images.panelRound,
 				cct.fontRegular(),
 				cct.strings.ui_save())
 			).setOnClick([this](UIButton& b) {

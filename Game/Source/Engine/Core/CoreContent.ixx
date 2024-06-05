@@ -30,6 +30,7 @@ export namespace fbc {
 	private:
 		uptr<FFont> fontBoldData;
 		uptr<FFont> fontRegularData;
+		uptr<FFont> fontSmallData;
 	};
 
 	export CoreContent cct = CoreContent(futil::FBC);
@@ -40,6 +41,7 @@ export namespace fbc {
 		images.dispose();
 		fontBoldData = nullptr;
 		fontRegularData = nullptr;
+		fontSmallData = nullptr;
 	}
 
 	// TODO
@@ -52,8 +54,9 @@ export namespace fbc {
 
 	void CoreContent::initializeFonts()
 	{
-		fontBoldData = std::make_unique<FFont>(cfg.textFontBold.get(), 48, 2, 3);
-		fontRegularData = std::make_unique<FFont>(cfg.textFont.get(), 48, 0, 3);
+		fontBoldData = std::make_unique<FFont>(cfg.textFontBold.get(), 48, 2, 4);
+		fontRegularData = std::make_unique<FFont>(cfg.textFont.get(), 48, 0, 4);
+		fontSmallData = std::make_unique<FFont>(cfg.textFont.get(), 32, 0, 3);
 	}
 
 	// TODO

@@ -109,19 +109,20 @@ export namespace fbc {
             sdl::fontOutlineSet(font, 0);
             sdl::RectI targetRect = { res, res, targetSurf->w, targetSurf->h };
             sdl::surfaceBlitScaled(targetSurf, nullptr, outlineSurf, &targetRect, sdl::ScaleMode::SDL_SCALEMODE_BEST);
-            sdl::Surface* origSurf = targetSurf;
+            sdl::surfaceDestroy(targetSurf);
             targetSurf = outlineSurf;
-            sdl::surfaceDestroy(origSurf);
         }
 
         if (shadowSize > 0) {
             int res = cfg.fontScale(shadowSize);
             sdl::Surface* shadowSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, shadowColor, w);
-            sdl::RectI targetRect = { -res, -res, targetSurf->w, targetSurf->h };
-            sdl::surfaceBlit(targetSurf, nullptr, shadowSurf, &targetRect);
-            sdl::Surface* origSurf = targetSurf;
-            targetSurf = shadowSurf;
-            sdl::surfaceDestroy(origSurf);
+            sdl::Surface* newTargetSurf = sdl::surfaceCreate(targetSurf->w + res, targetSurf->h + res, targetSurf->format->format);
+            sdl::RectI shadowRect = { res, res, shadowSurf->w, shadowSurf->h };
+            sdl::surfaceBlitScaled(shadowSurf, nullptr, newTargetSurf, &shadowRect, sdl::ScaleMode::SDL_SCALEMODE_BEST);
+            sdl::surfaceBlitScaled(targetSurf, nullptr, newTargetSurf, &targetSurf->clip_rect, sdl::ScaleMode::SDL_SCALEMODE_BEST);
+            sdl::surfaceDestroy(targetSurf);
+            sdl::surfaceDestroy(shadowSurf);
+            targetSurf = newTargetSurf;
         }
 
         sdl::Texture* tex = sdl::textureCreateFromSurface(targetSurf);

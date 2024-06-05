@@ -23,7 +23,7 @@ export namespace fbc {
 		UIList(Hitbox* hb,
 			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
 			FFont& itemFont = cct.fontRegular(),
-			IDrawable& background = cct.images.hoverPanel,
+			IDrawable& background = cct.images.panelRound,
 			bool canAutosize = false) :
 			UIBase(hb), background(background), itemFont(itemFont), labelFunc(labelFunc), canAutosize(canAutosize) {
 		}
@@ -66,9 +66,9 @@ export namespace fbc {
 		inline virtual int getVisibleRowCount() const { return std::min(static_cast<int>(rows.size()), this->maxRows);; }
 		inline static float rMargin() { return cfg.renderScale(MARGIN); }
 
-		virtual void autosize();
-		virtual void makeRow(const T& item);
+		virtual UIEntry<T>* makeRow(const T& item, int i);
 	private:
+		virtual void autosize();
 		virtual void refreshRows();
 		virtual void updateRowPositions();
 	};
@@ -79,14 +79,18 @@ export namespace fbc {
 
 	// Create rows for each item in the provided list
 	template <typename T> template <c_itr<T> Iterable> UIList<T>& UIList<T>::addItems(const Iterable& items) {
-		for (const T& item : items) { makeRow(item); }
+		for (const T& item : items) {
+			rows.push_back(uptr<UIEntry<T>>(makeRow(item, rows.size())));
+		}
 		refreshRows();
 		return *this;
 	}
 
 	// Create rows for each item in the provided list (pointer version)
 	template <typename T> template <c_itr<T*> Iterable> UIList<T>& UIList<T>::addItems(const Iterable& items) {
-		for (T* item : items) { makeRow(*item); }
+		for (T* item : items) {
+			rows.push_back(uptr<UIEntry<T>>(makeRow(*item, rows.size())));
+		}
 		refreshRows();
 		return *this;
 	}
@@ -94,7 +98,9 @@ export namespace fbc {
 	// Create rows for each item in the provided list (varargs version)
 	template<typename T> template<c_varg<T> ...Args> UIList<T>& UIList<T>::addItems(Args&&... items)
 	{
-		for (const T& item : items) { makeRow(item); }
+		for (const T& item : items) {
+			rows.push_back(uptr<UIEntry<T>>(makeRow(item, rows.size())));
+		}
 		refreshRows();
 		return *this;
 	}
@@ -102,7 +108,9 @@ export namespace fbc {
 	// Create rows for each item in the provided list (varargs pointer version)
 	template<typename T> template<c_varg<T*> ...Args> UIList<T>& UIList<T>::addItems(Args&&... items)
 	{
-		for (T* item : items) { makeRow(*item); }
+		for (T* item : items) {
+			rows.push_back(uptr<UIEntry<T>>(makeRow(*item, rows.size())));
+		}
 		refreshRows();
 		return *this;
 	}
@@ -200,15 +208,15 @@ export namespace fbc {
 	}
 
 	// Create a menu row for a new item
-	template <typename T> void UIList<T>::makeRow(const T& item) {
+	template <typename T> UIEntry<T>* UIList<T>::makeRow(const T& item, int i) {
 		UIEntry<T>* entry = new UIEntry<T>(item,
-			rows.size(),
+			i,
 			[this](UIEntry<T>& p) { this->selectRow(p); },
 			new RelativeHitbox(*this->hb),
 			this->getItemFont(),
 			labelFunc(item));
 		entry->setHbExactSizeY(cfg.renderScale(64));
-		rows.push_back(uptr<UIEntry<T>>(entry));
+		return entry;
 	}
 
 
