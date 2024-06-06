@@ -8,12 +8,13 @@ import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.RelativeHitbox;
 import fbc.UIEntry;
+import fbc.UIBase;
 import fbc.UIList;
 import sdl;
 import std;
 
 export namespace fbc {
-	export template <typename T> class UINavigation : public UIList<T> {
+	export template <c_ext<UIBase> T> class UINavigation : public UIList<T> {
 	public:
 		UINavigation(Hitbox* hb,
 			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
@@ -23,38 +24,66 @@ export namespace fbc {
 			UIList<T>(hb, labelFunc, itemFont, background, canAutosize) {}
 		virtual ~UINavigation() {}
 
-		inline const T* getSelectedItem() { return &this->rows[currentIndex]->item; }
+		inline T* getSelectedItem() { return currentItem; }
 		inline UINavigation& setItemFont(FFont& itemFont) { return UIList<T>::setItemFont(itemFont), * this; }
 		inline UINavigation& setLabelFunc(func<const str(T&)> labelFunc) { return UIList<T>::setLabelFunc(labelFunc), * this; }
 		inline UINavigation& setMaxRows(int rows) { return UIList<T>::setMaxRows(rows), * this; }
-		inline UINavigation& setOnChange(func<void(const T*)> onChange) { return this->onChange = onChange, *this; }
 
+		virtual bool isHovered() override;
+		void refreshHb() override;
+		void renderImpl() override;
 		void select(int ind);
 		void select(T& item);
 		void selectRow(UIEntry<T>& entry) override;
+		void updateImpl() override;
 	protected:
-		int currentIndex = 0;
+		T* currentItem;
 
 		virtual UIEntry<T>* makeRow(const T& item, int i) override;
-	private:
-		func<void(const T*)> onChange;
-
-		void changeEvent();
 	};
 
-	// Selects the row matching the given index
-	template<typename T> void UINavigation<T>::select(int ind)
+	template<c_ext<UIBase> T> bool UINavigation<T>::isHovered()
 	{
-		currentIndex = ind;
-		for (const uptr<UIEntry<T>>& row : this->rows) { row->updateSelectStatus(row->index == ind); }
+		return UIList<T>::isHovered() || (currentItem && currentItem->isHovered());
+	}
+
+	template<c_ext<UIBase> T> void UINavigation<T>::refreshHb()
+	{
+		UIList<T>::refreshHb();
+		for (const uptr<UIEntry<T>>& row : this->rows) {
+			const_cast<T&>(row->item).refreshHb();
+		}
+	}
+
+	// Render the currently selected page
+	template<c_ext<UIBase> T> void UINavigation<T>::renderImpl()
+	{
+		UIList<T>::renderImpl();
+		if (currentItem) {
+			currentItem->renderImpl();
+		}
+	}
+
+	// Selects the row matching the given index
+	template<c_ext<UIBase> T> void UINavigation<T>::select(int ind)
+	{
+		for (const uptr<UIEntry<T>>& row : this->rows) {
+			if (row->index == ind) {
+				currentItem = const_cast<T*>(&row->item);
+				row->updateSelectStatus(true);
+			}
+			else {
+				row->updateSelectStatus(false);
+			}
+		}
 	}
 
 	// Selects the row matching the given item
-	template<typename T> void UINavigation<T>::select(T& item)
+	template<c_ext<UIBase> T> void UINavigation<T>::select(T& item)
 	{
-		for (const uptr<UIEntry<T>>& row : this->rows) { 
+		for (const uptr<UIEntry<T>>& row : this->rows) {
 			if (row->item == item) {
-				currentIndex = row->index;
+				currentItem = const_cast<T*>(&row->item);
 				row->updateSelectStatus(true);
 			}
 			else {
@@ -64,14 +93,22 @@ export namespace fbc {
 	}
 
 	// Directly select a row entry
-	template<typename T> void UINavigation<T>::selectRow(UIEntry<T>& entry)
+	template<c_ext<UIBase> T> void UINavigation<T>::selectRow(UIEntry<T>& entry)
 	{
-		currentIndex = entry.index;
+		currentItem = const_cast<T*>(&entry.item);
 		for (const uptr<UIEntry<T>>& row : this->rows) { row->updateSelectStatus(row->index == entry.index); }
-		changeEvent();
 	}
 
-	template<typename T> UIEntry<T>* UINavigation<T>::makeRow(const T& item, int i)
+	// Update the currently selected page
+	template<c_ext<UIBase> T> void UINavigation<T>::updateImpl()
+	{
+		UIList<T>::updateImpl();
+		if (currentItem) {
+			currentItem->updateImpl();
+		}
+	}
+
+	template<c_ext<UIBase> T> UIEntry<T>* UINavigation<T>::makeRow(const T& item, int i)
 	{
 		UIEntry<T>* entry = new UIEntry<T>(item,
 			i,
@@ -83,12 +120,5 @@ export namespace fbc {
 			cct.images.uiArrowLarge);
 		entry->setHbExactSizeY(cfg.renderScale(64));
 		return entry;
-	}
-
-	template<typename T> void UINavigation<T>::changeEvent()
-	{
-		if (onChange) {
-			onChange(getSelectedItem());
-		}
 	}
 }

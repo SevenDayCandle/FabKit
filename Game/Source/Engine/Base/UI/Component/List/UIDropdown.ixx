@@ -12,7 +12,7 @@ import fbc.ScreenManager;
 import fbc.TextInfo;
 import fbc.UIEntry;
 import fbc.UIInteractable;
-import fbc.UIMenu;
+import fbc.UISelectorList;
 import fbc.ScaleHitbox;
 import sdl;
 import std;
@@ -22,7 +22,7 @@ export namespace fbc {
 	public:
 
 		UIDropdown(Hitbox* hb, 
-			UIMenu<T>* menu, 
+			UISelectorList<T>* menu, 
 			IDrawable& image = cct.images.panel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall,
@@ -32,7 +32,7 @@ export namespace fbc {
 			init();
 		}
 		UIDropdown(Hitbox* hb,
-			uptr<UIMenu<T>> menu,
+			uptr<UISelectorList<T>> menu,
 			IDrawable& image = cct.images.panel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall,
@@ -43,12 +43,12 @@ export namespace fbc {
 		}
 		virtual ~UIDropdown() override{}
 
-		uptr<UIMenu<T>> menu;
+		uptr<UISelectorList<T>> menu;
 
 		inline void clearItems() { menu->clearItems(); }
 		inline bool isOpen() { return proxy != nullptr; }
 		inline int selectedSize() const { return menu->selectedSize(); }
-		inline UIDropdown& setEntryFunc(func<UIEntry<T>*(UIMenu<T>&, T&, str&, int)> entryFunc) { return menu->setEntryFunc(entryFunc), *this; }
+		inline UIDropdown& setEntryFunc(func<UIEntry<T>*(UISelectorList<T>&, T&, str&, int)> entryFunc) { return menu->setEntryFunc(entryFunc), *this; }
 		inline UIDropdown& setOnChange(func<void(vec<const T*>)> onChange) { return menu->setOnChange(onChange), * this; }
 		inline virtual UIDropdown& setOnClose(func<void()> onClose) { return this->onClose = onClose, *this; }
 		inline UIDropdown& setOnOpen(func<void()> onOpen) { return this->onOpen = onOpen, *this; }
@@ -209,7 +209,7 @@ export namespace fbc {
 	{
 		return std::make_unique<UIDropdown<T>>(
 			hb,
-			UIMenu<T>::multiMenu(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), labelFunc, itemFont, background),
+			UISelectorList<T>::multiMenu(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), labelFunc, itemFont, background),
 			image,
 			arrow,
 			clear,
@@ -223,7 +223,7 @@ export namespace fbc {
 	{
 		return std::make_unique<UIDropdown<T>>(
 			hb,
-			UIMenu<T>::singleMenu(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), labelFunc, itemFont, background),
+			UISelectorList<T>::singleMenu(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), labelFunc, itemFont, background),
 			image,
 			arrow,
 			clear,

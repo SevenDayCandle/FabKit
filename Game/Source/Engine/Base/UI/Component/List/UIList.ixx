@@ -98,9 +98,7 @@ export namespace fbc {
 	// Create rows for each item in the provided list (varargs version)
 	template<typename T> template<c_varg<T> ...Args> UIList<T>& UIList<T>::addItems(Args&&... items)
 	{
-		for (const T& item : items) {
-			rows.push_back(uptr<UIEntry<T>>(makeRow(item, rows.size())));
-		}
+		(rows.push_back(uptr<UIEntry<T>>(makeRow(items, rows.size()))), ...);
 		refreshRows();
 		return *this;
 	}
@@ -108,9 +106,7 @@ export namespace fbc {
 	// Create rows for each item in the provided list (varargs pointer version)
 	template<typename T> template<c_varg<T*> ...Args> UIList<T>& UIList<T>::addItems(Args&&... items)
 	{
-		for (T* item : items) {
-			rows.push_back(uptr<UIEntry<T>>(makeRow(*item, rows.size())));
-		}
+		(rows.push_back(uptr<UIEntry<T>>(makeRow(*items, rows.size()))), ...);
 		refreshRows();
 		return *this;
 	}

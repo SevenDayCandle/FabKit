@@ -12,7 +12,7 @@ import fbc.ITextInputter;
 import fbc.UIDropdown;
 import fbc.UIEntry;
 import fbc.UIInteractable;
-import fbc.UIMenu;
+import fbc.UISelectorList;
 import fbc.ScaleHitbox;
 import sdl;
 import std;
@@ -21,7 +21,7 @@ export namespace fbc {
 	export template <typename T> class UISearchableDropdown : public UIDropdown<T>, public ITextInputter {
 	public:
 		UISearchableDropdown(Hitbox* hb,
-			UIMenu<T>* menu,
+			UISelectorList<T>* menu,
 			IDrawable& image = cct.images.panel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall,
@@ -31,7 +31,7 @@ export namespace fbc {
 			initSearchable();
 		}
 		UISearchableDropdown(Hitbox* hb,
-			uptr<UIMenu<T>> menu,
+			uptr<UISelectorList<T>> menu,
 			IDrawable& image = cct.images.panel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall,
@@ -185,7 +185,7 @@ export namespace fbc {
 	{
 		return std::make_unique<UISearchableDropdown<T>>(
 			hb,
-			UIMenu<T>::multiMenu(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), labelFunc, itemFont, background),
+			UISelectorList<T>::multiMenu(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), labelFunc, itemFont, background),
 			image,
 			arrow,
 			clear,
@@ -199,7 +199,7 @@ export namespace fbc {
 	{
 		return std::make_unique<UISearchableDropdown<T>>(
 			hb,
-			UIMenu<T>::singleMenu(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), labelFunc, itemFont, background),
+			UISelectorList<T>::singleMenu(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), labelFunc, itemFont, background),
 			image,
 			arrow,
 			clear,

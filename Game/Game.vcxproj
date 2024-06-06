@@ -168,11 +168,15 @@
     </ClCompile>
     <ClCompile Include="Source\Engine\Base\Content\StaticImages.ixx" />
     <ClCompile Include="Source\Engine\Base\Content\BaseStrings.ixx" />
+    <ClCompile Include="Source\Engine\Base\UI\Component\List\UINavigation.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Engine\Base\UI\Component\List\UIList.ixx">
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\UI\Component\List\UINavigation.ixx">
+    <ClCompile Include="Source\Engine\Base\UI\Component\List\UIMenu.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -256,7 +260,7 @@
     </ClCompile>
     <ClCompile Include="Source\Engine\Base\UI\Component\UIButton.ixx" />
     <ClCompile Include="Source\Engine\Base\UI\Component\Layout\UICanvas.ixx" />
-    <ClCompile Include="Source\Engine\Base\UI\Component\List\UIMenu.ixx">
+    <ClCompile Include="Source\Engine\Base\UI\Component\List\UISelectorList.ixx">
       <SubType>
       </SubType>
     </ClCompile>

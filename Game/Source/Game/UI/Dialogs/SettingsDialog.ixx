@@ -22,10 +22,7 @@ export namespace fbc {
 			graphics.addDropdown<pair<int,int>, ilist<pair<int,int>>>(cfg.graphicsResolution, cct.strings.options_graphics_resolution(), RESOLUTIONS, [](const pair<int,int>& item) { return futil::dimensionString(item); });
 			graphics.addToggle(cfg.graphicsVSync, cct.strings.options_graphics_vsync());
 
-			ilist<SettingsDialogPage*> items = { &graphics, &sound, &text };
-			navigation.addItems(items);
-			navigation.setOnChange([this](const SettingsDialogPage* chosen) {this->selected = const_cast<SettingsDialogPage*>(chosen); });
-			selected = &graphics;
+			navigation.addItems(&graphics, &sound, &text);
 
 			UIButton& cancel = this->addElement(std::make_unique<UITextButton>(
 				new RelativeHitbox(*hb, 10, hb->getScaleOffsetSizeY() * 0.9f, 300, 100),
@@ -57,8 +54,6 @@ export namespace fbc {
 		SettingsDialogPage text = page(cct.strings.options_section_text());
 
 		virtual bool isHovered() override;
-		void renderImpl() override;
-		void updateImpl() override;
 
 		inline static void openNew() { screenManager::openOverlay(std::make_unique<SettingsDialog>()); } // Displays a new Settings Dialog
 	protected:
@@ -66,36 +61,26 @@ export namespace fbc {
 
 		void applyAll();
 		void resetCurrent();
-	private:
-		SettingsDialogPage* selected;
 	};
 
-	// The navigation lies outside of the dialog box
 	bool SettingsDialog::isHovered()
 	{
 		return UIDialog::isHovered() || navigation.isHovered();
 	}
 
-	void SettingsDialog::renderImpl()
-	{
-		UIDialog::renderImpl();
-		if (selected) {
-			selected->renderImpl();
-		}
-	}
-
-	void SettingsDialog::updateImpl()
-	{
-		UIDialog::updateImpl();
-		if (selected) {
-			selected->updateImpl();
-		}
-	}
 
 	void SettingsDialog::applyAll()
 	{
 		for (const SettingsDialogPage* page : navigation.getAllItems()) {
 			const_cast<SettingsDialogPage*>(page)->commit();
+		}
+	}
+
+	void SettingsDialog::resetCurrent()
+	{
+		SettingsDialogPage* selected = navigation.getSelectedItem();
+		if (selected) {
+			selected->reset();
 		}
 	}
 }
