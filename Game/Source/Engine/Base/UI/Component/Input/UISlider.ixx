@@ -25,7 +25,7 @@ export namespace fbc {
 
 		virtual UISlider& setValue(int num) override;
 		virtual void onSizeUpdated() override;
-		virtual void refreshHb() override;
+		virtual void refreshDimensions() override;
 		virtual void renderImpl() override;
 		virtual void updateImpl() override;
 	protected:
@@ -40,10 +40,10 @@ export namespace fbc {
 		scrollbar.onSizeUpdated();
 	}
 
-	void UISlider::refreshHb()
+	void UISlider::refreshDimensions()
 	{
-		UINumberInput::refreshHb();
-		scrollbar.refreshHb();
+		UINumberInput::refreshDimensions();
+		scrollbar.refreshDimensions();
 	}
 
 	void UISlider::renderImpl()

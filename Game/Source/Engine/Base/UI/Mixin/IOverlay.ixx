@@ -7,7 +7,7 @@ export namespace fbc {
 
 		inline virtual void dispose() {};
 		inline virtual void open() {}
-		inline virtual void refreshHb() {}  // Force resizing of hitboxes when the screen size changes
+		inline virtual void refreshDimensions() {}  // Force resizing of hitboxes when the screen size changes
 
 		virtual void render() = 0;
 		virtual void update() = 0;

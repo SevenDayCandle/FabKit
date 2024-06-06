@@ -38,6 +38,7 @@ export namespace fbc {
 		virtual UINumberInput& setLimits(int limMin, int limMax);
 		virtual UINumberInput& setValue(int num);
 		virtual void onSizeUpdated() override;
+		virtual void refreshDimensions() override;
 		virtual void renderImpl() override;
 		virtual void start() override;
 		virtual void updateImpl() override;
@@ -91,6 +92,12 @@ export namespace fbc {
 	{
 		TextInfo::setPos(cfg.renderScale(24), this->hb->h * 0.25f);
 		moreRect.w = moreRect.h = lessRect.w = lessRect.h = hb->h / 2;
+	}
+
+	void UINumberInput::refreshDimensions()
+	{
+		UITitledInteractable::refreshDimensions();
+		updateCache();
 	}
 
 	void UINumberInput::renderImpl()

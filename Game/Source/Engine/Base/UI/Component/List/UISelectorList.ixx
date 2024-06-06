@@ -50,7 +50,7 @@ export namespace fbc {
 		void forceClosePopup();
 		void openPopup();
 		void refilterRows();
-		void refreshHb() override;
+		void refreshDimensions() override;
 		void renderImpl() override;
 		template <c_itr<int> Iterable> void selectIndices(Iterable& indices);
 		template <c_itr<T> Iterable> void selectSelection(Iterable& items);
@@ -268,9 +268,9 @@ export namespace fbc {
 	}
 
 	// Updates the dimensions of all children too
-	template<typename T> void UISelectorList<T>::refreshHb() {
-		UIList<T>::refreshHb();
-		scrollbar.refreshHb();
+	template<typename T> void UISelectorList<T>::refreshDimensions() {
+		UIList<T>::refreshDimensions();
+		scrollbar.refreshDimensions();
 	}
 
 	// Render all visible rows and the scrollbar if it is shown

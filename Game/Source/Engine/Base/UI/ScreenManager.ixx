@@ -65,10 +65,10 @@ export namespace fbc::screenManager {
 	// Whenever the screen size changes, we need to setExactSize all UI elements
 	void refreshSize() {
 		for (const uptr<UIBase>& screen : screens) {
-			screen->refreshHb();
+			screen->refreshDimensions();
 		}
 		for (const uptr<IOverlay>& overlay : overlays) {
-			overlay->refreshHb();
+			overlay->refreshDimensions();
 		}
 	}
 

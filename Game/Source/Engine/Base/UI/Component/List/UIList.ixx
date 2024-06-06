@@ -47,7 +47,7 @@ export namespace fbc {
 		UIList& setMaxRows(int rows);
 		vec<const T*> getAllItems();
 		void forEach(func<void(const T&)> func);
-		void refreshHb() override;
+		void refreshDimensions() override;
 		void renderImpl() override;
 		void updateImpl() override;
 
@@ -177,10 +177,10 @@ export namespace fbc {
 	}
 
 	// Updates the dimensions of all children too
-	template<typename T> void UIList<T>::refreshHb() {
-		UIBase::refreshHb();
+	template<typename T> void UIList<T>::refreshDimensions() {
+		UIBase::refreshDimensions();
 		for (const uptr<UIEntry<T>>& row : rows) {
-			row->refreshHb();
+			row->refreshDimensions();
 		}
 		autosize();
 	}

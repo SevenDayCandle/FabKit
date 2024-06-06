@@ -84,7 +84,7 @@ export namespace fbc {
 		void forceClosePopup();
 		virtual void onSizeUpdated() override;
 		virtual void openPopup();
-		virtual void refreshHb() override;
+		virtual void refreshDimensions() override;
 		virtual void renderImpl() override;
 		virtual void updateImpl() override;
 		virtual void unsetProxy();
@@ -139,9 +139,10 @@ export namespace fbc {
 		if (proxy != nullptr) { screenManager::closeOverlay(proxy); }
 	}
 
-	template<typename T> void UIDropdown<T>::refreshHb() {
-		UITitledInteractable::refreshHb();
-		this->menu->refreshHb();
+	template<typename T> void UIDropdown<T>::refreshDimensions() {
+		UITitledInteractable::refreshDimensions();
+		updateCache();
+		this->menu->refreshDimensions();
 	}
 
 	template<typename T> void UIDropdown<T>::unsetProxy() {

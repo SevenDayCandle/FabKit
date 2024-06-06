@@ -25,7 +25,8 @@ export namespace fbc {
 		inline UIToggle& setOnClick(const func<void(UIToggle&)>& onClick) { return this->onClick = onClick, *this; }
 		inline UIToggle& setToggleState(bool val) { return this->toggled = val, *this; }
 
-		virtual void onSizeUpdated() override;
+		void onSizeUpdated() override;
+		void refreshDimensions() override;
 		void renderImpl() override;
 		void toggle(bool val);
 	private:
@@ -37,6 +38,12 @@ export namespace fbc {
 	void UIToggle::onSizeUpdated()
 	{
 		TextInfo::setPos(this->hb->w * 1.25f, this->hb->h * 0.1f);
+	}
+
+	void UIToggle::refreshDimensions()
+	{
+		UIInteractable::refreshDimensions();
+		updateCache();
 	}
 
 	void UIToggle::renderImpl()

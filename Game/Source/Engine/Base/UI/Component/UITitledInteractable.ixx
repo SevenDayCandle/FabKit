@@ -24,7 +24,7 @@ export namespace fbc {
 		inline virtual float getBeginY() override { return label ? std::min(hb->y, hb->y + label->getTextYPos()) : hb->y; }
 		inline strv getLabelText() const { return label ? label->getText() : ""; }
 
-		virtual void refreshHb() override;
+		virtual void refreshDimensions() override;
 		virtual void renderImpl() override;
 		UITitledInteractable& withLabel(strv text, FFont& font = cct.fontBold(), float xOff = 0, float yOff = -80, sdl::Color color = sdl::COLOR_WHITE, sdl::Color colorOutline = sdl::COLOR_BLACK);
 	private:
@@ -33,11 +33,12 @@ export namespace fbc {
 	};
 
 	// Ensure that the label offsets remain in sync with the hitbox size
-	void UITitledInteractable::refreshHb()
+	void UITitledInteractable::refreshDimensions()
 	{
-		UIInteractable::refreshHb();
+		UIInteractable::refreshDimensions();
 		if (label) {
 			label->setPos(cfg.renderScale(xOff), cfg.renderScale(yOff));
+			label->updateCache();
 		}
 	}
 

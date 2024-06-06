@@ -35,7 +35,7 @@ export namespace fbc {
 		virtual UIBase& setHbOffsetSizeX(const float x);
 		virtual UIBase& setHbOffsetSizeY(const float y);
 		 
-		virtual void refreshHb() override;
+		virtual void refreshDimensions() override;
 		virtual void render() override;
 		virtual void update() override;
 		virtual void updateImpl();
@@ -91,8 +91,8 @@ export namespace fbc {
 		return *this;
 	}
 
-	// Force updating of the hb dimensions to match their offsets. Invoked when the screen size is changed
-	void UIBase::refreshHb()
+	// When the screen size is changed, text and hitboxes must be resized
+	void UIBase::refreshDimensions()
 	{
 		hb->refresh();
 		onSizeUpdated();

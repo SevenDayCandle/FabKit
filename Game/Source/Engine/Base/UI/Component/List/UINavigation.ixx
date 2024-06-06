@@ -30,7 +30,7 @@ export namespace fbc {
 		inline UINavigation& setMaxRows(int rows) { return UIList<T>::setMaxRows(rows), * this; }
 
 		virtual bool isHovered() override;
-		void refreshHb() override;
+		void refreshDimensions() override;
 		void renderImpl() override;
 		void select(int ind);
 		void select(T& item);
@@ -47,11 +47,11 @@ export namespace fbc {
 		return UIList<T>::isHovered() || (currentItem && currentItem->isHovered());
 	}
 
-	template<c_ext<UIBase> T> void UINavigation<T>::refreshHb()
+	template<c_ext<UIBase> T> void UINavigation<T>::refreshDimensions()
 	{
-		UIList<T>::refreshHb();
+		UIList<T>::refreshDimensions();
 		for (const uptr<UIEntry<T>>& row : this->rows) {
-			const_cast<T&>(row->item).refreshHb();
+			const_cast<T&>(row->item).refreshDimensions();
 		}
 	}
 

@@ -20,7 +20,7 @@ export namespace fbc {
 		template<typename T> requires std::is_base_of_v<UIBase, T> T& stackElementXDir(uptr<T>&& element, float spacing = 0);
 		template<typename T> requires std::is_base_of_v<UIBase, T> T& stackElementYDir(uptr<T>&& element, float spacing = 0);
 		virtual bool isHovered() override;
-		virtual void refreshHb() override;
+		virtual void refreshDimensions() override;
 		virtual void renderImpl() override;
 		virtual void updateImpl() override;
 	protected:
@@ -41,11 +41,11 @@ export namespace fbc {
 	}
 
 	// Updates the dimensions of all children too
-	void UICanvas::refreshHb()
+	void UICanvas::refreshDimensions()
 	{
-		UIBase::refreshHb();
+		UIBase::refreshDimensions();
 		for (const uptr<UIBase>& element : elements) {
-			element->refreshHb();
+			element->refreshDimensions();
 		}
 	}
 

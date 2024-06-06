@@ -33,6 +33,7 @@ export namespace fbc {
 		inline virtual void updateSelectStatus(bool selected) { toggled = selected; };
 
 		virtual void onSizeUpdated() override;
+		virtual void refreshDimensions() override;
 		virtual void renderImpl() override;
 		virtual void updateImpl() override;
 	protected:
@@ -42,6 +43,12 @@ export namespace fbc {
 	template<typename T> void UIEntry<T>::onSizeUpdated()
 	{
 		TextInfo::setPos(this->hb->h * 1.25f, 0);
+	}
+
+	template<typename T> void UIEntry<T>::refreshDimensions()
+	{
+		UIInteractable::refreshDimensions();
+		updateCache();
 	}
 
 	template<typename T> void UIEntry<T>::renderImpl() {
