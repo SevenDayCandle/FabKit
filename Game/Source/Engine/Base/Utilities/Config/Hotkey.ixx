@@ -15,7 +15,7 @@ export namespace fbc {
 
 	export class Hotkey {
 	public:
-		Hotkey(strv id, int key, int gamepad): ID(id), key(key), keyDefault(key), pad(gamepad), padDefault(gamepad) {}
+		Hotkey(strv id, sdl::Scancode key, sdl::GamepadButton gamepad): ID(id), key(key), keyDefault(key), pad(gamepad), padDefault(gamepad) {}
 		virtual ~Hotkey() {}
 
 		const str ID;
@@ -23,15 +23,15 @@ export namespace fbc {
 		inline bool isKeyJustPressed() { return key > 0 && sdl::keyboardJustPressed(key); }
 		inline int getKey() { return key; }
 		inline int getPad() { return pad; }
-		inline void setKey(int key) { this->key = key; }
-		inline void setPad(int pad) { this->pad = pad; }
+		inline void setKey(sdl::Scancode key) { this->key = key; }
+		inline void setPad(sdl::GamepadButton  pad) { this->pad = pad; }
 
 		void reset();
 		void set(int key, int pad);
 
 		static inline str configPath() { return sdl::dirPref(futil::FBC.data(), BASE_HOTKEY_FILE.data()); }
 
-		static Hotkey& add(strv id, int key, int pad);
+		static Hotkey& add(strv id, sdl::Scancode key, sdl::GamepadButton pad);
 		static void commit();
 		static void reload();
 	private:
@@ -59,7 +59,7 @@ export namespace fbc {
 	}
 
 	// Register a hotkey to be tracked for saving and reloading
-	Hotkey& Hotkey::add(strv id, int key, int pad)
+	Hotkey& Hotkey::add(strv id, sdl::Scancode key, sdl::GamepadButton pad)
 	{
 		auto [it, inserted] = keys.try_emplace(str(id), Hotkey(id, key, pad));
 		if (!inserted) {
@@ -87,8 +87,7 @@ export namespace fbc {
 		if (std::filesystem::exists(configPath)) {
 			glz::parse_error error = glz::read_file_json(input, configPath, str{});
 			if (error) {
-				sdl::logError("Failed to read hotkeys at path %s", configPath.data());
-				return;
+				sdl::logError("Failed to read hotkeys at path %s: %s", configPath.data(), error.includer_error.data());
 			}
 
 			// If a hotkey is in the map, set it to whatever values were read from the map. Otherwise, reset them to their defaults

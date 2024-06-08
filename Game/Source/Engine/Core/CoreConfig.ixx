@@ -5,10 +5,12 @@ import fbc.ConfigHotkey;
 import fbc.ConfigItem;
 import fbc.FUtil;
 import fbc.Language;
+import fbc.WindowMode;
 import sdl;
 import std;
 
 export namespace fbc {
+	constexpr float BASE_DENOMINATOR = 2160;
 	constexpr ilist<pair<int, int>> RESOLUTIONS = {
 		{320, 240},
 		{640, 480},
@@ -36,7 +38,6 @@ export namespace fbc {
 		{3840, 1600},
 		{3840, 2160},
 	};
-	constexpr float BASE_DENOMINATOR = 2160;
 	constexpr strv FONT_BOLD = "Resources/Fonts/NotoSans-Bold.ttf";
 	constexpr strv FONT_REGULAR = "Resources/Fonts/NotoSans-Regular.ttf";
 
@@ -50,7 +51,7 @@ export namespace fbc {
 		ConfigItem<bool> graphicsParticleEffects = ConfigItem<bool>(*this, "GraphicsParticleEffects", true);
 		ConfigItem<pair<int, int>> graphicsResolution = ConfigItem<pair<int,int>>(*this, "GraphicsResolution", {1920, 1080});
 		ConfigItem<bool> graphicsVSync = ConfigItem<bool>(*this, "GraphicsVSync", true);
-		ConfigItem<int> graphicsWindowMode = ConfigItem<int>(*this, "GraphicsFPS", 0);
+		ConfigItem<WindowMode> graphicsWindowMode = ConfigItem<WindowMode>(*this, "GraphicsFPS", WindowMode::WINDOWED);
 		ConfigItem<int> soundVolumeEffects = ConfigItem<int>(*this, "SoundVolumeEffects", 100);
 		ConfigItem<int> soundVolumeMaster = ConfigItem<int>(*this, "SoundVolumeMaster", 100);
 		ConfigItem<int> soundVolumeMusic = ConfigItem<int>(*this, "SoundVolumeMusic", 100);
@@ -60,11 +61,11 @@ export namespace fbc {
 		ConfigItem<bool> textIcons = ConfigItem<bool>(*this, "TextIcons", false);
 		ConfigItem<str> textLanguage = ConfigItem<str>(*this, "TextLanguage", str(lang::ENG_DEFAULT));
 
-		Hotkey actDirDown = Hotkey::add("ActDirDown", sdl::KEY_DOWN, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_DOWN);
-		Hotkey actDirLeft = Hotkey::add("ActDirLeft", sdl::KEY_LEFT, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_LEFT);
-		Hotkey actDirRight = Hotkey::add("ActDirRight", sdl::KEY_RIGHT, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_RIGHT);
-		Hotkey actDirUp = Hotkey::add("ActDirUp", sdl::KEY_UP, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_UP);
-		Hotkey actEsc = Hotkey::add("ActEsc", sdl::KEY_ESC, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_INVALID);
+		Hotkey actDirDown = Hotkey::add("ActDirDown", sdl::SCAN_DOWN, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_DOWN);
+		Hotkey actDirLeft = Hotkey::add("ActDirLeft", sdl::SCAN_LEFT, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_LEFT);
+		Hotkey actDirRight = Hotkey::add("ActDirRight", sdl::SCAN_RIGHT, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_RIGHT);
+		Hotkey actDirUp = Hotkey::add("ActDirUp", sdl::SCAN_UP, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_UP);
+		Hotkey actEsc = Hotkey::add("ActEsc", sdl::SCAN_ESC, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_INVALID);
 
 		inline int getScreenXSize() { return graphicsResolution.get().first; }
 		inline int getScreenYSize() { return graphicsResolution.get().second; };
@@ -78,6 +79,7 @@ export namespace fbc {
 		void postInitialize() override;
 		void resizeWindow();
 		void setupWindow();
+		void updateWindowMode();
 	private:
 		float fontScalePrivate = 1.0;
 		float renderScalePrivate = 1.0;
@@ -109,8 +111,23 @@ export namespace fbc {
 		postInitialize();
 	}
 
-	// Update the window from the config
+	// Create the window from the config
 	void CoreConfig::setupWindow() {
 		sdl::initWindow(getScreenXSize(), getScreenYSize(), graphicsWindowMode.get(), graphicsVSync.get());
+	}
+
+	// Update the window fullscreen mode from the config
+	void CoreConfig::updateWindowMode() {
+		switch (graphicsWindowMode.get()) {
+		case BORDERLESS_FULLSCREEN:
+			sdl::windowSetFullscreen(1);
+			break;
+		case FULLSCREEN:
+			sdl::windowSetFullscreen(1);
+			break;
+		default:
+			sdl::windowSetFullscreen(0);
+			break;
+		}
 	}
 }

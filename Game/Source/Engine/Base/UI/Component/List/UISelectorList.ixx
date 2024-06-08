@@ -23,7 +23,7 @@ export namespace fbc {
 
 	public:
 		UISelectorList(Hitbox* hb,
-		       func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
+		       func<str(const T&)> labelFunc = futil::toString<T>,
 		       FFont& itemFont = cct.fontRegular(),
 		       IDrawable& background = cct.images.panelRound,
 		       bool canAutosize = false):
@@ -70,13 +70,15 @@ export namespace fbc {
 		void updateSingle(T item);
 		void updateSingle(T* item);
 
-		static uptr<UISelectorList> multiMenu(Hitbox* hb, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); }, FFont& itemFont = cct.fontRegular(), IDrawable& background = cct.images.darkPanelRound, bool canAutosize = false);
-		static uptr<UISelectorList> singleMenu(Hitbox* hb, func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); }, FFont& itemFont = cct.fontRegular(), IDrawable& background = cct.images.darkPanelRound, bool canAutosize = false);
+		static uptr<UISelectorList> multiList(Hitbox* hb, func<str(const T&)> labelFunc = futil::toString<T>, FFont& itemFont = cct.fontRegular(), IDrawable& background = cct.images.darkPanelRound, bool canAutosize = false);
+		static uptr<UISelectorList> singleList(Hitbox* hb, func<str(const T&)> labelFunc = futil::toString<T>, FFont& itemFont = cct.fontRegular(), IDrawable& background = cct.images.darkPanelRound, bool canAutosize = false);
 	protected:
 		set<int> currentIndices;
 		vec<UIEntry<T>*> rowsForRender;
 
 		inline int getVisibleRowCount() const { return std::min(static_cast<int>(rowsForRender.size()), this->maxRows); }
+
+		virtual void updateTopVisibleRowIndex(int value) override;
 	private:
 		int selectionLimit = std::numeric_limits<int>::max();
 		func<bool(const UIEntry<T>*)> filterFunc;
@@ -288,11 +290,37 @@ export namespace fbc {
 	template <typename T> void UISelectorList<T>::updateImpl() {
 		UIBase::updateImpl();
 		int rowCount = getVisibleRowCount();
-		for (int i = this->topVisibleRowIndex; i < this->topVisibleRowIndex + rowCount; ++i) { rowsForRender[i]->updateImpl(); }
+		for (int i = this->topVisibleRowIndex; i < this->topVisibleRowIndex + rowCount; ++i) {
+			rowsForRender[i]->updateImpl();
+			if (rowsForRender[i]->hb->justHovered()) {
+				this->activeRow = i;
+			}
+		}
+
+		if (this->activeRow >= 0) {
+			if (cfg.actDirUp.isKeyJustPressed()) {
+				this->activeRow = std::max(0, this->activeRow - 1);
+				if (this->activeRow < this->topVisibleRowIndex) {
+					updateTopVisibleRowIndex(this->topVisibleRowIndex - 1);
+				}
+			}
+			else if (cfg.actDirDown.isKeyJustPressed()) {
+				this->activeRow = std::min((int)rowsForRender.size() - 1, this->activeRow + 1);
+				if (this->activeRow > this->topVisibleRowIndex + this->maxRows) {
+					updateTopVisibleRowIndex(this->topVisibleRowIndex + 1);
+				}
+			}
+			else if (sdl::mouseIsLeftJustClicked() && !this->isHovered()) {
+				this->activeRow = -1;
+			}
+		}
 
 		scrollbar.update();
+		scrollbar.processMouseScroll();
 
-		// TODO handle keyboard/controllers
+		for (int i = 0; i < rowsForRender.size(); ++i) {
+			rowsForRender[i]->updateActiveStatus(this->activeRow == i);
+		}
 	}
 
 	// If the row exists in the selection, remove it. Otherwise, add it to the selection. Invokes the change callback
@@ -428,11 +456,11 @@ export namespace fbc {
 	 * Statics
 	 */
 
-	template<typename T> uptr<UISelectorList<T>> UISelectorList<T>::multiMenu(Hitbox* hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize) {
+	template<typename T> uptr<UISelectorList<T>> UISelectorList<T>::multiList(Hitbox* hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize) {
 		return std::make_unique<UISelectorList<T>>(hb, labelFunc, itemFont, background, canAutosize);
 	}
 
-	template<typename T> uptr<UISelectorList<T>> UISelectorList<T>::singleMenu(Hitbox* hb,
+	template<typename T> uptr<UISelectorList<T>> UISelectorList<T>::singleList(Hitbox* hb,
 		func<str(const T&)> labelFunc,
 		FFont& itemFont,
 		IDrawable& background, 
@@ -441,6 +469,14 @@ export namespace fbc {
 		res->setSelectionLimit(1);
 		return res;
 	}
+
+	template<typename T> void UISelectorList<T>::updateTopVisibleRowIndex(int value)
+	{
+		UIList<T>::updateTopVisibleRowIndex(value);
+		int count = rowsForRender.size() - getVisibleRowCount();
+		scrollbar.setScrollPos(count > 0 ? value / static_cast<float>(count) : 0);
+	}
+
 	/*
 	 * UIMenuProxy Implementations
 	 */

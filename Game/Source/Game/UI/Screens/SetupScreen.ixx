@@ -36,7 +36,7 @@ export namespace fbc {
 				cct.strings.ui_confirm()
 				));
 
-			UISearchableDropdown<Language>& dr = stackElementXDir(UISearchableDropdown<Language>::multiMenu(new RelativeHitbox(*hb, 400, 100)));
+			UISearchableDropdown<Language>& dr = stackElementXDir(UISearchableDropdown<Language>::multiSearch(new RelativeHitbox(*hb, 400, 100)));
 			dr.setItems(Language::all());
 
 			UITextInput& inp = stackElementYDir(std::make_unique<UITextInput>(new RelativeHitbox(*hb, 500, 1400, 500, 100)));

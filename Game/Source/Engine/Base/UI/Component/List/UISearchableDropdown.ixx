@@ -51,8 +51,8 @@ export namespace fbc {
 		virtual void start() override;
 		virtual void unsetProxy() override;
 
-		static uptr<UISearchableDropdown> multiMenu(Hitbox* hb,
-			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
+		static uptr<UISearchableDropdown> multiSearch(Hitbox* hb,
+			func<str(const T&)> labelFunc = futil::toString<T>,
 			func<str(vec<const UIEntry<T>*>)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
@@ -60,8 +60,8 @@ export namespace fbc {
 			IDrawable& image = cct.images.panel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall);
-		static uptr<UISearchableDropdown> singleMenu(Hitbox* hb,
-			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
+		static uptr<UISearchableDropdown> singleSearch(Hitbox* hb,
+			func<str(const T&)> labelFunc = futil::toString<T>,
 			func<str(vec<const UIEntry<T>*>)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
@@ -180,12 +180,12 @@ export namespace fbc {
 		caret.y = this->hb->y;
 	}
 
-	template<typename T> uptr<UISearchableDropdown<T>> UISearchableDropdown<T>::multiMenu(
+	template<typename T> uptr<UISearchableDropdown<T>> UISearchableDropdown<T>::multiSearch(
 		Hitbox* hb, func<str(const T&)> labelFunc, func<str(vec<const UIEntry<T>*>)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
 	{
 		return std::make_unique<UISearchableDropdown<T>>(
 			hb,
-			UISelectorList<T>::multiMenu(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), labelFunc, itemFont, background),
+			UISelectorList<T>::multiList(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), labelFunc, itemFont, background),
 			image,
 			arrow,
 			clear,
@@ -194,12 +194,12 @@ export namespace fbc {
 		);
 	}
 
-	template<typename T> uptr<UISearchableDropdown<T>> UISearchableDropdown<T>::singleMenu(
+	template<typename T> uptr<UISearchableDropdown<T>> UISearchableDropdown<T>::singleSearch(
 		Hitbox* hb, func<str(const T&)> labelFunc, func<str(vec<const UIEntry<T>*>)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
 	{
 		return std::make_unique<UISearchableDropdown<T>>(
 			hb,
-			UISelectorList<T>::singleMenu(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), labelFunc, itemFont, background),
+			UISelectorList<T>::singleList(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), labelFunc, itemFont, background),
 			image,
 			arrow,
 			clear,

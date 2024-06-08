@@ -17,6 +17,10 @@ export namespace fbc {
 		inline str options_graphics_fps() const { return uiStrings.at("options_graphics_fps"); };
 		inline str options_graphics_resolution() const { return uiStrings.at("options_graphics_resolution"); };
 		inline str options_graphics_vsync() const { return uiStrings.at("options_graphics_vsync"); };
+		inline str options_graphics_window_mode() const { return uiStrings.at("options_graphics_window_mode"); };
+		inline str options_graphics_window_mode_borderless() const { return uiStrings.at("options_graphics_window_mode_borderless"); };
+		inline str options_graphics_window_mode_fullscreen() const { return uiStrings.at("options_graphics_window_mode_fullscreen"); };
+		inline str options_graphics_window_mode_windowed() const { return uiStrings.at("options_graphics_window_mode_windowed"); };
 		inline str options_section_graphics() const { return uiStrings.at("options_section_graphics"); };
 		inline str options_section_sound() const { return uiStrings.at("options_section_sound"); };
 		inline str options_section_text() const { return uiStrings.at("options_section_text"); };

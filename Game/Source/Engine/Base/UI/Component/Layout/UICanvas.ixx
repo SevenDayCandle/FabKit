@@ -17,8 +17,9 @@ export namespace fbc {
 		inline void clear() { elements.clear(); }
 
 		template<typename T> requires std::is_base_of_v<UIBase, T> T& addElement(uptr<T>&& element);
-		template<typename T> requires std::is_base_of_v<UIBase, T> T& stackElementXDir(uptr<T>&& element, float spacing = 0);
-		template<typename T> requires std::is_base_of_v<UIBase, T> T& stackElementYDir(uptr<T>&& element, float spacing = 0);
+		template<typename T> requires std::is_base_of_v<UIBase, T> T& stackElementXDir(uptr<T>&& element, float spacing = 8, float yOff = 0);
+		template<typename T> requires std::is_base_of_v<UIBase, T> T& stackElementYDir(uptr<T>&& element, float spacing = 8, float xOff = 0);
+		UIBase* getLastItem();
 		virtual bool isHovered() override;
 		virtual void refreshDimensions() override;
 		virtual void renderImpl() override;
@@ -33,6 +34,15 @@ export namespace fbc {
 		T& ref = *element;
 		elements.push_back(std::move(element));
 		return ref;
+	}
+
+	// Get the hb for the last item added into the list
+	UIBase* UICanvas::getLastItem()
+	{
+		if (elements.size() > 0) {
+			return elements[elements.size() - 1].get();
+		}
+		return nullptr;
 	}
 
 	// Is considered hovered if any child element is hovered; own hitbox is ignored
@@ -60,7 +70,7 @@ export namespace fbc {
 	 * If the element's X endpoint would exceed the width of this hb, it gets moved below the last element at the X offset defined by start
 	 * Spacing will automatically be scaled by renderScale
 	 */
-	template<typename T> requires std::is_base_of_v<UIBase, T> T& UICanvas::stackElementXDir(uptr<T>&& element, float spacing) {
+	template<typename T> requires std::is_base_of_v<UIBase, T> T& UICanvas::stackElementXDir(uptr<T>&& element, float spacing, float yOff) {
 		float scaled = cfg.renderScale(spacing);
 		T& ref = *element;
 		elements.push_back(std::move(element));
@@ -69,11 +79,11 @@ export namespace fbc {
 			UIBase& last = *elements[elements.size() - 2];
 			Hitbox& lhb = *(last.hb);
 			float xPos = last.getEndX() + scaled;
-			float yPos = last.getBeginY();
+			float yPos = last.getBeginY() + yOff;
 
 			if (xPos > hb->x + hb->w) {
 				xPos = hb->x;
-				yPos = last.getEndY() + scaled;
+				yPos = last.getEndY() + scaled + yOff;
 			}
 
 			ref.hb->setExactPos(xPos, yPos);
@@ -85,7 +95,7 @@ export namespace fbc {
 	 * If the element's Y endpoint would exceed the height of this hb, it gets moved to the right of the last element at the Y offset defined by start
 	 * Spacing will automatically be scaled by renderScale
 	 */
-	template<typename T> requires std::is_base_of_v<UIBase, T> T& UICanvas::stackElementYDir(uptr<T>&& element, float spacing) {
+	template<typename T> requires std::is_base_of_v<UIBase, T> T& UICanvas::stackElementYDir(uptr<T>&& element, float spacing, float xOff) {
 		float scaled = cfg.renderScale(spacing);
 		T& ref = *element;
 		elements.push_back(std::move(element));
@@ -93,11 +103,11 @@ export namespace fbc {
 		if (elements.size() > 1) {
 			UIBase& last = *elements[elements.size() - 2];
 			Hitbox& lhb = *(last.hb);
-			float xPos = last.getBeginX();
+			float xPos = last.getBeginX() + xOff;
 			float yPos = last.getEndY() + scaled;
 
 			if (yPos > hb->y + hb->h) {
-				xPos = last.getEndX() + scaled;
+				xPos = last.getEndX() + scaled + xOff;
 				yPos = hb->y;
 			}
 

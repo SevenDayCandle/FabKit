@@ -21,7 +21,7 @@ export namespace fbc {
 	export template <typename T> class UIList : public UIBase {
 	public:
 		UIList(Hitbox* hb,
-			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
+			func<str(const T&)> labelFunc = futil::toString<T>,
 			FFont& itemFont = cct.fontRegular(),
 			IDrawable& background = cct.images.panelRound,
 			bool canAutosize = false) :
@@ -31,6 +31,7 @@ export namespace fbc {
 		~UIList() override {}
 
 		inline void clearItems() { setItems(); }
+		inline bool empty() { return rows.empty(); }
 		inline FFont& getItemFont() const { return itemFont; }
 		inline int size() const { return rows.size(); }
 
@@ -55,6 +56,7 @@ export namespace fbc {
 
 	protected:
 		bool canAutosize;
+		int activeRow = -1;
 		int maxRows = 15;
 		int topVisibleRowIndex;
 		sdl::Color backgroundColor = sdl::COLOR_WHITE;
@@ -63,13 +65,14 @@ export namespace fbc {
 		func<str(const T&)> labelFunc;
 		vec<uptr<UIEntry<T>>> rows;
 
-		inline virtual int getVisibleRowCount() const { return std::min(static_cast<int>(rows.size()), this->maxRows);; }
+		inline virtual int getVisibleRowCount() const { return std::min(static_cast<int>(rows.size()), this->maxRows); }
+		inline virtual void updateTopVisibleRowIndex(int value) { topVisibleRowIndex = value; }
 		inline static float rMargin() { return cfg.renderScale(MARGIN); }
 
 		virtual UIEntry<T>* makeRow(const T& item, int i);
+		virtual void refreshRows();
 	private:
 		virtual void autosize();
-		virtual void refreshRows();
 		virtual void updateRowPositions();
 	};
 
@@ -114,28 +117,32 @@ export namespace fbc {
 	// Replaces the current rows with rows for each item in the provided list. Clears any selections in the process, but does NOT invoke the change callback.
 	template <typename T> template <c_itr<T> Iterable> UIList<T>& UIList<T>::setItems(const Iterable& items) {
 		rows.clear();
-		topVisibleRowIndex = 0;
+		activeRow = -1;
+		updateTopVisibleRowIndex(0);
 		return addItems(items);
 	}
 
 	// Replaces the current rows with rows for each item in the provided list (pointer version). Clears any selections in the process, but does NOT invoke the change callback.
 	template <typename T> template <c_itr<T*> Iterable> UIList<T>& UIList<T>::setItems(const Iterable& items) {
 		rows.clear();
-		topVisibleRowIndex = 0;
+		activeRow = -1;
+		updateTopVisibleRowIndex(0);
 		return addItems(items);
 	}
 
 	// Replaces the current rows with rows for each item in the provided list (varargs version). Clears any selections in the process, but does NOT invoke the change callback.
 	template<typename T> template<c_varg<T> ...Args> UIList<T>& UIList<T>::setItems(Args&&... items) {
 		rows.clear();
-		topVisibleRowIndex = 0;
+		activeRow = -1;
+		updateTopVisibleRowIndex(0);
 		return addItems(items);
 	}
 
 	// Replaces the current rows with rows for each item in the provided list (varargs version). Clears any selections in the process, but does NOT invoke the change callback.
 	template<typename T> template<c_varg<T*> ...Args> UIList<T>& UIList<T>::setItems(Args&&... items) {
 		rows.clear();
-		topVisibleRowIndex = 0;
+		activeRow = -1;
+		updateTopVisibleRowIndex(0);
 		return addItems(items);
 	}
 
@@ -198,9 +205,34 @@ export namespace fbc {
 	template <typename T> void UIList<T>::updateImpl() {
 		UIBase::updateImpl();
 		int rowCount = getVisibleRowCount();
-		for (int i = topVisibleRowIndex; i < topVisibleRowIndex + rowCount; ++i) { rows[i]->updateImpl(); }
+		for (int i = topVisibleRowIndex; i < topVisibleRowIndex + rowCount; ++i) {
+			rows[i]->updateImpl();
+			if (rows[i]->hb->justHovered()) {
+				activeRow = i;
+			}
+		}
 
-		// TODO handle keyboard/controllers
+		if (activeRow >= 0) {
+			if (cfg.actDirUp.isKeyJustPressed()) {
+				activeRow = std::max(0, activeRow - 1);
+				if (activeRow < topVisibleRowIndex) {
+					updateTopVisibleRowIndex(topVisibleRowIndex - 1);
+				}
+			}
+			else if (cfg.actDirDown.isKeyJustPressed()) {
+				activeRow = std::min((int) rows.size() - 1, activeRow + 1);
+				if (activeRow > topVisibleRowIndex + maxRows) {
+					updateTopVisibleRowIndex(topVisibleRowIndex + 1);
+				}
+			}
+			else if (sdl::mouseIsLeftJustClicked() && !isHovered()) {
+				activeRow = -1;
+			}
+		}
+
+		for (int i = 0; i < rows.size(); ++i) {
+			rows[i]->updateActiveStatus(this->activeRow == i);
+		}
 	}
 
 	// Create a menu row for a new item

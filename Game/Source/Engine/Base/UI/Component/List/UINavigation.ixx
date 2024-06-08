@@ -17,7 +17,7 @@ export namespace fbc {
 	export template <c_ext<UIBase> T> class UINavigation : public UIList<T> {
 	public:
 		UINavigation(Hitbox* hb,
-			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
+			func<str(const T&)> labelFunc = futil::toString<T>,
 			FFont& itemFont = cct.fontRegular(),
 			IDrawable& background = cct.images.darkPanelRound,
 			bool canAutosize = false) :
@@ -40,6 +40,8 @@ export namespace fbc {
 		T* currentItem;
 
 		virtual UIEntry<T>* makeRow(const T& item, int i) override;
+	private:
+		void refreshRows() override;
 	};
 
 	template<c_ext<UIBase> T> bool UINavigation<T>::isHovered()
@@ -120,5 +122,17 @@ export namespace fbc {
 			cct.images.uiArrowLarge);
 		entry->setHbExactSizeY(cfg.renderScale(64));
 		return entry;
+	}
+
+	// Ensure that an item is always selected if the list has items. Conversely, if the list is empty, ensure that nothing is selected
+	template<c_ext<UIBase> T> void UINavigation<T>::refreshRows()
+	{
+		UIList<T>::refreshRows();
+		if ((currentItem == nullptr && !this->empty()) || !futil::any(this->rows, [this](const uptr<UIEntry<T>>& row) {return &row->item == currentItem; })) {
+			select(0);
+		}
+		else if (this->empty()) {
+			currentItem = nullptr;
+		}
 	}
 }

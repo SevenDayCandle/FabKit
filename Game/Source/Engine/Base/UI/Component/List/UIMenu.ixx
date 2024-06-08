@@ -16,7 +16,7 @@ export namespace fbc {
 	export template <typename T> class UIMenu : public UIList<T> {
 	public:
 		UIMenu(Hitbox* hb,
-			func<str(const T&)> labelFunc = [](const T& item) { return futil::toString(item); },
+			func<str(const T&)> labelFunc = futil::toString<T>,
 			FFont& itemFont = cct.fontRegular(),
 			IDrawable& background = cct.images.darkPanelRound,
 			bool canAutosize = false) :

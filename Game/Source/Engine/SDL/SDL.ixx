@@ -19,15 +19,17 @@ namespace sdl {
 	int mouseLast = -1;
 	int mousePosX = 0;
 	int mousePosY = 0;
+	int mouseWheelX = 0;
+	int mouseWheelY = 0;
 	int numKeys;
 	int numPads;
-	IKeyInputListener* kListener;
+	IKeyInputListener* kListener = nullptr;
 	SDL_Event e;
 	SDL_Gamepad* gamepad;
 	SDL_Renderer* renderer;
 	SDL_Window* window;
 	Uint32 timeStart;
-	Uint8* keyLast;
+	Uint8* keyJust;
 	Uint8* padLast;
 
 	export using BlendMode = ::SDL_BlendMode;
@@ -35,12 +37,14 @@ namespace sdl {
 	export using FlipMode = ::SDL_FlipMode;
 	export using Font = ::TTF_Font;
 	export using GamepadButton = ::SDL_GamepadButton;
+	export using Keycode = ::SDL_Keycode;
 	export using PixelFormatEnum = ::SDL_PixelFormatEnum;
 	export using Point = ::SDL_FPoint;
 	export using PointI = ::SDL_Point;
 	export using RectF = ::SDL_FRect;
 	export using RectI = ::SDL_Rect;
 	export using ScaleMode = ::SDL_ScaleMode;
+	export using Scancode = ::SDL_Scancode;
 	export using Surface = ::SDL_Surface;
 	export using Texture = ::SDL_Texture;
 
@@ -56,7 +60,7 @@ namespace sdl {
 	export constexpr Color COLOR_LIME = { 76, 255, 57, 255 };
 	export constexpr Color COLOR_WHITE = { 255, 255, 255, 255 };
 
-	/* Key constants */
+	/* Key constants (used for input listeners) */
 	export constexpr Sint32 KEY_BACKSPACE = SDLK_BACKSPACE;
 	export constexpr Sint32 KEY_DOWN = SDLK_DOWN;
 	export constexpr Sint32 KEY_ENTER = SDLK_KP_ENTER;
@@ -65,6 +69,16 @@ namespace sdl {
 	export constexpr Sint32 KEY_RETURN = SDLK_RETURN; // This may be separate on some keyboards
 	export constexpr Sint32 KEY_RIGHT = SDLK_RIGHT;
 	export constexpr Sint32 KEY_UP = SDLK_UP;
+
+	/* Scan constants (used for hotkeys) */
+	export constexpr Scancode SCAN_BACKSPACE = SDL_SCANCODE_BACKSPACE;
+	export constexpr Scancode SCAN_DOWN = SDL_SCANCODE_DOWN;
+	export constexpr Scancode SCAN_ENTER = SDL_SCANCODE_KP_ENTER;
+	export constexpr Scancode SCAN_ESC = SDL_SCANCODE_ESCAPE;
+	export constexpr Scancode SCAN_LEFT = SDL_SCANCODE_LEFT;
+	export constexpr Scancode SCAN_RETURN = SDL_SCANCODE_RETURN; // This may be separate on some keyboards
+	export constexpr Scancode SCAN_RIGHT = SDL_SCANCODE_RIGHT;
+	export constexpr Scancode SCAN_UP = SDL_SCANCODE_UP;
 
 	/* Directory stuff */
 	export char* dirBase() noexcept { return SDL_GetBasePath(); }
@@ -119,12 +133,16 @@ namespace sdl {
 			SDL_StopTextInput();
 		}
 	}
-	export bool keyboardJustPressed(int pressed) { return key[pressed] && !keyLast[pressed] && kListener == nullptr; } // Keyboard listeners should block regular keyboard input
+	export bool keyboardJustPressed(int pressed) {
+		return key[pressed] && keyJust[pressed] && kListener == nullptr;
+	} // Keyboard listeners should block regular keyboard input
 	export bool keyboardJustPressedEnter() { return keyboardJustPressed(SDLK_KP_ENTER) || keyboardJustPressed(SDLK_RETURN); }
 	export bool keyboardJustPressedEsc() { return keyboardJustPressed(SDLK_ESCAPE); }
 	export bool keyboardPressed(int pressed) { return key[pressed] && kListener == nullptr; }
 
 	/* Mouse state functions */
+	export int mouseGetWheelX() noexcept { return mouseWheelX; }
+	export int mouseGetWheelY() noexcept { return mouseWheelY; }
 	export int mouseGetX() noexcept { return mousePosX; }
 	export int mouseGetY() noexcept { return mousePosY; }
 	export bool mouseIsHovering(const RectF& rect) {
@@ -298,8 +316,8 @@ namespace sdl {
 
 		// Initialize keyboard and pad
 		key = SDL_GetKeyboardState(&numKeys);
-		keyLast = new Uint8[numKeys];
-		memcpy(keyLast, key, numKeys);
+		keyJust = new Uint8[numKeys];
+		memcpy(keyJust, key, numKeys);
 
 		// TODO pad
 
@@ -333,13 +351,12 @@ namespace sdl {
 		// Update temporary states
 		timeStart = ticks();
 		mouseLast = mouse;
-		std::memcpy(keyLast, key, numKeys);
+		mouseWheelX = 0;
+		mouseWheelY = 0;
+		std::memset(keyJust, 0, numKeys);
 
 		// Update input events
-		int res = SDL_PollEvent(&e);
-		key = SDL_GetKeyboardState(nullptr);
-
-		if (res != 0) {
+		while (SDL_PollEvent(&e)) {
 			switch (e.type) {
 			case SDL_EVENT_QUIT:
 				return false;
@@ -357,11 +374,19 @@ namespace sdl {
 				mousePosX = e.button.x;
 				mousePosY = e.button.y;
 				break;
-			// Key down: If a listener is present, special keys will trigger listeners. These keys are independent of hotkey settings
+			case SDL_EVENT_MOUSE_WHEEL:
+				mouseWheelX = e.wheel.x;
+				mouseWheelY = e.wheel.y;
+				break;
+				// Key down: If a listener is present, special keys will trigger listeners. These keys are independent of hotkey settings
 			case SDL_EVENT_KEY_DOWN:
 				if (kListener) {
 					kListener->onKeyPress(e.key.keysym.sym);
 				}
+				keyJust[e.key.keysym.scancode] = 1;
+				break;
+			case SDL_EVENT_KEY_UP:
+				keyJust[e.key.keysym.scancode] = 1;
 				break;
 			case SDL_EVENT_TEXT_INPUT:
 				if (kListener) {

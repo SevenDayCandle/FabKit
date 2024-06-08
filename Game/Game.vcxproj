@@ -228,6 +228,10 @@
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Base\Utilities\Config\WindowMode.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Engine\Base\Utilities\ILoadable.ixx">
       <SubType>
       </SubType>
@@ -376,11 +380,11 @@
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Source\Game\UI\Dialogs\SettingsDialog.ixx">
+    <ClCompile Include="Source\Engine\Core\UI\SettingsDialog.ixx">
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Game\UI\Dialogs\SettingsDialogPage.ixx">
+    <ClCompile Include="Source\Engine\Core\UI\SettingsDialogPage.ixx">
       <SubType>
       </SubType>
     </ClCompile>
