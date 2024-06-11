@@ -38,6 +38,7 @@ namespace sdl {
 	export using Font = ::TTF_Font;
 	export using GamepadButton = ::SDL_GamepadButton;
 	export using Keycode = ::SDL_Keycode;
+	export using Music = ::Mix_Music;
 	export using PixelFormatEnum = ::SDL_PixelFormatEnum;
 	export using Point = ::SDL_FPoint;
 	export using PointI = ::SDL_Point;
@@ -45,6 +46,7 @@ namespace sdl {
 	export using RectI = ::SDL_Rect;
 	export using ScaleMode = ::SDL_ScaleMode;
 	export using Scancode = ::SDL_Scancode;
+	export using Sound = ::Mix_Chunk;
 	export using Surface = ::SDL_Surface;
 	export using Texture = ::SDL_Texture;
 
@@ -66,7 +68,7 @@ namespace sdl {
 	export constexpr Sint32 KEY_ENTER = SDLK_KP_ENTER;
 	export constexpr Sint32 KEY_ESC = SDLK_ESCAPE;
 	export constexpr Sint32 KEY_LEFT = SDLK_LEFT;
-	export constexpr Sint32 KEY_RETURN = SDLK_RETURN; // This may be separate on some keyboards
+	export constexpr Sint32 KEY_RETURN = SDLK_RETURN;
 	export constexpr Sint32 KEY_RIGHT = SDLK_RIGHT;
 	export constexpr Sint32 KEY_UP = SDLK_UP;
 
@@ -76,7 +78,7 @@ namespace sdl {
 	export constexpr Scancode SCAN_ENTER = SDL_SCANCODE_KP_ENTER;
 	export constexpr Scancode SCAN_ESC = SDL_SCANCODE_ESCAPE;
 	export constexpr Scancode SCAN_LEFT = SDL_SCANCODE_LEFT;
-	export constexpr Scancode SCAN_RETURN = SDL_SCANCODE_RETURN; // This may be separate on some keyboards
+	export constexpr Scancode SCAN_RETURN = SDL_SCANCODE_RETURN;
 	export constexpr Scancode SCAN_RIGHT = SDL_SCANCODE_RIGHT;
 	export constexpr Scancode SCAN_UP = SDL_SCANCODE_UP;
 
@@ -164,6 +166,10 @@ namespace sdl {
 	export bool mouseIsRightJustReleased() noexcept { return mouse != SDL_BUTTON_RIGHT && mouseLast == SDL_BUTTON_RIGHT; }
 	export bool mouseIsRightReleased() noexcept { return mouse != SDL_BUTTON_RIGHT; }
 
+	/* Music management functions */
+
+
+
 	/* Rendering functions */
 	export void renderClear() { SDL_RenderClear(renderer); }
 	export void renderCopy(Texture* texture, const RectF* srcrect, const RectF* dstrect) { SDL_RenderTexture(renderer, texture, srcrect, dstrect); }
@@ -222,6 +228,27 @@ namespace sdl {
 	export SDL_Surface* textRenderUTF8BlendedWrapped(TTF_Font* font, const char* text, SDL_Color fg, Uint32 wrapLength) { return TTF_RenderUTF8_Blended_Wrapped(font, text, fg, wrapLength); }
 	export SDL_Surface* textRenderUTF8Shaded(TTF_Font* font, const char* text, SDL_Color fg, SDL_Color bg) { return TTF_RenderUTF8_Shaded(font, text, fg, bg); }
 	export SDL_Surface* textRenderUTF8Solid(TTF_Font* font, const char* text, SDL_Color fg) { return TTF_RenderUTF8_Solid(font, text, fg); }
+
+	/* Sound management functions */
+	export int soundChannelPaused(int channel) { return Mix_Paused(channel); }
+	export int soundExpireChannel(int channel, int ticks) { return Mix_ExpireChannel(channel, ticks); }
+	export int soundFadeOutChannel(int channel, int ms) { return Mix_FadeOutChannel(channel, ms); }
+	export int soundGetChannelVolume(int channel) { return Mix_Volume(channel, -1); }
+	export int soundHaltChannel(int channel) { return Mix_HaltChannel(channel); }
+	export int soundPlay(Sound* sound, int loops = 0, int time = -1) { return Mix_PlayChannelTimed(-1, sound, loops, time); }
+	export int soundPlayFade(Sound* sound, int fade, int loops = 0, int time = -1) { return Mix_FadeInChannelTimed(-1, sound, loops, fade, time); }
+	export int soundReserveChannels(int num) { return Mix_ReserveChannels(num); }
+	export int soundSetVolume(Sound* sound, int volume) { return Mix_VolumeChunk(sound, volume); }
+	export Sound* soundGetChunk(int channel) { return Mix_GetChunk(channel); }
+	export Sound* soundLoad(const char* path) { return Mix_LoadWAV(path); }
+	export void soundDestroy(Sound* sound) { Mix_FreeChunk(sound); }
+	export void soundPauseChannel(int channel) { Mix_Pause(channel); }
+	export void soundResumeChannel(int channel) { Mix_Resume(channel); }
+	export void soundSetAllVolume(int volume) {
+		for (int i = 0; i < Mix_AllocateChannels(-1); ++i) {
+			Mix_Volume(i, volume);
+		}
+	}
 
 	/* Texture management functions */
 	export int textureGetAlphaMod(Texture* texture, Uint8* alpha) { return SDL_GetTextureAlphaMod(texture, alpha); }

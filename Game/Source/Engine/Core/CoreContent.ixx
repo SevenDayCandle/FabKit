@@ -1,6 +1,7 @@
 export module fbc.CoreContent;
 
 import fbc.BaseContent;
+import fbc.CoreAudio;
 import fbc.CoreConfig;
 import fbc.CoreImages;
 import fbc.CoreStrings;
@@ -16,6 +17,7 @@ export namespace fbc {
 	public:
 		CoreContent(strv ID) : fbc::BaseContent(ID, sdl::dirBase() + BASE_FOLDER) {}
 
+		CoreAudio audio = CoreAudio(*this);
 		CoreImages images = CoreImages(*this);
 		CoreStrings strings = CoreStrings(*this);
 
@@ -48,6 +50,7 @@ export namespace fbc {
 	void CoreContent::initialize()
 	{
 		initializeFonts();
+		audio.initialize();
 		images.initialize();
 		strings.initialize();
 	}
@@ -62,6 +65,7 @@ export namespace fbc {
 	// TODO
 	void CoreContent::postInitialize()
 	{
+		audio.postInitialize();
 		images.postInitialize();
 		strings.postInitialize();
 	}

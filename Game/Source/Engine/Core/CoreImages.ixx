@@ -3,7 +3,7 @@ export module fbc.CoreImages;
 import fbc.BaseContent;
 import fbc.RBordered;
 import fbc.RHorizontal;
-import fbc.StaticImages;
+import fbc.StaticLoadables;
 import fbc.Cache;
 import fbc.CoreConfig;
 import fbc.EmptyDrawable;
@@ -13,9 +13,9 @@ import fbc.RVertical;
 import std;
 
 export namespace fbc {
-	export class CoreImages : public StaticImages {
+	export class CoreImages : public StaticLoadables {
 	public:
-		CoreImages(BaseContent& cnt) : StaticImages(cnt) {}
+		CoreImages(BaseContent& cnt) : StaticLoadables(cnt) {}
 
 		EmptyDrawable none = EmptyDrawable();
 

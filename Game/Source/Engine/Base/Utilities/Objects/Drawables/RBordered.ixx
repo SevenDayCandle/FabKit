@@ -72,7 +72,7 @@ export namespace fbc {
 	}
 
 	// If the patch size was not manually set, automatically adjust it based on the source texture
-	// Note that this working relies on the original texture being reloaded before this; this should normally be enforced when creating drawables in StaticImages through its helper methods
+	// Note that this working relies on the original texture being reloaded before this; this should normally be enforced when creating drawables in StaticLoadables through its helper methods
 	void RBordered::reload()
 	{
 		if (patchSize <= 0) {

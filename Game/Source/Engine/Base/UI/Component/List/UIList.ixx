@@ -217,12 +217,14 @@ export namespace fbc {
 				activeRow = std::max(0, activeRow - 1);
 				if (activeRow < topVisibleRowIndex) {
 					updateTopVisibleRowIndex(topVisibleRowIndex - 1);
+					updateRowPositions();
 				}
 			}
 			else if (cfg.actDirDown.isKeyJustPressed()) {
 				activeRow = std::min((int) rows.size() - 1, activeRow + 1);
 				if (activeRow > topVisibleRowIndex + maxRows) {
 					updateTopVisibleRowIndex(topVisibleRowIndex + 1);
+					updateRowPositions();
 				}
 			}
 			else if (sdl::mouseIsLeftJustClicked() && !isHovered()) {
@@ -232,6 +234,10 @@ export namespace fbc {
 
 		for (int i = 0; i < rows.size(); ++i) {
 			rows[i]->updateActiveStatus(this->activeRow == i);
+		}
+
+		if (this->activeRow >= 0 && cfg.actSelect.isKeyJustPressed()) {
+			this->selectRow(*rows[this->activeRow]);
 		}
 	}
 

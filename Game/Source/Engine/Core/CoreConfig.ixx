@@ -66,6 +66,7 @@ export namespace fbc {
 		Hotkey actDirRight = Hotkey::add("ActDirRight", sdl::SCAN_RIGHT, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_RIGHT);
 		Hotkey actDirUp = Hotkey::add("ActDirUp", sdl::SCAN_UP, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_UP);
 		Hotkey actEsc = Hotkey::add("ActEsc", sdl::SCAN_ESC, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_INVALID);
+		Hotkey actSelect = Hotkey::add("ActSelect", sdl::SCAN_RETURN, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_START);
 
 		inline int getScreenXSize() { return graphicsResolution.get().first; }
 		inline int getScreenYSize() { return graphicsResolution.get().second; };
