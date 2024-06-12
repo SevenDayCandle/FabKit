@@ -17,7 +17,6 @@ export namespace fbc {
 		virtual ~UIVerticalScrollbar() {}
 
 		float toPercentage(float x, float y) override;
-		void processMouseScroll();
 		void updateDropzonePos(float percent) override;
 		void updateDropzoneSize(float percent) override;
 	};
@@ -26,14 +25,6 @@ export namespace fbc {
 	float UIVerticalScrollbar::toPercentage(float x, float y)
 	{
 		return (y - hb->y) / actualRange;
-	}
-
-	void UIVerticalScrollbar::processMouseScroll()
-	{
-		int scrollDiff = sdl::mouseGetWheelY();
-		if (scrollDiff != 0) {
-			scroll(getScroll() + scrollDiff * -0.05f);
-		}
 	}
 
 	void UIVerticalScrollbar::updateDropzonePos(float percent)

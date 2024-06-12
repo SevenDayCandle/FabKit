@@ -13,7 +13,7 @@ export namespace fbc {
 		~FSound() override {
 			// Unload sound when destroyed
 			if (sound && sdl::sdlEnabled()) {
-				sdl::soundDestroy(sound);
+				sdl::soundFree(sound);
 				sound = nullptr;
 			}
 		}
@@ -30,14 +30,14 @@ export namespace fbc {
 
 	void FSound::dispose()
 	{
-		sdl::soundDestroy(sound);
+		sdl::soundFree(sound);
 		sound = nullptr;
 	}
 
 	void FSound::reload()
 	{
 		if (sound) {
-			sdl::soundDestroy(sound);
+			sdl::soundFree(sound);
 		}
 		sound = sdl::soundLoad(path.data());
 		if (sound == nullptr) {

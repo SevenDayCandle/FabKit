@@ -42,9 +42,11 @@ export namespace fbc {
 		inline UISelectorList& setOnOpen(func<void()> onOpen) { return this->onOpen = onOpen, *this; }
 		inline UISelectorList& setOnSelectionUpdate(func<void(vec<const UIEntry<T>*>&)> onSelectionUpdate) {return this->onSelectionUpdate = onSelectionUpdate, *this;}
 
+		inline int getMinSelections() const { return selectionMin; }
 		inline int selectedSize() const { return currentIndices.size(); }
 
 		UISelectorList& setSelectionLimit(int rows);
+		UISelectorList& setSelectionMin(int rows);
 		vec<const T*> getSelectedItems();
 		void clearSelection();
 		void forceClosePopup();
@@ -81,6 +83,7 @@ export namespace fbc {
 		virtual void updateTopVisibleRowIndex(int value) override;
 	private:
 		int selectionLimit = std::numeric_limits<int>::max();
+		int selectionMin = 0;
 		func<bool(const UIEntry<T>*)> filterFunc;
 		func<void(vec<const T*>)> onChange;
 		func<void()> onClose;
@@ -111,50 +114,50 @@ export namespace fbc {
 		void update() override;
 	};
 
-	// Updates the selected indexes. DOES invoke the change callback.
+	// Updates the selected indexes. DOES invoke the change callback. Note that this does not enforce selection limits.
 	template <typename T> template <c_itr<int> Iterable> void UISelectorList<T>::selectIndices(Iterable& indices) {
 		updateIndices(indices);
 		changeEvent();
 	}
 
 
-	// Updates the selected indexes based on the given items. DOES invoke the change callback.
+	// Updates the selected indexes based on the given items. DOES invoke the change callback. Note that this does not enforce selection limits.
 	template <typename T> template <c_itr<T> Iterable> void UISelectorList<T>::selectSelection(Iterable& items) {
 		updateSelection(items);
 		changeEvent();
 	}
 
-	// Updates the selected indexes based on the given items. DOES invoke the change callback.
+	// Updates the selected indexes based on the given items. DOES invoke the change callback. Note that this does not enforce selection limits.
 	template <typename T> template <c_itr<T*> Iterable> void UISelectorList<T>::selectSelection(Iterable& items) {
 		updateSelection(items);
 		changeEvent();
 	}
 
-	// Updates the selected indexes based on the given items. DOES invoke the change callback.
+	// Updates the selected indexes based on the given items. DOES invoke the change callback. Note that this does not enforce selection limits.
 	template<typename T> template<c_varg<T> ...Args> void UISelectorList<T>::selectSelection(Args&&... items) {
 		updateSelection(items);
 		changeEvent();
 	}
 
-	// Updates the selected indexes based on the given items. DOES invoke the change callback.
+	// Updates the selected indexes based on the given items. DOES invoke the change callback. Note that this does not enforce selection limits.
 	template<typename T> template<c_varg<T*> ...Args> void UISelectorList<T>::selectSelection(Args&&... items) {
 		updateSelection(items);
 		changeEvent();
 	}
 
-	// Updates the selected indexes based on the given item. DOES invoke the change callback.
+	// Updates the selected indexes based on the given item. DOES invoke the change callback. Note that this does not enforce selection limits.
 	template<typename T> void UISelectorList<T>::selectSingle(T item) {
 		updateSingle(item);
 		changeEvent();
 	}
 
-	// Updates the selected indexes based on the given item. DOES invoke the change callback.
+	// Updates the selected indexes based on the given item. DOES invoke the change callback. Note that this does not enforce selection limits.
 	template<typename T> void UISelectorList<T>::selectSingle(T* item) {
 		updateSingle(item);
 		changeEvent();
 	}
 
-	// Updates the selected indexes. Does NOT invoke the change callback.
+	// Updates the selected indexes. Does NOT invoke the change callback. Note that this does not enforce selection limits.
 	template <typename T> template <c_itr<int> Iterable> void UISelectorList<T>::updateIndices(Iterable& indices) {
 		currentIndices.clear();
 		currentIndices.insert(indices.begin(), indices.end());
@@ -162,7 +165,7 @@ export namespace fbc {
 		updateForSelection();
 	}
 
-	// Updates the selected indexes based on the given items. Does NOT invoke the change callback.
+	// Updates the selected indexes based on the given items. Does NOT invoke the change callback. Note that this does not enforce selection limits.
 	template <typename T> template <c_itr<T> Iterable> void UISelectorList<T>::updateSelection(Iterable& items) {
 		currentIndices.clear();
 		for (const uptr<UIEntry<T>>& row : this->rows) {
@@ -173,7 +176,7 @@ export namespace fbc {
 		updateForSelection();
 	}
 
-	// Updates the selected indexes based on the given items. Does NOT invoke the change callback.
+	// Updates the selected indexes based on the given items. Does NOT invoke the change callback. Note that this does not enforce selection limits
 	template <typename T> template <c_itr<T*> Iterable> void UISelectorList<T>::updateSelection(Iterable& items) {
 		currentIndices.clear();
 		for (const uptr<UIEntry<T>>& row : this->rows) {
@@ -184,21 +187,21 @@ export namespace fbc {
 		updateForSelection();
 	}
 
-	// Updates the selected indexes based on the given items (varargs version). Does NOT invoke the change callback.
+	// Updates the selected indexes based on the given items (varargs version). Does NOT invoke the change callback. Note that this does not enforce selection limits.
 	template<typename T> template<c_varg<T> ...Args> void UISelectorList<T>::updateSelection(Args&&... items)
 	{
 		uset<T*> set{ std::forward<Args>(items)... };
 		updateSelection(set);
 	}
 
-	// Updates the selected indexes based on the given items (varargs version). Does NOT invoke the change callback.
+	// Updates the selected indexes based on the given items (varargs version). Does NOT invoke the change callback. Note that this does not enforce selection limits.
 	template<typename T> template<c_varg<T*> ...Args> void UISelectorList<T>::updateSelection(Args&&... items)
 	{
 		uset<T*> set{ std::forward<Args>(items)... };
 		updateSelection(set);
 	}
 
-	// Updates the selected indexes based on the given single item. Does NOT invoke the change callback.
+	// Updates the selected indexes based on the given single item. Does NOT invoke the change callback. Note that this does not enforce selection limits.
 	template<typename T> void UISelectorList<T>::updateSingle(T item)
 	{
 		currentIndices.clear();
@@ -211,7 +214,7 @@ export namespace fbc {
 		updateForSelection();
 	}
 
-	// Updates the selected indexes based on the given single item. Does NOT invoke the change callback.
+	// Updates the selected indexes based on the given single item. Does NOT invoke the change callback. Note that this does not enforce selection limits.
 	template<typename T> void UISelectorList<T>::updateSingle(T* item)
 	{
 		currentIndices.clear();
@@ -228,6 +231,27 @@ export namespace fbc {
 	template<typename T> UISelectorList<T>& UISelectorList<T>::setSelectionLimit(int rows)
 	{
 		this->selectionLimit = std::clamp(rows, 0, std::numeric_limits<int>::max());
+		int ind = 0;
+		while (this->selectedSize() > this->selectionLimit && ind < this->size()) {
+			if (this->currentIndices.contains(ind)) {
+				selectRow(*(this->rows[ind]));
+			}
+			++ind;
+		}
+		return *this;
+	}
+
+	// Enforce a minimum number of rows to be selected. If the current selection is below the minimum, select rows from top to bottom until the requirements are met
+	template<typename T> UISelectorList<T>& UISelectorList<T>::setSelectionMin(int rows)
+	{
+		this->selectionMin = rows;
+		int ind = 0;
+		while (this->selectedSize() < this->selectionMin && ind < this->size()) {
+			if (!this->currentIndices.contains(ind)) {
+				selectRow(*(this->rows[ind]));
+			}
+			++ind;
+		}
 		return *this;
 	}
 
@@ -332,8 +356,10 @@ export namespace fbc {
 	// If the row exists in the selection, remove it. Otherwise, add it to the selection. Invokes the change callback
 	template <typename T> void UISelectorList<T>::selectRow(UIEntry<T>& entry) {
 		if (currentIndices.contains(entry.index)) {
-			currentIndices.erase(entry.index);
-			entry.updateSelectStatus(false);
+			if (currentIndices.size() > selectionMin) {
+				currentIndices.erase(entry.index);
+				entry.updateSelectStatus(false);
+			}
 		}
 		else {
 			if (currentIndices.size() >= selectionLimit) {

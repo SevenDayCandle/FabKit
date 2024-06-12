@@ -11,6 +11,7 @@ import std;
 
 export namespace fbc {
 	constexpr float BASE_DENOMINATOR = 2160;
+	constexpr float VOLUME_SCALAR = 1.28f;
 	constexpr ilist<pair<int, int>> RESOLUTIONS = {
 		{320, 240},
 		{640, 480},
@@ -84,6 +85,8 @@ export namespace fbc {
 	private:
 		float fontScalePrivate = 1.0;
 		float renderScalePrivate = 1.0;
+
+		void updateScales();
 	};
 
 	export CoreConfig cfg = CoreConfig(futil::FBC);
@@ -100,16 +103,28 @@ export namespace fbc {
 	}
 
 	void CoreConfig::postInitialize() {
-		// Resolution uses the height of a 4k screen as a base
-		renderScalePrivate = getScreenYSize() / BASE_DENOMINATOR;
-		fontScalePrivate = renderScalePrivate * textFontScale.get();
+		updateScales();
+		sdl::musicSetVolume(soundVolumeMusic.get() * soundVolumeMaster.get() * VOLUME_SCALAR);
+		sdl::soundSetAllVolume(soundVolumeEffects.get() * soundVolumeMaster.get() * VOLUME_SCALAR);
+
+		// Add sound config subscriptions. Note that graphical config subscriptions need to get set up in screenManager since they invoke refreshing on the screenManager
+		cfg.soundVolumeMaster.setOnReload([](const int& val) {
+			sdl::musicSetVolume(cfg.soundVolumeMusic.get() * val * VOLUME_SCALAR);
+			sdl::soundSetAllVolume(cfg.soundVolumeEffects.get() * val * VOLUME_SCALAR);
+		});
+		cfg.soundVolumeEffects.setOnReload([](const int& val) {
+			sdl::soundSetAllVolume(val * cfg.soundVolumeMaster.get() * VOLUME_SCALAR);
+		});
+		cfg.soundVolumeMusic.setOnReload([](const int& val) {
+			sdl::musicSetVolume(val * cfg.soundVolumeMaster.get() * VOLUME_SCALAR);
+		});
 	}
 
 	// When the window size parameters change, we should setExactSize the window and update renderScalePrivate
 	void CoreConfig::resizeWindow()
 	{
 		sdl::windowSetSize(getScreenXSize(), getScreenYSize());
-		postInitialize();
+		updateScales();
 	}
 
 	// Create the window from the config
@@ -130,5 +145,12 @@ export namespace fbc {
 			sdl::windowSetFullscreen(0);
 			break;
 		}
+	}
+
+	// Resolution uses the height of a 4k screen as a base
+	void CoreConfig::updateScales()
+	{
+		renderScalePrivate = getScreenYSize() / BASE_DENOMINATOR;
+		fontScalePrivate = renderScalePrivate * textFontScale.get();
 	}
 }

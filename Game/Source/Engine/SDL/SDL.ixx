@@ -167,8 +167,20 @@ namespace sdl {
 	export bool mouseIsRightReleased() noexcept { return mouse != SDL_BUTTON_RIGHT; }
 
 	/* Music management functions */
-
-
+	export double musicGetPosition(Mix_Music* music) { return Mix_GetMusicPosition(music); }
+	export int musicFadeOut(int ms) { return Mix_FadeOutMusic(ms); }
+	export int musicGetVolume() { return Mix_VolumeMusic(-1); }
+	export int musicHalt() { return Mix_HaltMusic(); }
+	export int musicIsPaused() { return Mix_PausedMusic(); }
+	export int musicPlay(Mix_Music* music, int loops = -1) { return Mix_PlayMusic(music, loops); }
+	export int musicPlayFade(Mix_Music* music, int fade, int loops = -1) { return Mix_FadeInMusic(music, loops, fade); }
+	export int musicSetPosition(double position) { return Mix_SetMusicPosition(position); }
+	export Mix_Music* musicLoad(const char* path) { return Mix_LoadMUS(path); }
+	export void musicFree(Mix_Music* music) { Mix_FreeMusic(music); }
+	export void musicPause() { Mix_PauseMusic(); }
+	export void musicResume() { Mix_ResumeMusic(); }
+	export void musicRewind() { Mix_RewindMusic(); }
+	export void musicSetVolume(int volume) { Mix_VolumeMusic(volume); }
 
 	/* Rendering functions */
 	export void renderClear() { SDL_RenderClear(renderer); }
@@ -241,7 +253,7 @@ namespace sdl {
 	export int soundSetVolume(Sound* sound, int volume) { return Mix_VolumeChunk(sound, volume); }
 	export Sound* soundGetChunk(int channel) { return Mix_GetChunk(channel); }
 	export Sound* soundLoad(const char* path) { return Mix_LoadWAV(path); }
-	export void soundDestroy(Sound* sound) { Mix_FreeChunk(sound); }
+	export void soundFree(Sound* sound) { Mix_FreeChunk(sound); }
 	export void soundPauseChannel(int channel) { Mix_Pause(channel); }
 	export void soundResumeChannel(int channel) { Mix_Resume(channel); }
 	export void soundSetAllVolume(int volume) {

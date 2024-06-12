@@ -24,10 +24,14 @@ export namespace fbc {
 			graphics.addDropdown<WindowMode, ilist<WindowMode>>(cfg.graphicsWindowMode, cct.strings.options_graphics_window_mode(), WINDOWMODE_ALL, [](const WindowMode& item) { return windowScreenName(item); });
 			graphics.addToggle(cfg.graphicsVSync, cct.strings.options_graphics_vsync());
 
+			sound.addSlider(cfg.soundVolumeMaster, cct.strings.options_sound_master(), 0, 100, 300);
+			sound.addSlider(cfg.soundVolumeEffects, cct.strings.options_sound_effects(), 0, 100, 300);
+			sound.addSlider(cfg.soundVolumeMusic, cct.strings.options_sound_music(), 0, 100, 300);
+
 			navigation.addItems(&graphics, &sound, &text);
 
 			UIButton& cancel = this->addElement(std::make_unique<UITextButton>(
-				new RelativeHitbox(*hb, 10, hb->getScaleOffsetSizeY() * 0.9f, 300, 100),
+				new RelativeHitbox(*hb, 20, hb->getScaleOffsetSizeY() * 0.86f, 300, 100),
 				cct.images.panelRound,
 				cct.fontRegular(),
 				cct.strings.ui_cancel())

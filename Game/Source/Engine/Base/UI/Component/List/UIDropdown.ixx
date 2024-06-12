@@ -45,18 +45,20 @@ export namespace fbc {
 
 		uptr<UISelectorList<T>> menu;
 
-		inline void clearItems() { menu->clearItems(); }
 		inline bool isOpen() { return proxy != nullptr; }
 		inline int selectedSize() const { return menu->selectedSize(); }
-		inline UIDropdown& setEntryFunc(func<UIEntry<T>*(UISelectorList<T>&, T&, str&, int)> entryFunc) { return menu->setEntryFunc(entryFunc), *this; }
-		inline UIDropdown& setOnChange(func<void(vec<const T*>)> onChange) { return menu->setOnChange(onChange), * this; }
-		inline virtual UIDropdown& setOnClose(func<void()> onClose) { return this->onClose = onClose, *this; }
-		inline UIDropdown& setOnOpen(func<void()> onOpen) { return this->onOpen = onOpen, *this; }
 		inline int size() { return menu->size(); }
+		inline UIDropdown& setEntryFunc(func<UIEntry<T>*(UISelectorList<T>&, T&, str&, int)> entryFunc) { return menu->setEntryFunc(entryFunc), *this; }
 		inline UIDropdown& setItemFont(FFont& itemFont) { return menu->setItemFont(itemFont), * this; }
 		inline UIDropdown& setMaxRows(int rows) { return menu->setMaxRows(rows), * this; }
+		inline UIDropdown& setOnChange(func<void(vec<const T*>)> onChange) { return menu->setOnChange(onChange), * this; }
+		inline UIDropdown& setOnOpen(func<void()> onOpen) { return this->onOpen = onOpen, *this; }
+		inline UIDropdown& setSelectionLimit(int rows) { return menu->setSelectionLimit(rows), * this; }
+		inline UIDropdown& setSelectionMin(int rows) { return menu->setSelectionMin(rows), * this; }
 		inline vec<T*> getAllItems() { return menu->getAllItems(); }
 		inline vec<T*> getSelectedItems() { return menu->getSelectedItems(); }
+		inline virtual UIDropdown& setOnClose(func<void()> onClose) { return this->onClose = onClose, *this; }
+		inline void clearItems() { menu->clearItems(); }
 		inline void clearSelection() { menu->clearSelection(); }
 		inline void selectSingle(T item) { menu->selectSingle(item); }
 		inline void selectSingle(T* item) { menu->selectSingle(item); }
@@ -122,6 +124,8 @@ export namespace fbc {
 		func<void()> onOpen;
 		IOverlay* proxy;
 
+		inline bool canClear() { return menu->getMinSelections() < 1; }
+
 		void init();
 	};
 
@@ -178,7 +182,7 @@ export namespace fbc {
 
 	template<typename T> void UIDropdown<T>::renderImpl() {
 		UITitledInteractable::renderImpl();
-		if (this->selectedSize() > 0) {
+		if (this->selectedSize() > 0 && this->canClear()) {
 			clear.draw(&arrowRect, UIImage::color, origin, rotation);
 		}
 		else {
@@ -253,7 +257,7 @@ export namespace fbc {
 
 	// When clicked, open the menu if closed. Otherwise, dispose the menu
 	template<typename T> void UIDropdown<T>::clickLeftEvent() {
-		if (this->selectedSize() > 0 && sdl::mouseGetX() >= arrowRect.x) {
+		if (this->selectedSize() > 0 && sdl::mouseGetX() >= arrowRect.x && this->canClear()) {
 			clearSelection();
 		}
 		else if (isOpen()) {

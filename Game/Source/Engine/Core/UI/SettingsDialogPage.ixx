@@ -48,34 +48,34 @@ export namespace fbc {
 
 		friend std::ostream& operator<<(std::ostream& os, const SettingsDialogPage& obj) { return os << obj.name; }
 
-		template <typename T, c_itr<T> Iterable> inline UIDropdown<T>& addDropdown(ConfigItem<T>& conf, strv name, const Iterable& items, func<str(const T&)> labelFunc = futil::toString<T>) { return addDropdownImpl<T, Iterable>(conf, name, items, labelFunc); }
-		template <typename T, c_itr<T*> Iterable> inline UIDropdown<T>& addDropdown(ConfigItem<T>& conf, strv name, const Iterable& items, func<str(const T&)> labelFunc = futil::toString<T>) { return addDropdownImpl<T, Iterable>(conf, name, items, labelFunc); }
-		template <typename T, typename U, c_itr<U> Iterable> inline UIDropdown<U>& addDropdownMapped(ConfigItem<T>& conf, strv name, Iterable& items, func<T(const U*)> convFunc, func<str(const T&)> labelFunc = futil::toString<T>) { return addDropdownMappedImpl<T, U, Iterable>(conf, name, items, convFunc, labelFunc); }
-		template <typename T, typename U, c_itr<U*> Iterable> inline UIDropdown<U>& addDropdownMapped(ConfigItem<T>& conf, strv name, Iterable& items, func<T(const U*)> convFunc, func<str(const T&)> labelFunc = futil::toString<T>) { return addDropdownMappedImpl<T, U, Iterable>(conf, name, items, convFunc, labelFunc); }
+		template <typename T, c_itr<T> Iterable> inline UIDropdown<T>& addDropdown(ConfigItem<T>& conf, strv name, const Iterable& items, func<str(const T&)> labelFunc = futil::toString<T>, int min = 1) { return addDropdownImpl<T, Iterable>(conf, name, items, labelFunc, min); }
+		template <typename T, c_itr<T*> Iterable> inline UIDropdown<T>& addDropdown(ConfigItem<T>& conf, strv name, const Iterable& items, func<str(const T&)> labelFunc = futil::toString<T>, int min = 1) { return addDropdownImpl<T, Iterable>(conf, name, items, labelFunc, min); }
+		template <typename T, typename U, c_itr<U> Iterable> inline UIDropdown<U>& addDropdownMapped(ConfigItem<T>& conf, strv name, Iterable& items, func<T(const U*)> convFunc, func<str(const T&)> labelFunc = futil::toString<T>, int min = 1) { return addDropdownMappedImpl<T, U, Iterable>(conf, name, items, convFunc, labelFunc, min); }
+		template <typename T, typename U, c_itr<U*> Iterable> inline UIDropdown<U>& addDropdownMapped(ConfigItem<T>& conf, strv name, Iterable& items, func<T(const U*)> convFunc, func<str(const T&)> labelFunc = futil::toString<T>, int min = 1) { return addDropdownMappedImpl<T, U, Iterable>(conf, name, items, convFunc, labelFunc, min); }
 
 		UINumberInput& addInputNum(ConfigItem<int>& conf, strv name);
 		UITextInput& addInputText(ConfigItem<str>& conf, strv name);
-		UISlider& addSlider(ConfigItem<int>& conf, strv name, int min = 0, int max = std::numeric_limits<int>::max());
+		UISlider& addSlider(ConfigItem<int>& conf, strv name, int min = 0, int max = std::numeric_limits<int>::max(), float xOff = 400);
 		UIToggle& addToggle(ConfigItem<bool>& conf, strv name);
 		void commit();
 		void reset();
 	private:
 		vec<uptr<SettingsDialogBaseCache>> confs;
 
-		template <typename T, typename Iterable> UIDropdown<T>& addDropdownImpl(ConfigItem<T>& conf, strv name, const Iterable& items, func<str(const T&)> labelFunc = futil::toString<T>);
-		template <typename T, typename U, typename Iterable> UIDropdown<U>& addDropdownMappedImpl(ConfigItem<T>& conf, strv name, const Iterable& items, func<T(const U*)> convFunc, func<str(const T&)> labelFunc = futil::toString<T>);
+		template <typename T, typename Iterable> UIDropdown<T>& addDropdownImpl(ConfigItem<T>& conf, strv name, const Iterable& items, func<str(const T&)> labelFunc = futil::toString<T>, int min = 1);
+		template <typename T, typename U, typename Iterable> UIDropdown<U>& addDropdownMappedImpl(ConfigItem<T>& conf, strv name, const Iterable& items, func<T(const U*)> convFunc, func<str(const T&)> labelFunc = futil::toString<T>, int min = 1);
 		float getOffsetFromLast();
 	};
 
 
-	UISlider& SettingsDialogPage::addSlider(ConfigItem<int>& conf, strv name, int min, int max)
+	UISlider& SettingsDialogPage::addSlider(ConfigItem<int>& conf, strv name, int min, int max, float xOff)
 	{
 		SettingsDialogCache<int>& cache = static_cast<SettingsDialogCache<int>&>(*confs.emplace_back(std::make_unique<SettingsDialogCache<int>>(conf)));
-		UISlider& slider = stackElementYDir(std::make_unique<UISlider>(new RelativeHitbox(*hb, 400, 0, 600, 100), min, max), 8, getOffsetFromLast());
+		UISlider& slider = stackElementYDir(std::make_unique<UISlider>(new RelativeHitbox(*hb, xOff, 0, 200, 100), min, max), 8, getOffsetFromLast());
 		slider
 			.setValue(conf.get())
 			.setOnComplete([&cache](int val) {cache.value = val; })
-			.withLabel(name, cct.fontBold(), -400, 25);
+			.withLabel(name, cct.fontBold(), -xOff, 25);
 		cache.setOnReset([&slider, &conf]() {slider.setValue(conf.get()); });
 		return slider;
 	}
@@ -90,7 +90,7 @@ export namespace fbc {
 		return toggle;
 	}
 
-	template<typename T, typename Iterable> UIDropdown<T>& SettingsDialogPage::addDropdownImpl(ConfigItem<T>& conf, strv name, const Iterable& items, func<str(const T&)> labelFunc)
+	template<typename T, typename Iterable> UIDropdown<T>& SettingsDialogPage::addDropdownImpl(ConfigItem<T>& conf, strv name, const Iterable& items, func<str(const T&)> labelFunc, int min)
 	{
 		SettingsDialogCache<T>& cache = static_cast<SettingsDialogCache<T>&>(*confs.emplace_back(std::make_unique<SettingsDialogCache<T>>(conf)));
 		UIDropdown<T>& dr = stackElementYDir(UIDropdown<T>::singleList(new RelativeHitbox(*hb, 400, 0, 500, 100), labelFunc), 8, getOffsetFromLast());
@@ -98,11 +98,14 @@ export namespace fbc {
 			.setOnChange([&cache](vec<const T*> res) { if (res.size() > 0) cache.value = *res[0]; })
 			.withLabel(name, cct.fontBold(), -400, 25);
 		dr.updateSingle(conf.get());
+		if (min > 0) {
+			dr.setSelectionMin(min);
+		}
 		cache.setOnReset([&dr, &conf]() {dr.selectSingle(conf.get()); });
 		return dr;
 	}
 
-	template<typename T, typename U, typename Iterable> UIDropdown<U>& SettingsDialogPage::addDropdownMappedImpl(ConfigItem<T>& conf, strv name, const Iterable& items, func<T(const U*)> convFunc, func<str(const T&)> labelFunc)
+	template<typename T, typename U, typename Iterable> UIDropdown<U>& SettingsDialogPage::addDropdownMappedImpl(ConfigItem<T>& conf, strv name, const Iterable& items, func<T(const U*)> convFunc, func<str(const T&)> labelFunc, int min)
 	{
 		SettingsDialogCache<T>& cache = static_cast<SettingsDialogCache<T>&>(*confs.emplace_back(std::make_unique<SettingsDialogCache<T>>(conf)));
 		UIDropdown<U>& dr = stackElementYDir(UIDropdown<U>::singleList(new RelativeHitbox(*hb, 400, 0, 500, 100), labelFunc), 8, getOffsetFromLast());
@@ -110,6 +113,9 @@ export namespace fbc {
 			.setOnChange([&cache, convFunc](vec<const U*> res) { if (res.size() > 0) cache.value = convFunc(res[0]); })
 			.withLabel(name, cct.fontBold(), -400, 25);
 		dr.updateSingle(conf.get());
+		if (min > 0) {
+			dr.setSelectionMin(min);
+		}
 		cache.setOnReset([&dr, &conf]() {dr.selectSingle(conf.get()); });
 		return dr;
 	}

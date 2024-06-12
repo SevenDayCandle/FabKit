@@ -19,7 +19,7 @@ export namespace fbc {
 		}
 		UISlider(Hitbox* hb, int limMin = 0,
 			int limMax = std::numeric_limits<int>::max(),IDrawable& imageBar = cct.images.sliderEmpty, IDrawable& imageButton = cct.images.scrollbutton, IDrawable& panelImage = cct.images.panel) :
-			UISlider(hb, new RelativeHitbox(*hb, hb->getOffsetSizeX(), 0, hb->getOffsetSizeX() * 3, hb->getOffsetSizeY()), limMin, limMax, imageBar, imageButton, panelImage) {}
+			UISlider(hb, new RelativeHitbox(*hb, hb->getOffsetSizeX() + 4, 0, hb->getOffsetSizeX() * 3, hb->getOffsetSizeY()), limMin, limMax, imageBar, imageButton, panelImage) {}
 
 		virtual ~UISlider() {}
 
@@ -54,8 +54,8 @@ export namespace fbc {
 
 	UISlider& UISlider::setValue(int num)
 	{
-		UINumberInput::commit(num);
-		float pos = limMin == limMax ? 0 : (num - limMin) / (limMax - limMin);
+		UINumberInput::setValue(num);
+		float pos = limMin == limMax ? 0 : (num - limMin) / static_cast<float>(limMax - limMin);
 		scrollbar.setScrollPos(pos);
 		return *this;
 	}
