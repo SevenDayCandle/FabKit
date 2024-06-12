@@ -24,9 +24,9 @@ export namespace fbc {
         inline virtual void postInitialize() {}
 
         void commit();
-        str getValue(const str& key);
-        void initialize();
-        void reload();
+        strv getValue(const str& key);
+        void load();
+        void refreshItems();
         void set(const str& key, const str& value);
     protected:
         str getConfigPath() const;
@@ -48,8 +48,8 @@ export namespace fbc {
         }
     }
 
-    // Refresh the value map contents from the external file if it exists
-    void Config::initialize() {
+    // Refresh the value map contents from the external file if it exists, then update all listeners with the new config values
+    void Config::load() {
         str configPath = getConfigPath();
         if (std::filesystem::exists(configPath)) {
             glz::parse_error error = glz::read_file_json(values_map, configPath, str{});
@@ -60,6 +60,14 @@ export namespace fbc {
                 sdl::logInfo("Read config at path %s", configPath.data());
             }
         }
+        refreshItems();
+    }
+
+    // Update all listeners with the read config values
+    void Config::refreshItems() {
+        for (func<void()>& callback : items) {
+            callback();
+        }
     }
 
     // Get the path to the file used to store this config's data
@@ -68,20 +76,12 @@ export namespace fbc {
     }
 
     // Get the mapped value for key
-    str Config::getValue(const str& key) {
+    strv Config::getValue(const str& key) {
         auto val = values_map.find(key);
         if (val != values_map.end()) {
             return val->second;
         }
-        return "";
-    }
-
-    // Refresh the config (reloadInternal) and then update all listeners with the new config values
-    void Config::reload() {
-        initialize();
-        for (func<void()>& callback : items) {
-            callback();
-        }
+        return strv{};
     }
 
     // Set the value in the map

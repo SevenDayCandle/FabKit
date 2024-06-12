@@ -151,6 +151,7 @@ export namespace fbc::screenManager {
 	void subscribeToConfig() {
 		cfg.graphicsResolution.setOnReload([](const pair<int, int>& val) {
 			cfg.resizeWindow();
+			cct.reloadFonts();
 			refreshSize();
 		});
 		cfg.graphicsWindowMode.setOnReload([](const int& val) {sdl::windowSetFullscreen(val); });

@@ -3,6 +3,7 @@ export module fbc.SettingsDialogPage;
 import fbc.CoreContent;
 import fbc.CoreConfig;
 import fbc.ConfigItem;
+import fbc.ConfigNumeric;
 import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.RelativeHitbox;
@@ -48,6 +49,7 @@ export namespace fbc {
 
 		friend std::ostream& operator<<(std::ostream& os, const SettingsDialogPage& obj) { return os << obj.name; }
 
+		inline UISlider& addSlider(ConfigNumeric& conf, strv name, float xOff = 400) { return addSlider(conf, name, conf.getMin(), conf.getMax(), xOff); }
 		template <typename T, c_itr<T> Iterable> inline UIDropdown<T>& addDropdown(ConfigItem<T>& conf, strv name, const Iterable& items, func<str(const T&)> labelFunc = futil::toString<T>, int min = 1) { return addDropdownImpl<T, Iterable>(conf, name, items, labelFunc, min); }
 		template <typename T, c_itr<T*> Iterable> inline UIDropdown<T>& addDropdown(ConfigItem<T>& conf, strv name, const Iterable& items, func<str(const T&)> labelFunc = futil::toString<T>, int min = 1) { return addDropdownImpl<T, Iterable>(conf, name, items, labelFunc, min); }
 		template <typename T, typename U, c_itr<U> Iterable> inline UIDropdown<U>& addDropdownMapped(ConfigItem<T>& conf, strv name, Iterable& items, func<T(const U*)> convFunc, func<str(const T&)> labelFunc = futil::toString<T>, int min = 1) { return addDropdownMappedImpl<T, U, Iterable>(conf, name, items, convFunc, labelFunc, min); }
@@ -55,7 +57,7 @@ export namespace fbc {
 
 		UINumberInput& addInputNum(ConfigItem<int>& conf, strv name);
 		UITextInput& addInputText(ConfigItem<str>& conf, strv name);
-		UISlider& addSlider(ConfigItem<int>& conf, strv name, int min = 0, int max = std::numeric_limits<int>::max(), float xOff = 400);
+		UISlider& addSlider(ConfigItem<int>& conf, strv name, int min, int max, float xOff = 400);
 		UIToggle& addToggle(ConfigItem<bool>& conf, strv name);
 		void commit();
 		void reset();

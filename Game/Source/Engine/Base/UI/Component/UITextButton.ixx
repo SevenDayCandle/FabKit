@@ -31,6 +31,7 @@ export namespace fbc {
 	{
 		UIButton::refreshDimensions();
 		updateCache();
+		TextInfo::setPos((this->hb->w - getTextWidth()) / 2, (this->hb->h - getTextHeight()) / 2);
 	}
 
 	void UITextButton::renderImpl() {

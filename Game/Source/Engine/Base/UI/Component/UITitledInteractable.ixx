@@ -37,8 +37,8 @@ export namespace fbc {
 	{
 		UIInteractable::refreshDimensions();
 		if (label) {
-			label->setPos(cfg.renderScale(xOff), cfg.renderScale(yOff));
 			label->updateCache();
+			label->setPos(cfg.renderScale(xOff), cfg.renderScale(yOff));
 		}
 	}
 

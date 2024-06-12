@@ -24,9 +24,9 @@ export namespace fbc {
 			graphics.addDropdown<WindowMode, ilist<WindowMode>>(cfg.graphicsWindowMode, cct.strings.options_graphics_window_mode(), WINDOWMODE_ALL, [](const WindowMode& item) { return windowScreenName(item); });
 			graphics.addToggle(cfg.graphicsVSync, cct.strings.options_graphics_vsync());
 
-			sound.addSlider(cfg.soundVolumeMaster, cct.strings.options_sound_master(), 0, 100, 300);
-			sound.addSlider(cfg.soundVolumeEffects, cct.strings.options_sound_effects(), 0, 100, 300);
-			sound.addSlider(cfg.soundVolumeMusic, cct.strings.options_sound_music(), 0, 100, 300);
+			sound.addSlider(cfg.soundVolumeMaster, cct.strings.options_sound_master(), 300);
+			sound.addSlider(cfg.soundVolumeEffects, cct.strings.options_sound_effects(), 300);
+			sound.addSlider(cfg.soundVolumeMusic, cct.strings.options_sound_music(), 300);
 
 			navigation.addItems(&graphics, &sound, &text);
 
@@ -81,6 +81,7 @@ export namespace fbc {
 		for (const SettingsDialogPage* page : navigation.getAllItems()) {
 			const_cast<SettingsDialogPage*>(page)->commit();
 		}
+		cfg.commit();
 	}
 
 	void SettingsDialog::resetCurrent()

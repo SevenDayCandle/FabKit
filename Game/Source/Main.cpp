@@ -33,7 +33,7 @@ bool initialize() {
 		return false;
 	}
 
-	cfg.initialize();
+	cfg.load();
 	fbc::Hotkey::reload();
 	cfg.postInitialize();
 	cfg.setupWindow();

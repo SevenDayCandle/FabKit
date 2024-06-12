@@ -223,6 +223,10 @@
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Base\Utilities\Config\ConfigNumeric.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Engine\Base\Utilities\Config\Hotkey.ixx">
       <SubType>
       </SubType>

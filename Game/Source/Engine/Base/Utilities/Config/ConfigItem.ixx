@@ -13,16 +13,17 @@ export namespace fbc {
 
         const str ID;
 
-        inline void setOnReload(func<void(const T&)> onChange) {this->onChange = onChange;}
-        inline T get() {return value;}
-        void set(const T& newValue);
-
         operator T() { return value; }
 
-    protected:
-        T parseValue(const str& input);
-        void reload();
+        inline void setOnReload(func<void(const T&)> onChange) {this->onChange = onChange;}
+        inline T get() {return value;}
 
+        void set(const T& newValue);
+    protected:
+        inline virtual void assignValue(const T& result) { this->value = result; }
+
+        T parseValue(strv input);
+        void reload();
     private:
         fbc::Config& config;
         const T defaultValue;
@@ -31,7 +32,7 @@ export namespace fbc {
     };
 
     // Convert a string input into the value for this config item
-    template<typename T> T ConfigItem<T>::parseValue(const str& input)
+    template<typename T> T ConfigItem<T>::parseValue(strv input)
     {
         try {
             // TODO use glz::read_json when it is ready to use with modules
@@ -39,19 +40,23 @@ export namespace fbc {
             return futil::fromString<T>(input, pos);
         }
         catch (const exception& e) {
-            sdl::logError("Config item with ID %s failed to parse input %s: %s", ID, input, e);
+            sdl::logError("Config item with ID %s failed to parse input %s: %s", ID.data(), input.data(), e.what());
             return defaultValue;
         }
     }
 
-    // Reset this config's values to whatever is in the config file
+    // Reset this config's values to whatever is in the config file, if it exists
     template<typename T> void ConfigItem<T>::reload() {
-        this->value = parseValue(config.getValue(ID));
+        strv val = config.getValue(ID);
+        if (!val.empty()) {
+            T parsed = parseValue(config.getValue(ID));
+            assignValue(parsed);
+        }
     }
 
     // Set the value for this config item, write it back to the file, and broadcast this change to all listeners
     template<typename T> void ConfigItem<T>::set(const T& newValue) {
-        this->value = newValue;
+        assignValue(newValue);
         // TODO use glz::write_json when it is ready to use with modules
         config.set(ID, futil::toString(newValue));
         if (onChange) {

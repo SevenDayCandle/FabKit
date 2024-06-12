@@ -145,7 +145,7 @@ export namespace fbc::futil {
 
 	// Create a lowercase version of a string-like
 	export str toLowerCase(strv input) {
-		str res;
+		str res(input.size(), '\0');
 		std::ranges::transform(input.begin(), input.end(), res.begin(),
 			[](unsigned char c) { return std::tolower(c); });
 		return res;
@@ -160,7 +160,7 @@ export namespace fbc::futil {
 
 	// Create an uppercase version of a string-like
 	export str toUpperCase(strv input) {
-		str res;
+		str res(input.size(), '\0');
 		std::ranges::transform(input.begin(), input.end(), res.begin(),
 			[](unsigned char c) { return std::toupper(c); });
 		return res;

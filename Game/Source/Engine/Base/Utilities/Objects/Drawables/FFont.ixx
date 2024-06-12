@@ -26,6 +26,7 @@ export namespace fbc {
         pair<int, int> measureDim(strv text);
         int measureH(strv text);
         int measureW(strv text);
+        void reloadFont();
 
         FFont& setAllSizes(int size, int outlineSize, int shadowSize);
         FFont& setOutlineSize(int size);
@@ -39,8 +40,6 @@ export namespace fbc {
         int outlineSize;
         int shadowSize;
         int size;
-
-        void reloadFont();
 	};
 
     pair<int, int> FFont::measureDim(strv text)

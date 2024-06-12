@@ -3,6 +3,7 @@ export module fbc.CoreConfig;
 import fbc.Config;
 import fbc.ConfigHotkey;
 import fbc.ConfigItem;
+import fbc.ConfigNumeric;
 import fbc.FUtil;
 import fbc.Language;
 import fbc.WindowMode;
@@ -47,20 +48,20 @@ export namespace fbc {
 		CoreConfig(strv ID) : Config(ID) {}
 		virtual ~CoreConfig() override {}
 
-		ConfigItem<int> gameActionSpeed = ConfigItem<int>(*this, "GameActionSpeed", 3);
-		ConfigItem<int> graphicsFPS = ConfigItem<int>(*this, "GraphicsFPS", 144);
 		ConfigItem<bool> graphicsParticleEffects = ConfigItem<bool>(*this, "GraphicsParticleEffects", true);
-		ConfigItem<pair<int, int>> graphicsResolution = ConfigItem<pair<int,int>>(*this, "GraphicsResolution", {1920, 1080});
 		ConfigItem<bool> graphicsVSync = ConfigItem<bool>(*this, "GraphicsVSync", true);
-		ConfigItem<WindowMode> graphicsWindowMode = ConfigItem<WindowMode>(*this, "GraphicsFPS", WindowMode::WINDOWED);
-		ConfigItem<int> soundVolumeEffects = ConfigItem<int>(*this, "SoundVolumeEffects", 100);
-		ConfigItem<int> soundVolumeMaster = ConfigItem<int>(*this, "SoundVolumeMaster", 100);
-		ConfigItem<int> soundVolumeMusic = ConfigItem<int>(*this, "SoundVolumeMusic", 100);
+		ConfigItem<bool> textIcons = ConfigItem<bool>(*this, "TextIcons", false);
+		ConfigItem<pair<int, int>> graphicsResolution = ConfigItem<pair<int,int>>(*this, "GraphicsResolution", {1920, 1080});
 		ConfigItem<str> textFont = ConfigItem<str>(*this, "TextFont", str(FONT_REGULAR));
 		ConfigItem<str> textFontBold = ConfigItem<str>(*this, "TextFont", str(FONT_BOLD));
-		ConfigItem<int> textFontScale = ConfigItem<int>(*this, "SoundVolumeMusic", 1);
-		ConfigItem<bool> textIcons = ConfigItem<bool>(*this, "TextIcons", false);
 		ConfigItem<str> textLanguage = ConfigItem<str>(*this, "TextLanguage", str(lang::ENG_DEFAULT));
+		ConfigItem<WindowMode> graphicsWindowMode = ConfigItem<WindowMode>(*this, "GraphicsFPS", WindowMode::WINDOWED);
+		ConfigNumeric gameActionSpeed = ConfigNumeric(*this, "GameActionSpeed", 3, 1, 5);
+		ConfigNumeric graphicsFPS = ConfigNumeric(*this, "GraphicsFPS", 144, 30, 240);
+		ConfigNumeric soundVolumeEffects = ConfigNumeric(*this, "SoundVolumeEffects", 100, 0, 100);
+		ConfigNumeric soundVolumeMaster = ConfigNumeric(*this, "SoundVolumeMaster", 100, 0, 100);
+		ConfigNumeric soundVolumeMusic = ConfigNumeric(*this, "SoundVolumeMusic", 100, 0, 100);
+		ConfigNumeric textFontScale = ConfigNumeric(*this, "TextFontScale", 1, 1, 4);
 
 		Hotkey actDirDown = Hotkey::add("ActDirDown", sdl::SCAN_DOWN, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_DOWN);
 		Hotkey actDirLeft = Hotkey::add("ActDirLeft", sdl::SCAN_LEFT, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_LEFT);
