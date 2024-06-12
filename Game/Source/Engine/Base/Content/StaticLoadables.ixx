@@ -4,6 +4,7 @@ import fbc.BaseContent;
 import fbc.RBordered;
 import fbc.Cache;
 import fbc.FUtil;
+import fbc.FMusic;
 import fbc.FSound;
 import fbc.FTexture;
 import fbc.ILoadable;
@@ -27,6 +28,7 @@ export namespace fbc {
 		virtual void dispose();
 		virtual void initialize();
 	protected:
+		inline FMusic& cacheMusic(const strv& key) { return static_cast<FMusic&>(*items.emplace_back(std::make_unique<FMusic>(getPath(key, AUDIO_PATH)))); }
 		inline FSound& cacheSound(const strv& key) { return static_cast<FSound&>(*items.emplace_back(std::make_unique<FSound>(getPath(key, AUDIO_PATH)))); }
 		inline FTexture& cacheTexture(const strv& key) { return static_cast<FTexture&>(*items.emplace_back(std::make_unique<FTexture>(getPath(key, IMAGE_PATH)))); }
 		inline RBordered& cacheBordered(FTexture& texture) { return static_cast<RBordered&>(*items.emplace_back(std::make_unique<RBordered>(texture))); }

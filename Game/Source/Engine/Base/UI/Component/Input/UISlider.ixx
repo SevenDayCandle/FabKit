@@ -30,6 +30,8 @@ export namespace fbc {
 		virtual void updateImpl() override;
 	protected:
 		UIHorizontalScrollbar scrollbar;
+
+		void commitInternal() override;
 	private:
 		void commitFromScroll(float scroll);
 	};
@@ -66,9 +68,17 @@ export namespace fbc {
 		scrollbar.updateImpl();
 	}
 
+	void UISlider::commitInternal()
+	{
+		UINumberInput::commitInternal();
+		float pos = limMin == limMax ? 0 : (getValue() - limMin) / static_cast<float>(limMax - limMin);
+		scrollbar.setScrollPos(pos);
+	}
+
 	void UISlider::commitFromScroll(float scroll)
 	{
 		int value = std::lerp(limMin, limMax, scroll);
-		UINumberInput::commit(value);
+		UINumberInput::setValue(value);
+		doOnComplete(value);
 	}
 }

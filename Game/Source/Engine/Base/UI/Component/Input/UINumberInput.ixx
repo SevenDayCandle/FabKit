@@ -46,8 +46,10 @@ export namespace fbc {
 		int limMax = std::numeric_limits<int>::max();
 		int limMin = 0;
 
+		inline void doOnComplete(int val) { if (onComplete) onComplete(val); }
 		inline virtual int getLimitWidth() override { return this->hb->w; }
 
+		virtual void commitInternal();
 		void clickLeftEvent() override;
 		void onBufferUpdated() override;
 		void onKeyPress(int32 c) override;
@@ -64,7 +66,6 @@ export namespace fbc {
 		int val = 0;
 		int valTemp = 0;
 
-		void commitInternal();
 		void modifyDuringInput(int val);
 	};
 
@@ -72,9 +73,7 @@ export namespace fbc {
 	void UINumberInput::commit(int num)
 	{
 		setValue(num);
-		if (onComplete) {
-			onComplete(val);
-		}
+		doOnComplete(num);
 	}
 
 	// Sets the limits to constrain inputted values

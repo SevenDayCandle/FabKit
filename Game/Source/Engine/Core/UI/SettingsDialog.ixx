@@ -31,7 +31,7 @@ export namespace fbc {
 			navigation.addItems(&graphics, &sound, &text);
 
 			UIButton& cancel = this->addElement(std::make_unique<UITextButton>(
-				new RelativeHitbox(*hb, 20, hb->getScaleOffsetSizeY() * 0.86f, 300, 100),
+				new RelativeHitbox(*hb, 20, hb->getScaleOffsetSizeY() * 0.88f, 300, 100),
 				cct.images.panelRound,
 				cct.fontRegular(),
 				cct.strings.ui_cancel())

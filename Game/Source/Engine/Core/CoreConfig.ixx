@@ -11,7 +11,7 @@ import std;
 
 export namespace fbc {
 	constexpr float BASE_DENOMINATOR = 2160;
-	constexpr float VOLUME_SCALAR = 1.28f;
+	constexpr float VOLUME_SCALAR = .0128;
 	constexpr ilist<pair<int, int>> RESOLUTIONS = {
 		{320, 240},
 		{640, 480},
@@ -108,15 +108,15 @@ export namespace fbc {
 		sdl::soundSetAllVolume(soundVolumeEffects.get() * soundVolumeMaster.get() * VOLUME_SCALAR);
 
 		// Add sound config subscriptions. Note that graphical config subscriptions need to get set up in screenManager since they invoke refreshing on the screenManager
-		cfg.soundVolumeMaster.setOnReload([](const int& val) {
-			sdl::musicSetVolume(cfg.soundVolumeMusic.get() * val * VOLUME_SCALAR);
-			sdl::soundSetAllVolume(cfg.soundVolumeEffects.get() * val * VOLUME_SCALAR);
+		soundVolumeMaster.setOnReload([this](const int& val) {
+			sdl::musicSetVolume(soundVolumeMusic.get() * val * VOLUME_SCALAR);
+			sdl::soundSetAllVolume(soundVolumeEffects.get() * val * VOLUME_SCALAR);
 		});
-		cfg.soundVolumeEffects.setOnReload([](const int& val) {
-			sdl::soundSetAllVolume(val * cfg.soundVolumeMaster.get() * VOLUME_SCALAR);
+		soundVolumeEffects.setOnReload([this](const int& val) {
+			sdl::soundSetAllVolume(val * soundVolumeMaster.get() * VOLUME_SCALAR);
 		});
-		cfg.soundVolumeMusic.setOnReload([](const int& val) {
-			sdl::musicSetVolume(val * cfg.soundVolumeMaster.get() * VOLUME_SCALAR);
+		soundVolumeMusic.setOnReload([this](const int& val) {
+			sdl::musicSetVolume(val * soundVolumeMaster.get() * VOLUME_SCALAR);
 		});
 	}
 
