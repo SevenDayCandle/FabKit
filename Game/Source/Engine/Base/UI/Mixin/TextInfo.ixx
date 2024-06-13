@@ -23,12 +23,12 @@ export namespace fbc {
 		void drawText(float offX, float offY) const;
 		TextInfo& set(strv text, sdl::Color color);
 		TextInfo& set(strv text, sdl::Color color, sdl::Color colorOutline);
-		TextInfo& set(strv text, sdl::Color color, sdl::Color colorOutline, FFont& font);
+		TextInfo& set(strv text, sdl::Color color, sdl::Color colorOutline, const FFont& font);
 		TextInfo& setColor(sdl::Color color);
 		TextInfo& setColorOutline(sdl::Color colorOutline);
-		TextInfo& setFont(FFont& font);
+		TextInfo& setFont(const FFont& font);
 		TextInfo& setPos(float x, float y);
-		TextInfo& setText(str text);
+		TextInfo& setText(strv text);
 	protected:
 		FFont& font;
 		str text;
@@ -76,7 +76,7 @@ export namespace fbc {
 		return *this;
 	}
 
-	TextInfo& TextInfo::set(strv text, sdl::Color color, sdl::Color colorOutline, FFont& font)
+	TextInfo& TextInfo::set(strv text, sdl::Color color, sdl::Color colorOutline, const FFont& font)
 	{
 		this->text = text;
 		this->color = color;
@@ -100,7 +100,7 @@ export namespace fbc {
 		return *this;
 	}
 
-	TextInfo& TextInfo::setFont(FFont& font)
+	TextInfo& TextInfo::setFont(const FFont& font)
 	{
 		this->font = font;
 		updateCache();
@@ -114,7 +114,7 @@ export namespace fbc {
 		return *this;
 	}
 
-	TextInfo& TextInfo::setText(str text)
+	TextInfo& TextInfo::setText(strv text)
 	{
 		this->text = text;
 		updateCache();

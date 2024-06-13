@@ -8,7 +8,7 @@ import sdl;
 export namespace fbc {
 	export class FFont {
     public:
-        FFont(str path, int size, int outlineSize = 0, int shadowSize = 0): path(path), size(size), outlineSize(outlineSize), shadowSize(shadowSize) {
+        FFont(strv path, int size, int outlineSize = 0, int shadowSize = 0): path(path), size(size), outlineSize(outlineSize), shadowSize(shadowSize) {
             reloadFont();
         }
         FFont(const FFont&) = delete;

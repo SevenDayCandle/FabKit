@@ -10,12 +10,13 @@ export namespace fbc {
         ConfigItem(fbc::Config& config, strv ID, const T& defaultValue) : config(config), ID(ID), defaultValue(defaultValue), value(defaultValue) {
             config.addOnReload([this]() { this->reload(); });
         }
+        virtual ~ConfigItem() {}
 
         const str ID;
 
         operator T() { return value; }
 
-        inline void setOnReload(func<void(const T&)> onChange) {this->onChange = onChange;}
+        inline void setOnReload(const func<void(const T&)>& onChange) {this->onChange = onChange;}
         inline T get() {return value;}
 
         void set(const T& newValue);

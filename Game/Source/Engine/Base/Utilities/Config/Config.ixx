@@ -18,7 +18,7 @@ export namespace fbc {
 
         const str ID;
 
-        inline void addOnReload(func<void()> callback) {
+        inline void addOnReload(const func<void()>& callback) {
             items.push_back(callback);
         }
         inline virtual void postInitialize() {}

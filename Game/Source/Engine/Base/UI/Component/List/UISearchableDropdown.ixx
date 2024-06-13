@@ -26,7 +26,7 @@ export namespace fbc {
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
-			func<str(vec<const UIEntry<T>*>)> buttonLabelFunc = {}
+			func<str(vec<const UIEntry<T>*>)>& buttonLabelFunc = {}
 		) : UIDropdown<T>(hb, menu, image, arrow, clear, textFont, buttonLabelFunc) {
 			initSearchable();
 		}
@@ -36,7 +36,7 @@ export namespace fbc {
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
-			func<str(vec<const UIEntry<T>*>)> buttonLabelFunc = {}
+			func<str(vec<const UIEntry<T>*>)>& buttonLabelFunc = {}
 		) : UIDropdown<T>(hb, std::move(menu), image, arrow, clear, textFont, buttonLabelFunc) {
 			initSearchable();
 		}
@@ -185,7 +185,7 @@ export namespace fbc {
 	{
 		return std::make_unique<UISearchableDropdown<T>>(
 			hb,
-			UISelectorList<T>::multiList(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), labelFunc, itemFont, background),
+			UISelectorList<T>::multiList(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), std::move(labelFunc), itemFont, background),
 			image,
 			arrow,
 			clear,
@@ -199,7 +199,7 @@ export namespace fbc {
 	{
 		return std::make_unique<UISearchableDropdown<T>>(
 			hb,
-			UISelectorList<T>::singleList(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), labelFunc, itemFont, background),
+			UISelectorList<T>::singleList(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), std::move(labelFunc), itemFont, background),
 			image,
 			arrow,
 			clear,

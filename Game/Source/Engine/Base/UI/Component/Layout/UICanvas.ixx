@@ -19,7 +19,7 @@ export namespace fbc {
 		template<typename T> requires std::is_base_of_v<UIBase, T> T& addElement(uptr<T>&& element);
 		template<typename T> requires std::is_base_of_v<UIBase, T> T& stackElementXDir(uptr<T>&& element, float spacing = 8, float yOff = 0);
 		template<typename T> requires std::is_base_of_v<UIBase, T> T& stackElementYDir(uptr<T>&& element, float spacing = 8, float xOff = 0);
-		UIBase* getLastItem();
+		UIBase* getLastItem() const;
 		virtual bool isHovered() override;
 		virtual void refreshDimensions() override;
 		virtual void renderImpl() override;
@@ -37,7 +37,7 @@ export namespace fbc {
 	}
 
 	// Get the hb for the last item added into the list
-	UIBase* UICanvas::getLastItem()
+	UIBase* UICanvas::getLastItem() const
 	{
 		if (elements.size() > 0) {
 			return elements[elements.size() - 1].get();
@@ -77,7 +77,6 @@ export namespace fbc {
 		// Only actually do positioning if there is a previous element to reference
 		if (elements.size() > 1) {
 			UIBase& last = *elements[elements.size() - 2];
-			Hitbox& lhb = *(last.hb);
 			float xPos = last.getEndX() + scaled;
 			float yPos = last.getBeginY() + yOff;
 
@@ -102,7 +101,6 @@ export namespace fbc {
 		// Only actually do positioning if there is a previous element to reference
 		if (elements.size() > 1) {
 			UIBase& last = *elements[elements.size() - 2];
-			Hitbox& lhb = *(last.hb);
 			float xPos = last.getBeginX() + xOff;
 			float yPos = last.getEndY() + scaled;
 

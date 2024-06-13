@@ -26,8 +26,8 @@ export namespace fbc {
 
 		}
 
-		inline UITextInput& setOnBufferUpdate(func<void(strv)> onBufferUpdateCallback) { return this->onBufferUpdateCallback = onBufferUpdateCallback, * this; }
-		inline UITextInput& setOnComplete(func<void(strv)> onComplete) { return this->onComplete = onComplete, *this; }
+		inline UITextInput& setOnBufferUpdate(const func<void(strv)>& onBufferUpdateCallback) { return this->onBufferUpdateCallback = onBufferUpdateCallback, * this; }
+		inline UITextInput& setOnComplete(const func<void(strv)>& onComplete) { return this->onComplete = onComplete, *this; }
 
 		void commit(strv text);
 		virtual void onSizeUpdated() override;

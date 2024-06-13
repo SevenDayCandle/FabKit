@@ -20,9 +20,9 @@ export namespace fbc {
 
 		const str ID;
 
-		inline bool isKeyJustPressed() { return key > 0 && sdl::keyboardJustPressed(key); }
-		inline int getKey() { return key; }
-		inline int getPad() { return pad; }
+		inline bool isKeyJustPressed() const { return key > 0 && sdl::keyboardJustPressed(key); }
+		inline int getKey() const { return key; }
+		inline int getPad() const { return pad; }
 		inline void setKey(sdl::Scancode key) { this->key = key; }
 		inline void setPad(sdl::GamepadButton  pad) { this->pad = pad; }
 
@@ -82,9 +82,9 @@ export namespace fbc {
 	// Refresh the value map contents from the external file if it exists
 	void Hotkey::reload()
 	{
-		map<str, pair<int, int>> input;
 		str configPath = Hotkey::configPath();
 		if (std::filesystem::exists(configPath)) {
+			map<str, pair<int, int>> input;
 			glz::parse_error error = glz::read_file_json(input, configPath, str{});
 			if (error) {
 				sdl::logError("Failed to read hotkeys at path %s: %s", configPath.data(), error.includer_error.data());

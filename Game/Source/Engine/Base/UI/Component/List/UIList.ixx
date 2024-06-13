@@ -25,7 +25,7 @@ export namespace fbc {
 			FFont& itemFont = cct.fontRegular(),
 			IDrawable& background = cct.images.panelRound,
 			bool canAutosize = false) :
-			UIBase(hb), background(background), itemFont(itemFont), labelFunc(labelFunc), canAutosize(canAutosize) {
+			UIBase(hb), background(background), itemFont(itemFont), labelFunc(std::move(labelFunc)), canAutosize(canAutosize) {
 		}
 
 		~UIList() override {}
@@ -43,11 +43,11 @@ export namespace fbc {
 		template <c_itr<T*> Iterable> UIList& setItems(const Iterable& items);
 		template <c_varg<T>... Args> UIList& setItems(Args&&... items);
 		template <c_varg<T*>... Args> UIList& setItems(Args&&... items);
-		UIList& setItemFont(FFont& itemFont);
-		UIList& setLabelFunc(func<str(const T&)> labelFunc);
+		UIList& setItemFont(const FFont& itemFont);
+		UIList& setLabelFunc(const func<str(const T&)>& labelFunc);
 		UIList& setMaxRows(int rows);
 		vec<const T*> getAllItems();
-		void forEach(func<void(const T&)> func);
+		void forEach(func<void(const T&)>& func);
 		void refreshDimensions() override;
 		void renderImpl() override;
 		void updateImpl() override;
@@ -148,7 +148,7 @@ export namespace fbc {
 
 	// Updates the menu font used by rows. This will update existing rows to use the new font and will setExactSize the menu
 	template <typename T>
-	UIList<T>& UIList<T>::setItemFont(FFont& itemFont) {
+	UIList<T>& UIList<T>::setItemFont(const FFont& itemFont) {
 		this->itemFont = itemFont;
 		for (const uptr<UIEntry<T>>& row : rows) { row.setFont(itemFont); }
 		autosize();
@@ -156,9 +156,9 @@ export namespace fbc {
 	}
 
 	// Updates the label function used for row titles. This will update titles on existing rows and will setExactSize the menu
-	template<typename T> UIList<T>& UIList<T>::setLabelFunc(func<str(const T&)> labelFunc) {
+	template<typename T> UIList<T>& UIList<T>::setLabelFunc(const func<str(const T&)>& labelFunc) {
 		this->labelFunc = labelFunc;
-		for (const uptr<UIEntry<T>>& row : rows) { row->setText(labelFunc(row->item)); }
+		for (const uptr<UIEntry<T>>& row : rows) { row->setText(this->labelFunc(row->item)); }
 		autosize();
 		return *this;
 	}
@@ -176,7 +176,7 @@ export namespace fbc {
 	}
 
 	// Execute a function on every item in the list
-	template<typename T> void UIList<T>::forEach(func<void(const T&)> func)
+	template<typename T> void UIList<T>::forEach(func<void(const T&)>& func)
 	{
 		for (const uptr<UIEntry<T>>& row : rows) {
 			func(row->item);
@@ -221,7 +221,7 @@ export namespace fbc {
 				}
 			}
 			else if (cfg.actDirDown.isKeyJustPressed()) {
-				activeRow = std::min((int) rows.size() - 1, activeRow + 1);
+				activeRow = std::min(static_cast<int>(rows.size()) - 1, activeRow + 1);
 				if (activeRow > topVisibleRowIndex + maxRows) {
 					updateTopVisibleRowIndex(topVisibleRowIndex + 1);
 					updateRowPositions();

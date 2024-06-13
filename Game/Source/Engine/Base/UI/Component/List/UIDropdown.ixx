@@ -27,7 +27,7 @@ export namespace fbc {
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
-			func<str(vec<const UIEntry<T>*>&)> buttonLabelFunc = {}
+			func<str(vec<const UIEntry<T>*>&)>& buttonLabelFunc = {}
 		): UITitledInteractable(hb, image), TextInfo(textFont), menu(menu), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
 			init();
 		}
@@ -37,7 +37,7 @@ export namespace fbc {
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
-			func<str(vec<const UIEntry<T>*>&)> buttonLabelFunc = {}
+			func<str(vec<const UIEntry<T>*>&)>& buttonLabelFunc = {}
 		): UITitledInteractable(hb, image), TextInfo(textFont), menu(std::move(menu)), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
 			init();
 		}
@@ -45,19 +45,19 @@ export namespace fbc {
 
 		uptr<UISelectorList<T>> menu;
 
-		inline bool isOpen() { return proxy != nullptr; }
+		inline bool isOpen() const { return proxy != nullptr; }
 		inline int selectedSize() const { return menu->selectedSize(); }
 		inline int size() { return menu->size(); }
-		inline UIDropdown& setEntryFunc(func<UIEntry<T>*(UISelectorList<T>&, T&, str&, int)> entryFunc) { return menu->setEntryFunc(entryFunc), *this; }
-		inline UIDropdown& setItemFont(FFont& itemFont) { return menu->setItemFont(itemFont), * this; }
+		inline UIDropdown& setEntryFunc(const func<UIEntry<T>*(const UISelectorList<T>&, T&, str&, int)>& entryFunc) { return menu->setEntryFunc(entryFunc), *this; }
+		inline UIDropdown& setItemFont(const FFont& itemFont) { return menu->setItemFont(itemFont), * this; }
 		inline UIDropdown& setMaxRows(int rows) { return menu->setMaxRows(rows), * this; }
-		inline UIDropdown& setOnChange(func<void(vec<const T*>)> onChange) { return menu->setOnChange(onChange), * this; }
-		inline UIDropdown& setOnOpen(func<void()> onOpen) { return this->onOpen = onOpen, *this; }
+		inline UIDropdown& setOnChange(const func<void(vec<const T*>)>& onChange) { return menu->setOnChange(onChange), * this; }
+		inline UIDropdown& setOnOpen(const func<void()>& onOpen) { return this->onOpen = onOpen, *this; }
 		inline UIDropdown& setSelectionLimit(int rows) { return menu->setSelectionLimit(rows), * this; }
 		inline UIDropdown& setSelectionMin(int rows) { return menu->setSelectionMin(rows), * this; }
 		inline vec<T*> getAllItems() { return menu->getAllItems(); }
 		inline vec<T*> getSelectedItems() { return menu->getSelectedItems(); }
-		inline virtual UIDropdown& setOnClose(func<void()> onClose) { return this->onClose = onClose, *this; }
+		inline virtual UIDropdown& setOnClose(const func<void()>& onClose) { return this->onClose = onClose, *this; }
 		inline void clearItems() { menu->clearItems(); }
 		inline void clearSelection() { menu->clearSelection(); }
 		inline void selectSingle(T item) { menu->selectSingle(item); }

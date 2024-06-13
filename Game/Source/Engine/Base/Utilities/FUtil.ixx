@@ -32,6 +32,8 @@ export namespace fbc {
 	export using uint32 = std::uint32_t;
 	export using path = std::filesystem::path;
 
+	export using std::move;
+
 	// Const stuff, adapted from https://github.com/stephenberry/glaze
 	// TODO just use the glz module version once it is available
 	export template <typename, template <typename...> typename> inline constexpr bool is_specialization_v = false;
@@ -197,7 +199,7 @@ export namespace fbc::futil {
 
 	// Check whether the text can be converted into a number
 	export bool isNumeric(strv text) {
-		return !text.empty() && std::all_of(text.begin(), text.end(), [](const char c) {return std::isdigit(c); });
+		return !text.empty() && std::ranges::all_of(text, [](unsigned char c) {return std::isdigit(c); });
 	}
 
 	// Join a collection of strings with a delimiter

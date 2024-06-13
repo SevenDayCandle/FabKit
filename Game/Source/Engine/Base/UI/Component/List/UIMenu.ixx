@@ -20,14 +20,14 @@ export namespace fbc {
 			FFont& itemFont = cct.fontRegular(),
 			IDrawable& background = cct.images.darkPanelRound,
 			bool canAutosize = false) :
-			UIList<T>(hb, labelFunc, itemFont, background, canAutosize) {}
+			UIList<T>(hb, std::move(labelFunc), itemFont, background, canAutosize) {}
 		virtual ~UIMenu() {}
 
 		inline const T* getSelectedItem() { return &this->rows[currentIndex]->item; }
-		inline UIMenu& setItemFont(FFont& itemFont) { return UIList<T>::setItemFont(itemFont), * this; }
-		inline UIMenu& setLabelFunc(func<const str(T&)> labelFunc) { return UIList<T>::setLabelFunc(labelFunc), * this; }
+		inline UIMenu& setItemFont(const FFont& itemFont) { return UIList<T>::setItemFont(itemFont), * this; }
+		inline UIMenu& setLabelFunc(const func<const str(T&)>& labelFunc) { return UIList<T>::setLabelFunc(labelFunc), * this; }
 		inline UIMenu& setMaxRows(int rows) { return UIList<T>::setMaxRows(rows), * this; }
-		inline UIMenu& setOnChange(func<void(const T*)> onChange) { return this->onChange = onChange, *this; }
+		inline UIMenu& setOnChange(const func<void(const T*)>& onChange) { return this->onChange = onChange, *this; }
 
 		void select(int ind);
 		void select(T& item);

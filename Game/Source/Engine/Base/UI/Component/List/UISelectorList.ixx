@@ -27,20 +27,20 @@ export namespace fbc {
 		       FFont& itemFont = cct.fontRegular(),
 		       IDrawable& background = cct.images.panelRound,
 		       bool canAutosize = false):
-			UIList<T>(hb, labelFunc, itemFont, background, canAutosize),
+			UIList<T>(hb, std::move(labelFunc), itemFont, background, canAutosize),
 			scrollbar(new RelativeHitbox(*hb, 0, 0, 48, 48)) { scrollbar.setOnScroll([this](float f) { onScroll(f); }); }
 
 		~UISelectorList() override {}
 
 		inline bool isOpen() const { return proxy != nullptr; }
-		inline UISelectorList& setFilterFunc(func<bool(const UIEntry<T>*)> filterFunc) { return this->filterFunc = filterFunc, *this; }
-		inline UISelectorList& setItemFont(FFont& itemFont) { return UIList<T>::setItemFont(itemFont), * this; }
-		inline UISelectorList& setLabelFunc(func<const str(T&)> labelFunc) { return UIList<T>::setLabelFunc(labelFunc), * this; }
+		inline UISelectorList& setFilterFunc(const func<bool(const UIEntry<T>*)>& filterFunc) { return this->filterFunc = filterFunc, *this; }
+		inline UISelectorList& setItemFont(const FFont& itemFont) { return UIList<T>::setItemFont(itemFont), * this; }
+		inline UISelectorList& setLabelFunc(const func<const str(T&)>& labelFunc) { return UIList<T>::setLabelFunc(labelFunc), * this; }
 		inline UISelectorList& setMaxRows(int rows) { return UIList<T>::setMaxRows(rows), *this; }
-		inline UISelectorList& setOnChange(func<void(vec<const T*>)> onChange) { return this->onChange = onChange, *this; }
-		inline UISelectorList& setOnClose(func<void()> onClose) { return this->onClose = onClose, *this; }
-		inline UISelectorList& setOnOpen(func<void()> onOpen) { return this->onOpen = onOpen, *this; }
-		inline UISelectorList& setOnSelectionUpdate(func<void(vec<const UIEntry<T>*>&)> onSelectionUpdate) {return this->onSelectionUpdate = onSelectionUpdate, *this;}
+		inline UISelectorList& setOnChange(const func<void(vec<const T*>)>& onChange) { return this->onChange = onChange, *this; }
+		inline UISelectorList& setOnClose(const func<void()>& onClose) { return this->onClose = onClose, *this; }
+		inline UISelectorList& setOnOpen(const func<void()>& onOpen) { return this->onOpen = onOpen, *this; }
+		inline UISelectorList& setOnSelectionUpdate(const func<void(vec<const UIEntry<T>*>&)>& onSelectionUpdate) {return this->onSelectionUpdate = onSelectionUpdate, *this;}
 
 		inline int getMinSelections() const { return selectionMin; }
 		inline int selectedSize() const { return currentIndices.size(); }
@@ -330,8 +330,8 @@ export namespace fbc {
 				}
 			}
 			else if (cfg.actDirDown.isKeyJustPressed()) {
-				this->activeRow = std::min((int)rowsForRender.size() - 1, this->activeRow + 1);
-				if (this->activeRow > this->topVisibleRowIndex + this->maxRows) {
+				this->activeRow = std::min(static_cast<int>(rowsForRender.size()) - 1, this->activeRow + 1);
+				if (this->activeRow >= this->topVisibleRowIndex + this->maxRows) {
 					updateTopVisibleRowIndex(this->topVisibleRowIndex + 1);
 					updateRowPositions();
 				}

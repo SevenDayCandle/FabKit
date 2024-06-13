@@ -8,7 +8,7 @@ import std;
 export namespace fbc {
 	export template <typename T> class Cache : public ILoadable {
 	public:
-		Cache(func<T*()> fetchFunc): fetchFunc(fetchFunc) {}
+		Cache(const func<T*()>& fetchFunc): fetchFunc(fetchFunc) {}
 		~Cache() {Cache<T>::dispose();}
 
 		operator T& () const { return get(); }
