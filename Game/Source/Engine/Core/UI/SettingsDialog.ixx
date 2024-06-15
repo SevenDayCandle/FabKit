@@ -22,6 +22,8 @@ export namespace fbc {
 		SettingsDialog(): UIDialog(new ScreenSizeHitbox(0.25, 0.25, 0.5, 0.5), cct.images.darkPanelRound) {
 			graphics.addDropdown<pair<int,int>, ilist<pair<int,int>>>(cfg.graphicsResolution, cct.strings.options_graphics_resolution(), RESOLUTIONS, [](const pair<int,int>& item) { return futil::dimensionString(item); });
 			graphics.addDropdown<WindowMode, ilist<WindowMode>>(cfg.graphicsWindowMode, cct.strings.options_graphics_window_mode(), WINDOWMODE_ALL, [](const WindowMode& item) { return windowScreenName(item); });
+			graphics.addSlider(cfg.graphicsFPS, cct.strings.options_graphics_fps())
+			.setOwnedTip(cct.strings.options_graphics_fps());
 			graphics.addToggle(cfg.graphicsVSync, cct.strings.options_graphics_vsync());
 
 			sound.addSlider(cfg.soundVolumeMaster, cct.strings.options_sound_master(), 300);
@@ -58,6 +60,7 @@ export namespace fbc {
 		SettingsDialogPage graphics = page(cct.strings.options_section_graphics());
 		SettingsDialogPage sound = page(cct.strings.options_section_sound());
 		SettingsDialogPage text = page(cct.strings.options_section_text());
+		SettingsDialogPage hotkeys = page(cct.strings.options_section_graphics());
 
 		virtual bool isHovered() override;
 

@@ -8,6 +8,7 @@ export namespace fbc {
 	export class TextInfo {
 	public:
 		TextInfo(FFont& font, strv text = "", sdl::Color color = sdl::COLOR_WHITE, sdl::Color colorOutline = sdl::COLOR_BLACK) : font(font), text(text), color(color), colorOutline(colorOutline) {
+			// TODO remove constructor method
 			updateCache();
 		}
 		virtual ~TextInfo() {}
@@ -35,10 +36,13 @@ export namespace fbc {
 		sdl::Color color = sdl::COLOR_WHITE;
 		sdl::Color colorOutline = sdl::COLOR_BLACK;
 
+		inline virtual bool hasCache() { return cache.texture != nullptr; }
 		inline virtual int getLimitWidth() { return 0; }
 		inline void updateCache(strv text) { updateCache(text, this->color, this->colorOutline); }
 		inline void updateCache(strv text, const sdl::Color& color) { updateCache(text, color, this->colorOutline); }
-		void updateCache(strv text, const sdl::Color& color, const sdl::Color& colorOutline);
+		virtual void updateCache(strv text, const sdl::Color& color, const sdl::Color& colorOutline);
+
+		void unloadCache();
 	private:
 		sdl::FontRender cache = { 0, 0, 0, 0, nullptr };
 	};
@@ -124,10 +128,7 @@ export namespace fbc {
 	// Whenever any font parameter changes, renders must be updated
 	void TextInfo::updateCache(strv text, const sdl::Color& color, const sdl::Color& colorOutline)
 	{
-		// Free existing texture
-		if (cache.texture) {
-			sdl::textureDestroy(cache.texture);
-		}
+		unloadCache();
 
 		if (text.empty()) {
 			cache.texture = nullptr;
@@ -136,6 +137,14 @@ export namespace fbc {
 		}
 		else {
 			cache = font.makeTexture(text, getLimitWidth(), cache.x, cache.y, color, colorOutline);
+		}
+	}
+
+	// Free existing texture
+	void TextInfo::unloadCache()
+	{
+		if (cache.texture) {
+			sdl::textureDestroy(cache.texture);
 		}
 	}
 }

@@ -10,14 +10,15 @@ import sdl;
 import std;
 
 namespace fbc {
-	fbc::deque<fbc::uptr<fbc::UIBase>> screens;
-	fbc::deque<fbc::uptr<fbc::IOverlay>> overlays;
-	fbc::IOverlay* queuedCloseOverlay;
+	deque<uptr<UIBase>> screens;
+	deque<uptr<IOverlay>> overlays;
+	IOverlay* queuedCloseOverlay;
+	IOverlay* tipBatch;
 	bool queuedCloseScreen;
 }
 
 export namespace fbc::screenManager {
-	fbc::UIBase* activeElement;
+	UIBase* activeElement;
 
 	// Close the currently opened screen and reopen the last screen opened.
 	// The screen's dispose method should save any screen state as necessary since the screen will get disposed of
@@ -46,12 +47,12 @@ export namespace fbc::screenManager {
 		return overlays.back().get();
 	}
 
-	// Add an overlay to the top of the screen
+	// Add an overlay to the top of the screen. The screen manager will take ownership of this overlay.
 	void openOverlay(uptr<fbc::IOverlay>&& target) {
 		overlays.push_back(std::move(target));
 	}
 
-	// Add a screen to the history of opened screens and open that screen. Also dispose all overlays
+	// Add a screen to the history of opened screens and open that screen. The screen manager will take ownership of this screen. Also dispose all overlays and tooltips.
 	void openScreen(uptr<fbc::UIBase>&& screen) {
 		screens.push_back(std::move(screen));
 		screens.back()->open();
@@ -60,6 +61,14 @@ export namespace fbc::screenManager {
 		}
 		activeElement = nullptr;
 		sdl::keyboardInputStop();
+	}
+
+	// Add a tooltip batch to be shown. Only one tooltip batch can be shown at a time
+	void queueTip(IOverlay* tip) {
+		if (!tipBatch) {
+			tipBatch = tip;
+			tipBatch->open();
+		}
 	}
 
 	// Whenever the screen size changes, we need to setExactSize all UI elements
@@ -80,6 +89,10 @@ export namespace fbc::screenManager {
 		for (const uptr<IOverlay>& overlay : overlays) {
 			overlay->render();
 		}
+		if (tipBatch) {
+			tipBatch->render();
+		}
+		tipBatch = nullptr;
 	}
 
 	// Close the current screen and switch the specified screen. Also dispose all overlays
@@ -112,6 +125,9 @@ export namespace fbc::screenManager {
 		}
 		else if (!screens.empty()) {
 			screens.back()->updateImpl();
+		}
+		if (tipBatch) {
+			tipBatch->update();
 		}
 
 		// Check if currently opened should dispose. If so, dispose all overlays and the screen, then reopen the last screen

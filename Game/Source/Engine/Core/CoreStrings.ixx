@@ -21,10 +21,11 @@ export namespace fbc {
 		inline str options_graphics_window_mode_borderless() const { return uiStrings.at("options_graphics_window_mode_borderless"); };
 		inline str options_graphics_window_mode_fullscreen() const { return uiStrings.at("options_graphics_window_mode_fullscreen"); };
 		inline str options_graphics_window_mode_windowed() const { return uiStrings.at("options_graphics_window_mode_windowed"); };
-		inline str options_section_graphics() const { return uiStrings.at("options_section_graphics"); };
 		inline str options_sound_effects() const { return uiStrings.at("options_sound_effects"); };
 		inline str options_sound_master() const { return uiStrings.at("options_sound_master"); };
 		inline str options_sound_music() const { return uiStrings.at("options_sound_music"); };
+		inline str options_section_graphics() const { return uiStrings.at("options_section_graphics"); };
+		inline str options_section_hotkeys() const { return uiStrings.at("options_section_hotkeys"); };
 		inline str options_section_sound() const { return uiStrings.at("options_section_sound"); };
 		inline str options_section_text() const { return uiStrings.at("options_section_text"); };
 		inline str screen_setup_header() const { return uiStrings.at("screen_setup_header"); };

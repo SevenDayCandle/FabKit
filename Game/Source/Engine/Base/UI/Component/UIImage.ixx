@@ -5,7 +5,7 @@ import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.TextInfo;
 import fbc.ScreenManager;
-import fbc.UITooltip;
+import fbc.Tooltip;
 import fbc.UITipHoverable;
 import sdl;
 

@@ -4,7 +4,7 @@ import fbc.FFont;
 import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.TextInfo;
-import fbc.UITooltip;
+import fbc.Tooltip;
 import fbc.UITipHoverable;
 
 export namespace fbc {

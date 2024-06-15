@@ -2,30 +2,40 @@ export module fbc.UITipHoverable;
 
 import fbc.FUtil;
 import fbc.Hitbox;
-import fbc.UITooltip;
+import fbc.Tooltip;
 import fbc.UIBase;
 
 export namespace fbc {
 	export class UITipHoverable : public UIBase {
 	public:
-		UITooltip* tooltip;
+		Tooltip* tooltip;
 
 		UITipHoverable(Hitbox* hb) : UIBase(hb), tooltip(nullptr) {}
 		~UITipHoverable() override {}
 
 		virtual void updateImpl() override;
 
-		inline virtual UITipHoverable& setTooltip(UITooltip* tooltip) {
-			this->tooltip = tooltip;
-			return *this;
-		}
+		inline UITipHoverable& setOwnedTip(strv text) { return setOwnedTip(new Tooltip(text)); }
+		inline virtual UITipHoverable& setTooltip(Tooltip* tooltip) { return this->tooltip = tooltip, *this; } // Assigns a non-owned tooltip to this object
+
+		UITipHoverable& setOwnedTip(Tooltip* tooltip);
+	private:
+		uptr<Tooltip> ownedTip;
 	};
 
 	void UITipHoverable::updateImpl()
 	{
 		UIBase::updateImpl();
-		if (hb->isHovered()) {
-			// TODO queue tooltip
+		if (hb->isHovered() && tooltip) {
+			tooltip->queue();
 		}
+	}
+
+	// Assigns an owned tooltip to this object (i.e. a tooltip that gets destroyed when this object is destroyed)
+	UITipHoverable& UITipHoverable::setOwnedTip(Tooltip* tooltip)
+	{
+		ownedTip = uptr<Tooltip>(tooltip);
+		this->tooltip = ownedTip.get();
+		return *this;
 	}
 }
