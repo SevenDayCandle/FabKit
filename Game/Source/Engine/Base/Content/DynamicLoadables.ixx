@@ -6,31 +6,29 @@ import fbc.Cache;
 import fbc.FUtil;
 import fbc.FTexture;
 import fbc.ILoadable;
-import fbc.IContentLoadables;
+import fbc.ContentLoadables;
 import fbc.RHorizontal;
 import fbc.RVertical;
 import std;
 
 export namespace fbc {
-	export template <c_ext<ILoadable> T> class DynamicLoadables : public IContentLoadables {
+	export template <c_ext<ILoadable> T> class DynamicLoadables : public ContentLoadables {
 	public:
-		DynamicLoadables(const BaseContent& content) : content(content) {}
+		DynamicLoadables(const BaseContent& content) : ContentLoadables(content) {}
 		virtual ~DynamicLoadables() {}
-
-		const BaseContent& content;
 
 		inline void dispose() override { items.clear(); }
 
-		T* get(const strv& key);
+		T* get(strv key);
 
 		virtual void initialize() override;
 	private:
-		T* loadItem(const strv& key);
+		T* loadItem(strv key);
 		umap<strv, uptr<T>> items;
 	};
 
 	// Attempt to fetch a cached texture. If none are found, generate one and put it into the map
-	template <c_ext<ILoadable> T> T* DynamicLoadables<T>::get(const strv& key) {
+	template <c_ext<ILoadable> T> T* DynamicLoadables<T>::get(strv key) {
 		auto found = items.find(key);
 		if (found != items.end()) {
 			return found->second.get();
@@ -41,16 +39,16 @@ export namespace fbc {
 	// Reload all loaded items
 	template <c_ext<ILoadable> T> void DynamicLoadables<T>::initialize()
 	{
-		for (auto& pair : items) {
-			pair.second->reload();
+		for (uptr<T>& pair : items | std::views::values) {
+			pair->reload();
 		}
 	}
 
 	// Attempt to load a texture from disk, saving it into the map
-	template <c_ext<ILoadable> T> T* DynamicLoadables<T>::loadItem(const strv& key)
+	template <c_ext<ILoadable> T> T* DynamicLoadables<T>::loadItem(strv key)
 	{
 		path pathImpl = content.contentFolder;
-		pathImpl /= IContentLoadables::getDirectoryPath<T>();
+		pathImpl /= ContentLoadables::getDirectoryPath<T>();
 		pathImpl /= key;
 		str pathStr = pathImpl.string();
 		auto [it, inserted] = items.emplace(std::piecewise_construct,

@@ -3,16 +3,17 @@ export module fbc.FFont;
 import fbc.CoreConfig;
 import fbc.FTexture;
 import fbc.FUtil;
+import fbc.ILoadable;
 import sdl;
 
 export namespace fbc {
-	export class FFont {
+	export class FFont : public ILoadable {
     public:
         FFont(strv path, int size, int outlineSize = 0, int shadowSize = 0): path(path), size(size), outlineSize(outlineSize), shadowSize(shadowSize) {
-            reloadFont();
+            reload();
         }
         FFont(const FFont&) = delete;
-        ~FFont() {
+        virtual ~FFont() {
             // Unload font when destroyed
             if (font) {
                 sdl::fontClose(font);
@@ -23,17 +24,17 @@ export namespace fbc {
         inline int getOutlineSize() const { return outlineSize; }
         inline int getShadowSize() const { return outlineSize; }
         inline int getSize() const { return size; }
-        pair<int, int> measureDim(strv text);
-        int measureH(strv text);
-        int measureW(strv text);
-        void reloadFont();
 
         FFont& setAllSizes(int size, int outlineSize, int shadowSize);
         FFont& setOutlineSize(int size);
         FFont& setShadowSize(int size);
         FFont& setSize(int size);
+        int measureH(strv text);
+        int measureW(strv text);
+        pair<int, int> measureDim(strv text);
         sdl::FontRender makeTexture(strv text, uint32 w, float x, float y, sdl::Color color, sdl::Color outlineColor, sdl::Color shadowColor);
         void dispose();
+        void reload();
     private:
         sdl::Font* font;
         str path;
@@ -42,6 +43,7 @@ export namespace fbc {
         int size;
 	};
 
+    // Get the x and y sizes of the given text written with this font
     pair<int, int> FFont::measureDim(strv text)
     {
         pair<int, int> pair;
@@ -49,6 +51,7 @@ export namespace fbc {
         return pair;
     }
 
+    // Get the x size of the given text written with this font
     int FFont::measureH(strv text)
     {
         int w, h;
@@ -56,6 +59,7 @@ export namespace fbc {
         return h;
     }
 
+    // Get the y size of the given text written with this font
     int FFont::measureW(strv text)
     {
         int w, h;
@@ -69,7 +73,7 @@ export namespace fbc {
         this->size = size;
         this->outlineSize = outlineSize;
         this->shadowSize = shadowSize;
-        reloadFont();
+        reload();
         return *this;
     }
 
@@ -91,7 +95,7 @@ export namespace fbc {
     FFont& FFont::setSize(int size)
     {
         this->size = size;
-        reloadFont();
+        reload();
         return *this;
     }
 
@@ -138,7 +142,7 @@ export namespace fbc {
     }
 
     /* Refreshes the font to match its size */
-    void FFont::reloadFont()
+    void FFont::reload()
     {
         int res = cfg.fontScale(size);
         font = sdl::fontOpen(path.c_str(), res);

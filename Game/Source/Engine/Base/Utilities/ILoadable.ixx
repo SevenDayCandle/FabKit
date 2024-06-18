@@ -9,7 +9,6 @@ export namespace fbc {
 	export struct ILoadable {
 	public:
 		ILoadable() {}
-		ILoadable(strv path) {} // For DynamicLoadables
 
 		virtual ~ILoadable() {}
 

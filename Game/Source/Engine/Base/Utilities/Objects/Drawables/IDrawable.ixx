@@ -5,7 +5,7 @@ import fbc.ILoadable;
 import sdl;
 
 export namespace fbc {
-	export class IDrawable : public ILoadable {
+	export struct IDrawable : public ILoadable {
 	public:
 		IDrawable() {}
 		virtual ~IDrawable() {}

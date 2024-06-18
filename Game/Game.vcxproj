@@ -169,7 +169,7 @@
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Content\IContentLoadables.ixx">
+    <ClCompile Include="Source\Engine\Base\Content\ContentLoadables.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -448,8 +448,8 @@
     <Image Include="Resources\Images\UI\SquareButton.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Localization\ENG\KeywordStrings.json" />
-    <None Include="Resources\Localization\ENG\UIStrings.json" />
+    <None Include="Resources\Strings\ENG\KeywordStrings.json" />
+    <None Include="Resources\Strings\ENG\UIStrings.json" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Resources\Fonts\NotoSans-Bold.ttf" />

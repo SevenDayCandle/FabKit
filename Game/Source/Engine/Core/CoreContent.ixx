@@ -6,17 +6,23 @@ import fbc.CoreConfig;
 import fbc.CoreImages;
 import fbc.CoreStrings;
 import fbc.FFont;
+import fbc.FMusic;
+import fbc.FSound;
+import fbc.FTexture;
 import fbc.FUtil;
 import sdl;
 import std;
 
-export namespace fbc {
-	const str BASE_FOLDER = "/Resources";
+namespace fbc {
+	strv BASE_FOLDER = "/Resources";
+	map<strv, BaseContent&> registeredContents;
+}
 
-	export class CoreContent : public fbc::BaseContent {
-		static map<strv, BaseContent&> registeredContents;
+export namespace fbc {
+
+	export class CoreContent : public BaseContent {
 	public:
-		CoreContent(strv ID) : fbc::BaseContent(ID, sdl::dirBase() + BASE_FOLDER) {}
+		CoreContent(strv ID) : BaseContent(ID, sdl::dirBase() + str(BASE_FOLDER)) {}
 
 		CoreAudio audio = CoreAudio(*this);
 		CoreImages images = CoreImages(*this);
@@ -26,10 +32,14 @@ export namespace fbc {
 		inline FFont& fontRegular() { return *fontRegularData; }
 		inline FFont& fontSmall() { return *fontSmallData; }
 
+		FMusic* getMusic(strv content, strv path);
+		FSound* getSound(strv content, strv path);
+		FTexture* getTexture(strv content, strv path);
 		void dispose() override;
 		void initialize() override;
 		void initializeFonts();
 		void postInitialize() override;
+		void reloadAudio() override;
 		void reloadFonts();
 		void reloadImages() override;
 
@@ -42,22 +52,55 @@ export namespace fbc {
 
 	export CoreContent cct = CoreContent(futil::FBC);
 
-	// TODO
+	FMusic* CoreContent::getMusic(strv content, strv path)
+	{
+		auto found = registeredContents.find(content);
+		if (found != registeredContents.end()) {
+			return found->second.getMusic(path);
+		}
+		return nullptr;
+	}
+
+	FSound* CoreContent::getSound(strv content, strv path)
+	{
+		auto found = registeredContents.find(content);
+		if (found != registeredContents.end()) {
+			return found->second.getSound(path);
+		}
+		return nullptr;
+	}
+
+	FTexture* CoreContent::getTexture(strv content, strv path)
+	{
+		auto found = registeredContents.find(content);
+		if (found != registeredContents.end()) {
+			return found->second.getTexture(path);
+		}
+		return nullptr;
+	}
+
 	void CoreContent::dispose()
 	{
+		for (BaseContent& content : registeredContents | std::views::values) {
+			content.dispose();
+		}
+		audio.dispose();
 		images.dispose();
+		strings.dispose();
 		fontBoldData = nullptr;
 		fontRegularData = nullptr;
 		fontSmallData = nullptr;
 	}
 
-	// TODO
 	void CoreContent::initialize()
 	{
 		initializeFonts();
 		audio.initialize();
 		images.initialize();
 		strings.initialize();
+		for (BaseContent& content : registeredContents | std::views::values) {
+			content.initialize();
+		}
 	}
 
 	void CoreContent::initializeFonts()
@@ -67,24 +110,34 @@ export namespace fbc {
 		fontSmallData = std::make_unique<FFont>(cfg.textFont.get(), 32, 0, 3);
 	}
 
-	// TODO
 	void CoreContent::postInitialize()
 	{
-		audio.postInitialize();
-		images.postInitialize();
-		strings.postInitialize();
+		for (BaseContent& content : registeredContents | std::views::values) {
+			content.postInitialize();
+		}
 	}
 
 	void CoreContent::reloadFonts()
 	{
-		fontBoldData->reloadFont();
-		fontRegularData->reloadFont();
-		fontSmallData->reloadFont();
+		fontBoldData->reload();
+		fontRegularData->reload();
+		fontSmallData->reload();
+	}
+
+	void CoreContent::reloadAudio()
+	{
+		audio.initialize();
+		for (BaseContent& content : registeredContents | std::views::values) {
+			content.reloadAudio();
+		}
 	}
 
 	void CoreContent::reloadImages()
 	{
 		images.initialize();
+		for (BaseContent& content : registeredContents | std::views::values) {
+			content.reloadImages();
+		}
 	}
 
 	template<c_ext<BaseContent> T> T CoreContent::registerContent(strv ID, strv contentFolder)

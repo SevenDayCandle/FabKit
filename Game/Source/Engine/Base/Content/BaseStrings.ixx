@@ -5,33 +5,31 @@ module;
 export module fbc.BaseStrings;
 
 import fbc.BaseContent;
+import fbc.ContentLoadables;
 import fbc.CoreConfig;
 import fbc.FUtil;
-import fbc.Language;
 import fbc.KeywordStrings;
+import fbc.Language;
 import fbc.ObjectStrings;
 
 export namespace fbc {
 	constexpr strv DEFAULT_KEYWORDS = "KeywordStrings";
 	constexpr strv DEFAULT_UI = "UIStrings";
-	constexpr strv LOCALIZATION_PATH = "Localization";
 
-	export class BaseStrings {
+	export class BaseStrings : public ContentLoadables {
 	public:
-		BaseStrings(BaseContent& content) : content(content) {}
+		BaseStrings(const BaseContent& content) : ContentLoadables(content) {}
 		virtual ~BaseStrings() {}
 
-		const BaseContent& content;
-
+		virtual void dispose() {};
 		virtual void initialize() {};
-		virtual void postInitialize() {}
 	protected:
 		inline path getPathForLanguage(const strv& suffix) const {
 			return getPathForLanguage(cfg.getLanguage(), suffix);
 		};
 		inline path getPathForLanguage(const Language& lang, const strv& suffix) const {
 			path p = content.contentFolder;
-			return (p / LOCALIZATION_PATH / lang.name / suffix).replace_extension(futil::JSON_EXT);
+			return (p / STRINGS_PATH / lang.name / suffix).replace_extension(futil::JSON_EXT);
 		};
 		void loadKeywordStrings(umap<str, KeywordStrings>& res, const strv& suffix = DEFAULT_KEYWORDS);
 		void loadObjectStrings(umap<str, ObjectStrings>& res, const strv& suffix);

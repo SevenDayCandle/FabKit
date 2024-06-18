@@ -7,19 +7,17 @@ import fbc.FUtil;
 import fbc.FMusic;
 import fbc.FSound;
 import fbc.FTexture;
-import fbc.IContentLoadables;
+import fbc.ContentLoadables;
 import fbc.ILoadable;
 import fbc.RHorizontal;
 import fbc.RVertical;
 import std;
 
 export namespace fbc {
-	export class StaticLoadables : public IContentLoadables {
+	export class StaticLoadables : public ContentLoadables {
 	public:
-		StaticLoadables(const BaseContent& content) : content(content) {}
+		StaticLoadables(const BaseContent& content) : ContentLoadables(content) {}
 		virtual ~StaticLoadables() {}
-
-		const BaseContent& content;
 
 		virtual void dispose() override;
 		virtual void initialize() override;

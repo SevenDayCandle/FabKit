@@ -2,7 +2,6 @@ export module fbc.FTexture;
 
 import fbc.FUtil;
 import fbc.IDrawable;
-import fbc.ILoadable;
 import sdl;
 import std;
 
@@ -11,7 +10,7 @@ export namespace fbc {
     public:
         FTexture(strv path) : path(path) {}
         FTexture(const FTexture&) = delete;
-        ~FTexture() override {
+        virtual ~FTexture() override {
             // Unload texture when destroyed
             if (texture && sdl::sdlEnabled()) {
                 sdl::textureDestroy(texture);

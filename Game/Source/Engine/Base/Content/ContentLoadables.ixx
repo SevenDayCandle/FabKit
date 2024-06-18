@@ -1,5 +1,6 @@
-export module fbc.IContentLoadables;
+export module fbc.ContentLoadables;
 
+import fbc.BaseContent;
 import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.ILoadable;
@@ -11,14 +12,16 @@ import std;
 
 export namespace fbc {
 	constexpr strv AUDIO_PATH = "Audio";
+	constexpr strv FONT_PATH = "Fonts";
 	constexpr strv IMAGE_PATH = "Images";
+	constexpr strv STRINGS_PATH = "Strings";
 
-	export class IContentLoadables {
+	export class ContentLoadables {
 	public:
-		IContentLoadables() {}
-		virtual ~IContentLoadables() {}
+		ContentLoadables(const BaseContent& content) : content(content) {}
+		virtual ~ContentLoadables() {}
 
-		inline virtual void postInitialize() {}
+		const BaseContent& content;
 
 		virtual void dispose() = 0;
 		virtual void initialize() = 0;
@@ -26,7 +29,7 @@ export namespace fbc {
 		template <c_ext<ILoadable> T> static strv getDirectoryPath();
 	};
 
-	template<c_ext<ILoadable> T> strv IContentLoadables::getDirectoryPath()
+	template<c_ext<ILoadable> T> strv ContentLoadables::getDirectoryPath()
 	{
 		if constexpr (std::is_base_of_v<FTexture, T>) {
 			return IMAGE_PATH;
@@ -34,6 +37,6 @@ export namespace fbc {
 		if constexpr (std::is_base_of_v<FSound, T> || std::is_base_of_v<FMusic, T>) {
 			return AUDIO_PATH;
 		}
-		return IMAGE_PATH;
+		return FONT_PATH;
 	}
 }
