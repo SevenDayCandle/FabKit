@@ -51,7 +51,7 @@ export namespace fbc {
 	void UIToggle::refreshDimensions()
 	{
 		UIInteractable::refreshDimensions();
-		updateCache();
+		refreshCache();
 	}
 
 	void UIToggle::renderImpl()

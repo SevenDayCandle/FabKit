@@ -165,6 +165,14 @@
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Base\Content\DynamicContent.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Base\Content\IContentLoadables.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Engine\Base\Content\StaticLoadables.ixx" />
     <ClCompile Include="Source\Engine\Base\Content\BaseStrings.ixx" />
     <ClCompile Include="Source\Engine\Base\UI\Component\List\UINavigation.ixx">
@@ -224,6 +232,10 @@
       </SubType>
     </ClCompile>
     <ClCompile Include="Source\Engine\Base\UI\Mixin\ITextInputter.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Base\UI\Tooltip\TitleTooltip.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -396,6 +408,10 @@
       </SubType>
     </ClCompile>
     <ClCompile Include="Source\Engine\Core\UI\SettingsDialogPage.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Entity\ObjectData.ixx">
       <SubType>
       </SubType>
     </ClCompile>

@@ -22,7 +22,7 @@ export namespace fbc {
 	public:
 		UIList(Hitbox* hb,
 			func<str(const T&)> labelFunc = futil::toString<T>,
-			FFont& itemFont = cct.fontRegular(),
+			FFont& itemFont = cct.fontSmall(),
 			IDrawable& background = cct.images.panelRound,
 			bool canAutosize = false) :
 			UIBase(hb), background(background), itemFont(itemFont), labelFunc(std::move(labelFunc)), canAutosize(canAutosize) {
@@ -61,7 +61,7 @@ export namespace fbc {
 		int topVisibleRowIndex;
 		sdl::Color backgroundColor = sdl::COLOR_WHITE;
 		IDrawable& background;
-		FFont& itemFont = cct.fontRegular();
+		FFont& itemFont = cct.fontSmall();
 		func<str(const T&)> labelFunc;
 		vec<uptr<UIEntry<T>>> rows;
 

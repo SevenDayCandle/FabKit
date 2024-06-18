@@ -8,6 +8,9 @@ import std;
 export namespace fbc {
 	export struct ILoadable {
 	public:
+		ILoadable() {}
+		ILoadable(strv path) {} // For DynamicLoadables
+
 		virtual ~ILoadable() {}
 
 		virtual void dispose() = 0;

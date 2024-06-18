@@ -20,7 +20,7 @@ export namespace fbc {
 
 	export class Tooltip : public TextInfo, public IOverlay {
 	public:
-		Tooltip(strv text, FFont& font = cct.fontRegular(), float boxSize = DEFAULT_SIZE, IDrawable& background = cct.images.darkPanelRound) : TextInfo(font, text), bounds(0, 0, boxSize, 0), background(background) {
+		Tooltip(strv text, FFont& font = cct.fontSmall(), float boxSize = DEFAULT_SIZE, IDrawable& background = cct.images.darkPanelRound) : TextInfo(font, text), bounds(0, 0, boxSize, 0), background(background) {
 			updateBounds();
 		}
 		virtual ~Tooltip() {}

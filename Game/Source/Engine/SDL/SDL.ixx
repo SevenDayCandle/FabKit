@@ -85,6 +85,9 @@ namespace sdl {
 	/* Directory stuff */
 	export char* dirBase() noexcept { return SDL_GetBasePath(); }
 	export char* dirPref(const char* org, const char* app) { return SDL_GetPrefPath(org, app); }
+	export void dirSelect() {
+		//return SDL_ShowOpenFolderDialog();
+	}
 
 	/* Font management functions */
 	export int fontAscent(TTF_Font* font) { return TTF_FontAscent(font); }

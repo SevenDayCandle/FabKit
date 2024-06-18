@@ -38,6 +38,7 @@ bool initialize() {
 	cfg.postInitialize();
 	cfg.setupWindow();
 	cct.initialize();
+	cct.postInitialize();
 
 	screenManager::subscribeToConfig();
 	screenManager::openScreen(std::make_unique<fbc::TitleScreen>());

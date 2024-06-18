@@ -21,7 +21,7 @@ export namespace fbc {
 	void UILabel::refreshDimensions()
 	{
 		UITipHoverable::refreshDimensions();
-		updateCache();
+		refreshCache();
 	}
 
 	void UILabel::renderImpl() {

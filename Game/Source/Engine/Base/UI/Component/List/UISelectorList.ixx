@@ -24,7 +24,7 @@ export namespace fbc {
 	public:
 		UISelectorList(Hitbox* hb,
 		       func<str(const T&)> labelFunc = futil::toString<T>,
-		       FFont& itemFont = cct.fontRegular(),
+		       FFont& itemFont = cct.fontSmall(),
 		       IDrawable& background = cct.images.panelRound,
 		       bool canAutosize = false):
 			UIList<T>(hb, std::move(labelFunc), itemFont, background, canAutosize),
@@ -72,8 +72,8 @@ export namespace fbc {
 		void updateSingle(T item);
 		void updateSingle(T* item);
 
-		static uptr<UISelectorList> multiList(Hitbox* hb, func<str(const T&)> labelFunc = futil::toString<T>, FFont& itemFont = cct.fontRegular(), IDrawable& background = cct.images.darkPanelRound, bool canAutosize = false);
-		static uptr<UISelectorList> singleList(Hitbox* hb, func<str(const T&)> labelFunc = futil::toString<T>, FFont& itemFont = cct.fontRegular(), IDrawable& background = cct.images.darkPanelRound, bool canAutosize = false);
+		static uptr<UISelectorList> multiList(Hitbox* hb, func<str(const T&)> labelFunc = futil::toString<T>, FFont& itemFont = cct.fontSmall(), IDrawable& background = cct.images.darkPanelRound, bool canAutosize = false);
+		static uptr<UISelectorList> singleList(Hitbox* hb, func<str(const T&)> labelFunc = futil::toString<T>, FFont& itemFont = cct.fontSmall(), IDrawable& background = cct.images.darkPanelRound, bool canAutosize = false);
 	protected:
 		set<int> currentIndices;
 		vec<UIEntry<T>*> rowsForRender;

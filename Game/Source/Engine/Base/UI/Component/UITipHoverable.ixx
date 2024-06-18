@@ -13,6 +13,7 @@ export namespace fbc {
 		UITipHoverable(Hitbox* hb) : UIBase(hb), tooltip(nullptr) {}
 		~UITipHoverable() override {}
 
+		virtual void refreshDimensions() override;
 		virtual void updateImpl() override;
 
 		inline UITipHoverable& setOwnedTip(strv text) { return setOwnedTip(new Tooltip(text)); }
@@ -22,6 +23,14 @@ export namespace fbc {
 	private:
 		uptr<Tooltip> ownedTip;
 	};
+
+	void UITipHoverable::refreshDimensions()
+	{
+		UIBase::refreshDimensions();
+		if (tooltip) {
+			tooltip->refreshCache();
+		}
+	}
 
 	void UITipHoverable::updateImpl()
 	{

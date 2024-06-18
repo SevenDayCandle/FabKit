@@ -66,7 +66,7 @@ export namespace fbc {
 	void UITextInput::refreshDimensions()
 	{
 		UITitledInteractable::refreshDimensions();
-		updateCache();
+		refreshCache();
 	}
 
 	void UITextInput::renderImpl()
@@ -128,7 +128,7 @@ export namespace fbc {
 			releaseBuffer();
 			return;
 		case sdl::KEY_ESC:
-			this->updateCache();
+			this->refreshCache();
 			releaseBuffer();
 			return;
 		default:
@@ -137,7 +137,7 @@ export namespace fbc {
 	}
 
 	void UITextInput::resetBuffer() {
-		this->updateCache();
+		this->refreshCache();
 		buffer = getText();
 	}
 }

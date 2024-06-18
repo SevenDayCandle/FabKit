@@ -14,6 +14,7 @@ export namespace fbc {
 	const str BASE_FOLDER = "/Resources";
 
 	export class CoreContent : public fbc::BaseContent {
+		static map<strv, BaseContent&> registeredContents;
 	public:
 		CoreContent(strv ID) : fbc::BaseContent(ID, sdl::dirBase() + BASE_FOLDER) {}
 
@@ -23,6 +24,7 @@ export namespace fbc {
 
 		inline FFont& fontBold() { return *fontBoldData; }
 		inline FFont& fontRegular() { return *fontRegularData; }
+		inline FFont& fontSmall() { return *fontSmallData; }
 
 		void dispose() override;
 		void initialize() override;
@@ -30,6 +32,8 @@ export namespace fbc {
 		void postInitialize() override;
 		void reloadFonts();
 		void reloadImages() override;
+
+		template <c_ext<BaseContent> T> static T registerContent(strv ID, strv contentFolder);
 	private:
 		uptr<FFont> fontBoldData;
 		uptr<FFont> fontRegularData;
@@ -81,5 +85,12 @@ export namespace fbc {
 	void CoreContent::reloadImages()
 	{
 		images.initialize();
+	}
+
+	template<c_ext<BaseContent> T> T CoreContent::registerContent(strv ID, strv contentFolder)
+	{
+		T content = T(ID, contentFolder);
+		registeredContents[content.ID] = content;
+		return content;
 	}
 }

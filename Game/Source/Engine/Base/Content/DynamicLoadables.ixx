@@ -1,4 +1,4 @@
-export module fbc.DynamicImages;
+export module fbc.DynamicLoadables;
 
 import fbc.BaseContent;
 import fbc.RBordered;
@@ -6,59 +6,56 @@ import fbc.Cache;
 import fbc.FUtil;
 import fbc.FTexture;
 import fbc.ILoadable;
+import fbc.IContentLoadables;
 import fbc.RHorizontal;
 import fbc.RVertical;
 import std;
 
 export namespace fbc {
-	constexpr strv IMAGE_PATH = "Images";
-
-	export class DynamicImages : public ILoadable {
+	export template <c_ext<ILoadable> T> class DynamicLoadables : public IContentLoadables {
 	public:
-		DynamicImages(const BaseContent& content) : content(content) {}
-		virtual ~DynamicImages() {}
+		DynamicLoadables(const BaseContent& content) : content(content) {}
+		virtual ~DynamicLoadables() {}
 
 		const BaseContent& content;
 
-		inline void dispose() { textures.clear(); }
-		inline virtual void initialize() {};
-		inline virtual void postInitialize() {}
+		inline void dispose() override { items.clear(); }
 
-		FTexture* get(const strv& key);
+		T* get(const strv& key);
 
-		virtual void reload() override;
+		virtual void initialize() override;
 	private:
-		FTexture* loadTexture(const strv& key);
-		umap<strv, uptr<FTexture>> textures;
+		T* loadItem(const strv& key);
+		umap<strv, uptr<T>> items;
 	};
 
 	// Attempt to fetch a cached texture. If none are found, generate one and put it into the map
-	FTexture* DynamicImages::get(const strv& key) {
-		auto found = textures.find(key);
-		if (found != textures.end()) {
+	template <c_ext<ILoadable> T> T* DynamicLoadables<T>::get(const strv& key) {
+		auto found = items.find(key);
+		if (found != items.end()) {
 			return found->second.get();
 		}
-		return loadTexture(key);
+		return loadItem(key);
 	}
 
-	// Reload all loaded textures
-	void DynamicImages::reload()
+	// Reload all loaded items
+	template <c_ext<ILoadable> T> void DynamicLoadables<T>::initialize()
 	{
-		for (auto& pair : textures) {
+		for (auto& pair : items) {
 			pair.second->reload();
 		}
 	}
 
 	// Attempt to load a texture from disk, saving it into the map
-	FTexture* DynamicImages::loadTexture(const strv& key)
+	template <c_ext<ILoadable> T> T* DynamicLoadables<T>::loadItem(const strv& key)
 	{
 		path pathImpl = content.contentFolder;
-		pathImpl /= IMAGE_PATH;
+		pathImpl /= IContentLoadables::getDirectoryPath<T>();
 		pathImpl /= key;
 		str pathStr = pathImpl.string();
-		auto [it, inserted] = textures.emplace(std::piecewise_construct,
+		auto [it, inserted] = items.emplace(std::piecewise_construct,
 			std::forward_as_tuple(key),
-			std::forward_as_tuple(std::make_unique<FTexture>(pathStr)));
+			std::forward_as_tuple(std::make_unique<T>(pathStr)));
 		return it->second.get();
 	}
 }

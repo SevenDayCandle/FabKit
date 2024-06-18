@@ -61,7 +61,7 @@ export namespace fbc {
 	template<typename T> void UIEntry<T>::refreshDimensions()
 	{
 		UIInteractable::refreshDimensions();
-		updateCache();
+		refreshCache();
 	}
 
 	template<typename T> void UIEntry<T>::renderImpl() {

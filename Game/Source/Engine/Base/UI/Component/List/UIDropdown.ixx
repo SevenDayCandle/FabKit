@@ -145,7 +145,7 @@ export namespace fbc {
 
 	template<typename T> void UIDropdown<T>::refreshDimensions() {
 		UITitledInteractable::refreshDimensions();
-		updateCache();
+		refreshCache();
 		this->menu->refreshDimensions();
 	}
 

@@ -96,7 +96,7 @@ export namespace fbc {
 	void UINumberInput::refreshDimensions()
 	{
 		UITitledInteractable::refreshDimensions();
-		updateCache();
+		refreshCache();
 	}
 
 	void UINumberInput::renderImpl()
@@ -194,7 +194,7 @@ export namespace fbc {
 			releaseBuffer();
 			return;
 		case sdl::KEY_ESC:
-			this->updateCache();
+			this->refreshCache();
 			releaseBuffer();
 			return;
 		case sdl::KEY_DOWN:
@@ -221,7 +221,7 @@ export namespace fbc {
 
 	void UINumberInput::resetBuffer()
 	{
-		this->updateCache();
+		this->refreshCache();
 		buffer = getText();
 	}
 

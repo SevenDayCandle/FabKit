@@ -9,7 +9,7 @@ export namespace fbc {
 	public:
 		TextInfo(FFont& font, strv text = "", sdl::Color color = sdl::COLOR_WHITE, sdl::Color colorOutline = sdl::COLOR_BLACK) : font(font), text(text), color(color), colorOutline(colorOutline) {
 			// TODO remove constructor method
-			updateCache();
+			refreshCache();
 		}
 		virtual ~TextInfo() {}
 
@@ -18,7 +18,7 @@ export namespace fbc {
 		inline float getTextXPos() const { return cache.x; }
 		inline float getTextYPos() const { return cache.y; }
 		inline strv getText() const { return text; }
-		inline void updateCache() { updateCache(this->text, this->color, this->colorOutline); }
+		inline void refreshCache() { updateCache(this->text, this->color, this->colorOutline); }
 
 		void drawText() const;
 		void drawText(float offX, float offY) const;
@@ -66,7 +66,7 @@ export namespace fbc {
 	{
 		this->text = text;
 		this->color = color;
-		updateCache();
+		refreshCache();
 		return *this;
 	}
 
@@ -76,7 +76,7 @@ export namespace fbc {
 		this->text = text;
 		this->color = color;
 		this->colorOutline = colorOutline;
-		updateCache();
+		refreshCache();
 		return *this;
 	}
 
@@ -86,28 +86,28 @@ export namespace fbc {
 		this->color = color;
 		this->colorOutline = colorOutline;
 		this->font = font;
-		updateCache();
+		refreshCache();
 		return *this;
 	}
 
 	TextInfo& TextInfo::setColor(sdl::Color color)
 	{
 		this->color = color;
-		updateCache();
+		refreshCache();
 		return *this;
 	}
 
 	TextInfo& TextInfo::setColorOutline(sdl::Color colorOutline)
 	{
 		this->colorOutline = colorOutline;
-		updateCache();
+		refreshCache();
 		return *this;
 	}
 
 	TextInfo& TextInfo::setFont(const FFont& font)
 	{
 		this->font = font;
-		updateCache();
+		refreshCache();
 		return *this;
 	}
 
@@ -121,7 +121,7 @@ export namespace fbc {
 	TextInfo& TextInfo::setText(strv text)
 	{
 		this->text = text;
-		updateCache();
+		refreshCache();
 		return *this;
 	}
 
