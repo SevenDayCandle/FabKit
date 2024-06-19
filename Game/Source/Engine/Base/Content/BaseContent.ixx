@@ -4,10 +4,10 @@ import fbc.FMusic;
 import fbc.FSound;
 import fbc.FTexture;
 import fbc.FUtil;
-import std;
+import fbc.KeywordStrings;
+import fbc.ObjectStrings;
 
 export namespace fbc {
-
 	export class BaseContent {
 	public:
 		BaseContent(strv ID, strv contentFolder): ID(ID), contentFolder(contentFolder) {}
@@ -19,6 +19,8 @@ export namespace fbc {
 		inline virtual FMusic* getMusic(strv path) { return nullptr; }
 		inline virtual FSound* getSound(strv path) { return nullptr; }
 		inline virtual FTexture* getTexture(strv path) { return nullptr; }
+		inline virtual KeywordStrings* getKeywordStrings(strv path) { return nullptr; }
+		inline virtual ObjectStrings* getObjectStrings(strv type, strv path) { return nullptr; }
 
 		virtual void reloadAudio() {}
 		virtual void reloadImages() {}
@@ -27,6 +29,4 @@ export namespace fbc {
 		virtual void initialize() = 0;
 		virtual void postInitialize() = 0;
 	};
-
-
 }

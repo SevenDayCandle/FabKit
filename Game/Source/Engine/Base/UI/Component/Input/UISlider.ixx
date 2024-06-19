@@ -1,11 +1,11 @@
 export module fbc.UISlider;
 
 import fbc.CoreContent;
+import fbc.Hitbox;
 import fbc.IDrawable;
+import fbc.RelativeHitbox;
 import fbc.UIHorizontalScrollbar;
 import fbc.UINumberInput;
-import fbc.Hitbox;
-import fbc.RelativeHitbox;
 import sdl;
 import std;
 

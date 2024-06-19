@@ -98,6 +98,8 @@ export namespace fbc {
 		audio.initialize();
 		images.initialize();
 		strings.initialize();
+		// TODO read content from folders
+
 		for (BaseContent& content : registeredContents | std::views::values) {
 			content.initialize();
 		}

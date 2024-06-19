@@ -1,13 +1,13 @@
 export module fbc.UIInteractable;
 
-import fbc.CoreContent;
 import fbc.CoreConfig;
+import fbc.CoreContent;
 import fbc.FSound;
 import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.IDrawable;
-import fbc.UIImage;
 import fbc.ScreenManager;
+import fbc.UIImage;
 import sdl;
 import std;
 

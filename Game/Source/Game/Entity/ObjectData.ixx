@@ -2,8 +2,6 @@ export module fbc.ObjectData;
 
 import fbc.BaseContent;
 import fbc.FUtil;
-import fbc.Hitbox;
-import sdl;
 import std;
 
 export namespace fbc {

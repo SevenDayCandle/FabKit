@@ -173,6 +173,10 @@
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Base\Content\DynamicStrings.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Engine\Base\Content\StaticLoadables.ixx" />
     <ClCompile Include="Source\Engine\Base\Content\BaseStrings.ixx" />
     <ClCompile Include="Source\Engine\Base\UI\Component\List\UINavigation.ixx">

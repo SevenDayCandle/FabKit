@@ -1,8 +1,8 @@
 export module fbc.UIButton;
 
 import fbc.FUtil;
-import fbc.IDrawable;
 import fbc.Hitbox;
+import fbc.IDrawable;
 import fbc.ScreenManager;
 import fbc.UIInteractable;
 import sdl;

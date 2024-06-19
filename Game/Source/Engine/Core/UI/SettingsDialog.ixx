@@ -13,7 +13,6 @@ import fbc.UINavigation;
 import fbc.UIButton;
 import fbc.UITextButton;
 import fbc.WindowMode;
-import sdl;
 import std;
 
 export namespace fbc {
@@ -21,7 +20,7 @@ export namespace fbc {
 	public:
 		SettingsDialog(): UIDialog(new ScreenSizeHitbox(0.25, 0.25, 0.5, 0.5), cct.images.darkPanelRound) {
 			graphics.addDropdown<pair<int,int>, ilist<pair<int,int>>>(cfg.graphicsResolution, cct.strings.options_graphics_resolution(), RESOLUTIONS, [](const pair<int,int>& item) { return futil::dimensionString(item); });
-			graphics.addDropdown<WindowMode, ilist<WindowMode>>(cfg.graphicsWindowMode, cct.strings.options_graphics_window_mode(), WINDOWMODE_ALL, [](const WindowMode& item) { return windowScreenName(item); });
+			graphics.addDropdown<WindowMode, ilist<WindowMode>>(cfg.graphicsWindowMode, cct.strings.options_graphics_window_mode(), WINDOWMODE_ALL, [](const WindowMode& item) { return str(windowScreenName(item)); });
 			graphics.addSlider(cfg.graphicsFPS, cct.strings.options_graphics_fps())
 			.setOwnedTip(cct.strings.options_graphics_fps());
 			graphics.addToggle(cfg.graphicsVSync, cct.strings.options_graphics_vsync());
@@ -66,7 +65,7 @@ export namespace fbc {
 
 		inline static void openNew() { screenManager::openOverlay(std::make_unique<SettingsDialog>()); } // Displays a new Settings Dialog
 
-		static str windowScreenName(WindowMode mode);
+		static strv windowScreenName(WindowMode mode);
 	protected:
 		inline SettingsDialogPage page(strv name) { return SettingsDialogPage(new RelativeHitbox(*hb, hb->w * 0.1f, hb->h * 0.1f, hb->w * 0.8f, hb->h * 0.7f), name); }
 
@@ -97,7 +96,7 @@ export namespace fbc {
 
 	/* Statics */
 
-	str SettingsDialog::windowScreenName(WindowMode mode)
+	strv SettingsDialog::windowScreenName(WindowMode mode)
 	{
 		switch (mode) {
 		case BORDERLESS_FULLSCREEN:

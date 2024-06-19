@@ -55,7 +55,7 @@ export namespace fbc {
 		ConfigItem<str> textFont = ConfigItem<str>(*this, "TextFont", str(FONT_REGULAR));
 		ConfigItem<str> textFontBold = ConfigItem<str>(*this, "TextFont", str(FONT_BOLD));
 		ConfigItem<str> textLanguage = ConfigItem<str>(*this, "TextLanguage", str(lang::ENG_DEFAULT));
-		ConfigItem<WindowMode> graphicsWindowMode = ConfigItem<WindowMode>(*this, "GraphicsFPS", WindowMode::WINDOWED);
+		ConfigItem<WindowMode> graphicsWindowMode = ConfigItem<WindowMode>(*this, "GraphicsWindowMode", WindowMode::WINDOWED);
 		ConfigNumeric gameActionSpeed = ConfigNumeric(*this, "GameActionSpeed", 3, 1, 5);
 		ConfigNumeric graphicsFPS = ConfigNumeric(*this, "GraphicsFPS", 144, 30, 240);
 		ConfigNumeric soundVolumeEffects = ConfigNumeric(*this, "SoundVolumeEffects", 100, 0, 100);

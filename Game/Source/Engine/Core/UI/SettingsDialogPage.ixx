@@ -13,7 +13,6 @@ import fbc.UINumberInput;
 import fbc.UITextInput;
 import fbc.UISlider;
 import fbc.UIToggle;
-import sdl;
 import std;
 
 export namespace fbc {

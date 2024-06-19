@@ -1,14 +1,14 @@
 export module fbc.StaticLoadables;
 
 import fbc.BaseContent;
-import fbc.RBordered;
 import fbc.Cache;
-import fbc.FUtil;
+import fbc.ContentLoadables;
 import fbc.FMusic;
 import fbc.FSound;
 import fbc.FTexture;
-import fbc.ContentLoadables;
+import fbc.FUtil;
 import fbc.ILoadable;
+import fbc.RBordered;
 import fbc.RHorizontal;
 import fbc.RVertical;
 import std;

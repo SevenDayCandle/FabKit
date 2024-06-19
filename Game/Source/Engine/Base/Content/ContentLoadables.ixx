@@ -2,12 +2,10 @@ export module fbc.ContentLoadables;
 
 import fbc.BaseContent;
 import fbc.FUtil;
-import fbc.Hitbox;
 import fbc.ILoadable;
 import fbc.FTexture;
 import fbc.FMusic;
 import fbc.FSound;
-import sdl;
 import std;
 
 export namespace fbc {
@@ -29,14 +27,9 @@ export namespace fbc {
 		template <c_ext<ILoadable> T> static strv getDirectoryPath();
 	};
 
-	template<c_ext<ILoadable> T> strv ContentLoadables::getDirectoryPath()
-	{
-		if constexpr (std::is_base_of_v<FTexture, T>) {
-			return IMAGE_PATH;
-		}
-		if constexpr (std::is_base_of_v<FSound, T> || std::is_base_of_v<FMusic, T>) {
-			return AUDIO_PATH;
-		}
+	template <c_ext<ILoadable> T> strv ContentLoadables::getDirectoryPath() {
+		if constexpr (std::is_base_of_v<FTexture, T>) { return IMAGE_PATH; }
+		if constexpr (std::is_base_of_v<FSound, T> || std::is_base_of_v<FMusic, T>) { return AUDIO_PATH; }
 		return FONT_PATH;
 	}
 }

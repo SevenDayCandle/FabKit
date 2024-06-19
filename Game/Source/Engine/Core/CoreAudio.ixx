@@ -4,7 +4,6 @@ import fbc.BaseContent;
 import fbc.FUtil;
 import fbc.StaticLoadables;
 import fbc.FSound;
-import sdl;
 import std;
 
 export namespace fbc {

@@ -3,14 +3,14 @@ export module fbc.UINumberInput;
 import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.FFont;
+import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.IDrawable;
+import fbc.ITextInputter;
+import fbc.TextInfo;
 import fbc.UIButton;
 import fbc.UIInteractable;
-import fbc.TextInfo;
-import fbc.FUtil;
 import fbc.UITitledInteractable;
-import fbc.ITextInputter;
 import sdl;
 import std;
 

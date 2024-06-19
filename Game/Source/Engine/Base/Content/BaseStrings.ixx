@@ -16,10 +16,15 @@ export namespace fbc {
 	constexpr strv DEFAULT_KEYWORDS = "KeywordStrings";
 	constexpr strv DEFAULT_UI = "UIStrings";
 
+	template <typename T> using strumap = umap<str, T, str_hash, equal_to<>>;
+
 	export class BaseStrings : public ContentLoadables {
 	public:
 		BaseStrings(const BaseContent& content) : ContentLoadables(content) {}
 		virtual ~BaseStrings() {}
+
+		inline virtual KeywordStrings* getKeywordStrings(strv path) { return nullptr; }
+		inline virtual ObjectStrings* getObjectStrings(strv type, strv path) { return nullptr; }
 
 		virtual void dispose() {};
 		virtual void initialize() {};
@@ -31,22 +36,22 @@ export namespace fbc {
 			path p = content.contentFolder;
 			return (p / STRINGS_PATH / lang.name / suffix).replace_extension(futil::JSON_EXT);
 		};
-		void loadKeywordStrings(umap<str, KeywordStrings>& res, const strv& suffix = DEFAULT_KEYWORDS);
-		void loadObjectStrings(umap<str, ObjectStrings>& res, const strv& suffix);
-		void loadUIStrings(umap<str, str>& res, const strv& suffix = DEFAULT_UI);
+		void loadKeywordStrings(strumap<KeywordStrings>& res, const strv& suffix = DEFAULT_KEYWORDS);
+		void loadObjectStrings(strumap<ObjectStrings>& res, const strv& suffix);
+		void loadUIStrings(strumap<str>& res, const strv& suffix = DEFAULT_UI);
 	};
 
-	void BaseStrings::loadKeywordStrings(umap<str, KeywordStrings>& res, const strv& suffix)
+	void BaseStrings::loadKeywordStrings(strumap<KeywordStrings>& res, const strv& suffix)
 	{
 		glz::read_file_json(res, getPathForLanguage(suffix).string(), str{});
 	}
 
-	void BaseStrings::loadObjectStrings(umap<str, ObjectStrings>& res, const strv& suffix)
+	void BaseStrings::loadObjectStrings(strumap<ObjectStrings>& res, const strv& suffix)
 	{
 		glz::read_file_json(res, getPathForLanguage(suffix).string(), str{});
 	}
 
-	void BaseStrings::loadUIStrings(umap<str, str>& res, const strv& suffix) {
+	void BaseStrings::loadUIStrings(strumap<str>& res, const strv& suffix) {
 		glz::read_file_json(res, getPathForLanguage(suffix).string(), str{});
 	}
 }

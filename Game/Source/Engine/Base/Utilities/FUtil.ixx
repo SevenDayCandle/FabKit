@@ -7,31 +7,36 @@ import std;
 
 export namespace fbc {
 	// std shorthands. Sorry peeps
+	export template <typename R> using func = std::function<R>;
+	export template <typename T, class Comp = std::less<T>, class Alloc = std::allocator<T>> using set = std::set<T, Comp, Alloc>;
+	export template <typename T, class Hash = std::hash<T>, class Eq = std::equal_to<T>, class Alloc = std::allocator<T>> using uset = std::unordered_set<T, Hash, Eq, Alloc>;
+	export template <typename T, size_t U> using arr = std::array<T, U>;
+	export template <typename T, typename U, class Comp = std::less<T>, class Alloc = std::allocator<std::pair<const T, U>>> using map = std::map<T, U, Comp, Alloc>;
+	export template <typename T, typename U, class Hash = std::hash<T>, class Eq = std::equal_to<T>, class Alloc = std::allocator<std::pair<const T, U>>> using umap = std::unordered_map<T, U, Hash, Eq, Alloc>;
+	export template <typename T, typename U> using pair = std::pair<T, U>;
 	export template <typename T> using dec_t = std::decay_t<T>;
 	export template <typename T> using deque = std::deque<T>;
-	export template <typename R> using func = std::function<R>;
+	export template <typename T> using hash = std::hash<T>;
 	export template <typename T> using ilist = std::initializer_list<T>;
 	export template <typename T> using list = std::list<T>;
 	export template <typename T> using opt = std::optional<T>;
 	export template <typename T> using ref = std::reference_wrapper<T>;
-	export template <typename T> using set = std::set<T>;
 	export template <typename T> using span = std::span<T>;
 	export template <typename T> using sptr = std::shared_ptr<T>;
 	export template <typename T> using uptr = std::unique_ptr<T>;
-	export template <typename T> using uset = std::unordered_set<T>;
 	export template <typename T> using vec = std::vector<T>;
-	export template <typename T, size_t U> using arr = std::array<T, U>;
-	export template <typename T, typename U> using map = std::map<T, U>;
-	export template <typename T, typename U> using pair = std::pair<T, U>;
-	export template <typename T, typename U> using umap = std::unordered_map<T, U>;
-	export using any = std::any;
-	export using exception = std::exception;
 	export using int32 = std::int32_t;
+	export using path = std::filesystem::path;
 	export using str = std::string;
 	export using strv = std::string_view;
 	export using uint32 = std::uint32_t;
-	export using path = std::filesystem::path;
 
+	export using std::any;
+	export using std::equal_to;
+	export using std::exception;
+
+	export using std::make_shared;
+	export using std::make_unique;
 	export using std::move;
 
 	// Const stuff, adapted from https://github.com/stephenberry/glaze
@@ -74,6 +79,17 @@ export namespace fbc {
 	};
 	export template<typename T, typename... Args> concept c_varg = (std::same_as<T, Args> && ...);;
 	export template<typename T> concept c_vec = is_specialization_v<T, std::vector>;
+
+	// Hasing structure for string_view lookup on str containers
+	export struct str_hash
+	{
+		using hash_type = std::hash<std::string_view>;
+		using is_transparent = void;
+
+		std::size_t operator()(const char* str) const { return hash_type{}(str); }
+		std::size_t operator()(std::string_view str) const { return hash_type{}(str); }
+		std::size_t operator()(std::string const& str) const { return hash_type{}(str); }
+	};
 }
 
 // Utility functions
@@ -82,7 +98,9 @@ export namespace fbc::futil {
 	export constexpr strv JSON_EXT = ".json";
 	export constexpr strv MODS = "mods";
 	export constexpr strv VAL_FALSE = "false";
+	export constexpr strv VAL_FALSE_NUM = "0";
 	export constexpr strv VAL_TRUE = "true";
+	export constexpr strv VAL_TRUE_NUM = "1";
 
 	export bool isNumeric(strv text);
 	export bool isPrefix(strv source, strv prefix);
@@ -96,7 +114,7 @@ export namespace fbc::futil {
 	export strv getView(strv input, size_t& pos);
 	export template <c_itr<strv> SCo> str joinStr(strv delimiter, SCo items);
 	export template <typename T, c_itr<T> TCo> bool has(const TCo& container, const T& value);
-	export template <typename T, c_itr<T> TCo> opt<T> find(const TCo& container, const T& value);
+	export template <typename T, c_itr<T> TCo> T* find(const TCo& container, const T& value);
 	export template <typename T, typename Pred> bool all(const T& container, Pred predicate);
 	export template <typename T, typename Pred> bool any(const T& container, Pred predicate);
 	export template <typename T, typename U, c_itr<T> TCo, c_invc<T, U> Func> vec<U> transform(const TCo& container, Func mapFunc);
@@ -176,17 +194,17 @@ export namespace fbc::futil {
 	}
 
 	// Find the first item in the container that matches the given value
-	export template<typename T, c_itr<T> TCo> opt<T> find(const TCo& container, const T& value) {
+	export template<typename T, c_itr<T> TCo> T* find(const TCo& container, const T& value) {
 		if constexpr (c_set<T, TCo>) {
 			auto it = container.find(value);
 			if (it != container.end()) {
-				return *it;
+				return &(*it);
 			}
 		}
 		else {
 			auto it = std::find(container.begin(), container.end(), value);
 			if (it != container.end()) {
-				return *it;
+				return &(*it);
 			}
 		}
 		return std::nullopt;
@@ -194,7 +212,7 @@ export namespace fbc::futil {
 
 	// Check whether the given container contains the given value
 	export template<typename T, c_itr<T> TCo> bool has(const TCo& container, const T& value) {
-		return find(container, value) != std::nullopt;
+		return find(container, value) != nullptr;
 	}
 
 	// Check whether the text can be converted into a number
@@ -382,7 +400,7 @@ export namespace fbc::futil {
 	}
 
 	// Attempt to parse a JSON-like string into an object
-	// TODO handle iterables and maps
+	// TODO handle maps
 	export template <typename T> T fromString(strv input) {
 		size_t pos = 0;
 		return fromString<T>(input, pos);
@@ -451,10 +469,10 @@ export namespace fbc::futil {
 
 			if constexpr (std::is_same_v<T, bool>) {
 				str toLower = futil::toLowerCase(substr);
-				if (toLower == VAL_TRUE || toLower == "1") {
+				if (toLower == VAL_TRUE || toLower == VAL_TRUE_NUM) {
 					return true;
 				}
-				else if (toLower == VAL_FALSE || toLower == "0") {
+				else if (toLower == VAL_FALSE || toLower == VAL_FALSE_NUM) {
 					return false;
 				}
 				else {

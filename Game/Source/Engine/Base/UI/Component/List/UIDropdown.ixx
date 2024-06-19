@@ -247,7 +247,7 @@ export namespace fbc {
 		else {
 			str displayText = (futil::joinStrMap(", ", items, [](const UIEntry<T>* entry) {return entry->getText(); }));
 			if (this->font.measureW(displayText) > hb->w) {
-				return cct.strings.ui_items(this->selectedSize());
+				return str(cct.strings.ui_items(this->selectedSize()));
 			}
 			else {
 				return displayText;

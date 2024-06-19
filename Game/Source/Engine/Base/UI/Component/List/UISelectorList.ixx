@@ -169,8 +169,7 @@ export namespace fbc {
 	template <typename T> template <c_itr<T> Iterable> void UISelectorList<T>::updateSelection(Iterable& items) {
 		currentIndices.clear();
 		for (const uptr<UIEntry<T>>& row : this->rows) {
-			opt<T> res = futil::find(items, row->item);
-			if (res != std::nullopt) { currentIndices.insert(row->index); }
+			if (futil::has(items, row->item)) { currentIndices.insert(row->index); }
 		}
 		for (const uptr<UIEntry<T>>& row : this->rows) { row->updateSelectStatus(currentIndices.contains(row->index)); }
 		updateForSelection();
@@ -180,8 +179,7 @@ export namespace fbc {
 	template <typename T> template <c_itr<T*> Iterable> void UISelectorList<T>::updateSelection(Iterable& items) {
 		currentIndices.clear();
 		for (const uptr<UIEntry<T>>& row : this->rows) {
-			opt<T> res = futil::find(items, &row->item);
-			if (res != std::nullopt) { currentIndices.insert(row->index); }
+			if (futil::has(items, row->item)) { currentIndices.insert(row->index); }
 		}
 		for (const uptr<UIEntry<T>>& row : this->rows) { row->updateSelectStatus(currentIndices.contains(row->index)); }
 		updateForSelection();

@@ -1,14 +1,11 @@
 export module fbc.DynamicLoadables;
 
 import fbc.BaseContent;
-import fbc.RBordered;
 import fbc.Cache;
-import fbc.FUtil;
-import fbc.FTexture;
-import fbc.ILoadable;
 import fbc.ContentLoadables;
-import fbc.RHorizontal;
-import fbc.RVertical;
+import fbc.FTexture;
+import fbc.FUtil;
+import fbc.ILoadable;
 import std;
 
 export namespace fbc {
