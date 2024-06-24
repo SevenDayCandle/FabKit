@@ -5,6 +5,7 @@ module;
 export module fbc.Config;
 
 import fbc.FUtil;
+import fbc.ConfigEntry;
 import sdl;
 import std;
 
@@ -18,21 +19,19 @@ export namespace fbc {
 
         const str ID;
 
-        inline void addOnReload(const func<void()>& callback) {
-            items.push_back(callback);
-        }
         inline virtual void postInitialize() {}
 
-        void commit();
         strv getValue(const str& key);
+        void commit();
         void load();
         void refreshItems();
+        void registerEntry(ConfigEntry* item);
         void set(const str& key, const str& value);
     protected:
         str getConfigPath() const;
     private:
-        map<str, str> values_map = map<str,str>();
-        vec<func<void()>> items;
+        map<str, str> values_map;
+        map<strv, ConfigEntry*> items;
     };
 
 
@@ -65,8 +64,17 @@ export namespace fbc {
 
     // Update all listeners with the read config values
     void Config::refreshItems() {
-        for (func<void()>& callback : items) {
-            callback();
+        for (ConfigEntry* item : items | std::views::values) {
+            item->reload();
+        }
+    }
+
+    // Add a listener to this config. Disallows items with duplicate IDs
+    void Config::registerEntry(ConfigEntry* item)
+    {
+        auto [it, inserted] = items.try_emplace(item->ID, item);
+        if (!inserted) {
+            throw std::logic_error("Duplicate Config entry in " + this->ID + " with ID: " + item->ID);
         }
     }
 

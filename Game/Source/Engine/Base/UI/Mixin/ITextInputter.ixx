@@ -112,7 +112,7 @@ export namespace fbc {
 
 	// Renders the caret with a smooth fading "animation"
 	void ITextInputter::renderCaret() const {
-		sdl::textureSetAlphaMod(caret.texture, 127 + 127 * std::sin(sdl::ticks() / 100000000.0f));
+		sdl::textureSetAlphaMod(caret.texture, 127 + 127 * std::sin(sdl::timeTotal() / 100000000.0f));
 		sdl::renderCopy(caret.texture, nullptr, &caret);
 	}
 }

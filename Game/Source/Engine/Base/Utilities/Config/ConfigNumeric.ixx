@@ -1,15 +1,15 @@
 export module fbc.ConfigNumeric;
 
 import fbc.Config;
-import fbc.ConfigItem;
+import fbc.ConfigValue;
 import fbc.FUtil;
 import sdl;
 import std;
 
 export namespace fbc {
-	export class ConfigNumeric : public ConfigItem<int> {
+	export class ConfigNumeric : public ConfigValue<int> {
 	public:
-		ConfigNumeric(fbc::Config& config, strv ID, const int& defaultValue, int min = 0, int max = std::numeric_limits<int>::max()): ConfigItem<int>(config, ID, defaultValue), min(min), max(max) {}
+		ConfigNumeric(fbc::Config& config, strv ID, const int& defaultValue, int min = 0, int max = std::numeric_limits<int>::max()): ConfigValue<int>(config, ID, defaultValue), min(min), max(max) {}
 		virtual ~ConfigNumeric() {}
 
 		inline int getMax() const { return max; }
@@ -22,6 +22,6 @@ export namespace fbc {
 	};
 
 	void ConfigNumeric::assignValue(const int& res) {
-		ConfigItem<int>::assignValue(std::clamp(res, min, max));
+		ConfigValue<int>::assignValue(std::clamp(res, min, max));
 	}
 }

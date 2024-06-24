@@ -131,7 +131,8 @@
       <AdditionalDependencies>winmm.lib;SDL3.lib;SDL3_image.lib;SDL3_mixer.lib;SDL3_ttf.lib;SDL3_test.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xcopy /E /I /Y /D "$(ProjectDir)Resources" "$(TargetDir)Resources"</Command>
+      <Command>xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xcopy /E /I /Y /D "$(ProjectDir)Resources" "$(TargetDir)Resources"
+xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xcopy /E /I /Y /D "$(ProjectDir)Content" "$(TargetDir)Content"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -165,6 +166,10 @@
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Base\Content\ContentManifest.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Engine\Base\Content\DynamicContent.ixx">
       <SubType>
       </SubType>
@@ -179,6 +184,10 @@
     </ClCompile>
     <ClCompile Include="Source\Engine\Base\Content\StaticLoadables.ixx" />
     <ClCompile Include="Source\Engine\Base\Content\BaseStrings.ixx" />
+    <ClCompile Include="Source\Engine\Base\UI\Component\Layout\UIScreen.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Engine\Base\UI\Component\List\UINavigation.ixx">
       <SubType>
       </SubType>
@@ -243,6 +252,10 @@
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Base\Utilities\Config\ConfigEntry.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Engine\Base\Utilities\Config\ConfigNumeric.ixx">
       <SubType>
       </SubType>
@@ -272,6 +285,10 @@
       </SubType>
     </ClCompile>
     <ClCompile Include="Source\Engine\Base\Content\DynamicLoadables.ixx" />
+    <ClCompile Include="Source\Engine\Base\VFX\VFX.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Engine\Core\CoreAudio.ixx">
       <SubType>
       </SubType>
@@ -374,7 +391,7 @@
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Utilities\Config\ConfigItem.ixx">
+    <ClCompile Include="Source\Engine\Base\Utilities\Config\ConfigValue.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
@@ -415,10 +432,76 @@
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Game\Entity\ObjectData.ixx">
+    <ClCompile Include="Source\Game\Combat\CombatInstance.ixx">
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Game\Combat\CombatSquare.ixx" />
+    <ClCompile Include="Source\Game\Combat\CombatTurn.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Combat\IActionable.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Effect\Effect.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Effect\Keyword.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Effect\Variable\Variable.ixx" />
+    <ClCompile Include="Source\Game\Entity\Card\Card.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Entity\Card\CardData.ixx" />
+    <ClCompile Include="Source\Game\Entity\Card\CardRenderable.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Entity\Card\CardType.ixx" />
+    <ClCompile Include="Source\Game\Entity\Card\CardGroup.ixx" />
+    <ClCompile Include="Source\Game\Entity\Creature\Creature.ixx" />
+    <ClCompile Include="Source\Game\Entity\Creature\CreatureBehavior.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Entity\Creature\CreatureData.ixx" />
+    <ClCompile Include="Source\Game\Effect\EffectData.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Entity\Creature\PileType.ixx" />
+    <ClCompile Include="Source\Game\Entity\FieldObject.ixx" />
+    <ClCompile Include="Source\Game\Entity\FieldObjectData.ixx" />
+    <ClCompile Include="Source\Game\Entity\GameObject.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Entity\GameObjectData.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Entity\ObjectRarity.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Entity\Passive\PassiveData.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Entity\Status\StatusData.ixx" />
+    <ClCompile Include="Source\Game\Entity\Status\Status.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Entity\Status\StatusTurnMode.ixx" />
+    <ClCompile Include="Source\Game\Entity\AttributeObject.ixx" />
+    <ClCompile Include="Source\Game\Entity\AttributeObjectData.ixx" />
     <ClCompile Include="Source\Game\UI\Screens\TitleScreen.ixx" />
     <ClCompile Include="Source\Main.cpp">
       <DeploymentContent>false</DeploymentContent>

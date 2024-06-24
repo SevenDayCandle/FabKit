@@ -21,6 +21,7 @@ export namespace fbc {
 		inline virtual float getEndY() { return hb->y + hb->h; } // The bottom-most end Y coordinate of this object, may be larger than hb if this has subcomponents
 		inline virtual bool isHovered() { return hb->isHovered(); }
 		inline virtual void onSizeUpdated() {}
+		inline virtual UIBase& addVFX(uptr<IOverlay>&& vfx) { return *this; }
 		inline virtual UIBase& setHbExactPos(const float x, const float y) { return hb->setExactPos(x, y), *this; }
 		inline virtual UIBase& setHbExactPosX(const float x) { return hb->setExactPosX(x), * this; }
 		inline virtual UIBase& setHbExactPosY(const float y) { return hb->setExactPosY(y), * this; }

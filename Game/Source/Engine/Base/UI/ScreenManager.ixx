@@ -6,6 +6,7 @@ import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.IOverlay;
 import fbc.UIBase;
+import fbc.VFX;
 import sdl;
 import std;
 
@@ -20,11 +21,23 @@ namespace fbc {
 export namespace fbc::screenManager {
 	UIBase* activeElement;
 
+	// Add a VFX to the current screen
+	void addVFX(uptr<IOverlay>&& vfx) {
+		if (!screens.empty()) {
+			screens.back()->addVFX(std::move(vfx));
+		}
+	}
+
 	// Close the currently opened screen and reopen the last screen opened.
 	// The screen's dispose method should save any screen state as necessary since the screen will get disposed of
 	// Note that the screen will dispose at the END of the update cycle to ensure that all screen logic for the loop is executed
 	void closeCurrentScreen() {
 		queuedCloseScreen = true;
+	}
+
+	// Get the currently opened screen
+	UIBase* currentScreen() {
+		return screens.empty() ? nullptr : screens.back().get();
 	}
 
 	// Close a specific overlay and all overlays above it

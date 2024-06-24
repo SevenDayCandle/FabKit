@@ -28,7 +28,9 @@ namespace sdl {
 	SDL_Gamepad* gamepad;
 	SDL_Renderer* renderer;
 	SDL_Window* window;
-	Uint32 timeStart;
+	Uint64 delta;
+	Uint64 timeCurrent;
+	Uint64 timeLast;
 	Uint8* keyJust;
 	Uint8* padLast;
 
@@ -311,7 +313,6 @@ namespace sdl {
 	export void windowShow() { SDL_ShowWindow(window); }
 
 	/* Misc functions */
-	export Uint64 ticks() { return SDL_GetTicksNS(); }
 	export const char* __cdecl getError() { return TTF_GetError(); }
 	export template <typename... Args> void log(SDL_LogPriority priority, const char* message, const Args&... args) { SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, priority, message, args...); }
 	export template <typename... Args> void log(SDL_LogPriority priority, std::string_view message, const Args&... args) { SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, priority, message.data(), args...); }
@@ -320,12 +321,13 @@ namespace sdl {
 	export template <typename... Args> void logError(const char* message, const Args&... args) { log(SDL_LOG_PRIORITY_ERROR, message, args...); }
 	export template <typename... Args> void logError(std::string_view message, const Args&... args) { log(SDL_LOG_PRIORITY_ERROR, message, args...); }
 	export bool sdlEnabled() { return enabled; }
+	export Uint64 timeDelta() { return delta; }
+	export Uint64 timeTotal() { return timeCurrent; }
 
 
 	/* When using a fixed framerate, sleep to fill up remaining time */
 	export void capFrame(int fps) {
-		Uint32 delta = ticks() - timeStart;
-		Uint32 frameDur = (1000 / fps);
+		Uint64 frameDur = (1000 / fps);
 		if (frameDur > delta) {
 			SDL_Delay(frameDur - delta);
 		}
@@ -390,8 +392,12 @@ namespace sdl {
 	Returns false if the program should terminate 
 	*/
 	export bool poll() {
+		// Update time
+		timeCurrent = SDL_GetTicksNS();
+		delta = timeCurrent - timeLast;
+		timeLast = timeCurrent;
+
 		// Update temporary states
-		timeStart = ticks();
 		mouseLast = mouse;
 		mouseWheelX = 0;
 		mouseWheelY = 0;

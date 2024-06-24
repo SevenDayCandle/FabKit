@@ -2,7 +2,7 @@ export module fbc.CoreConfig;
 
 import fbc.Config;
 import fbc.ConfigHotkey;
-import fbc.ConfigItem;
+import fbc.ConfigValue;
 import fbc.ConfigNumeric;
 import fbc.FUtil;
 import fbc.Language;
@@ -48,14 +48,14 @@ export namespace fbc {
 		CoreConfig(strv ID) : Config(ID) {}
 		virtual ~CoreConfig() override {}
 
-		ConfigItem<bool> graphicsParticleEffects = ConfigItem<bool>(*this, "GraphicsParticleEffects", true);
-		ConfigItem<bool> graphicsVSync = ConfigItem<bool>(*this, "GraphicsVSync", true);
-		ConfigItem<bool> textIcons = ConfigItem<bool>(*this, "TextIcons", false);
-		ConfigItem<pair<int, int>> graphicsResolution = ConfigItem<pair<int,int>>(*this, "GraphicsResolution", {1920, 1080});
-		ConfigItem<str> textFont = ConfigItem<str>(*this, "TextFont", str(FONT_REGULAR));
-		ConfigItem<str> textFontBold = ConfigItem<str>(*this, "TextFont", str(FONT_BOLD));
-		ConfigItem<str> textLanguage = ConfigItem<str>(*this, "TextLanguage", str(lang::ENG_DEFAULT));
-		ConfigItem<WindowMode> graphicsWindowMode = ConfigItem<WindowMode>(*this, "GraphicsWindowMode", WindowMode::WINDOWED);
+		ConfigValue<bool> graphicsParticleEffects = ConfigValue<bool>(*this, "GraphicsParticleEffects", true);
+		ConfigValue<bool> graphicsVSync = ConfigValue<bool>(*this, "GraphicsVSync", true);
+		ConfigValue<bool> textIcons = ConfigValue<bool>(*this, "TextIcons", false);
+		ConfigValue<pair<int, int>> graphicsResolution = ConfigValue<pair<int,int>>(*this, "GraphicsResolution", {1920, 1080});
+		ConfigValue<str> textFont = ConfigValue<str>(*this, "TextFont", str(FONT_REGULAR));
+		ConfigValue<str> textFontBold = ConfigValue<str>(*this, "TextFontBold", str(FONT_BOLD));
+		ConfigValue<str> textLanguage = ConfigValue<str>(*this, "TextLanguage", str(lang::ENG_DEFAULT));
+		ConfigValue<WindowMode> graphicsWindowMode = ConfigValue<WindowMode>(*this, "GraphicsWindowMode", WindowMode::WINDOWED);
 		ConfigNumeric gameActionSpeed = ConfigNumeric(*this, "GameActionSpeed", 3, 1, 5);
 		ConfigNumeric graphicsFPS = ConfigNumeric(*this, "GraphicsFPS", 144, 30, 240);
 		ConfigNumeric soundVolumeEffects = ConfigNumeric(*this, "SoundVolumeEffects", 100, 0, 100);

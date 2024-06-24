@@ -94,6 +94,9 @@ export namespace fbc {
 
 // Utility functions
 export namespace fbc::futil {
+	export constexpr int INT_MAX = std::numeric_limits<int>::max();
+	export constexpr int INT_MIN = std::numeric_limits<int>::min();
+	export constexpr strv BLANK = "";
 	export constexpr strv FBC = "fbc";
 	export constexpr strv JSON_EXT = ".json";
 	export constexpr strv MODS = "mods";

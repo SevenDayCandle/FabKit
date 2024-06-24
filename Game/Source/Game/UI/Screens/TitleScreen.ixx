@@ -6,15 +6,15 @@ import fbc.ScreenSizeHitbox;
 import fbc.ScreenManager;
 import fbc.SettingsDialog;
 import fbc.UIButton;
-import fbc.UICanvas;
+import fbc.UIScreen;
 import fbc.UITextButton;
 import fbc.FUtil;
 import std;
 
 export namespace fbc {
-	export class TitleScreen : public UICanvas {
+	export class TitleScreen : public UIScreen {
 	public:
-		TitleScreen(): UICanvas(new ScreenSizeHitbox()) {
+		TitleScreen(): UIScreen(new ScreenSizeHitbox()) {
 			UITextButton& b = addElement(std::make_unique<UITextButton>(
 				new ScreenPosHitbox(0.5f, 0.5f, 290, 170),
 				cct.images.panel,
