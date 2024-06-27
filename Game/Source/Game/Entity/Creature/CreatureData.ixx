@@ -1,14 +1,14 @@
 export module fbc.CreatureData;
 
 import fbc.BaseContent;
-import fbc.FieldObjectData;
+import fbc.GameObjectData;
 import fbc.FUtil;
 import std;
 
 export namespace fbc {
-	export class CreatureData : FieldObjectData {
+	export class CreatureData : public GameObjectDataDerived<CreatureData> {
 	public:
-		CreatureData(BaseContent& source, strv ID): FieldObjectData(source, ID) {}
+		CreatureData(BaseContent& source, strv id): GameObjectDataDerived(source, id) {}
 		virtual ~CreatureData() {}
 
 		int actSpeed;

@@ -5,7 +5,7 @@ import fbc.KeyedItem;
 import std;
 
 export namespace fbc {
-	export class PileType : KeyedItem<PileType> {
+	export class PileType : public KeyedItem<PileType> {
 	public:
 		PileType(strv key) : KeyedItem<PileType>(key) {}
 	};

@@ -2,15 +2,18 @@ export module fbc.EffectData;
 
 import fbc.BaseContent;
 import fbc.FUtil;
+import fbc.IRegisterable;
 import std;
 
 export namespace fbc {
-	export class EffectData {
+	export class EffectData : public IRegisterable<EffectData> {
 	public:
-		EffectData(BaseContent& source, strv ID) : source(source), ID(ID) {}
+		EffectData(BaseContent& source, strv id) : source(source), id(id) {}
 		virtual ~EffectData() {}
 
 		const BaseContent& source;
-		const str ID;
+		const str id;
+
+		inline strv registrationID() const override { return id; }
 	};
 }

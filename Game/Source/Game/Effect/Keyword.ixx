@@ -7,10 +7,10 @@ import std;
 export namespace fbc {
 	export class Keyword {
 	public:
-		Keyword(strv ID): ID(ID) {}
+		Keyword(strv id): id(id) {}
 		virtual ~Keyword() {}
 
-		const str ID;
+		const str id;
 
 		vec<uptr<Effect>> effects;
 	};

@@ -19,10 +19,10 @@ export namespace fbc {
 		virtual void refresh();
 
 		virtual str getSubText() = 0;
-		virtual void use(GameObject<>* target) = 0;
+		virtual void use(GameObject* target) = 0;
 	protected:
 		Effect* parent;
-		GameObject<>* source;
+		GameObject* source;
 		uptr<Variable> variable;
 		vec<uptr<Effect>> childEffects;
 	};

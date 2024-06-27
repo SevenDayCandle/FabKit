@@ -4,7 +4,7 @@ import fbc.FUtil;
 import fbc.KeyedItem;
 
 export namespace fbc {
-	export struct Language : KeyedItem<Language> {
+	export struct Language : public KeyedItem<Language> {
 		Language(strv key): KeyedItem(key) {}
 	};
 

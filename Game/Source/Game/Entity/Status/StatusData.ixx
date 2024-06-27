@@ -3,14 +3,14 @@ export module fbc.StatusData;
 import fbc.BaseContent;
 import fbc.Effect;
 import fbc.FUtil;
-import fbc.AttributeObjectData;
+import fbc.GameObjectData;
 import fbc.StatusTurnMode;
 import std;
 
 export namespace fbc {
-	export class StatusData : public AttributeObjectData {
+	export class StatusData : public GameObjectDataDerived<StatusData> {
 	public:
-		StatusData(BaseContent& source, strv ID): AttributeObjectData(source, ID) {}
+		StatusData(BaseContent& source, strv id): GameObjectDataDerived(source, id) {}
 		virtual ~StatusData() {}
 
 		bool removable;

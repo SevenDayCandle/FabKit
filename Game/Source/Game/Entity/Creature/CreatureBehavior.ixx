@@ -5,7 +5,7 @@ import fbc.KeyedItem;
 import std;
 
 export namespace fbc {
-	export class CreatureBehavior : KeyedItem<CreatureBehavior> {
+	export class CreatureBehavior : public KeyedItem<CreatureBehavior> {
 	public:
 		CreatureBehavior(strv key): KeyedItem<CreatureBehavior>(key) {}
 		virtual ~CreatureBehavior() {}

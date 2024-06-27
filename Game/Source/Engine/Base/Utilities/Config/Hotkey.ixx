@@ -15,10 +15,10 @@ export namespace fbc {
 
 	export class Hotkey {
 	public:
-		Hotkey(strv id, sdl::Scancode key, sdl::GamepadButton gamepad): ID(id), key(key), keyDefault(key), pad(gamepad), padDefault(gamepad) {}
+		Hotkey(strv id, sdl::Scancode key, sdl::GamepadButton gamepad): id(id), key(key), keyDefault(key), pad(gamepad), padDefault(gamepad) {}
 		virtual ~Hotkey() {}
 
-		const str ID;
+		const str id;
 
 		inline bool isKeyJustPressed() const { return key > 0 && sdl::keyboardJustPressed(key); }
 		inline int getKey() const { return key; }
@@ -63,7 +63,7 @@ export namespace fbc {
 	{
 		auto [it, inserted] = keys.try_emplace(str(id), Hotkey(id, key, pad));
 		if (!inserted) {
-			throw std::logic_error("Duplicate Hotkey with ID: " + str(id));
+			throw std::logic_error("Duplicate Hotkey with id: " + str(id));
 		}
 		return it->second;
 	}

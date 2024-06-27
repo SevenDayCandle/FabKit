@@ -8,9 +8,9 @@ import sdl;
 import std;
 
 export namespace fbc {
-	export class Card : public GameObject<CardData> {
+	export class Card : public GameObjectDerived<CardData> {
 	public:
-		Card(CardData& data) : GameObject<CardData>(data) {}
+		Card(CardData& data) : GameObjectDerived<CardData>(data) {}
 		virtual ~Card() {}
 
 		int upgrades;
@@ -20,6 +20,6 @@ export namespace fbc {
 		Card& setUpgrade(int upgrades);
 		int cost();
 		vec<uptr<Effect>>& getEffects();
-		void use(GameObject<>* target);
+		void use(GameObject* target);
 	};
 }

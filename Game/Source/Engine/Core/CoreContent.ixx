@@ -20,7 +20,7 @@ export namespace fbc {
 
 	export class CoreContent : public BaseContent {
 	public:
-		CoreContent(strv ID) : BaseContent(ID, sdl::dirBase() + str(BASE_FOLDER)) {}
+		CoreContent(strv id) : BaseContent(id, sdl::dirBase() + str(BASE_FOLDER)) {}
 
 		CoreAudio audio = CoreAudio(*this);
 		CoreImages images = CoreImages(*this);
@@ -53,7 +53,7 @@ export namespace fbc {
 
 	export CoreContent cct = CoreContent(futil::FBC);
 
-	// Gets a registered content with the designated ID
+	// Gets a registered content with the designated id
 	BaseContent* CoreContent::getContent(strv content)
 	{
 		auto found = registeredContents.find(content);
@@ -181,9 +181,9 @@ export namespace fbc {
 	template<c_ext<BaseContent> T> T& CoreContent::registerContent(uptr<T>&& element)
 	{
 		T& refer = *element;
-		auto [it, inserted] = registeredContents.try_emplace(refer.ID, std::move(element));
+		auto [it, inserted] = registeredContents.try_emplace(refer.id, std::move(element));
 		if (!inserted) {
-			throw std::logic_error("Duplicate Content with ID: " + refer.ID);
+			throw std::logic_error("Duplicate Content with id: " + refer.id);
 		}
 		return refer;
 	}

@@ -10,7 +10,7 @@ export namespace fbc {
 	public:
 		CombatSquare() {}
 
-		FieldObject<>* occuptant;
+		FieldObject* occuptant;
 		vec<uptr<Status>> statuses;
 	};
 }

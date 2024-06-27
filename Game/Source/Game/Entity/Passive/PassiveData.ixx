@@ -3,14 +3,14 @@ export module fbc.PassiveData;
 import fbc.BaseContent;
 import fbc.Effect;
 import fbc.FUtil;
-import fbc.AttributeObjectData;
+import fbc.GameObjectData;
 import sdl;
 import std;
 
 export namespace fbc {
-	export class PassiveData : public AttributeObjectData {
+	export class PassiveData : public GameObjectDataDerived<PassiveData> {
 	public:
-		PassiveData(BaseContent& source, strv ID) : AttributeObjectData(source, ID) {}
+		PassiveData(BaseContent& source, strv id) : GameObjectDataDerived(source, id) {}
 		virtual ~PassiveData() {}
 
 		int maxUpgrades = 0;

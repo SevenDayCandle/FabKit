@@ -4,7 +4,7 @@ import fbc.FUtil;
 
 export namespace fbc {
 	export struct ContentManifest {
-		str ID;
+		str id;
 		str name;
 		str description;
 		str version;

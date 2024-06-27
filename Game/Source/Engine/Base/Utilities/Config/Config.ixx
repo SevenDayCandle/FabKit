@@ -14,10 +14,10 @@ export namespace fbc {
 
     export class Config {
     public:
-        Config(strv ID) : ID(ID) {}
+        Config(strv id) : id(id) {}
         virtual ~Config() {}
 
-        const str ID;
+        const str id;
 
         inline virtual void postInitialize() {}
 
@@ -72,15 +72,15 @@ export namespace fbc {
     // Add a listener to this config. Disallows items with duplicate IDs
     void Config::registerEntry(ConfigEntry* item)
     {
-        auto [it, inserted] = items.try_emplace(item->ID, item);
+        auto [it, inserted] = items.try_emplace(item->id, item);
         if (!inserted) {
-            throw std::logic_error("Duplicate Config entry in " + this->ID + " with ID: " + item->ID);
+            throw std::logic_error("Duplicate Config entry in " + this->id + " with id: " + item->id);
         }
     }
 
     // Get the path to the file used to store this config's data
     str Config::getConfigPath() const {
-        return sdl::dirPref(futil::FBC.data(), ID.c_str()) + str(BASE_CONFIG_FILE);
+        return sdl::dirPref(futil::FBC.data(), id.c_str()) + str(BASE_CONFIG_FILE);
     }
 
     // Get the mapped value for key

@@ -1,0 +1,81 @@
+export module fbc.IRegisterable;
+
+import fbc.FUtil;
+import sdl;
+import std;
+
+/*
+ * Variant of KeyedItem that doesn't throw on duplicate values and that allows for deletion.
+ */
+export namespace fbc {
+	export template <typename C> struct IRegisterable {
+		IRegisterable() {}
+		virtual ~IRegisterable() {}
+
+		operator str() const { return registrationID(); }
+
+		static auto all();
+		static C* get(strv name);
+		static C* registerCopy(C& copy);
+		static C* registerData(uptr<C>&& copy);
+		static vec<C*> allAsList();
+		template <typename Pred> auto findAll(Pred predicate);
+
+	protected:
+		virtual strv registrationID() const = 0;
+
+		static map<strv, uptr<C>>& registered() {
+			static map<strv, uptr<C>> values;
+			return values;
+		}
+	};
+
+	// Get every single instantiation of this class
+	template<typename C> auto IRegisterable<C>::all()
+	{
+		return registered() | std::views::values | std::views::transform([](uptr<C>* item) {return item.get(); });
+	}
+
+	// Get every single instantiation of this class as a list
+	template<typename C> vec<C*> IRegisterable<C>::allAsList()
+	{
+		const auto& values = registered();
+		std::vector<C*> result;
+		for (const auto& pair : values) {
+			result.emplace_back(pair.second.get());
+		}
+		return result;
+	}
+
+	// Get a particular instantation of this class matching the given id.
+	template<typename C> C* IRegisterable<C>::get(strv name)
+	{
+		auto& values = registered();
+		auto it = values.find(name);
+		if (it == values.end()) {
+			return nullptr;
+		}
+		return it->second.get();
+	}
+
+	// Registers a copy of an existing object
+	template<typename C> C* IRegisterable<C>::registerCopy(C& copy)
+	{
+		return registerData(make_unique<C>(copy));
+	}
+
+	// Registers a data object
+	template<typename C> C* IRegisterable<C>::registerData(uptr<C>&& copy)
+	{
+		auto& values = registered();
+		if (!values.try_emplace(copy->registrationID(), move(copy)).second) {
+			sdl::logInfo("IRegisterable with id already exists: " + copy->registrationID());
+		}
+		return copy;
+	}
+
+	template<typename C> template<typename Pred> auto IRegisterable<C>::findAll(Pred predicate)
+	{
+		return all() | std::views::filter(predicate);
+	}
+}

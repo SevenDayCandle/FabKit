@@ -34,7 +34,7 @@ export namespace fbc {
 		};
 		inline path getPathForLanguage(const Language& lang, const strv& suffix) const {
 			path p = content.contentFolder;
-			return (p / STRINGS_PATH / lang.name / suffix).replace_extension(futil::JSON_EXT);
+			return (p / STRINGS_PATH / lang.id / suffix).replace_extension(futil::JSON_EXT);
 		};
 		void loadKeywordStrings(strumap<KeywordStrings>& res, const strv& suffix = DEFAULT_KEYWORDS);
 		void loadObjectStrings(strumap<ObjectStrings>& res, const strv& suffix);

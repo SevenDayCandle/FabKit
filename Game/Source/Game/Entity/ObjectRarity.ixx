@@ -4,7 +4,7 @@ import fbc.FUtil;
 import fbc.KeyedItem;
 
 export namespace fbc {
-	export struct ObjectRarity : KeyedItem<ObjectRarity> {
+	export struct ObjectRarity : public KeyedItem<ObjectRarity> {
 	public:
 		ObjectRarity(strv key, uint32 weight = 0) : KeyedItem<ObjectRarity>(key), weight(weight) {}
 

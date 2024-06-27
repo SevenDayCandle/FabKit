@@ -5,14 +5,15 @@ import fbc.CreatureBehavior;
 import fbc.CreatureData;
 import fbc.FieldObject;
 import fbc.FUtil;
+import fbc.GameObject;
 import fbc.PileType;
 import sdl;
 import std;
 
 export namespace fbc {
-	export class Creature : FieldObject<CreatureData> {
+	export class Creature : public GameObjectDerived<CreatureData>, public FieldObject {
 	public:
-		Creature(CreatureData& data): FieldObject(data) {}
+		Creature(CreatureData& data): GameObjectDerived(data) {}
 		virtual ~Creature() {}
 
 		CreatureBehavior* behavior;

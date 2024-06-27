@@ -1,16 +1,17 @@
 export module fbc.Status;
 
+import fbc.AttributeObject;
 import fbc.Effect;
 import fbc.FUtil;
-import fbc.AttributeObject;
+import fbc.GameObject;
 import fbc.StatusData;
 import sdl;
 import std;
 
 export namespace fbc {
-	export class Status : public AttributeObject<StatusData> {
+	export class Status : public GameObjectDerived<StatusData>, public AttributeObject {
 	public:
-		Status(StatusData& data): AttributeObject<StatusData>(data) {}
+		Status(StatusData& data): GameObjectDerived<StatusData>(data) {}
 		virtual ~Status() {}
 
 		int stacks;

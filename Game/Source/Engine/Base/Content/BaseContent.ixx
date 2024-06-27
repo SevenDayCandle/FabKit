@@ -12,10 +12,10 @@ export namespace fbc {
 
 	export class BaseContent {
 	public:
-		BaseContent(strv ID, strv contentFolder): ID(ID), contentFolder(contentFolder) {}
+		BaseContent(strv id, strv contentFolder): id(id), contentFolder(contentFolder) {}
 		virtual ~BaseContent() {}
 
-		const str ID;
+		const str id;
 		const str contentFolder;
 
 		inline virtual FMusic* getMusic(strv path) { return nullptr; }

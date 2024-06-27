@@ -12,7 +12,7 @@ import std;
 export namespace fbc {
 	export class DynamicContent : public BaseContent {
 	public:
-		DynamicContent(strv ID, strv folder): BaseContent(ID, folder) {}
+		DynamicContent(strv id, strv folder): BaseContent(id, folder) {}
 		~DynamicContent() override {}
 
 		BaseStrings strings = BaseStrings(*this);

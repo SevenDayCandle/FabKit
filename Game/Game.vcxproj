@@ -477,7 +477,6 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
     </ClCompile>
     <ClCompile Include="Source\Game\Entity\Creature\PileType.ixx" />
     <ClCompile Include="Source\Game\Entity\FieldObject.ixx" />
-    <ClCompile Include="Source\Game\Entity\FieldObjectData.ixx" />
     <ClCompile Include="Source\Game\Entity\GameObject.ixx">
       <SubType>
       </SubType>
@@ -487,6 +486,10 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       </SubType>
     </ClCompile>
     <ClCompile Include="Source\Game\Entity\ObjectRarity.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Entity\Passive\Passive.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -501,7 +504,10 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
     </ClCompile>
     <ClCompile Include="Source\Game\Entity\Status\StatusTurnMode.ixx" />
     <ClCompile Include="Source\Game\Entity\AttributeObject.ixx" />
-    <ClCompile Include="Source\Game\Entity\AttributeObjectData.ixx" />
+    <ClCompile Include="Source\Game\IRegisterable.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Game\UI\Screens\TitleScreen.ixx" />
     <ClCompile Include="Source\Main.cpp">
       <DeploymentContent>false</DeploymentContent>
