@@ -10,6 +10,11 @@ export namespace fbc {
 	};
 
 	export namespace cardtype {
-		export const CardType DAMAGE("DAMAGE");
+		export const CardType ATTACK("ATTACK");
+		export const CardType DEFENSE("DEFENSE");
+		export const CardType ENHANCE("ENHANCE");
+		export const CardType IMPAIR("IMPAIR");
+		export const CardType MOVE("MOVE");
+		export const CardType NEGATIVE("NEGATIVE");
 	}
 }

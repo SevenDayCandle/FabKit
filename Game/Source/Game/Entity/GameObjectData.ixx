@@ -16,6 +16,8 @@ export namespace fbc {
 		ObjectStrings* strings;
 	protected:
 		GameObjectData(BaseContent& source, strv id) : source(source), id(id) {}
+	private:
+		//map<str,str> customFields;
 	};
 
 	export template <typename T> class GameObjectDataDerived : public GameObjectData, public IRegisterable<T> {

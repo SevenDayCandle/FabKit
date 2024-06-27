@@ -4,6 +4,7 @@ import fbc.BaseContent;
 import fbc.Effect;
 import fbc.FUtil;
 import fbc.GameObjectData;
+import fbc.ObjectRarity;
 import sdl;
 import std;
 
@@ -14,6 +15,8 @@ export namespace fbc {
 		virtual ~PassiveData() {}
 
 		int maxUpgrades = 0;
+		ObjectRarity* rarity;
 		vec<uptr<Effect>> effects;
+		vec<str> upgradeBranches;
 	};
 }

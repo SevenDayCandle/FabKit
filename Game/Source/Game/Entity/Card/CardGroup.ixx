@@ -1,11 +1,18 @@
 export module fbc.CardGroup;
 
+import fbc.BaseContent;
 import fbc.FUtil;
-import fbc.KeyedItem;
+import fbc.IRegisterable;
 
 export namespace fbc {
-	export class CardGroup : public KeyedItem<CardGroup> {
+	export class CardGroup : public IRegisterable<CardGroup> {
 	public:
-		CardGroup(strv key) : KeyedItem<CardGroup>(key) {}
+		CardGroup(BaseContent& source, strv id) : source(source), id(id) {}
+		virtual ~CardGroup() {}
+
+		const BaseContent& source;
+		const str id;
+
+		inline strv registrationID() const override { return id; }
 	};
 }

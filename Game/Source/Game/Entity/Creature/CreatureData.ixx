@@ -13,10 +13,14 @@ export namespace fbc {
 
 		int actSpeed;
 		int actSpeedUpgrade;
-		int draw;
-		int drawUpgrade;
-		int energy;
-		int energyUpgrade;
+		int energyGain;
+		int energyGainUpgrade;
+		int energyMax;
+		int energyMaxUpgrade;
+		int handDraw;
+		int handDrawUpgrade;
+		int handSize;
+		int handSizeUpgrade;
 		int health;
 		int healthUpgrade;
 		int move;

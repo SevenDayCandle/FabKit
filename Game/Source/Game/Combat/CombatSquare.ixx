@@ -1,8 +1,8 @@
 export module fbc.CombatSquare;
 
+import fbc.AttributeObject;
 import fbc.FieldObject;
 import fbc.FUtil;
-import fbc.Status;
 import std;
 
 export namespace fbc {
@@ -11,6 +11,6 @@ export namespace fbc {
 		CombatSquare() {}
 
 		FieldObject* occuptant;
-		vec<uptr<Status>> statuses;
+		vec<uptr<AttributeObject>> attributes;
 	};
 }

@@ -9,6 +9,7 @@ export namespace fbc {
 	public:
 		CombatTurn(FieldObject& source, int actionValue): source(source), actionValue(actionValue) {}
 
+		bool isDone = false;
 		FieldObject& source;
 		int actionValue;
 

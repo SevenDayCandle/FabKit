@@ -23,6 +23,7 @@ export namespace fbc {
 		CardType* type;
 		int costBase = 1;
 		int costUp = 0;
+		int maxCopies = -1;
 		int maxUpgrades = 1;
 		int targetRangeMax = 1;
 		int targetRangeMaxUp = 0;
@@ -34,6 +35,7 @@ export namespace fbc {
 		int targetSizeYUp = 0;
 		ObjectRarity* rarity;
 		vec<uptr<Effect>> effects;
+		vec<str> tags;
 		vec<str> upgradeBranches;
 
 		inline int getCost(int level) const { return costBase + costUp * level; }
