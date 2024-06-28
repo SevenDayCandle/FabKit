@@ -6,8 +6,8 @@ import sdl;
 import sdl.IKeyInputListener;
 import std;
 
-export namespace fbc {
-	constexpr strv INDICATOR = "|";
+namespace fbc {
+	export constexpr strv INDICATOR = "|";
 
 	export struct ITextInputter : public sdl::IKeyInputListener {
 	public:

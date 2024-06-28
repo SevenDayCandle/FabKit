@@ -9,7 +9,7 @@ import fbc.UIInteractable;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class UIDialog : public UICanvas {
 	public:
 		UIDialog(Hitbox* hb, IDrawable& image) : UICanvas(hb), image(image) {}

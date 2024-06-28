@@ -5,12 +5,12 @@ import fbc.FieldObject;
 import fbc.FUtil;
 import std;
 
-export namespace fbc {
-	export class CombatSquare {
+namespace fbc {
+	export class CombatSquare : FieldObject {
 	public:
-		CombatSquare() {}
+		CombatSquare(int pos): pos(pos) {}
 
+		const int pos;
 		FieldObject* occuptant;
-		vec<uptr<AttributeObject>> attributes;
 	};
 }

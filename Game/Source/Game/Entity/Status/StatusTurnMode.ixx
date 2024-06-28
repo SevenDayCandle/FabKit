@@ -2,7 +2,7 @@ export module fbc.StatusTurnMode;
 
 import fbc.FUtil;
 
-export namespace fbc {
+namespace fbc {
 	export enum StatusTurnMode {
 		NONE,
 		ROUND_BEGIN,

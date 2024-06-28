@@ -8,7 +8,7 @@ import fbc.FUtil;
 import fbc.ILoadable;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export template <c_ext<ILoadable> T> class DynamicLoadables : public ContentLoadables {
 	public:
 		DynamicLoadables(const BaseContent& content) : ContentLoadables(content) {}

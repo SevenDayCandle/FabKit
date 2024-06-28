@@ -15,7 +15,7 @@ import fbc.UISlider;
 import fbc.UIToggle;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class SettingsDialogPage : public UICanvas {
 		class SettingsDialogBaseCache {
 		public:

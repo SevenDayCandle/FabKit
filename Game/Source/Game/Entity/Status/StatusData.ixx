@@ -7,7 +7,7 @@ import fbc.GameObjectData;
 import fbc.StatusTurnMode;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class StatusData : public GameObjectDataDerived<StatusData> {
 	public:
 		StatusData(BaseContent& source, strv id): GameObjectDataDerived(source, id) {}

@@ -5,7 +5,7 @@ import fbc.GameObjectData;
 import fbc.FUtil;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class CreatureData : public GameObjectDataDerived<CreatureData> {
 	public:
 		CreatureData(BaseContent& source, strv id): GameObjectDataDerived(source, id) {}
@@ -26,5 +26,6 @@ export namespace fbc {
 		int move;
 		int moveUpgrade;
 		vec<str> defaultCards;
+		vec<str> passives;
 	};
 }

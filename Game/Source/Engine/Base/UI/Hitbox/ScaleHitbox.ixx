@@ -3,7 +3,7 @@ export module fbc.ScaleHitbox;
 import fbc.Hitbox;
 import fbc.CoreConfig;
 
-export namespace fbc {
+namespace fbc {
 	export class ScaleHitbox : public Hitbox {
 	public:
 		ScaleHitbox() : Hitbox(0, 0, 0, 0) {}

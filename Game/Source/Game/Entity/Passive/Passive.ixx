@@ -8,7 +8,7 @@ import fbc.PassiveData;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class Passive : public GameObjectDerived<PassiveData>, public AttributeObject {
 	public:
 		Passive(PassiveData& data) : GameObjectDerived<PassiveData>(data) {}

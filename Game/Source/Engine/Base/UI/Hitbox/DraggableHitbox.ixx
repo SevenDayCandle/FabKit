@@ -5,7 +5,7 @@ import fbc.ScaleHitbox;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class DraggableHitbox : public ScaleHitbox {
 	public:
 		DraggableHitbox() : ScaleHitbox(0, 0, 0, 0) {}

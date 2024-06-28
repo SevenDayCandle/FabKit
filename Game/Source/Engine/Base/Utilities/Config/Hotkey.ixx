@@ -6,12 +6,12 @@ export module fbc.ConfigHotkey;
 
 import fbc.Config;
 import fbc.FUtil;
-import fbc.Iserializable;
+import fbc.ISerializable;
 import sdl;
 import std;
 
-export namespace fbc {
-	constexpr strv BASE_HOTKEY_FILE = "hotkeys.json";
+namespace fbc {
+	export constexpr strv BASE_HOTKEY_FILE = "hotkeys.json";
 
 	export class Hotkey {
 	public:

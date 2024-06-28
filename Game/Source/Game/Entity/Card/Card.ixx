@@ -7,7 +7,7 @@ import fbc.GameObject;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class Card : public GameObjectDerived<CardData> {
 	public:
 		Card(CardData& data) : GameObjectDerived<CardData>(data) {}
@@ -16,10 +16,12 @@ export namespace fbc {
 		int upgrades;
 		opt<vec<uptr<Effect>>> effectOverride;
 
+		inline int cost() const { return data.costBase + data.costUp * upgrades; };
+		inline vec<uptr<Effect>>& getEffects() { return effectOverride ? effectOverride.value() : data.effects; }
+
 		bool isPlayable();
 		Card& setUpgrade(int upgrades);
-		int cost();
-		vec<uptr<Effect>>& getEffects();
-		void use(GameObject* target);
+		
+		void use(GameObject* source, int location);
 	};
 }

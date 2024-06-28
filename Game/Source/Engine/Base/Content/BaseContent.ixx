@@ -7,8 +7,8 @@ import fbc.FUtil;
 import fbc.KeywordStrings;
 import fbc.ObjectStrings;
 
-export namespace fbc {
-	constexpr strv CONTENT_ROOT = "/Content";
+namespace fbc {
+	export constexpr strv CONTENT_ROOT = "/Content";
 
 	export class BaseContent {
 	public:

@@ -1,25 +1,23 @@
 export module fbc.FUtil;
 
 import fbc.KeyedItem;
-import fbc.Iserializable;
-import sdl;
+import fbc.ISerializable;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	// std shorthands. Sorry peeps
 	export template <typename R> using func = std::function<R>;
-	export template <typename T, class Comp = std::less<T>, class Alloc = std::allocator<T>> using set = std::set<T, Comp, Alloc>;
+	export template <typename T, class Comp = std::less<T>, class Alloc = std::allocator<T>> using mset = std::multiset<T, Comp, Alloc>;
 	export template <typename T, class Hash = std::hash<T>, class Eq = std::equal_to<T>, class Alloc = std::allocator<T>> using uset = std::unordered_set<T, Hash, Eq, Alloc>;
 	export template <typename T, size_t U> using arr = std::array<T, U>;
 	export template <typename T, typename U, class Comp = std::less<T>, class Alloc = std::allocator<std::pair<const T, U>>> using map = std::map<T, U, Comp, Alloc>;
 	export template <typename T, typename U, class Hash = std::hash<T>, class Eq = std::equal_to<T>, class Alloc = std::allocator<std::pair<const T, U>>> using umap = std::unordered_map<T, U, Hash, Eq, Alloc>;
 	export template <typename T, typename U> using pair = std::pair<T, U>;
 	export template <typename T> using dec_t = std::decay_t<T>;
-	export template <typename T> using deque = std::deque<T>;
-	export template <typename T> using hash = std::hash<T>;
 	export template <typename T> using ilist = std::initializer_list<T>;
-	export template <typename T> using list = std::list<T>;
 	export template <typename T> using opt = std::optional<T>;
+	export template <typename T> using pqueue_max = std::priority_queue<T>;
+	export template <typename T> using pqueue_min = std::priority_queue<T, std::vector<T>, std::greater<T>>;
 	export template <typename T> using ref = std::reference_wrapper<T>;
 	export template <typename T> using span = std::span<T>;
 	export template <typename T> using sptr = std::shared_ptr<T>;
@@ -32,8 +30,12 @@ export namespace fbc {
 	export using uint32 = std::uint32_t;
 
 	export using std::any;
+	export using std::deque;
 	export using std::equal_to;
 	export using std::exception;
+	export using std::hash;
+	export using std::list;
+	export using std::set;
 
 	export using std::make_shared;
 	export using std::make_unique;
@@ -93,7 +95,7 @@ export namespace fbc {
 }
 
 // Utility functions
-export namespace fbc::futil {
+namespace fbc::futil {
 	export constexpr int INT_MAX = std::numeric_limits<int>::max();
 	export constexpr int INT_MIN = std::numeric_limits<int>::min();
 	export constexpr strv BLANK = "";
@@ -128,12 +130,9 @@ export namespace fbc::futil {
 	export template <typename T> T fromString(strv input);
 	export template <typename T> T fromString(strv input, size_t& pos);
 	export template <typename TCo, typename Func> str joinStrMap(strv delimiter, const TCo& items, Func strFunc) requires std::ranges::range<TCo>&& c_invc<Func, std::ranges::range_value_t<TCo>, strv>;
-	
-	/*
-	DEFINITIONS
-	*/
+}
 
-
+namespace fbc::futil {
 	// Wrapper function around std::all_of to check the entire container
 	export template <typename T, typename Pred> bool all(const T& container, Pred predicate) {
 		return std::all_of(container.begin(), container.end(), predicate);

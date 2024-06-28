@@ -6,7 +6,7 @@ import fbc.Hitbox;
 import fbc.UIBase;
 import std;
 
-export namespace fbc {
+namespace fbc {
 
 	export class UICanvas : public UIBase {
 	public:

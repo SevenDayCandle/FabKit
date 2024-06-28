@@ -4,7 +4,7 @@ import fbc.BaseContent;
 import fbc.FUtil;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class Variable {
 	public:
 		Variable() {}

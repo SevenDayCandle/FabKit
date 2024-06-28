@@ -13,7 +13,7 @@ import fbc.ScreenManager;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export template <typename T> class UIEntry : public UIInteractable, public TextInfo {
 	public:
 		UIEntry(const T& item, int index, const func<void(UIEntry<T>&)>& onClick, fbc::RelativeHitbox* hb, FFont& f, const str& text, IDrawable& image = cct.images.uiCheckboxEmpty, IDrawable& checkImage = cct.images.uiCheckboxFilled, sdl::Color baseColor = sdl::COLOR_WHITE, sdl::Color hoverColor = sdl::COLOR_WHITE) :

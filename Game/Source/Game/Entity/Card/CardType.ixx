@@ -3,7 +3,7 @@ export module fbc.CardType;
 import fbc.FUtil;
 import fbc.KeyedItem;
 
-export namespace fbc {
+namespace fbc {
 	export class CardType : public KeyedItem<CardType> {
 	public:
 		CardType(strv key) : KeyedItem<CardType>(key) {}

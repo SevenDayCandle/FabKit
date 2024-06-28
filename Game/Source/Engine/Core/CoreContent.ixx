@@ -14,9 +14,9 @@ import fbc.FUtil;
 import sdl;
 import std;
 
-export namespace fbc {
-	constexpr strv BASE_FOLDER = "/Resources";
-	constexpr strv MANIFEST = "manifest.json";
+namespace fbc {
+	export constexpr strv BASE_FOLDER = "/Resources";
+	export constexpr strv MANIFEST = "manifest.json";
 
 	export class CoreContent : public BaseContent {
 	public:

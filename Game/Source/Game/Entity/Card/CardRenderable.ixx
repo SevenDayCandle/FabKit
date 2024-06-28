@@ -7,7 +7,7 @@ import fbc.UIBase;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class CardRenderable : public UIBase {
 	public:
 		CardRenderable(Card& card, Hitbox* hb): UIBase(hb), card(card) {}

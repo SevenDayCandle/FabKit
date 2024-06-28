@@ -7,7 +7,7 @@ import fbc.ScreenManager;
 import fbc.UIInteractable;
 import sdl;
 
-export namespace fbc {
+namespace fbc {
 	export class UIButton : public UIInteractable {
 	public:
 

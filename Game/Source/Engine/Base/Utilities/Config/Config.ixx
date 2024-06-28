@@ -5,15 +5,24 @@ module;
 export module fbc.Config;
 
 import fbc.FUtil;
-import fbc.ConfigEntry;
 import sdl;
 import std;
 
-export namespace fbc {
-    constexpr strv BASE_CONFIG_FILE = "config.json";
+namespace fbc {
+    export constexpr strv BASE_CONFIG_FILE = "config.json";
 
     export class Config {
     public:
+        class ConfigEntry {
+        public:
+            ConfigEntry(strv id) : id(id) {}
+            virtual ~ConfigEntry() {}
+
+            const str id;
+
+            virtual void reload() = 0;
+        };
+
         Config(strv id) : id(id) {}
         virtual ~Config() {}
 

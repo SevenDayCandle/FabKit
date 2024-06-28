@@ -8,7 +8,7 @@ import fbc.Tooltip;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class TitleTooltip : public Tooltip {
 	public:
 		TitleTooltip(strv title, strv text, FFont& titleFont = cct.fontRegular(), FFont& font = cct.fontSmall(), float boxSize = DEFAULT_SIZE, IDrawable& background = cct.images.darkPanelRound): Tooltip(text, font, boxSize, background), title(titleFont, title) {}

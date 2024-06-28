@@ -5,7 +5,7 @@ import fbc.IDrawable;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class RBordered : public IDrawable {
 	public:
 		RBordered(IDrawable& base) : base(base), patchSize(base.getWidth() / 2.0f) {}

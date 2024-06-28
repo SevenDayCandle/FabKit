@@ -6,8 +6,8 @@ import fbc.IOverlay;
 import sdl;
 import std;
 
-export namespace fbc {
-	constexpr float DEFAULT_DURATION = 1;
+namespace fbc {
+	export constexpr float DEFAULT_DURATION = 1;
 
 	export class VFX : public IOverlay {
 	public:

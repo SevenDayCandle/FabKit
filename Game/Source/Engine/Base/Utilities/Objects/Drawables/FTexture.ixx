@@ -5,7 +5,7 @@ import fbc.IDrawable;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class FTexture : public IDrawable {
     public:
         FTexture(strv path) : path(path) {}

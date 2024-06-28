@@ -1,14 +1,13 @@
 export module fbc.ConfigValue;
 
 import fbc.Config;
-import fbc.ConfigEntry;
 import fbc.FUtil;
 import sdl;
 
-export namespace fbc {
-    export template<typename T> class ConfigValue : public ConfigEntry {
+namespace fbc {
+    export template<typename T> class ConfigValue : public Config::ConfigEntry {
     public:
-        ConfigValue(Config& config, strv id, const T& defaultValue) : ConfigEntry(id), config(config), defaultValue(defaultValue), value(defaultValue) {
+        ConfigValue(Config& config, strv id, const T& defaultValue) : Config::ConfigEntry(id), config(config), defaultValue(defaultValue), value(defaultValue) {
             config.registerEntry(this);
         }
         virtual ~ConfigValue() override {}

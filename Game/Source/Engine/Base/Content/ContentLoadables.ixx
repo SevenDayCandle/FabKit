@@ -8,11 +8,11 @@ import fbc.FMusic;
 import fbc.FSound;
 import std;
 
-export namespace fbc {
-	constexpr strv AUDIO_PATH = "Audio";
-	constexpr strv FONT_PATH = "Fonts";
-	constexpr strv IMAGE_PATH = "Images";
-	constexpr strv STRINGS_PATH = "Strings";
+namespace fbc {
+	export constexpr strv AUDIO_PATH = "Audio";
+	export constexpr strv FONT_PATH = "Fonts";
+	export constexpr strv IMAGE_PATH = "Images";
+	export constexpr strv STRINGS_PATH = "Strings";
 
 	export class ContentLoadables {
 	public:

@@ -12,7 +12,7 @@ import fbc.UIList;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export template <typename T> class UIMenu : public UIList<T> {
 	public:
 		UIMenu(Hitbox* hb,

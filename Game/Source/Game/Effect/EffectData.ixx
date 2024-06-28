@@ -5,7 +5,7 @@ import fbc.FUtil;
 import fbc.IRegisterable;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class EffectData : public IRegisterable<EffectData> {
 	public:
 		EffectData(BaseContent& source, strv id) : source(source), id(id) {}

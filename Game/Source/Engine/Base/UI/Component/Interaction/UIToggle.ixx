@@ -12,7 +12,7 @@ import fbc.UIInteractable;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class UIToggle : public UIInteractable, public TextInfo {
 	public:
 		UIToggle(Hitbox* hb, strv text, IDrawable& image = cct.images.uiCheckboxEmpty, IDrawable& checkImage = cct.images.uiCheckboxFilled, FFont& f = cct.fontRegular(), float xOff = cct.images.uiCheckboxEmpty.getWidth() * 1.15f, float yOff = cct.images.uiCheckboxEmpty.getHeight() * 0.25f):

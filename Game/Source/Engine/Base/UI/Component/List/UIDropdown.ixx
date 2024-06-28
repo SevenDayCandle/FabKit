@@ -17,7 +17,7 @@ import fbc.ScaleHitbox;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export template <typename T> class UIDropdown : public UITitledInteractable, public TextInfo {
 	public:
 

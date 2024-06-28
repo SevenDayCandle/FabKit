@@ -4,7 +4,7 @@ import fbc.FFont;
 import fbc.FUtil;
 import sdl;
 
-export namespace fbc {
+namespace fbc {
 	export class TextInfo {
 	public:
 		TextInfo(FFont& font, strv text = "", sdl::Color color = sdl::COLOR_WHITE, sdl::Color colorOutline = sdl::COLOR_BLACK) : font(font), text(text), color(color), colorOutline(colorOutline) {

@@ -3,7 +3,7 @@ export module fbc.ScreenSizeHitbox;
 import fbc.CoreConfig;
 import fbc.Hitbox;
 
-export namespace fbc {
+namespace fbc {
 	/* Hitbox whose position AND size scale with screen dimensions */
 	export class ScreenSizeHitbox : public Hitbox {
 	public:

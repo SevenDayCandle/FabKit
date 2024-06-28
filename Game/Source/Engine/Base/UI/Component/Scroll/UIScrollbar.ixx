@@ -8,7 +8,7 @@ import fbc.ScreenManager;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class UIScrollbar : public UIBase {
 	public:
 		UIScrollbar(Hitbox* hb, IDrawable& imageBar, IDrawable& imageButton): UIBase(hb), imageBar(imageBar), imageButton(imageButton) {

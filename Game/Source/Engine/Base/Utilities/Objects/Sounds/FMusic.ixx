@@ -5,7 +5,7 @@ import fbc.ILoadable;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class FMusic : public ILoadable {
 	public:
 		FMusic(strv path) : path(path) {}

@@ -6,7 +6,7 @@ import fbc.FUtil;
 import fbc.KeywordStrings;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class DynamicStrings : public BaseStrings {
 	public:
 		DynamicStrings(const BaseContent& content): BaseStrings(content) {}

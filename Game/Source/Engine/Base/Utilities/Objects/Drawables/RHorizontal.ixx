@@ -5,7 +5,7 @@ import fbc.FUtil;
 import fbc.IDrawable;
 import sdl;
 
-export namespace fbc {
+namespace fbc {
 	export class RHorizontal : public IDrawable {
 	public:
 		RHorizontal(IDrawable& base) : base(base), patchSize(base.getWidth() / 2) {}

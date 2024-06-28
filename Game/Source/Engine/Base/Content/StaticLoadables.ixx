@@ -13,7 +13,7 @@ import fbc.RHorizontal;
 import fbc.RVertical;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class StaticLoadables : public ContentLoadables {
 	public:
 		StaticLoadables(const BaseContent& content) : ContentLoadables(content) {}

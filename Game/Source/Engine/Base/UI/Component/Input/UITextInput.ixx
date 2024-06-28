@@ -13,7 +13,7 @@ import fbc.UITitledInteractable;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class UITextInput : public UITitledInteractable, public TextInfo, public ITextInputter {
 	public:
 		UITextInput(Hitbox* hb, 

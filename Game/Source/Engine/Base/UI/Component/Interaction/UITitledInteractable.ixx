@@ -11,7 +11,7 @@ import fbc.UIInteractable;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class UITitledInteractable : public UIInteractable {
 	public:
 		UITitledInteractable(Hitbox* hb, IDrawable& image) : UIInteractable(hb, image) {}

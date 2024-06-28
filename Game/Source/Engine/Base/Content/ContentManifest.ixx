@@ -2,7 +2,7 @@ export module fbc.ContentManifest;
 
 import fbc.FUtil;
 
-export namespace fbc {
+namespace fbc {
 	export struct ContentManifest {
 		str id;
 		str name;

@@ -4,7 +4,7 @@ import fbc.FUtil;
 import fbc.ILoadable;
 import sdl;
 
-export namespace fbc {
+namespace fbc {
 	export struct IDrawable : public ILoadable {
 	public:
 		IDrawable() {}

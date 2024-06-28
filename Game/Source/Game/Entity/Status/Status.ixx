@@ -8,7 +8,7 @@ import fbc.StatusData;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class Status : public GameObjectDerived<StatusData>, public AttributeObject {
 	public:
 		Status(StatusData& data): GameObjectDerived<StatusData>(data) {}

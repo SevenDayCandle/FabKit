@@ -6,7 +6,7 @@ import fbc.FUtil;
 import fbc.ILoadable;
 import sdl;
 
-export namespace fbc {
+namespace fbc {
 	export class FFont : public ILoadable {
     public:
         FFont(strv path, int size, int outlineSize = 0, int shadowSize = 0): path(path), size(size), outlineSize(outlineSize), shadowSize(shadowSize) {

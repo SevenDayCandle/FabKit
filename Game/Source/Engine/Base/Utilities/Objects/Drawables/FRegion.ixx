@@ -5,7 +5,7 @@ import fbc.FUtil;
 import fbc.IDrawable;
 import sdl;
 
-export namespace fbc {
+namespace fbc {
 	export class FRegion : public IDrawable {
 	public:
 		FRegion(FTexture& base, sdl::RectF dim): base(base), dim(dim) {}

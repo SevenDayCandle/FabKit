@@ -12,11 +12,11 @@ import fbc.KeywordStrings;
 import fbc.Language;
 import fbc.ObjectStrings;
 
-export namespace fbc {
-	constexpr strv DEFAULT_KEYWORDS = "KeywordStrings";
-	constexpr strv DEFAULT_UI = "UIStrings";
+namespace fbc {
+	export constexpr strv DEFAULT_KEYWORDS = "KeywordStrings";
+	export constexpr strv DEFAULT_UI = "UIStrings";
 
-	template <typename T> using strumap = umap<str, T, str_hash, equal_to<>>;
+	export template <typename T> using strumap = umap<str, T, str_hash, equal_to<>>;
 
 	export class BaseStrings : public ContentLoadables {
 	public:

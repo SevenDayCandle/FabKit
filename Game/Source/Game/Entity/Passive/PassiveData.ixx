@@ -8,7 +8,7 @@ import fbc.ObjectRarity;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class PassiveData : public GameObjectDataDerived<PassiveData> {
 	public:
 		PassiveData(BaseContent& source, strv id) : GameObjectDataDerived(source, id) {}

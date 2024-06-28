@@ -3,7 +3,7 @@ export module fbc.IActionable;
 import fbc.FUtil;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export struct IActionable {
 	public:
 		IActionable() {}

@@ -15,9 +15,9 @@ import fbc.FUtil;
 import sdl;
 import std;
 
-constexpr int MARGIN = 16;
+namespace fbc {
+	constexpr int MARGIN = 16;
 
-export namespace fbc {
 	export template <typename T> class UIList : public UIBase {
 	public:
 		UIList(Hitbox* hb,

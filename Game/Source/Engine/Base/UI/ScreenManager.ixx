@@ -10,17 +10,32 @@ import fbc.VFX;
 import sdl;
 import std;
 
-namespace fbc {
+namespace fbc::screenManager {
 	deque<uptr<UIBase>> screens;
 	deque<uptr<IOverlay>> overlays;
 	IOverlay* queuedCloseOverlay;
 	IOverlay* tipBatch;
 	bool queuedCloseScreen;
+
+	export UIBase* activeElement;
+
+	export IOverlay* getActiveOverlay();
+	export UIBase* currentScreen();
+	export void addVFX(std::unique_ptr<IOverlay>&& vfx);
+	export void closeCurrentScreen();
+	export void closeOverlay(IOverlay* target);
+	export void dispose();
+	export void openOverlay(std::unique_ptr<IOverlay>&& target);
+	export void openScreen(std::unique_ptr<UIBase>&& screen);
+	export void queueTip(IOverlay* tip);
+	export void refreshSize();
+	export void render();
+	export void subscribeToConfig();
+	export void swapScreen(std::unique_ptr<UIBase>&& screen);
+	export void update();
 }
 
-export namespace fbc::screenManager {
-	UIBase* activeElement;
-
+namespace fbc::screenManager {
 	// Add a VFX to the current screen
 	void addVFX(uptr<IOverlay>&& vfx) {
 		if (!screens.empty()) {

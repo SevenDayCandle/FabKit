@@ -3,7 +3,7 @@ export module fbc.ScreenPosHitbox;
 import fbc.CoreConfig;
 import fbc.Hitbox;
 
-export namespace fbc {
+namespace fbc {
 	/* Hitbox whose position scale with screen dimensions, and whose size scale with render scale */
 	export class ScreenPosHitbox : public Hitbox {
 	public:

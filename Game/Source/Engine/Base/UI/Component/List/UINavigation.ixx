@@ -13,7 +13,7 @@ import fbc.UIList;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export template <c_ext<UIBase> T> class UINavigation : public UIList<T> {
 	public:
 		UINavigation(Hitbox* hb,

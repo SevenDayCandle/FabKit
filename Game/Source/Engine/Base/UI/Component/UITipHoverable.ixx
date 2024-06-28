@@ -5,7 +5,7 @@ import fbc.Hitbox;
 import fbc.Tooltip;
 import fbc.UIBase;
 
-export namespace fbc {
+namespace fbc {
 	export class UITipHoverable : public UIBase {
 	public:
 		Tooltip* tooltip;

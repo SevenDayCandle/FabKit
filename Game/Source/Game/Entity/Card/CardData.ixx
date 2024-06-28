@@ -9,7 +9,7 @@ import fbc.GameObjectData;
 import fbc.ObjectRarity;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class CardData : public GameObjectDataDerived<CardData> {
 	public:
 		CardData(BaseContent& source, strv id) : GameObjectDataDerived(source, id) {}

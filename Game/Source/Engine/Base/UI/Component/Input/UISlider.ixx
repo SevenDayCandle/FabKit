@@ -9,7 +9,7 @@ import fbc.UINumberInput;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class UISlider : public UINumberInput {
 	public:
 		UISlider(Hitbox* hb, Hitbox* scrollhb, int limMin = 0,

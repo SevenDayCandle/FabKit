@@ -7,7 +7,7 @@ import fbc.ObjectStrings;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class GameObject {
 	public:
 		GameObject() {}
@@ -23,7 +23,7 @@ export namespace fbc {
 		GameObjectDerived(T& data) : data(data), GameObject() {}
 		virtual ~GameObjectDerived() {}
 
-		const T& data;
+		T& data;
 
 		inline BaseContent& source() override { return data.source; }
 		inline ObjectStrings* strings() override { return data.strings; }

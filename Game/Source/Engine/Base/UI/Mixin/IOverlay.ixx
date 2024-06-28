@@ -1,6 +1,6 @@
 export module fbc.IOverlay;
 
-export namespace fbc {
+namespace fbc {
 	export struct IOverlay {
 	public:
 		virtual ~IOverlay() {}

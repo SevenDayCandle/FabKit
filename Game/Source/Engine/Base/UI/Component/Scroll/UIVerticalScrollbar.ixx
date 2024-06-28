@@ -7,7 +7,7 @@ import fbc.IDrawable;
 import fbc.UIScrollbar;
 import sdl;
 
-export namespace fbc {
+namespace fbc {
 
 	export class UIVerticalScrollbar : public UIScrollbar {
 	public:

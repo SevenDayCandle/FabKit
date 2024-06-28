@@ -5,7 +5,7 @@ import fbc.Hitbox;
 import fbc.IOverlay;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class UIBase : public IOverlay {
 	public:
 		UIBase(Hitbox* hb) : hb(hb) {}

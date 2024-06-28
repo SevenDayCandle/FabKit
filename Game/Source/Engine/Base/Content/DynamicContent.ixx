@@ -9,7 +9,7 @@ import fbc.FTexture;
 import fbc.FUtil;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class DynamicContent : public BaseContent {
 	public:
 		DynamicContent(strv id, strv folder): BaseContent(id, folder) {}

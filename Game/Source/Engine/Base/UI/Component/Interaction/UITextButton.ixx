@@ -8,7 +8,7 @@ import fbc.IDrawable;
 import fbc.TextInfo;
 import fbc.UIButton;
 
-export namespace fbc {
+namespace fbc {
 	export class UITextButton : public UIButton, public TextInfo {
 	public:
 		UITextButton(Hitbox* hb, IDrawable& image, FFont& f, strv text = "") : UIButton(hb, image), TextInfo(f, text) {

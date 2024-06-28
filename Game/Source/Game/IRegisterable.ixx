@@ -7,7 +7,7 @@ import std;
 /*
  * Variant of KeyedItem that doesn't throw on duplicate values and that allows for deletion.
  */
-export namespace fbc {
+namespace fbc {
 	export template <typename C> struct IRegisterable {
 		IRegisterable() {}
 		virtual ~IRegisterable() {}

@@ -7,7 +7,7 @@ import fbc.TextInfo;
 import fbc.Tooltip;
 import fbc.UITipHoverable;
 
-export namespace fbc {
+namespace fbc {
 	export class UILabel : public UITipHoverable, public TextInfo {
 	public:
 		UILabel(fbc::Hitbox* hb, FFont& f) : UITipHoverable(hb), TextInfo(f) {}

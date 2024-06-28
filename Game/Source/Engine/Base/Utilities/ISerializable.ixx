@@ -1,8 +1,8 @@
-export module fbc.Iserializable;
+export module fbc.ISerializable;
 
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export struct ISerializable {
 	public:
 		virtual ~ISerializable() {}

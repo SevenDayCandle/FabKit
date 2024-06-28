@@ -4,7 +4,7 @@ import fbc.BaseContent;
 import fbc.FUtil;
 import fbc.IRegisterable;
 
-export namespace fbc {
+namespace fbc {
 	export class CardGroup : public IRegisterable<CardGroup> {
 	public:
 		CardGroup(BaseContent& source, strv id) : source(source), id(id) {}

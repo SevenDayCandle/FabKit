@@ -9,7 +9,7 @@ import fbc.Tooltip;
 import fbc.UITipHoverable;
 import sdl;
 
-export namespace fbc {
+namespace fbc {
 	export class UIImage : public UITipHoverable {
 	public:
 		sdl::Color color = sdl::COLOR_WHITE;

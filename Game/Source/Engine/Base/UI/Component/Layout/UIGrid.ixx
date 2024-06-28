@@ -8,7 +8,7 @@ import fbc.FUtil;
 import fbc.ScaleHitbox;
 import std;
 
-export namespace fbc {
+namespace fbc {
 
 	export template <c_ext<UIBase> T> class UIGrid : public UIBase {
 	public:

@@ -6,7 +6,7 @@ import fbc.StaticLoadables;
 import fbc.FSound;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class CoreAudio : public StaticLoadables {
 	public:
 		CoreAudio(BaseContent& cnt) : StaticLoadables(cnt) {}

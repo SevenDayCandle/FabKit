@@ -14,7 +14,7 @@ import fbc.UITitledInteractable;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class UINumberInput : public UITitledInteractable, public TextInfo, public ITextInputter {
 	public:
 		UINumberInput(Hitbox* hb,

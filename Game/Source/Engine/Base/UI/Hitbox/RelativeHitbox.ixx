@@ -5,7 +5,7 @@ import fbc.Hitbox;
 import fbc.Hitbox;
 import fbc.FUtil;
 
-export namespace fbc {
+namespace fbc {
 	export class RelativeHitbox : public Hitbox {
 	public:
 		RelativeHitbox(Hitbox& parent) : RelativeHitbox(parent, 0, 0, 0, 0) {}

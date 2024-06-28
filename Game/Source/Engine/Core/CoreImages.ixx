@@ -12,7 +12,7 @@ import fbc.FUtil;
 import fbc.RVertical;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class CoreImages : public StaticLoadables {
 	public:
 		CoreImages(BaseContent& cnt) : StaticLoadables(cnt) {}

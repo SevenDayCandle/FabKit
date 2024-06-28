@@ -252,10 +252,6 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Utilities\Config\ConfigEntry.ixx">
-      <SubType>
-      </SubType>
-    </ClCompile>
     <ClCompile Include="Source\Engine\Base\Utilities\Config\ConfigNumeric.ixx">
       <SubType>
       </SubType>
@@ -395,7 +391,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Utilities\FUtil.ixx">
+    <ClCompile Include="Source\Engine\FUtil.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
@@ -449,6 +445,10 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Game\Effect\EffectKeyword.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Game\Effect\Keyword.ixx">
       <SubType>
       </SubType>
@@ -465,8 +465,10 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
     </ClCompile>
     <ClCompile Include="Source\Game\Entity\Card\CardType.ixx" />
     <ClCompile Include="Source\Game\Entity\Card\CardGroup.ixx" />
+    <ClCompile Include="Source\Game\Entity\Card\Card.cppm" />
+    <ClCompile Include="Source\Game\Entity\Creature\Creature.cppm" />
     <ClCompile Include="Source\Game\Entity\Creature\Creature.ixx" />
-    <ClCompile Include="Source\Game\Entity\Creature\CreatureBehavior.ixx">
+    <ClCompile Include="Source\Game\Entity\Creature\Behavior\CommonBehavior.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -497,6 +499,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Game\Entity\Status\Status.cppm" />
     <ClCompile Include="Source\Game\Entity\Status\StatusData.ixx" />
     <ClCompile Include="Source\Game\Entity\Status\Status.ixx">
       <SubType>

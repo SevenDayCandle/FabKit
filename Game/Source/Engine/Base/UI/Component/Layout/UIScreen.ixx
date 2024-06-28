@@ -6,7 +6,7 @@ import fbc.IOverlay;
 import fbc.UICanvas;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class UIScreen : public UICanvas {
 	public:
 		UIScreen(Hitbox* hb) : UICanvas(hb) {}

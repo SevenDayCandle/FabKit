@@ -6,7 +6,7 @@ import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.UIScrollbar;
 
-export namespace fbc {
+namespace fbc {
 	export class UIHorizontalScrollbar : public UIScrollbar {
 	public:
 		UIHorizontalScrollbar(Hitbox* hb, IDrawable& imageBar = cct.images.scrollbar, IDrawable& imageButton = cct.images.scrollbutton) : UIScrollbar(hb, imageBar, imageButton) {

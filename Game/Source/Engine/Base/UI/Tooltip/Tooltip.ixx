@@ -12,11 +12,11 @@ import fbc.TextInfo;
 import sdl;
 import std;
 
-export namespace fbc {
-	constexpr float DEFAULT_SIZE = 100;
-	constexpr float PADDING = 24;
-	constexpr float QUEUE_OFFSET_X = 36;
-	constexpr float QUEUE_OFFSET_Y = 18;
+namespace fbc {
+	export constexpr float DEFAULT_SIZE = 100;
+	export constexpr float PADDING = 24;
+	export constexpr float QUEUE_OFFSET_X = 36;
+	export constexpr float QUEUE_OFFSET_Y = 18;
 
 	export class Tooltip : public TextInfo, public IOverlay {
 	public:

@@ -5,7 +5,7 @@ import fbc.ILoadable;
 import std;
 
 /* A lazy-initialized pointer that gets created when first invoked. Values can be used in const contexts */
-export namespace fbc {
+namespace fbc {
 	export template <typename T> class Cache : public ILoadable {
 	public:
 		Cache(const func<T*()>& fetchFunc): fetchFunc(fetchFunc) {}

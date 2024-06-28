@@ -6,7 +6,7 @@ import fbc.IRegisterable;
 import fbc.ObjectStrings;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class GameObjectData {
 	public:
 		virtual ~GameObjectData() {}

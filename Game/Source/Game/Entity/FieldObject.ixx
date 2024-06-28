@@ -5,13 +5,15 @@ import fbc.AttributeObject;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class FieldObject {
 	public:
 		virtual ~FieldObject() {}
 
 		vec<uptr<AttributeObject>> statuses;
 
-		virtual void act() = 0;
+		inline virtual void onEndTurn() {}
+
+		virtual bool act() = 0;
 	};
 }

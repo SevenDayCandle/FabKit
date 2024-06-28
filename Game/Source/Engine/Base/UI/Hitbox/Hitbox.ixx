@@ -3,7 +3,7 @@ export module fbc.Hitbox;
 import fbc.FUtil;
 import sdl;
 
-export namespace fbc {
+namespace fbc {
 	export class Hitbox : public sdl::RectF {
 	public:
 		Hitbox(float offsetX, float offsetY, float offsetWidth, float offsetHeight) : sdl::RectF(0, 0, 0, 0), offsetPosX(offsetX), offsetPosY(offsetY), offsetSizeX(offsetWidth), offsetSizeY(offsetHeight) {}

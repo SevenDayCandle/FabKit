@@ -15,7 +15,7 @@ import fbc.UITextButton;
 import fbc.WindowMode;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class SettingsDialog : public UIDialog {
 	public:
 		SettingsDialog(): UIDialog(new ScreenSizeHitbox(0.25, 0.25, 0.5, 0.5), cct.images.darkPanelRound) {

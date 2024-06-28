@@ -7,7 +7,7 @@ import fbc.FUtil;
 import fbc.KeywordStrings;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class CoreStrings : public BaseStrings {
 	public:
 		CoreStrings(BaseContent& cnt) : BaseStrings(cnt) {}

@@ -5,7 +5,7 @@ import fbc.IDrawable;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	constexpr sdl::RectF EMPTY = { 0,0,0,0 };
 
 	export class EmptyDrawable : public IDrawable {

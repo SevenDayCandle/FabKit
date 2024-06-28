@@ -11,7 +11,7 @@ import fbc.UITextButton;
 import fbc.FUtil;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class TitleScreen : public UIScreen {
 	public:
 		TitleScreen(): UIScreen(new ScreenSizeHitbox()) {

@@ -4,7 +4,7 @@ import fbc.FUtil;
 import fbc.IDrawable;
 import sdl;
 
-export namespace fbc {
+namespace fbc {
 	export class RVertical : public IDrawable {
 	public:
 		RVertical(IDrawable& base) : base(base), patchSize(base.getHeight() / 2) {}

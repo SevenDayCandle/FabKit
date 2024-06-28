@@ -4,7 +4,7 @@ import fbc.FUtil;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export class AttributeObject {
 	public:
 		virtual ~AttributeObject() {}

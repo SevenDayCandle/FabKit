@@ -3,7 +3,7 @@ export module fbc.Language;
 import fbc.FUtil;
 import fbc.KeyedItem;
 
-export namespace fbc {
+namespace fbc {
 	export struct Language : public KeyedItem<Language> {
 		Language(strv key): KeyedItem(key) {}
 	};

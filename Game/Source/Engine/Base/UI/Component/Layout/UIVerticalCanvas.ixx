@@ -7,7 +7,7 @@ import fbc.FUtil;
 import fbc.UIVerticalScrollbar;
 import fbc.ScaleHitbox;
 
-export namespace fbc {
+namespace fbc {
 	export class UIVerticalCanvas : public UICanvas {
 	public:
 		UIVerticalCanvas(Hitbox* hb, float scrollSpeed = 1): UICanvas(hb),

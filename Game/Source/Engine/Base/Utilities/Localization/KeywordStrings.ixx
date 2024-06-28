@@ -2,7 +2,7 @@ export module fbc.KeywordStrings;
 
 import fbc.FUtil;
 
-export namespace fbc {
+namespace fbc {
 	export struct KeywordStrings {
 		str NAME;
 		str DESCRIPTION;

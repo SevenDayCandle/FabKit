@@ -5,7 +5,7 @@ import fbc.Hitbox;
 import sdl;
 import std;
 
-export namespace fbc {
+namespace fbc {
 	export struct ILoadable {
 	public:
 		ILoadable() {}
