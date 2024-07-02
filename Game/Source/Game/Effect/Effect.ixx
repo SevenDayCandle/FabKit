@@ -12,7 +12,7 @@ namespace fbc {
 	export class Effect {
 	public:
 		Effect(EffectData& data): data(data) {}
-		virtual ~Effect() {}
+		virtual ~Effect() = default;
 
 		const EffectData& data;
 

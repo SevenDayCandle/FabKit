@@ -53,7 +53,6 @@ namespace fbc {
 					screenManager::closeOverlay(this);
 				});
 		}
-		virtual ~SettingsDialog() {}
 
 		UINavigation<SettingsDialogPage>& navigation = this->addElement(std::make_unique<UINavigation<SettingsDialogPage>>(new RelativeHitbox(*hb, -330, 0, 300, 100)));
 		SettingsDialogPage graphics = page(cct.strings.options_section_graphics());

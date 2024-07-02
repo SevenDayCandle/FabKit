@@ -9,6 +9,5 @@ namespace fbc {
 	export class CommonBehavior : public KeyedItem<CommonBehavior>, public Creature::Behavior {
 	public:
 		CommonBehavior(strv key): KeyedItem<CommonBehavior>(key) {}
-		virtual ~CommonBehavior() {}
 	};
 }

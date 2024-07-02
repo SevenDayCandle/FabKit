@@ -16,7 +16,6 @@ namespace fbc {
 	public:
 		UIInteractable(Hitbox* hb, IDrawable& image) : UIImage(hb, image) {}
 		UIInteractable(Hitbox* hb, IDrawable& image, sdl::Point origin) : UIImage(hb, image, origin) {}
-		virtual ~UIInteractable() override {}
 
 		bool interactable = true;
 		FSound* soundClick = &cct.audio.uiClick;

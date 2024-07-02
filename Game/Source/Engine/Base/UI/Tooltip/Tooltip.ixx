@@ -23,7 +23,6 @@ namespace fbc {
 		Tooltip(strv text, FFont& font = cct.fontSmall(), float boxSize = DEFAULT_SIZE, IDrawable& background = cct.images.darkPanelRound) : TextInfo(font, text), bounds(0, 0, boxSize, 0), background(background) {
 			updateBounds();
 		}
-		virtual ~Tooltip() {}
 
 		inline virtual void update() override {}
 

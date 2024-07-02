@@ -22,9 +22,6 @@ namespace fbc {
 			initCaret(this->font, this->hb->x, this->hb->y);
 			UITextInput::onSizeUpdated();
 		}
-		virtual ~UITextInput() {
-
-		}
 
 		inline UITextInput& setOnBufferUpdate(const func<void(strv)>& onBufferUpdateCallback) { return this->onBufferUpdateCallback = onBufferUpdateCallback, * this; }
 		inline UITextInput& setOnComplete(const func<void(strv)>& onComplete) { return this->onComplete = onComplete, *this; }

@@ -10,7 +10,6 @@ namespace fbc {
         ConfigValue(Config& config, strv id, const T& defaultValue) : Config::ConfigEntry(id), config(config), defaultValue(defaultValue), value(defaultValue) {
             config.registerEntry(this);
         }
-        virtual ~ConfigValue() override {}
 
         const str id;
 

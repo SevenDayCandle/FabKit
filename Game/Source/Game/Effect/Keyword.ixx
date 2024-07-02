@@ -9,7 +9,6 @@ namespace fbc {
 	export class Keyword : public IRegisterable<Keyword> {
 	public:
 		Keyword(strv id): id(id) {}
-		virtual ~Keyword() {}
 
 		const str id;
 

@@ -9,7 +9,6 @@ namespace fbc {
 	export class EffectData : public IRegisterable<EffectData> {
 	public:
 		EffectData(BaseContent& source, strv id) : source(source), id(id) {}
-		virtual ~EffectData() {}
 
 		const BaseContent& source;
 		const str id;

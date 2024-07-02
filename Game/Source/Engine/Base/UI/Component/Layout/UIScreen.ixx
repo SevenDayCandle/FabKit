@@ -11,7 +11,6 @@ namespace fbc {
 	public:
 		UIScreen(Hitbox* hb) : UICanvas(hb) {}
 		UIScreen(uptr<Hitbox>&& hb) : UICanvas(std::move(hb)) {}
-		virtual ~UIScreen() {}
 
 		virtual UIScreen& addVFX(uptr<IOverlay>&& eff) override;
 		virtual void render() override;

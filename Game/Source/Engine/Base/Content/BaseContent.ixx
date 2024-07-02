@@ -13,7 +13,7 @@ namespace fbc {
 	export class BaseContent {
 	public:
 		BaseContent(strv id, strv contentFolder): id(id), contentFolder(contentFolder) {}
-		virtual ~BaseContent() {}
+		virtual ~BaseContent() = default;
 
 		const str id;
 		const str contentFolder;

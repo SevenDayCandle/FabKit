@@ -11,7 +11,6 @@ namespace fbc {
 	export class StatusData : public GameObjectDataDerived<StatusData> {
 	public:
 		StatusData(BaseContent& source, strv id): GameObjectDataDerived(source, id) {}
-		virtual ~StatusData() {}
 
 		bool removable;
 		bool debuff;

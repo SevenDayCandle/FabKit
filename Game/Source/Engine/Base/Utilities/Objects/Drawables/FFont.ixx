@@ -13,7 +13,7 @@ namespace fbc {
             reload();
         }
         FFont(const FFont&) = delete;
-        virtual ~FFont() {
+        virtual ~FFont() override {
             // Unload font when destroyed
             if (font) {
                 sdl::fontClose(font);

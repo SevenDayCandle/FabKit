@@ -21,7 +21,6 @@ namespace fbc {
 	export class BaseStrings : public ContentLoadables {
 	public:
 		BaseStrings(const BaseContent& content) : ContentLoadables(content) {}
-		virtual ~BaseStrings() {}
 
 		inline virtual KeywordStrings* getKeywordStrings(strv path) { return nullptr; }
 		inline virtual ObjectStrings* getObjectStrings(strv type, strv path) { return nullptr; }

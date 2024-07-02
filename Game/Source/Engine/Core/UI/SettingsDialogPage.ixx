@@ -20,7 +20,7 @@ namespace fbc {
 		class SettingsDialogBaseCache {
 		public:
 			SettingsDialogBaseCache() {}
-			virtual ~SettingsDialogBaseCache() {}
+			virtual ~SettingsDialogBaseCache() = default;
 
 			func<void()> onReset;
 
@@ -32,7 +32,6 @@ namespace fbc {
 		template<typename T> class SettingsDialogCache : public SettingsDialogBaseCache {
 		public:
 			SettingsDialogCache(ConfigValue<T>& conf) : conf(conf), value(conf.get()) {}
-			virtual ~SettingsDialogCache() override {}
 
 			ConfigValue<T>& conf;
 			T value;
@@ -42,7 +41,6 @@ namespace fbc {
 
 	public:
 		SettingsDialogPage(Hitbox* hb, strv name): UICanvas(hb), name(name) {}
-		virtual ~SettingsDialogPage() {}
 
 		const str name;
 

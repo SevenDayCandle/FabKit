@@ -9,7 +9,6 @@ namespace fbc {
 	export class EffectKeyword : public Keyword {
 	public:
 		EffectKeyword(strv id): Keyword(id) {}
-		virtual ~EffectKeyword() {}
 
 		vec<uptr<Effect>> effects;
 	};

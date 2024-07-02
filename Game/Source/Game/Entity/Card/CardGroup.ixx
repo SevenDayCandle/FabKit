@@ -8,7 +8,6 @@ namespace fbc {
 	export class CardGroup : public IRegisterable<CardGroup> {
 	public:
 		CardGroup(BaseContent& source, strv id) : source(source), id(id) {}
-		virtual ~CardGroup() {}
 
 		const BaseContent& source;
 		const str id;

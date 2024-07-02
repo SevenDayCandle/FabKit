@@ -12,7 +12,6 @@ namespace fbc {
 	export class PassiveData : public GameObjectDataDerived<PassiveData> {
 	public:
 		PassiveData(BaseContent& source, strv id) : GameObjectDataDerived(source, id) {}
-		virtual ~PassiveData() {}
 
 		int maxUpgrades = 0;
 		ObjectRarity* rarity;

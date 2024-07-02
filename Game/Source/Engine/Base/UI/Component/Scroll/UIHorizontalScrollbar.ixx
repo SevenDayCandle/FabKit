@@ -12,7 +12,6 @@ namespace fbc {
 		UIHorizontalScrollbar(Hitbox* hb, IDrawable& imageBar = cct.images.scrollbar, IDrawable& imageButton = cct.images.scrollbutton) : UIScrollbar(hb, imageBar, imageButton) {
 			UIHorizontalScrollbar::updateDropzoneSize(0.05f);
 		}
-		virtual ~UIHorizontalScrollbar() {}
 
 		float toPercentage(float x, float y) override;
 		void updateDropzonePos(float percent) override;

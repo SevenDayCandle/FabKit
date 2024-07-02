@@ -5,7 +5,7 @@ import std;
 namespace fbc {
 	export struct ISerializable {
 	public:
-		virtual ~ISerializable() {}
+		virtual ~ISerializable() = default;
 
 		operator std::string() const { return write(); }
 		friend std::ostream& operator<<(std::ostream& os, const ISerializable& obj) { return os << obj; }

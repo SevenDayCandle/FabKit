@@ -10,7 +10,6 @@ namespace fbc {
 	public:
 		RBordered(IDrawable& base) : base(base), patchSize(base.getWidth() / 2.0f) {}
 		RBordered(IDrawable& base, float patchSize): base(base), patchSize(patchSize) {}
-		virtual ~RBordered() override {}
 
 		inline const sdl::RectF* getBaseRec() const override { return base.getBaseRec(); }
 		inline float getHeight() const override { return base.getHeight();}

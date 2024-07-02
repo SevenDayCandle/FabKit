@@ -19,7 +19,6 @@ namespace fbc {
 			UIInteractable(hb, image), checkImage(checkImage), TextInfo(f, text), xOff(xOff), yOff(yOff) {
 			UIToggle::onSizeUpdated();
 		}
-		virtual ~UIToggle() {}
 
 		bool toggled = false;
 		IDrawable& checkImage;

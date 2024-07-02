@@ -2,18 +2,19 @@ export module fbc.FieldObject;
 
 import fbc.FUtil;
 import fbc.AttributeObject;
-import sdl;
 import std;
 
 namespace fbc {
 	export class FieldObject {
 	public:
-		virtual ~FieldObject() {}
+		FieldObject() {}
+		FieldObject(FieldObject&& other) = default;
+		virtual ~FieldObject() = default;
 
 		vec<uptr<AttributeObject>> statuses;
 
-		inline virtual void onEndTurn() {}
+		inline virtual void onTurnEnd() {}
 
-		virtual bool act() = 0;
+		virtual bool onTurnBegin() = 0;
 	};
 }

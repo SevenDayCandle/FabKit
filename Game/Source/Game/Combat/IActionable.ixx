@@ -7,7 +7,7 @@ namespace fbc {
 	export struct IActionable {
 	public:
 		IActionable() {}
-		virtual ~IActionable() {}
+		virtual ~IActionable() = default;
 
 		inline virtual bool isDone() { return true; }
 

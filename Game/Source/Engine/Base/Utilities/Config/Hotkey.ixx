@@ -16,7 +16,7 @@ namespace fbc {
 	export class Hotkey {
 	public:
 		Hotkey(strv id, sdl::Scancode key, sdl::GamepadButton gamepad): id(id), key(key), keyDefault(key), pad(gamepad), padDefault(gamepad) {}
-		virtual ~Hotkey() {}
+		virtual ~Hotkey() = default;
 
 		const str id;
 

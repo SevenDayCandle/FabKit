@@ -10,7 +10,7 @@ import std;
 namespace fbc {
 	export template <typename C> struct IRegisterable {
 		IRegisterable() {}
-		virtual ~IRegisterable() {}
+		virtual ~IRegisterable() = default;
 
 		operator str() const { return registrationID(); }
 

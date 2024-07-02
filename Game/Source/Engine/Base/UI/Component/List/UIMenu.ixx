@@ -21,7 +21,6 @@ namespace fbc {
 			IDrawable& background = cct.images.darkPanelRound,
 			bool canAutosize = false) :
 			UIList<T>(hb, std::move(labelFunc), itemFont, background, canAutosize) {}
-		virtual ~UIMenu() {}
 
 		inline const T* getSelectedItem() { return &this->rows[currentIndex]->item; }
 		inline UIMenu& setItemFont(const FFont& itemFont) { return UIList<T>::setItemFont(itemFont), * this; }

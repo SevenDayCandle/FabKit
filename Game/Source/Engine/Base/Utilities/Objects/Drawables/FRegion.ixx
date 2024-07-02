@@ -9,7 +9,6 @@ namespace fbc {
 	export class FRegion : public IDrawable {
 	public:
 		FRegion(FTexture& base, sdl::RectF dim): base(base), dim(dim) {}
-		virtual ~FRegion() override {}
 
 		inline const sdl::RectF* getBaseRec() const override { return &dim; }
 		inline float getHeight() const override { return dim.h; }

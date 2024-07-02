@@ -17,7 +17,6 @@ namespace fbc {
 	export class StaticLoadables : public ContentLoadables {
 	public:
 		StaticLoadables(const BaseContent& content) : ContentLoadables(content) {}
-		virtual ~StaticLoadables() {}
 
 		virtual void dispose() override;
 		virtual void initialize() override;

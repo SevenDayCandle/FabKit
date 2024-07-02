@@ -16,7 +16,6 @@ namespace fbc {
 			baseOffsetY(hb->getOffsetPosY()) {
 			scrollbar.setOnScroll([this](float f) {reposition(f); });
 		}
-		virtual ~UIVerticalCanvas() {}
 
 		inline void scroll(float percent) { scrollbar.scroll(percent); }
 		inline void setScrollPos(float percent) { scrollbar.setScrollPos(percent); }

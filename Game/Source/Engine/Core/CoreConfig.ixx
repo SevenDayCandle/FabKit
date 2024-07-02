@@ -46,7 +46,6 @@ namespace fbc {
 	export class CoreConfig : public Config {
 	public:
 		CoreConfig(strv id) : Config(id) {}
-		virtual ~CoreConfig() override {}
 
 		ConfigValue<bool> graphicsParticleEffects = ConfigValue<bool>(*this, "GraphicsParticleEffects", true);
 		ConfigValue<bool> graphicsVSync = ConfigValue<bool>(*this, "GraphicsVSync", true);

@@ -41,7 +41,6 @@ namespace fbc {
 		): UITitledInteractable(hb, image), TextInfo(textFont), menu(std::move(menu)), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
 			init();
 		}
-		virtual ~UIDropdown() override{}
 
 		uptr<UISelectorList<T>> menu;
 

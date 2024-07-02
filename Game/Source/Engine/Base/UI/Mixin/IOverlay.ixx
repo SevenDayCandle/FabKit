@@ -3,7 +3,7 @@ export module fbc.IOverlay;
 namespace fbc {
 	export struct IOverlay {
 	public:
-		virtual ~IOverlay() {}
+		virtual ~IOverlay() = default;
 
 		inline virtual void dispose() {};
 		inline virtual void open() {}

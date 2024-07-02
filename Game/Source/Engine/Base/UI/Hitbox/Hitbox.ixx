@@ -7,7 +7,7 @@ namespace fbc {
 	export class Hitbox : public sdl::RectF {
 	public:
 		Hitbox(float offsetX, float offsetY, float offsetWidth, float offsetHeight) : sdl::RectF(0, 0, 0, 0), offsetPosX(offsetX), offsetPosY(offsetY), offsetSizeX(offsetWidth), offsetSizeY(offsetHeight) {}
-		virtual ~Hitbox() {}
+		virtual ~Hitbox() = default;
 
 		inline bool isClicked() const { return hovered && sdl::mouseIsLeftClicked(); };
 		inline bool isClickedRight() const { return hovered && sdl::mouseIsRightClicked(); };

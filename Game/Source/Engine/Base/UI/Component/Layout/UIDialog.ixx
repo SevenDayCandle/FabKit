@@ -13,7 +13,6 @@ namespace fbc {
 	export class UIDialog : public UICanvas {
 	public:
 		UIDialog(Hitbox* hb, IDrawable& image) : UICanvas(hb), image(image) {}
-		virtual ~UIDialog() {}
 
 		IDrawable& image;
 

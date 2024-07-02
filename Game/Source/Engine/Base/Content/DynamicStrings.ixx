@@ -10,7 +10,6 @@ namespace fbc {
 	export class DynamicStrings : public BaseStrings {
 	public:
 		DynamicStrings(const BaseContent& content): BaseStrings(content) {}
-		virtual ~DynamicStrings() {}
 
 		KeywordStrings* getKeywordStrings(strv path) override;
 		void initialize() override;

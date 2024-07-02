@@ -12,7 +12,6 @@ namespace fbc {
 	export class Passive : public GameObjectDerived<PassiveData>, public AttributeObject {
 	public:
 		Passive(PassiveData& data) : GameObjectDerived<PassiveData>(data) {}
-		virtual ~Passive() {}
 
 		int upgrades;
 	};

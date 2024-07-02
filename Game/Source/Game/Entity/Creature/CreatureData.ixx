@@ -9,7 +9,6 @@ namespace fbc {
 	export class CreatureData : public GameObjectDataDerived<CreatureData> {
 	public:
 		CreatureData(BaseContent& source, strv id): GameObjectDataDerived(source, id) {}
-		virtual ~CreatureData() {}
 
 		int actSpeed;
 		int actSpeedUpgrade;
@@ -27,5 +26,13 @@ namespace fbc {
 		int moveUpgrade;
 		vec<str> defaultCards;
 		vec<str> passives;
+
+		inline int getResultActSpeed(int upgrade) const { return actSpeed + upgrade * actSpeedUpgrade; }
+		inline int getResultEnergyGain(int upgrade) const { return energyGain + upgrade * energyGainUpgrade; }
+		inline int getResultEnergyMax(int upgrade) const { return energyMax + upgrade * energyMaxUpgrade; }
+		inline int getResultHandDraw(int upgrade) const { return handDraw + upgrade * handDrawUpgrade; }
+		inline int getResultHandSize(int upgrade) const { return handSize + upgrade * handSizeUpgrade; }
+		inline int getResultHealth(int upgrade) const { return health + upgrade * healthUpgrade; }
+		inline int getResultMove(int upgrade) const { return move + upgrade * moveUpgrade; }
 	};
 }

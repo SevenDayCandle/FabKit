@@ -8,7 +8,7 @@ namespace fbc {
 	export class Variable {
 	public:
 		Variable() {}
-		virtual ~Variable() {}
+		virtual ~Variable() = default;
 
 
 	};

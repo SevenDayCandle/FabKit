@@ -12,7 +12,6 @@ namespace fbc {
 	export class Status : public GameObjectDerived<StatusData>, public AttributeObject {
 	public:
 		Status(StatusData& data): GameObjectDerived<StatusData>(data) {}
-		virtual ~Status() {}
 
 		int stacks;
 		int turns;

@@ -11,7 +11,8 @@ namespace fbc {
 	export class GameObject {
 	public:
 		GameObject() {}
-		virtual ~GameObject() {}
+		GameObject(GameObject&& other) = default;
+		virtual ~GameObject() = default;
 
 		virtual BaseContent& source() = 0;
 		virtual ObjectStrings* strings() = 0;
@@ -21,7 +22,6 @@ namespace fbc {
 	export template <c_ext<GameObjectData> T> class GameObjectDerived : public GameObject {
 	public:
 		GameObjectDerived(T& data) : data(data), GameObject() {}
-		virtual ~GameObjectDerived() {}
 
 		T& data;
 

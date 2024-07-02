@@ -10,7 +10,7 @@ namespace fbc {
 	public:
 		UIBase(Hitbox* hb) : hb(hb) {}
 		UIBase(uptr<Hitbox>&& hb) : hb(std::move(hb)) {}
-		virtual ~UIBase() override {}
+		virtual ~UIBase() override = default;
 
 		uptr<Hitbox> hb;
 		bool enabled = true;

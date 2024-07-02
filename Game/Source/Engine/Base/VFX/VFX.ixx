@@ -12,7 +12,7 @@ namespace fbc {
 	export class VFX : public IOverlay {
 	public:
 		VFX(float duration = DEFAULT_DURATION): duration(duration) {}
-		virtual ~VFX() {}
+		virtual ~VFX() override = default;
 
 		float duration = DEFAULT_DURATION;
 		float ticks = 0;

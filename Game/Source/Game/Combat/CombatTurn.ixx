@@ -24,13 +24,13 @@ namespace fbc {
 
 	void CombatTurn::end()
 	{
-		source.onEndTurn();
+		source.onTurnEnd();
 		// TODO hooks
 	}
 
 	void CombatTurn::start()
 	{
-		isDone = source.act();
+		isDone = source.onTurnBegin();
 		// TODO hooks
 	}
 }

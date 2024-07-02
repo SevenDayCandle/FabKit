@@ -11,7 +11,7 @@ namespace fbc {
 			// TODO remove constructor method
 			refreshCache();
 		}
-		virtual ~TextInfo() {}
+		virtual ~TextInfo() = default;
 
 		inline float getTextHeight() const { return cache.h; }
 		inline float getTextWidth() const { return cache.w; }

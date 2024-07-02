@@ -9,7 +9,7 @@ import std;
 namespace fbc {
 	export class GameObjectData {
 	public:
-		virtual ~GameObjectData() {}
+		virtual ~GameObjectData() = default;
 
 		const str id;
 		BaseContent& source;
@@ -21,8 +21,6 @@ namespace fbc {
 	};
 
 	export template <typename T> class GameObjectDataDerived : public GameObjectData, public IRegisterable<T> {
-	public:
-		virtual ~GameObjectDataDerived() {}
 	protected:
 		GameObjectDataDerived(BaseContent& source, strv id) : GameObjectData(source, id) {}
 

@@ -13,7 +13,6 @@ namespace fbc {
 	public:
 		UIScrollbar(Hitbox* hb, IDrawable& imageBar, IDrawable& imageButton): UIBase(hb), imageBar(imageBar), imageButton(imageButton) {
 		}
-		virtual ~UIScrollbar() {}
 
 		inline float getScroll() const { return scrollPercent; }
 		inline UIScrollbar& setOnScroll(const func<void(float)>& onScroll) { return this->onScroll = onScroll, *this; }

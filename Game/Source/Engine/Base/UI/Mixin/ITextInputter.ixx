@@ -12,7 +12,7 @@ namespace fbc {
 	export struct ITextInputter : public sdl::IKeyInputListener {
 	public:
 		ITextInputter() {}
-		virtual ~ITextInputter() {}
+		virtual ~ITextInputter() override = default;
 
 		virtual void onKeyPress(int32 c) override;
 		virtual void onTextInput(char* text) override;

@@ -6,7 +6,7 @@ export namespace sdl {
 	export struct IKeyInputListener {
 	public:
 		IKeyInputListener() {}
-		virtual ~IKeyInputListener() {}
+		virtual ~IKeyInputListener() = default;
 
 		virtual void onKeyPress(std::int32_t c) = 0;
 		virtual void onTextInput(char* text) = 0;

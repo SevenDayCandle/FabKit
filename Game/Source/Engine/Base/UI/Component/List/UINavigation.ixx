@@ -22,7 +22,6 @@ namespace fbc {
 			IDrawable& background = cct.images.darkPanelRound,
 			bool canAutosize = false) :
 			UIList<T>(hb, labelFunc, itemFont, background, canAutosize) {}
-		virtual ~UINavigation() {}
 
 		inline T* getSelectedItem() { return currentItem; }
 		inline UINavigation& setItemFont(FFont& itemFont) { return UIList<T>::setItemFont(itemFont), * this; }

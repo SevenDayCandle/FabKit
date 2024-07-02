@@ -8,7 +8,7 @@ namespace fbc {
 	export struct IDrawable : public ILoadable {
 	public:
 		IDrawable() {}
-		virtual ~IDrawable() {}
+		virtual ~IDrawable() override = default;
 
 		inline void draw(const sdl::RectF* destRec, const sdl::Point& origin = { 0,0 }, float rotation = 0, sdl::FlipMode flip = sdl::FlipMode::SDL_FLIP_NONE) { drawBase(getBaseRec(), destRec, origin, rotation, flip); }
 		inline void draw(const sdl::RectF* destRec, const sdl::Color& tint, const sdl::Point& origin = { 0,0 }, float rotation = 0, sdl::FlipMode flip = sdl::FlipMode::SDL_FLIP_NONE) { draw(getBaseRec(), destRec, tint, origin, rotation, flip); }

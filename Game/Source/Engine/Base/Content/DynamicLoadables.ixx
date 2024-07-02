@@ -12,7 +12,6 @@ namespace fbc {
 	export template <c_ext<ILoadable> T> class DynamicLoadables : public ContentLoadables {
 	public:
 		DynamicLoadables(const BaseContent& content) : ContentLoadables(content) {}
-		virtual ~DynamicLoadables() {}
 
 		inline void dispose() override { items.clear(); }
 

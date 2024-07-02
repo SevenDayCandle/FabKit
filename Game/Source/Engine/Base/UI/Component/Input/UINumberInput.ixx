@@ -26,9 +26,6 @@ namespace fbc {
 			initCaret(this->font, this->hb->x, this->hb->y);
 			UINumberInput::onSizeUpdated();
 		}
-		virtual ~UINumberInput() {
-
-		}
 
 		inline int getValue() const { return val; }
 		inline UINumberInput& setOnBufferUpdate(const func<void(int)>& onBufferUpdateCallback) { return this->onBufferUpdateCallback = onBufferUpdateCallback, *this; }

@@ -16,7 +16,6 @@ namespace fbc {
 	public:
 		UITitledInteractable(Hitbox* hb, IDrawable& image) : UIInteractable(hb, image) {}
 		UITitledInteractable(Hitbox* hb, IDrawable& image, sdl::Point origin) : UIInteractable(hb, image, origin) {}
-		virtual ~UITitledInteractable() override {}
 
 		uptr<TextInfo> label;
 

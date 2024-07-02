@@ -428,6 +428,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Game\Combat\CombatInstance.cpp" />
     <ClCompile Include="Source\Game\Combat\CombatInstance.ixx">
       <SubType>
       </SubType>
@@ -465,8 +466,8 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
     </ClCompile>
     <ClCompile Include="Source\Game\Entity\Card\CardType.ixx" />
     <ClCompile Include="Source\Game\Entity\Card\CardGroup.ixx" />
-    <ClCompile Include="Source\Game\Entity\Card\Card.cppm" />
-    <ClCompile Include="Source\Game\Entity\Creature\Creature.cppm" />
+    <ClCompile Include="Source\Game\Entity\Card\Card.cpp" />
+    <ClCompile Include="Source\Game\Entity\Creature\Creature.cpp" />
     <ClCompile Include="Source\Game\Entity\Creature\Creature.ixx" />
     <ClCompile Include="Source\Game\Entity\Creature\Behavior\CommonBehavior.ixx">
       <SubType>
@@ -499,7 +500,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Game\Entity\Status\Status.cppm" />
+    <ClCompile Include="Source\Game\Entity\Status\Status.cpp" />
     <ClCompile Include="Source\Game\Entity\Status\StatusData.ixx" />
     <ClCompile Include="Source\Game\Entity\Status\Status.ixx">
       <SubType>
@@ -511,6 +512,16 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Game\Run\GameRun.cpp" />
+    <ClCompile Include="Source\Game\Run\GameRun.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Run\RunCreatureEntry.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Run\RunRoom.ixx" />
     <ClCompile Include="Source\Game\UI\Screens\TitleScreen.ixx" />
     <ClCompile Include="Source\Main.cpp">
       <DeploymentContent>false</DeploymentContent>

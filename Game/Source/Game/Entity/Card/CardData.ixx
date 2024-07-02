@@ -13,7 +13,6 @@ namespace fbc {
 	export class CardData : public GameObjectDataDerived<CardData> {
 	public:
 		CardData(BaseContent& source, strv id) : GameObjectDataDerived(source, id) {}
-		virtual ~CardData() {}
 
 		bool isUpgradeBranchOptional = true;
 		bool targetAlly = false;

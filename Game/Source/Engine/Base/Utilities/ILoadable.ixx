@@ -10,7 +10,7 @@ namespace fbc {
 	public:
 		ILoadable() {}
 
-		virtual ~ILoadable() {}
+		virtual ~ILoadable() = default;
 
 		virtual void dispose() = 0;
 		virtual void reload () = 0;

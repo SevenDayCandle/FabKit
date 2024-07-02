@@ -17,7 +17,7 @@ namespace fbc {
 	export class ContentLoadables {
 	public:
 		ContentLoadables(const BaseContent& content) : content(content) {}
-		virtual ~ContentLoadables() {}
+		virtual ~ContentLoadables() = default;
 
 		const BaseContent& content;
 
