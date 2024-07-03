@@ -5,7 +5,6 @@ import fbc.CoreAudio;
 import fbc.CoreConfig;
 import fbc.CoreImages;
 import fbc.CoreStrings;
-import fbc.DynamicContent;
 import fbc.FFont;
 import fbc.FMusic;
 import fbc.FSound;
@@ -16,7 +15,6 @@ import std;
 
 namespace fbc {
 	export constexpr strv BASE_FOLDER = "/Resources";
-	export constexpr strv MANIFEST = "manifest.json";
 
 	export class CoreContent : public BaseContent {
 	public:
@@ -26,9 +24,9 @@ namespace fbc {
 		CoreImages images = CoreImages(*this);
 		CoreStrings strings = CoreStrings(*this);
 
-		inline FFont& fontBold() { return *fontBoldData; }
-		inline FFont& fontRegular() { return *fontRegularData; }
-		inline FFont& fontSmall() { return *fontSmallData; }
+		inline FFont& fontBold() const { return *fontBoldData; }
+		inline FFont& fontRegular() const { return *fontRegularData; }
+		inline FFont& fontSmall() const { return *fontSmallData; }
 
 		BaseContent* getContent(strv content);
 		FMusic* getMusic(strv content, strv path);
@@ -37,8 +35,8 @@ namespace fbc {
 		template <c_ext<BaseContent> T> T& registerContent(uptr<T>&& element);
 		void dispose() override;
 		void initialize() override;
+		void initializeContents();
 		void initializeFonts();
-		void loadDynamicContent();
 		void postInitialize() override;
 		void reloadAudio() override;
 		void reloadFonts();
@@ -107,12 +105,14 @@ namespace fbc {
 	void CoreContent::initialize()
 	{
 		initializeFonts();
+		strings.initialize();
 		audio.initialize();
 		images.initialize();
-		strings.initialize();
+	}
 
-		loadDynamicContent();
-
+	void CoreContent::initializeContents()
+	{
+		// TODO order content based on dependencies
 		for (uptr<BaseContent>& content : registeredContents | std::views::values) {
 			content->initialize();
 		}
@@ -123,28 +123,6 @@ namespace fbc {
 		fontBoldData = std::make_unique<FFont>(cfg.textFontBold.get(), 48, 2, 4);
 		fontRegularData = std::make_unique<FFont>(cfg.textFont.get(), 48, 0, 4);
 		fontSmallData = std::make_unique<FFont>(cfg.textFont.get(), 32, 0, 3);
-	}
-
-	// Generate dynamic content from each folder in the content root folder
-	void CoreContent::loadDynamicContent()
-	{
-		for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(sdl::dirBase() + str(CONTENT_ROOT))) {
-			if (std::filesystem::is_directory(entry.status())) {
-				path subdir = entry.path();
-				path manifestPath = subdir / MANIFEST;
-
-				// TODO process content manifest
-				if (std::filesystem::exists(manifestPath)) {
-					//processManifest(manifestPath, id);
-				}
-				else {
-					str id = subdir.filename().string();
-					auto [it, inserted] = registeredContents.emplace(std::piecewise_construct,
-						std::forward_as_tuple(id),
-						std::forward_as_tuple(std::make_unique<DynamicContent>(id, subdir.string())));
-				}
-			}
-		}
 	}
 
 	void CoreContent::postInitialize()

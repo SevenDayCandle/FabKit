@@ -26,7 +26,7 @@
 namespace glz
 {
 
-   // forward declare from json/quoted.hpp to avoid circular include
+   // forward declare from json/wrappers.hpp to avoid circular include
    template <class T>
    struct quoted_t;
 
@@ -124,7 +124,7 @@ namespace glz
       };
 
       template <class T>
-         requires(glaze_value_t<T> && !specialized_with_custom_read<T>)
+         requires(glaze_value_t<T> && !custom_read<T>)
       struct from_json<T>
       {
          template <auto Opts, class Value, is_context Ctx, class It0, class It1>
@@ -143,6 +143,20 @@ namespace glz
          GLZ_ALWAYS_INLINE static void op(auto&&, is_context auto&& ctx, auto&&...) noexcept
          {
             ctx.error = error_code::attempt_member_func_read;
+         }
+      };
+
+      template <is_includer T>
+      struct from_json<T>
+      {
+         template <auto Opts, class... Args>
+         GLZ_ALWAYS_INLINE static void op(auto&&, is_context auto&& ctx, auto&& it, auto&& end) noexcept
+         {
+            if constexpr (!Opts.ws_handled) {
+               GLZ_SKIP_WS;
+            }
+
+            match<R"("")", Opts>(ctx, it, end);
          }
       };
 
@@ -223,9 +237,7 @@ namespace glz
             if constexpr (!Options.ws_handled) {
                GLZ_SKIP_WS;
             }
-            match<'['>(ctx, it);
-            if (bool(ctx.error)) [[unlikely]]
-               return;
+            GLZ_MATCH_OPEN_BRACKET;
 
             auto* ptr = reinterpret_cast<typename T::value_type*>(&v);
             static_assert(sizeof(T) == sizeof(typename T::value_type) * 2);
@@ -242,7 +254,7 @@ namespace glz
                return;
 
             GLZ_SKIP_WS;
-            match<']'>(ctx, it, end);
+            GLZ_MATCH_CLOSE_BRACKET;
          }
       };
 
@@ -274,28 +286,46 @@ namespace glz
                GLZ_SKIP_WS;
             }
 
-            if (size_t(end - it) < 4) [[unlikely]] {
-               ctx.error = error_code::expected_true_or_false;
-               return;
-            }
-
-            uint64_t c{};
-            // Note that because our buffer must be null terminated, we can read one more index without checking:
-            std::memcpy(&c, it, 5);
-            constexpr uint64_t u_true = 0b00000000'00000000'00000000'00000000'01100101'01110101'01110010'01110100;
-            constexpr uint64_t u_false = 0b00000000'00000000'00000000'01100101'01110011'01101100'01100001'01100110;
-            // We have to wipe the 5th character for true testing
-            if ((c & 0xFF'FF'FF'00'FF'FF'FF'FF) == u_true) {
-               value = true;
-               it += 4;
-            }
-            else {
-               if (c != u_false) [[unlikely]] {
-                  ctx.error = error_code::expected_true_or_false;
+            if constexpr (Opts.bools_as_numbers) {
+               if (*it == '1') {
+                  value = true;
+                  ++it;
+               }
+               else if (*it == '0') {
+                  value = false;
+                  ++it;
+               }
+               else {
+                  ctx.error = error_code::syntax_error;
                   return;
                }
-               value = false;
-               it += 5;
+            }
+            else {
+               if constexpr (not Opts.is_padded) {
+                  if (size_t(end - it) < 4) [[unlikely]] {
+                     ctx.error = error_code::expected_true_or_false;
+                     return;
+                  }
+               }
+
+               uint64_t c{};
+               // Note that because our buffer must be null terminated, we can read one more index without checking:
+               std::memcpy(&c, it, 5);
+               constexpr uint64_t u_true = 0b00000000'00000000'00000000'00000000'01100101'01110101'01110010'01110100;
+               constexpr uint64_t u_false = 0b00000000'00000000'00000000'01100101'01110011'01101100'01100001'01100110;
+               // We have to wipe the 5th character for true testing
+               if ((c & 0xFF'FF'FF'00'FF'FF'FF'FF) == u_true) {
+                  value = true;
+                  it += 4;
+               }
+               else {
+                  if (c != u_false) [[unlikely]] {
+                     ctx.error = error_code::expected_true_or_false;
+                     return;
+                  }
+                  value = false;
+                  it += 5;
+               }
             }
 
             if constexpr (Opts.quoted_num) {
@@ -307,18 +337,16 @@ namespace glz
       template <num_t T>
       struct from_json<T>
       {
-         template <auto Options, class It>
+         template <auto Opts, class It>
          GLZ_ALWAYS_INLINE static void op(auto&& value, is_context auto&& ctx, It&& it, auto&& end) noexcept
          {
-            if constexpr (Options.quoted_num) {
-               skip_ws<Options>(ctx, it, end);
+            if constexpr (Opts.quoted_num) {
+               GLZ_SKIP_WS;
                GLZ_MATCH_QUOTE;
             }
 
-            if constexpr (!Options.ws_handled) {
-               skip_ws<Options>(ctx, it, end);
-               if (bool(ctx.error)) [[unlikely]]
-                  return;
+            if constexpr (!Opts.ws_handled) {
+               GLZ_SKIP_WS;
             }
 
             using V = std::decay_t<decltype(value)>;
@@ -334,11 +362,11 @@ namespace glz
                      static_assert(sizeof(*it) == sizeof(char));
                      const char* cur = reinterpret_cast<const char*>(it);
                      const char* beg = cur;
-                     if constexpr (std::is_volatile_v<decltype(value)>) {
+                     if constexpr (std::is_volatile_v<std::remove_reference_t<decltype(value)>>) {
                         // Hardware may interact with value changes, so we parse into a temporary and assign in one
                         // place
                         uint64_t i{};
-                        auto s = parse_int<uint64_t, Options.force_conformance>(i, cur);
+                        auto s = parse_int<uint64_t, Opts.force_conformance>(i, cur);
                         if (!s) [[unlikely]] {
                            ctx.error = error_code::parse_number_failure;
                            return;
@@ -346,8 +374,7 @@ namespace glz
                         value = i;
                      }
                      else {
-                        auto s =
-                           parse_int<decay_keep_volatile_t<decltype(value)>, Options.force_conformance>(value, cur);
+                        auto s = parse_int<decay_keep_volatile_t<decltype(value)>, Opts.force_conformance>(value, cur);
                         if (!s) [[unlikely]] {
                            ctx.error = error_code::parse_number_failure;
                            return;
@@ -366,7 +393,7 @@ namespace glz
                      static_assert(sizeof(*it) == sizeof(char));
                      const char* cur = reinterpret_cast<const char*>(it);
                      const char* beg = cur;
-                     auto s = parse_int<std::decay_t<decltype(i)>, Options.force_conformance>(i, cur);
+                     auto s = parse_int<std::decay_t<decltype(i)>, Opts.force_conformance>(i, cur);
                      if (!s) [[unlikely]] {
                         ctx.error = error_code::parse_number_failure;
                         return;
@@ -391,7 +418,7 @@ namespace glz
                   static_assert(sizeof(*it) == sizeof(char));
                   const char* cur = reinterpret_cast<const char*>(it);
                   const char* beg = cur;
-                  auto s = parse_int<decay_keep_volatile_t<decltype(i)>, Options.force_conformance>(i, cur);
+                  auto s = parse_int<decay_keep_volatile_t<decltype(i)>, Opts.force_conformance>(i, cur);
                   if (!s) [[unlikely]] {
                      ctx.error = error_code::parse_number_failure;
                      return;
@@ -425,10 +452,10 @@ namespace glz
                   it = ptr;
                }
                else {
-                  if constexpr (std::is_volatile_v<decltype(value)>) {
+                  if constexpr (std::is_volatile_v<std::remove_reference_t<decltype(value)>>) {
                      // Hardware may interact with value changes, so we parse into a temporary and assign in one place
                      V temp;
-                     auto s = parse_float<V, Options.force_conformance>(value, it);
+                     auto s = parse_float<V, Opts.force_conformance>(temp, it);
                      if (!s) [[unlikely]] {
                         ctx.error = error_code::parse_number_failure;
                         return;
@@ -436,7 +463,7 @@ namespace glz
                      value = temp;
                   }
                   else {
-                     auto s = parse_float<V, Options.force_conformance>(value, it);
+                     auto s = parse_float<V, Opts.force_conformance>(value, it);
                      if (!s) [[unlikely]] {
                         ctx.error = error_code::parse_number_failure;
                         return;
@@ -445,7 +472,7 @@ namespace glz
                }
             }
 
-            if constexpr (Options.quoted_num) {
+            if constexpr (Opts.quoted_num) {
                GLZ_MATCH_QUOTE;
             }
          }
@@ -456,7 +483,7 @@ namespace glz
       {
          template <auto Opts, class It, class End>
             requires(Opts.is_padded)
-         GLZ_ALWAYS_INLINE static void op(auto& value, is_context auto&& ctx, It&& it, End&& end) noexcept
+         static void op(auto& value, is_context auto&& ctx, It&& it, End&& end) noexcept
          {
             if constexpr (Opts.number) {
                auto start = it;
@@ -478,7 +505,7 @@ namespace glz
                if constexpr (not Opts.raw_string) {
                   auto& temp = string_decode_buffer();
                   auto* p = temp.data();
-                  auto* p_end = temp.data() + temp.size() - padding_bytes;
+                  auto* p_end = p + temp.size() - padding_bytes;
 
                   while (true) {
                      if (p >= p_end) [[unlikely]] {
@@ -491,19 +518,42 @@ namespace glz
                      std::memcpy(p, it, 8);
                      uint64_t swar;
                      std::memcpy(&swar, p, 8);
-                     auto next = has_quote(swar) | has_escape(swar) | is_less_32(swar);
 
+                     constexpr uint64_t high_mask = repeat_byte8(0b10000000);
+                     constexpr uint64_t lo7_mask = repeat_byte8(0b01111111);
+                     const uint64_t hi = swar & high_mask;
+                     uint64_t next;
+                     if (hi == high_mask) {
+                        // unescaped unicode has all high bits set
+                        it += 8;
+                        p += 8;
+                        continue;
+                     }
+                     else if (hi == 0) {
+                        // we have only ascii
+                        const uint64_t quote = (swar ^ repeat_byte8('"')) + lo7_mask;
+                        const uint64_t backslash = (swar ^ repeat_byte8('\\')) + lo7_mask;
+                        const uint64_t less_32 = (swar & repeat_byte8(0b01100000)) + lo7_mask;
+                        next = ~(quote & backslash & less_32);
+                     }
+                     else {
+                        const uint64_t lo7 = swar & lo7_mask;
+                        const uint64_t quote = (lo7 ^ repeat_byte8('"')) + lo7_mask;
+                        const uint64_t backslash = (lo7 ^ repeat_byte8('\\')) + lo7_mask;
+                        const uint64_t less_32 = (swar & repeat_byte8(0b01100000)) + lo7_mask;
+                        next = ~((quote & backslash & less_32) | swar);
+                     }
+
+                     next &= repeat_byte8(0b10000000);
                      if (next) {
                         next = countr_zero(next) >> 3;
                         it += next;
                         if (*it == '"') {
-                           const auto n = size_t((p + next) - temp.data());
-                           value.resize(n);
-                           std::memcpy(value.data(), temp.data(), n);
+                           value.assign(temp.data(), size_t((p + next) - temp.data()));
                            ++it;
                            return;
                         }
-                        if (*it < 32) [[unlikely]] {
+                        if ((*it & 0b11100000) == 0) [[unlikely]] {
                            ctx.error = error_code::syntax_error;
                            return;
                         }
@@ -517,13 +567,12 @@ namespace glz
                            }
                         }
                         else {
-                           const auto escape_char = char_unescape_table[*it];
-                           if (escape_char == 0) [[unlikely]] {
+                           p += next;
+                           *p = char_unescape_table[*it];
+                           if (*p == 0) [[unlikely]] {
                               ctx.error = error_code::invalid_escape;
                               return;
                            }
-                           p += next;
-                           *p = escape_char;
                            ++p;
                            ++it;
                         }
@@ -541,7 +590,7 @@ namespace glz
                   if (bool(ctx.error)) [[unlikely]]
                      return;
 
-                  value = sv{start, size_t(it - start)};
+                  value.assign(start, size_t(it - start));
                   ++it;
                }
             }
@@ -569,84 +618,107 @@ namespace glz
                }
 
                if constexpr (not Opts.raw_string) {
-                  // A surrogate pair unicode code point may require 12 characters
-                  // So we need to have this much space available in our read buffer
-                  const auto end12 = end - 12;
                   auto& temp = string_decode_buffer();
                   auto* p = temp.data();
-                  auto* p_end = temp.data() + temp.size() - padding_bytes;
 
-                  while (true) {
-                     if (p >= p_end) [[unlikely]] {
-                        // the rare case of running out of temp buffer
-                        const auto distance = size_t(p - temp.data());
-                        temp.resize(temp.size() * 2);
-                        p = temp.data() + distance; // reset p from new memory
-                        p_end = temp.data() + temp.size() - padding_bytes;
-                     }
-                     if (it > end12) {
-                        break;
-                     }
-                     std::memcpy(p, it, 8);
-                     uint64_t swar;
-                     std::memcpy(&swar, p, 8);
-                     auto next = has_quote(swar) | has_escape(swar) | is_less_32(swar);
+                  if (size_t(end - it) > 11) {
+                     // A surrogate pair unicode code point may require 12 characters
+                     // So we need to have this much space available in our read buffer
+                     const auto end12 = end - 12;
+                     auto* p_end = p + temp.size() - padding_bytes;
 
-                     if (next) {
-                        next = countr_zero(next) >> 3;
-                        it += next;
-                        if (*it == '"') {
-                           const auto n = size_t((p + next) - temp.data());
-                           value.resize(n);
-                           std::memcpy(value.data(), temp.data(), n);
-                           ++it;
-                           return;
+                     while (true) {
+                        if (p >= p_end) [[unlikely]] {
+                           // the rare case of running out of temp buffer
+                           const auto distance = size_t(p - temp.data());
+                           temp.resize(temp.size() * 2);
+                           p = temp.data() + distance; // reset p from new memory
+                           p_end = temp.data() + temp.size() - padding_bytes;
                         }
-                        if (*it < 32) [[unlikely]] {
-                           ctx.error = error_code::syntax_error;
-                           return;
+                        if (it > end12) {
+                           break;
                         }
-                        ++it; // skip the escape
-                        if (*it == 'u') {
-                           ++it;
-                           p += next;
-                           if (!handle_unicode_code_point(it, p)) [[unlikely]] {
-                              ctx.error = error_code::unicode_escape_conversion_failure;
+                        std::memcpy(p, it, 8);
+                        uint64_t swar;
+                        std::memcpy(&swar, p, 8);
+
+                        constexpr uint64_t high_mask = repeat_byte8(0b10000000);
+                        constexpr uint64_t lo7_mask = repeat_byte8(0b01111111);
+                        const uint64_t hi = swar & high_mask;
+                        uint64_t next;
+                        if (hi == high_mask) {
+                           // unescaped unicode has all high bits set
+                           it += 8;
+                           p += 8;
+                           continue;
+                        }
+                        else if (hi == 0) {
+                           // we have only ascii
+                           const uint64_t quote = (swar ^ repeat_byte8('"')) + lo7_mask;
+                           const uint64_t backslash = (swar ^ repeat_byte8('\\')) + lo7_mask;
+                           const uint64_t less_32 = (swar & repeat_byte8(0b01100000)) + lo7_mask;
+                           next = ~(quote & backslash & less_32);
+                        }
+                        else {
+                           const uint64_t lo7 = swar & lo7_mask;
+                           const uint64_t quote = (lo7 ^ repeat_byte8('"')) + lo7_mask;
+                           const uint64_t backslash = (lo7 ^ repeat_byte8('\\')) + lo7_mask;
+                           const uint64_t less_32 = (swar & repeat_byte8(0b01100000)) + lo7_mask;
+                           next = ~((quote & backslash & less_32) | swar);
+                        }
+
+                        next &= repeat_byte8(0b10000000);
+                        if (next) {
+                           next = countr_zero(next) >> 3;
+                           it += next;
+                           if (*it == '"') {
+                              value.assign(temp.data(), size_t((p + next) - temp.data()));
+                              ++it;
                               return;
+                           }
+                           if ((*it & 0b11100000) == 0) [[unlikely]] {
+                              ctx.error = error_code::syntax_error;
+                              return;
+                           }
+                           ++it; // skip the escape
+                           if (*it == 'u') {
+                              ++it;
+                              p += next;
+                              if (!handle_unicode_code_point(it, p)) [[unlikely]] {
+                                 ctx.error = error_code::unicode_escape_conversion_failure;
+                                 return;
+                              }
+                           }
+                           else {
+                              p += next;
+                              *p = char_unescape_table[*it];
+                              if (*p == 0) [[unlikely]] {
+                                 ctx.error = error_code::invalid_escape;
+                                 return;
+                              }
+                              ++p;
+                              ++it;
                            }
                         }
                         else {
-                           const auto escape_char = char_unescape_table[*it];
-                           if (escape_char == 0) [[unlikely]] {
-                              ctx.error = error_code::invalid_escape;
-                              return;
-                           }
-                           p += next;
-                           *p = escape_char;
-                           ++p;
-                           ++it;
+                           it += 8;
+                           p += 8;
                         }
                      }
-                     else {
-                        it += 8;
-                        p += 8;
-                     }
-                  }
 
-                  // we know we won't run out of space in our temp buffer because we subtract padding_bytes
-                  while (it[-1] == '\\') [[unlikely]] {
-                     // if we ended on an escape character then we need to rewind
-                     // because we lost our context
-                     --it;
-                     --p;
+                     // we know we won't run out of space in our temp buffer because we subtract padding_bytes
+                     while (it[-1] == '\\') [[unlikely]] {
+                        // if we ended on an escape character then we need to rewind
+                        // because we lost our context
+                        --it;
+                        --p;
+                     }
                   }
 
                   while (it < end) [[likely]] {
                      *p = *it;
                      if (*it == '"') {
-                        const auto n = size_t(p - temp.data());
-                        value.resize(n);
-                        std::memcpy(value.data(), temp.data(), n);
+                        value.assign(temp.data(), size_t(p - temp.data()));
                         ++it;
                         return;
                      }
@@ -660,12 +732,11 @@ namespace glz
                            }
                         }
                         else {
-                           const auto escape_char = char_unescape_table[*it];
-                           if (escape_char == 0) [[unlikely]] {
+                           *p = char_unescape_table[*it];
+                           if (*p == 0) [[unlikely]] {
                               ctx.error = error_code::invalid_escape;
                               return;
                            }
-                           *p = escape_char;
                            ++p;
                            ++it;
                         }
@@ -685,7 +756,7 @@ namespace glz
                   if (bool(ctx.error)) [[unlikely]]
                      return;
 
-                  value = sv{start, size_t(it - start)};
+                  value.assign(start, size_t(it - start));
                   ++it;
                }
             }
@@ -714,7 +785,7 @@ namespace glz
                if (bool(ctx.error)) [[unlikely]]
                   return;
                value = {start, size_t(it - start)};
-               ++it;
+               ++it; // skip closing quote
             }
             else if constexpr (char_array_t<T>) {
                skip_string_view<Opts>(ctx, it, end);
@@ -728,6 +799,7 @@ namespace glz
                }
                std::memcpy(value, start, n);
                value[n] = '\0';
+               ++it; // skip closing quote
             }
          }
       };
@@ -800,11 +872,11 @@ namespace glz
       };
 
       template <class T>
-         requires(glaze_enum_t<T> && !specialized_with_custom_read<T>)
+         requires(glaze_enum_t<T> && !custom_read<T>)
       struct from_json<T>
       {
          template <auto Opts>
-         GLZ_ALWAYS_INLINE static void op(auto& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
+         static void op(auto& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
          {
             if constexpr (!Opts.ws_handled) {
                GLZ_SKIP_WS;
@@ -826,7 +898,7 @@ namespace glz
       };
 
       template <class T>
-         requires(std::is_enum_v<T> && !glaze_enum_t<T> && !specialized_with_custom_read<T>)
+         requires(std::is_enum_v<T> && !glaze_enum_t<T> && !custom_read<T>)
       struct from_json<T>
       {
          template <auto Opts>
@@ -844,7 +916,7 @@ namespace glz
       struct from_json<T>
       {
          template <auto Opts>
-         GLZ_ALWAYS_INLINE static void op(auto& /*value*/, is_context auto&& ctx, auto&& it, auto&& end) noexcept
+         static void op(auto& /*value*/, is_context auto&& ctx, auto&& it, auto&& end) noexcept
          {
             if constexpr (!Opts.ws_handled) {
                GLZ_SKIP_WS;
@@ -888,18 +960,14 @@ namespace glz
       struct from_json<T>
       {
          template <auto Options>
-         GLZ_FLATTEN static void op(auto& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
+         static void op(auto& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
          {
-            if constexpr (!Options.ws_handled) {
-               skip_ws<Options>(ctx, it, end);
-               if (bool(ctx.error)) [[unlikely]]
-                  return;
-            }
             constexpr auto Opts = ws_handled_off<Options>();
+            if constexpr (!Options.ws_handled) {
+               GLZ_SKIP_WS;
+            }
 
-            match<'['>(ctx, it);
-            if (bool(ctx.error)) [[unlikely]]
-               return;
+            GLZ_MATCH_OPEN_BRACKET;
             GLZ_SKIP_WS;
 
             value.clear();
@@ -931,23 +999,19 @@ namespace glz
       struct from_json<T>
       {
          template <auto Options>
-         GLZ_FLATTEN static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
+         static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
          {
-            if constexpr (!Options.ws_handled) {
-               skip_ws<Options>(ctx, it, end);
-               if (bool(ctx.error)) [[unlikely]]
-                  return;
-            }
             constexpr auto Opts = ws_handled_off<Options>();
+            if constexpr (!Options.ws_handled) {
+               GLZ_SKIP_WS;
+            }
 
-            match<'['>(ctx, it);
-            if (bool(ctx.error)) [[unlikely]]
-               return;
+            GLZ_MATCH_OPEN_BRACKET;
 
             const auto ws_start = it;
             GLZ_SKIP_WS;
 
-            if (*it == ']') [[unlikely]] {
+            if (*it == ']') {
                ++it;
                if constexpr (resizable<T>) {
                   value.clear();
@@ -970,7 +1034,7 @@ namespace glz
                if (bool(ctx.error)) [[unlikely]]
                   return;
                GLZ_SKIP_WS;
-               if (*it == ',') [[likely]] {
+               if (*it == ',') {
                   ++it;
 
                   if constexpr (!Opts.minified) {
@@ -999,143 +1063,148 @@ namespace glz
                }
             }
 
-            // growing
-            if constexpr (emplace_backable<T>) {
-               // This optimization is useful when a std::vector contains large types (greater than 4096 bytes)
-               // It is faster to simply use emplace_back for small types and reasonably lengthed vectors
-               // (less than a million elements)
-               // https://baptiste-wicht.com/posts/2012/12/cpp-benchmark-vector-list-deque.html
-               if constexpr (has_reserve<T> && has_capacity<T> &&
-                             requires { requires(sizeof(typename T::value_type) > 4096); }) {
-                  // If we can reserve memmory, like std::vector, then we want to check the capacity
-                  // and use a temporary buffer if the capacity needs to grow
-                  if (value.capacity() == 0) {
-                     value.reserve(1); // we want to directly use our vector for the first element
-                  }
-                  const auto capacity = value.capacity();
-                  for (size_t i = value.size(); i < capacity; ++i) {
-                     // emplace_back while we have capacity
-                     read<json>::op<ws_handled<Opts>()>(value.emplace_back(), ctx, it, end);
-                     if (bool(ctx.error)) [[unlikely]]
-                        return;
-                     GLZ_SKIP_WS;
-                     if (*it == ',') [[likely]] {
-                        ++it;
+            if constexpr (Opts.partial_read) {
+               return;
+            }
+            else {
+               // growing
+               if constexpr (emplace_backable<T>) {
+                  // This optimization is useful when a std::vector contains large types (greater than 4096 bytes)
+                  // It is faster to simply use emplace_back for small types and reasonably lengthed vectors
+                  // (less than a million elements)
+                  // https://baptiste-wicht.com/posts/2012/12/cpp-benchmark-vector-list-deque.html
+                  if constexpr (has_reserve<T> && has_capacity<T> &&
+                                requires { requires(sizeof(typename T::value_type) > 4096); }) {
+                     // If we can reserve memmory, like std::vector, then we want to check the capacity
+                     // and use a temporary buffer if the capacity needs to grow
+                     if (value.capacity() == 0) {
+                        value.reserve(1); // we want to directly use our vector for the first element
+                     }
+                     const auto capacity = value.capacity();
+                     for (size_t i = value.size(); i < capacity; ++i) {
+                        // emplace_back while we have capacity
+                        read<json>::op<ws_handled<Opts>()>(value.emplace_back(), ctx, it, end);
+                        if (bool(ctx.error)) [[unlikely]]
+                           return;
+                        GLZ_SKIP_WS;
+                        if (*it == ',') [[likely]] {
+                           ++it;
 
-                        if constexpr (!Opts.minified) {
-                           if (ws_size && ws_size < size_t(end - it)) {
-                              skip_matching_ws(ws_start, it, ws_size);
+                           if constexpr (!Opts.minified) {
+                              if (ws_size && ws_size < size_t(end - it)) {
+                                 skip_matching_ws(ws_start, it, ws_size);
+                              }
                            }
+
+                           GLZ_SKIP_WS;
+                        }
+                        else if (*it == ']') {
+                           ++it;
+                           return;
+                        }
+                        else [[unlikely]] {
+                           ctx.error = error_code::expected_bracket;
+                           return;
+                        }
+                     }
+
+                     using value_type = typename T::value_type;
+
+                     std::vector<std::vector<value_type>> intermediate;
+                     intermediate.reserve(48);
+                     auto* active = &intermediate.emplace_back();
+                     active->reserve(2);
+                     while (it < end) {
+                        if (active->size() == active->capacity()) {
+                           // we want to populate the next vector
+                           const auto former_capacity = active->capacity();
+                           active = &intermediate.emplace_back();
+                           active->reserve(2 * former_capacity);
                         }
 
+                        read<json>::op<ws_handled<Opts>()>(active->emplace_back(), ctx, it, end);
+                        if (bool(ctx.error)) [[unlikely]]
+                           return;
                         GLZ_SKIP_WS;
-                     }
-                     else if (*it == ']') {
-                        ++it;
-                        return;
-                     }
-                     else [[unlikely]] {
-                        ctx.error = error_code::expected_bracket;
-                        return;
-                     }
-                  }
+                        if (*it == ',') [[likely]] {
+                           ++it;
 
-                  using value_type = typename T::value_type;
+                           if constexpr (!Opts.minified) {
+                              if (ws_size && ws_size < size_t(end - it)) {
+                                 skip_matching_ws(ws_start, it, ws_size);
+                              }
+                           }
 
-                  std::vector<std::vector<value_type>> intermediate;
-                  intermediate.reserve(48);
-                  auto* active = &intermediate.emplace_back();
-                  active->reserve(2);
-                  while (it < end) {
-                     if (active->size() == active->capacity()) {
-                        // we want to populate the next vector
-                        const auto former_capacity = active->capacity();
-                        active = &intermediate.emplace_back();
-                        active->reserve(2 * former_capacity);
+                           GLZ_SKIP_WS;
+                        }
+                        else if (*it == ']') {
+                           ++it;
+                           break;
+                        }
+                        else [[unlikely]] {
+                           ctx.error = error_code::expected_bracket;
+                           return;
+                        }
                      }
 
-                     read<json>::op<ws_handled<Opts>()>(active->emplace_back(), ctx, it, end);
-                     if (bool(ctx.error)) [[unlikely]]
-                        return;
-                     GLZ_SKIP_WS;
-                     if (*it == ',') [[likely]] {
-                        ++it;
+                     const auto intermediate_size = intermediate.size();
+                     size_t reserve_size = value.size();
+                     for (size_t i = 0; i < intermediate_size; ++i) {
+                        reserve_size += intermediate[i].size();
+                     }
 
-                        if constexpr (!Opts.minified) {
-                           if (ws_size && ws_size < size_t(end - it)) {
-                              skip_matching_ws(ws_start, it, ws_size);
+                     if constexpr (std::is_trivially_copyable_v<value_type> && !std::same_as<T, std::vector<bool>>) {
+                        const auto original_size = value.size();
+                        value.resize(reserve_size);
+                        auto* dest = value.data() + original_size;
+                        for (const auto& vector : intermediate) {
+                           const auto vector_size = vector.size();
+                           std::memcpy(dest, vector.data(), vector_size * sizeof(value_type));
+                           dest += vector_size;
+                        }
+                     }
+                     else {
+                        value.reserve(reserve_size);
+                        for (const auto& vector : intermediate) {
+                           const auto inter_end = vector.end();
+                           for (auto inter = vector.begin(); inter < inter_end; ++inter) {
+                              value.emplace_back(std::move(*inter));
                            }
                         }
-
-                        GLZ_SKIP_WS;
-                     }
-                     else if (*it == ']') {
-                        ++it;
-                        break;
-                     }
-                     else [[unlikely]] {
-                        ctx.error = error_code::expected_bracket;
-                        return;
-                     }
-                  }
-
-                  const auto intermediate_size = intermediate.size();
-                  size_t reserve_size = value.size();
-                  for (size_t i = 0; i < intermediate_size; ++i) {
-                     reserve_size += intermediate[i].size();
-                  }
-
-                  if constexpr (std::is_trivially_copyable_v<value_type> && !std::same_as<T, std::vector<bool>>) {
-                     const auto original_size = value.size();
-                     value.resize(reserve_size);
-                     auto* dest = value.data() + original_size;
-                     for (const auto& vector : intermediate) {
-                        const auto vector_size = vector.size();
-                        std::memcpy(dest, vector.data(), vector_size * sizeof(value_type));
-                        dest += vector_size;
                      }
                   }
                   else {
-                     value.reserve(reserve_size);
-                     for (const auto& vector : intermediate) {
-                        const auto inter_end = vector.end();
-                        for (auto inter = vector.begin(); inter < inter_end; ++inter) {
-                           value.emplace_back(std::move(*inter));
+                     // If we don't have reserve (like std::deque) or we have small sized elements
+                     while (it < end) {
+                        read<json>::op<ws_handled<Opts>()>(value.emplace_back(), ctx, it, end);
+                        if (bool(ctx.error)) [[unlikely]]
+                           return;
+                        GLZ_SKIP_WS;
+                        if (*it == ',') [[likely]] {
+                           ++it;
+
+                           if constexpr (!Opts.minified) {
+                              if (ws_size && ws_size < size_t(end - it)) {
+                                 skip_matching_ws(ws_start, it, ws_size);
+                              }
+                           }
+
+                           GLZ_SKIP_WS;
+                        }
+                        else if (*it == ']') {
+                           ++it;
+                           return;
+                        }
+                        else [[unlikely]] {
+                           ctx.error = error_code::expected_bracket;
+                           return;
                         }
                      }
                   }
                }
                else {
-                  // If we don't have reserve (like std::deque) or we have small sized elements
-                  while (it < end) {
-                     read<json>::op<ws_handled<Opts>()>(value.emplace_back(), ctx, it, end);
-                     if (bool(ctx.error)) [[unlikely]]
-                        return;
-                     GLZ_SKIP_WS;
-                     if (*it == ',') [[likely]] {
-                        ++it;
-
-                        if constexpr (!Opts.minified) {
-                           if (ws_size && ws_size < size_t(end - it)) {
-                              skip_matching_ws(ws_start, it, ws_size);
-                           }
-                        }
-
-                        GLZ_SKIP_WS;
-                     }
-                     else if (*it == ']') {
-                        ++it;
-                        return;
-                     }
-                     else [[unlikely]] {
-                        ctx.error = error_code::expected_bracket;
-                        return;
-                     }
-                  }
+                  ctx.error = error_code::exceeded_static_array_size;
                }
-            }
-            else {
-               ctx.error = error_code::exceeded_static_array_size;
             }
          }
       };
@@ -1148,7 +1217,7 @@ namespace glz
       [[nodiscard]] GLZ_ALWAYS_INLINE size_t number_of_array_elements(is_context auto&& ctx, auto it,
                                                                       auto&& end) noexcept
       {
-         skip_ws_no_pre_check<Opts>(ctx, it, end);
+         skip_ws<Opts>(ctx, it, end);
          if (bool(ctx.error)) [[unlikely]]
             return {};
 
@@ -1170,11 +1239,13 @@ namespace glz
                break;
             }
             case '{':
+               ++it;
                skip_until_closed<Opts, '{', '}'>(ctx, it, end);
                if (bool(ctx.error)) [[unlikely]]
                   return {};
                break;
             case '[':
+               ++it;
                skip_until_closed<Opts, '[', ']'>(ctx, it, end);
                if (bool(ctx.error)) [[unlikely]]
                   return {};
@@ -1199,23 +1270,20 @@ namespace glz
          unreachable();
       }
 
+      // For types like std::forward_list
       template <class T>
          requires readable_array_t<T> && (!emplace_backable<T> && resizable<T>)
       struct from_json<T>
       {
          template <auto Options>
-         GLZ_FLATTEN static void op(auto& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
+         static void op(auto& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
          {
-            if constexpr (!Options.ws_handled) {
-               skip_ws<Options>(ctx, it, end);
-               if (bool(ctx.error)) [[unlikely]]
-                  return;
-            }
             constexpr auto Opts = ws_handled_off<Options>();
+            if constexpr (!Options.ws_handled) {
+               GLZ_SKIP_WS;
+            }
 
-            match<'['>(ctx, it);
-            if (bool(ctx.error)) [[unlikely]]
-               return;
+            GLZ_MATCH_OPEN_BRACKET;
             const auto n = number_of_array_elements<Opts>(ctx, it, end);
             if (bool(ctx.error)) [[unlikely]]
                return;
@@ -1241,7 +1309,7 @@ namespace glz
       struct from_json<T>
       {
          template <auto Opts>
-         GLZ_FLATTEN static void op(auto& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
+         static void op(auto& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
          {
             static constexpr auto N = []() constexpr {
                if constexpr (glaze_array_t<T>) {
@@ -1256,9 +1324,7 @@ namespace glz
                GLZ_SKIP_WS;
             }
 
-            match<'['>(ctx, it);
-            if (bool(ctx.error)) [[unlikely]]
-               return;
+            GLZ_MATCH_OPEN_BRACKET;
             GLZ_SKIP_WS;
 
             for_each<N>([&](auto I) {
@@ -1287,7 +1353,12 @@ namespace glz
                GLZ_SKIP_WS;
             });
 
-            match<']'>(ctx, it);
+            if constexpr (Opts.partial_read) {
+               return;
+            }
+            else {
+               match<']'>(ctx, it);
+            }
          }
       };
 
@@ -1295,15 +1366,13 @@ namespace glz
       struct from_json<T>
       {
          template <auto Opts>
-         GLZ_ALWAYS_INLINE static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
+         static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
          {
             if constexpr (!Opts.ws_handled) {
                GLZ_SKIP_WS;
             }
 
-            match<'['>(ctx, it);
-            if (bool(ctx.error)) [[unlikely]]
-               return;
+            GLZ_MATCH_OPEN_BRACKET;
 
             std::string& s = string_buffer();
 
@@ -1379,7 +1448,7 @@ namespace glz
 
       // TODO: count the maximum number of escapes that can be seen if error_on_unknown_keys is true
       template <glaze_object_t T>
-      GLZ_ALWAYS_INLINE constexpr bool keys_may_contain_escape()
+      constexpr bool keys_may_contain_escape()
       {
          auto is_unicode = [](const auto c) { return (static_cast<uint8_t>(c) >> 7) > 0; };
 
@@ -1411,13 +1480,13 @@ namespace glz
       }
 
       template <reflectable T>
-      inline constexpr bool keys_may_contain_escape()
+      constexpr bool keys_may_contain_escape()
       {
          return false; // escapes are not valid in C++ names
       }
 
       template <is_variant T>
-      GLZ_ALWAYS_INLINE constexpr bool keys_may_contain_escape()
+      constexpr bool keys_may_contain_escape()
       {
          bool may_escape = false;
          constexpr auto N = std::variant_size_v<T>;
@@ -1437,7 +1506,7 @@ namespace glz
       // only use this if the keys cannot contain escape characters
       template <class T, string_literal tag = "">
          requires(glaze_object_t<T> || reflectable<T>)
-      GLZ_ALWAYS_INLINE constexpr auto key_stats()
+      constexpr auto key_stats()
       {
          key_stats_t stats{};
          if constexpr (!tag.sv().empty()) {
@@ -1469,7 +1538,7 @@ namespace glz
       }
 
       template <is_variant T, string_literal tag = "">
-      GLZ_ALWAYS_INLINE constexpr auto key_stats()
+      constexpr auto key_stats()
       {
          key_stats_t stats{};
          if constexpr (!tag.sv().empty()) {
@@ -1499,17 +1568,6 @@ namespace glz
       }
 
       template <glz::opts Opts>
-      GLZ_ALWAYS_INLINE void parse_object_opening(is_context auto& ctx, auto& it, const auto end)
-      {
-         if constexpr (!Opts.opening_handled) {
-            if constexpr (!Opts.ws_handled) {
-               GLZ_SKIP_WS;
-            }
-            match<'{'>(ctx, it);
-         }
-      }
-
-      template <glz::opts Opts>
       GLZ_ALWAYS_INLINE void parse_object_entry_sep(is_context auto& ctx, auto& it, const auto end)
       {
          GLZ_SKIP_WS;
@@ -1525,7 +1583,7 @@ namespace glz
       {
          // skip white space and escape characters and find the string
          if constexpr (!Opts.ws_handled) {
-            skip_ws_no_pre_check<Opts>(ctx, it, end);
+            skip_ws<Opts>(ctx, it, end);
             if (bool(ctx.error)) [[unlikely]]
                return {};
          }
@@ -1563,14 +1621,16 @@ namespace glz
       struct from_json<T>
       {
          template <opts Options, string_literal tag = "">
-         GLZ_FLATTEN static void op(T& value, is_context auto&& ctx, auto&& it, auto&& end)
+         static void op(T& value, is_context auto&& ctx, auto&& it, auto&& end)
          {
-            parse_object_opening<Options>(ctx, it, end);
-            skip_ws<Options>(ctx, it, end);
-            if (bool(ctx.error)) [[unlikely]]
-               return;
-
             constexpr auto Opts = opening_handled_off<ws_handled_off<Options>()>();
+            if constexpr (!Options.opening_handled) {
+               if constexpr (!Options.ws_handled) {
+                  GLZ_SKIP_WS;
+               }
+               GLZ_MATCH_OPEN_BRACE;
+            }
+            GLZ_SKIP_WS;
 
             // Only used if error_on_missing_keys = true
             [[maybe_unused]] bit_array<1> fields{};
@@ -1616,18 +1676,24 @@ namespace glz
       struct from_json<T>
       {
          template <auto Options, string_literal tag = "">
-         GLZ_FLATTEN static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end)
+         static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end)
          {
-            parse_object_opening<Options>(ctx, it, end);
-            const auto ws_start = it;
-            skip_ws<Options>(ctx, it, end);
-            if (bool(ctx.error)) [[unlikely]]
-               return;
-            const size_t ws_size = size_t(it - ws_start);
+            static constexpr auto num_members = reflection_count<T>;
+            if constexpr (num_members == 0 && is_partial_read<T>) {
+               static_assert(false_v<T>, "No members to read for partial read");
+            }
 
             constexpr auto Opts = opening_handled_off<ws_handled_off<Options>()>();
+            if constexpr (!Options.opening_handled) {
+               if constexpr (!Options.ws_handled) {
+                  GLZ_SKIP_WS;
+               }
+               GLZ_MATCH_OPEN_BRACE;
+            }
+            const auto ws_start = it;
+            GLZ_SKIP_WS;
+            const size_t ws_size = size_t(it - ws_start);
 
-            static constexpr auto num_members = reflection_count<T>;
             if constexpr ((glaze_object_t<T> || reflectable<T>)&&num_members == 0 && Opts.error_on_unknown_keys) {
                if (*it == '}') [[likely]] {
                   ++it;
@@ -1637,12 +1703,29 @@ namespace glz
                return;
             }
             else {
-               // Only used if error_on_missing_keys = true
-               bit_array<num_members * Opts.error_on_missing_keys> fields{};
+               static constexpr bit_array<num_members> all_fields = [] {
+                  bit_array<num_members> arr{};
+                  for (size_t i = 0; i < num_members; ++i) {
+                     arr[i] = true;
+                  }
+                  return arr;
+               }();
+
+               decltype(auto) fields = [&]() -> decltype(auto) {
+                  if constexpr ((glaze_object_t<T> || reflectable<T>)&&(Opts.error_on_missing_keys ||
+                                                                        is_partial_read<T> || Opts.partial_read)) {
+                     return bit_array<num_members>{};
+                  }
+                  else {
+                     return nullptr;
+                  }
+               }();
+
+               size_t read_count{}; // for partial_read and dynamic objects
 
                decltype(auto) frozen_map = [&]() -> decltype(auto) {
+                  using V = decay_keep_volatile_t<decltype(value)>;
                   if constexpr (reflectable<T> && num_members > 0) {
-                     using V = decay_keep_volatile_t<decltype(value)>;
 #if ((defined _MSC_VER) && (!defined __clang__))
                      static thread_local auto cmap = make_map<V, Opts.use_hash_comparison>();
 #else
@@ -1663,12 +1746,27 @@ namespace glz
 
                bool first = true;
                while (true) {
+                  if constexpr ((glaze_object_t<T> || reflectable<T>)&&(is_partial_read<T> || Opts.partial_read)) {
+                     if ((all_fields & fields) == all_fields) {
+                        if constexpr (Opts.partial_read_nested) {
+                           skip_until_closed<Opts, '{', '}'>(ctx, it, end);
+                        }
+                        return;
+                     }
+                  }
+
                   if (*it == '}') {
-                     ++it;
-                     if constexpr (Opts.error_on_missing_keys) {
-                        constexpr auto req_fields = required_fields<T, Opts>();
-                        if ((req_fields & fields) != req_fields) {
-                           ctx.error = error_code::missing_key;
+                     if constexpr ((glaze_object_t<T> || reflectable<T>)&&((is_partial_read<T> || Opts.partial_read) &&
+                                                                           Opts.error_on_missing_keys)) {
+                        ctx.error = error_code::missing_key;
+                     }
+                     else {
+                        ++it;
+                        if constexpr ((glaze_object_t<T> || reflectable<T>)&&Opts.error_on_missing_keys) {
+                           constexpr auto req_fields = required_fields<T, Opts>();
+                           if ((req_fields & fields) != req_fields) {
+                              ctx.error = error_code::missing_key;
+                           }
                         }
                      }
                      return;
@@ -1736,7 +1834,7 @@ namespace glz
                            if (bool(ctx.error)) [[unlikely]]
                               return;
 
-                           if constexpr (Opts.error_on_missing_keys) {
+                           if constexpr (Opts.error_on_missing_keys || is_partial_read<T> || Opts.partial_read) {
                               // TODO: Kludge/hack. Should work but could easily cause memory issues with small changes.
                               // At the very least if we are going to do this add a get_index method to the maps and
                               // call that
@@ -1778,7 +1876,7 @@ namespace glz
                         if (const auto& member_it = frozen_map.find(key); member_it != frozen_map.end()) [[likely]] {
                            // This code should not error on valid unknown keys
                            // We arrived here because the key was perhaps found, but if the quote does not exist
-                           // then this does not necessarily mean have a syntax error.
+                           // then this does not necessarily mean we have a syntax error.
                            // We may have just found the prefix of a longer, unknown key.
                            if (*it != '"') [[unlikely]] {
                               auto* start = key.data();
@@ -1803,7 +1901,7 @@ namespace glz
                               if (bool(ctx.error)) [[unlikely]]
                                  return;
 
-                              if constexpr (Opts.error_on_missing_keys) {
+                              if constexpr (Opts.error_on_missing_keys || is_partial_read<T> || Opts.partial_read) {
                                  // TODO: Kludge/hack. Should work but could easily cause memory issues with small
                                  // changes. At the very least if we are going to do this add a get_index method to the
                                  // maps and call that
@@ -1841,22 +1939,37 @@ namespace glz
                      }
                   }
                   else {
-                     // using k_t = std::conditional_t<heterogeneous_map<T>, sv, typename T::key_type>;
-                     using k_t = typename T::key_type;
-                     if constexpr (std::is_same_v<k_t, std::string>) {
-                        static thread_local k_t key;
+                     // For types like std::map, std::unordered_map
+                     // using Key = std::conditional_t<heterogeneous_map<T>, sv, typename T::key_type>;
+                     using Key = typename T::key_type;
+                     if constexpr (std::is_same_v<Key, std::string>) {
+                        static thread_local Key key;
                         read<json>::op<Opts>(key, ctx, it, end);
                         if (bool(ctx.error)) [[unlikely]]
                            return;
 
                         parse_object_entry_sep<Opts>(ctx, it, end);
 
-                        read<json>::op<ws_handled<Opts>()>(value[key], ctx, it, end);
+                        if constexpr (Opts.partial_read) {
+                           if (auto element = value.find(key); element != value.end()) {
+                              ++read_count;
+                              read<json>::op<ws_handled<Opts>()>(element->second, ctx, it, end);
+                           }
+                           else {
+                              skip_value<Opts>(ctx, it, end);
+                           }
+                           if (read_count == value.size()) {
+                              return;
+                           }
+                        }
+                        else {
+                           read<json>::op<ws_handled<Opts>()>(value[key], ctx, it, end);
+                        }
                         if (bool(ctx.error)) [[unlikely]]
                            return;
                      }
-                     else if constexpr (str_t<k_t>) {
-                        k_t key;
+                     else if constexpr (str_t<Key>) {
+                        Key key;
                         read<json>::op<Opts>(key, ctx, it, end);
                         if (bool(ctx.error)) [[unlikely]]
                            return;
@@ -1865,21 +1978,35 @@ namespace glz
                         if (bool(ctx.error)) [[unlikely]]
                            return;
 
-                        read<json>::op<ws_handled<Opts>()>(value[key], ctx, it, end);
+                        if constexpr (Opts.partial_read) {
+                           if (auto element = value.find(key); element != value.end()) {
+                              ++read_count;
+                              read<json>::op<ws_handled<Opts>()>(element->second, ctx, it, end);
+                           }
+                           else {
+                              skip_value<Opts>(ctx, it, end);
+                           }
+                           if (read_count == value.size()) {
+                              return;
+                           }
+                        }
+                        else {
+                           read<json>::op<ws_handled<Opts>()>(value[key], ctx, it, end);
+                        }
                         if (bool(ctx.error)) [[unlikely]]
                            return;
                      }
                      else {
-                        k_t key_value{};
-                        if constexpr (glaze_enum_t<k_t>) {
+                        Key key_value{};
+                        if constexpr (glaze_enum_t<Key>) {
                            read<json>::op<Opts>(key_value, ctx, it, end);
                         }
-                        else if constexpr (std::is_arithmetic_v<k_t>) {
+                        else if constexpr (std::is_arithmetic_v<Key>) {
                            // prefer over quoted_t below to avoid double parsing of quoted_t
                            read<json>::op<opt_true<Opts, &opts::quoted_num>>(key_value, ctx, it, end);
                         }
                         else {
-                           read<json>::op<opt_false<Opts, &opts::raw_string>>(quoted_t<k_t>{key_value}, ctx, it, end);
+                           read<json>::op<opt_false<Opts, &opts::raw_string>>(quoted_t<Key>{key_value}, ctx, it, end);
                         }
                         if (bool(ctx.error)) [[unlikely]]
                            return;
@@ -1888,216 +2015,26 @@ namespace glz
                         if (bool(ctx.error)) [[unlikely]]
                            return;
 
-                        read<json>::op<Opts>(value[key_value], ctx, it, end);
+                        if constexpr (Opts.partial_read) {
+                           if (auto element = value.find(key_value); element != value.end()) {
+                              ++read_count;
+                              read<json>::op<ws_handled<Opts>()>(element->second, ctx, it, end);
+                           }
+                           else {
+                              skip_value<Opts>(ctx, it, end);
+                           }
+                           if (read_count == value.size()) {
+                              return;
+                           }
+                        }
+                        else {
+                           read<json>::op<Opts>(value[key_value], ctx, it, end);
+                        }
                         if (bool(ctx.error)) [[unlikely]]
                            return;
                      }
                   }
                   skip_ws<Opts>(ctx, it, end);
-               }
-            }
-         }
-      };
-
-      template <class T>
-         requires(glaze_object_t<T> || reflectable<T>) && partial_read<T>
-      struct from_json<T>
-      {
-         template <auto Options, string_literal tag = "">
-         GLZ_FLATTEN static void op(T& value, is_context auto&& ctx, auto&& it, auto&& end)
-         {
-            static constexpr auto num_members = reflection_count<T>;
-
-            if constexpr (num_members == 0) {
-               static_assert(false_v<T>, "No members to read for partial read");
-            }
-
-            parse_object_opening<Options>(ctx, it, end);
-            const auto ws_start = it;
-            skip_ws<Options>(ctx, it, end);
-            if (bool(ctx.error)) [[unlikely]]
-               return;
-            const size_t ws_size = size_t(it - ws_start);
-
-            constexpr auto Opts = opening_handled_off<ws_handled_off<Options>()>();
-
-            // Only used if partial_read_nested = true
-            [[maybe_unused]] uint32_t opening_counter = 1;
-
-            bit_array<num_members> fields{};
-            bit_array<num_members> all_fields{};
-            for_each<num_members>([&](auto I) constexpr { all_fields[I] = true; });
-
-            decltype(auto) frozen_map = [&]() -> decltype(auto) {
-               if constexpr (reflectable<T> && num_members > 0) {
-#if ((defined _MSC_VER) && (!defined __clang__))
-                  static thread_local auto cmap = make_map<T, Opts.use_hash_comparison>();
-#else
-                  static thread_local constinit auto cmap = make_map<T, Opts.use_hash_comparison>();
-#endif
-                  // We want to run this populate outside of the while loop
-                  populate_map(value, cmap); // Function required for MSVC to build
-                  return cmap;
-               }
-               else if constexpr (glaze_object_t<T> && num_members > 0) {
-                  static constexpr auto cmap = make_map<T, Opts.use_hash_comparison>();
-                  return cmap;
-               }
-               else {
-                  return nullptr;
-               }
-            }();
-
-            bool first = true;
-            while (true) {
-               if ((all_fields & fields) == all_fields) [[unlikely]] {
-                  if constexpr (Opts.partial_read_nested) {
-                     while (it != end) {
-                        if (*it == '}') [[unlikely]]
-                           --opening_counter;
-                        if (*it == '{') [[unlikely]]
-                           ++opening_counter;
-                        ++it;
-                        if (opening_counter == 0) [[unlikely]]
-                           return;
-                     }
-                  }
-                  else
-                     return;
-               }
-               else if (*it == '}') [[unlikely]] {
-                  if constexpr (Opts.error_on_missing_keys) {
-                     ctx.error = error_code::missing_key;
-                  }
-                  return;
-               }
-               else if (first) [[unlikely]] {
-                  first = false;
-               }
-               else [[likely]] {
-                  GLZ_MATCH_COMMA;
-
-                  if constexpr (num_members > 1 || !Opts.error_on_unknown_keys) {
-                     if (ws_size && ws_size < size_t(end - it)) {
-                        skip_matching_ws(ws_start, it, ws_size);
-                     }
-                  }
-
-                  GLZ_SKIP_WS;
-               }
-
-               std::conditional_t<Opts.error_on_unknown_keys, const sv, sv> key =
-                  parse_object_key<T, ws_handled<Opts>(), tag>(ctx, it, end);
-               if (bool(ctx.error)) [[unlikely]]
-                  return;
-
-               // Because parse_object_key does not necessarily return a valid JSON key, the logic for handling
-               // whitespace and the colon must run after checking if the key exists
-
-               if constexpr (Opts.error_on_unknown_keys) {
-                  if (*it != '"') [[unlikely]] {
-                     ctx.error = error_code::unknown_key;
-                     return;
-                  }
-                  ++it;
-
-                  if (const auto& member_it = frozen_map.find(key); member_it != frozen_map.end()) [[likely]] {
-                     parse_object_entry_sep<Opts>(ctx, it, end);
-                     if (bool(ctx.error)) [[unlikely]]
-                        return;
-
-                     // TODO: Kludge/hack. Should work but could easily cause memory issues with small changes.
-                     // At the very least if we are going to do this add a get_index method to the maps and
-                     // call that
-                     auto index = member_it - frozen_map.begin();
-                     fields[index] = true;
-
-                     std::visit(
-                        [&](auto&& member_ptr) {
-                           read<json>::op<ws_handled<Opts>()>(get_member(value, member_ptr), ctx, it, end);
-                        },
-                        member_it->second);
-                     if (bool(ctx.error)) [[unlikely]]
-                        return;
-                  }
-                  else [[unlikely]] {
-                     if constexpr (tag.sv().empty()) {
-                        it -= int64_t(key.size());
-                        ctx.error = error_code::unknown_key;
-                        return;
-                     }
-                     else if (key != tag.sv()) {
-                        it -= int64_t(key.size());
-                        ctx.error = error_code::unknown_key;
-                        return;
-                     }
-                     else {
-                        // We duplicate this code to avoid generating unreachable code
-                        parse_object_entry_sep<Opts>(ctx, it, end);
-                        if (bool(ctx.error)) [[unlikely]]
-                           return;
-
-                        read<json>::handle_unknown<Opts>(key, value, ctx, it, end);
-                        if (bool(ctx.error)) [[unlikely]]
-                           return;
-                     }
-                  }
-               }
-               else {
-                  if (const auto& member_it = frozen_map.find(key); member_it != frozen_map.end()) [[likely]] {
-                     // This code should not error on valid unknown keys
-                     // We arrived here because the key was perhaps found, but if the quote does not exist
-                     // then this does not necessarily mean have a syntax error.
-                     // We may have just found the prefix of a longer, unknown key.
-                     if (*it != '"') [[unlikely]] {
-                        auto* start = key.data();
-                        skip_string_view<Opts>(ctx, it, end);
-                        if (bool(ctx.error)) [[unlikely]]
-                           return;
-                        key = {start, size_t(it - start)};
-                     }
-                     ++it; // skip the quote
-
-                     parse_object_entry_sep<Opts>(ctx, it, end);
-                     if (bool(ctx.error)) [[unlikely]]
-                        return;
-
-                     // TODO: Kludge/hack. Should work but could easily cause memory issues with small changes.
-                     // At the very least if we are going to do this add a get_index method to the maps and
-                     // call that
-                     auto index = member_it - frozen_map.begin();
-                     fields[index] = true;
-
-                     std::visit(
-                        [&](auto&& member_ptr) {
-                           read<json>::op<ws_handled<Opts>()>(get_member(value, member_ptr), ctx, it, end);
-                        },
-                        member_it->second);
-                     if (bool(ctx.error)) [[unlikely]]
-                        return;
-                  }
-                  else [[unlikely]] {
-                     it -= key.size(); // rewind to skip the potentially escaped key
-
-                     // Unknown key handler does not unescape keys. Unknown escaped keys
-                     // are handled by the user.
-
-                     const auto start = it;
-                     skip_string_view<Opts>(ctx, it, end);
-                     if (bool(ctx.error)) [[unlikely]]
-                        return;
-                     key = {start, size_t(it - start)};
-                     ++it;
-
-                     // We duplicate this code to avoid generating unreachable code
-                     parse_object_entry_sep<Opts>(ctx, it, end);
-                     if (bool(ctx.error)) [[unlikely]]
-                        return;
-
-                     read<json>::handle_unknown<Opts>(key, value, ctx, it, end);
-                     if (bool(ctx.error)) [[unlikely]]
-                        return;
-                  }
                }
             }
          }
@@ -2187,7 +2124,7 @@ namespace glz
       struct process_arithmetic_boolean_string_or_array
       {
          template <auto Options>
-         GLZ_FLATTEN static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end)
+         static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end)
          {
             if constexpr (glz::tuple_size_v<Tuple> < 1) {
                ctx.error = error_code::no_matching_variant_type;
@@ -2235,15 +2172,14 @@ namespace glz
       {
          // Note that items in the variant are required to be default constructable for us to switch types
          template <auto Options>
-         GLZ_FLATTEN static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end)
+         static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end)
          {
+            constexpr auto Opts = ws_handled_off<Options>();
             if constexpr (variant_is_auto_deducible<T>()) {
                if constexpr (!Options.ws_handled) {
-                  skip_ws<Options>(ctx, it, end);
-                  if (bool(ctx.error)) [[unlikely]]
-                     return;
+                  GLZ_SKIP_WS;
                }
-               constexpr auto Opts = ws_handled_off<Options>();
+
                switch (*it) {
                case '\0':
                   ctx.error = error_code::unexpected_end;
@@ -2439,20 +2375,16 @@ namespace glz
       struct from_json<array_variant_wrapper<T>>
       {
          template <auto Options>
-         GLZ_FLATTEN static void op(auto&& wrapper, is_context auto&& ctx, auto&& it, auto&& end)
+         static void op(auto&& wrapper, is_context auto&& ctx, auto&& it, auto&& end)
          {
             auto& value = wrapper.value;
 
-            if constexpr (!Options.ws_handled) {
-               skip_ws<Options>(ctx, it, end);
-               if (bool(ctx.error)) [[unlikely]]
-                  return;
-            }
             constexpr auto Opts = ws_handled_off<Options>();
+            if constexpr (!Options.ws_handled) {
+               GLZ_SKIP_WS;
+            }
 
-            match<'['>(ctx, it);
-            if (bool(ctx.error)) [[unlikely]]
-               return;
+            GLZ_MATCH_OPEN_BRACKET;
             GLZ_SKIP_WS;
 
             // TODO Use key parsing for compiletime known keys
@@ -2489,7 +2421,7 @@ namespace glz
       struct from_json<T>
       {
          template <auto Opts, class... Args>
-         GLZ_FLATTEN static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
+         static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
          {
             if constexpr (!Opts.ws_handled) {
                GLZ_SKIP_WS;
@@ -2527,17 +2459,15 @@ namespace glz
                      }
                      else {
                         // set value to unexpected
-                        using error_type = typename std::decay_t<decltype(value)>::error_type;
-                        std::decay_t<error_type> error{};
+                        using error_ctx = typename std::decay_t<decltype(value)>::error_type;
+                        std::decay_t<error_ctx> error{};
                         read<json>::op<Opts>(error, ctx, it, end);
                         if (bool(ctx.error)) [[unlikely]]
                            return;
                         value = glz::unexpected(error);
                      }
                      GLZ_SKIP_WS;
-                     match<'}'>(ctx, it);
-                     if (bool(ctx.error)) [[unlikely]]
-                        return;
+                     GLZ_MATCH_CLOSE_BRACE;
                   }
                   else {
                      it = start;
@@ -2580,14 +2510,12 @@ namespace glz
       struct from_json<T>
       {
          template <auto Options>
-         GLZ_FLATTEN static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
+         static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
          {
-            if constexpr (!Options.ws_handled) {
-               skip_ws<Options>(ctx, it, end);
-               if (bool(ctx.error)) [[unlikely]]
-                  return;
-            }
             constexpr auto Opts = ws_handled_off<Options>();
+            if constexpr (!Options.ws_handled) {
+               GLZ_SKIP_WS;
+            }
 
             if (*it == 'n') {
                ++it;
@@ -2642,7 +2570,7 @@ namespace glz
    } // namespace detail
 
    template <class Buffer>
-   [[nodiscard]] inline parse_error validate_json(Buffer&& buffer) noexcept
+   [[nodiscard]] error_ctx validate_json(Buffer&& buffer) noexcept
    {
       context ctx{};
       glz::skip skip_value{};
@@ -2650,7 +2578,7 @@ namespace glz
    }
 
    template <class Buffer>
-   [[nodiscard]] inline parse_error validate_jsonc(Buffer&& buffer) noexcept
+   [[nodiscard]] error_ctx validate_jsonc(Buffer&& buffer) noexcept
    {
       context ctx{};
       glz::skip skip_value{};
@@ -2658,26 +2586,45 @@ namespace glz
    }
 
    template <read_json_supported T, class Buffer>
-   [[nodiscard]] inline parse_error read_json(T& value, Buffer&& buffer) noexcept
+   [[nodiscard]] error_ctx read_json(T& value, Buffer&& buffer) noexcept
    {
       context ctx{};
       return read<opts{}>(value, std::forward<Buffer>(buffer), ctx);
    }
 
    template <read_json_supported T, class Buffer>
-   [[nodiscard]] inline expected<T, parse_error> read_json(Buffer&& buffer) noexcept
+   [[nodiscard]] expected<T, error_ctx> read_json(Buffer&& buffer) noexcept
    {
       T value{};
       context ctx{};
-      const auto ec = read<opts{}>(value, std::forward<Buffer>(buffer), ctx);
+      const error_ctx ec = read<opts{}>(value, std::forward<Buffer>(buffer), ctx);
       if (ec) {
-         return unexpected(ec);
+         return unexpected<error_ctx>(ec);
+      }
+      return value;
+   }
+
+   template <read_json_supported T, class Buffer>
+   [[nodiscard]] error_ctx read_jsonc(T& value, Buffer&& buffer) noexcept
+   {
+      context ctx{};
+      return read<opts{.comments = true}>(value, std::forward<Buffer>(buffer), ctx);
+   }
+
+   template <read_json_supported T, class Buffer>
+   [[nodiscard]] expected<T, error_ctx> read_jsonc(Buffer&& buffer) noexcept
+   {
+      T value{};
+      context ctx{};
+      const error_ctx ec = read<opts{.comments = true}>(value, std::forward<Buffer>(buffer), ctx);
+      if (ec) {
+         return unexpected<error_ctx>(ec);
       }
       return value;
    }
 
    template <auto Opts = opts{}, read_json_supported T>
-   inline parse_error read_file_json(T& value, const sv file_name, auto&& buffer) noexcept
+   [[nodiscard]] error_ctx read_file_json(T& value, const sv file_name, auto&& buffer) noexcept
    {
       context ctx{};
       ctx.current_file = file_name;
@@ -2689,5 +2636,21 @@ namespace glz
       }
 
       return read<set_json<Opts>()>(value, buffer, ctx);
+   }
+
+   template <auto Opts = opts{}, read_json_supported T>
+   [[nodiscard]] error_ctx read_file_jsonc(T& value, const sv file_name, auto&& buffer) noexcept
+   {
+      context ctx{};
+      ctx.current_file = file_name;
+
+      const auto ec = file_to_buffer(buffer, ctx.current_file);
+
+      if (bool(ec)) {
+         return {ec};
+      }
+
+      constexpr auto Options = opt_true<set_json<Opts>(), &opts::comments>;
+      return read<Options>(value, buffer, ctx);
    }
 }

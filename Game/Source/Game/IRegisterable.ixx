@@ -14,11 +14,14 @@ namespace fbc {
 
 		operator str() const { return registrationID(); }
 
+		inline static C* get(strv name) { return getOrDefault(name, nullptr); }
+
 		static auto all();
-		static C* get(strv name);
+		static C* getOrDefault(strv name, C* defaultValue);
 		static C* registerCopy(C& copy);
 		static C* registerData(uptr<C>&& copy);
 		static vec<C*> allAsList();
+		static void deleteData(strv name);
 		template <typename Pred> auto findAll(Pred predicate);
 
 	protected:
@@ -36,6 +39,12 @@ namespace fbc {
 		return registered() | std::views::values | std::views::transform([](uptr<C>* item) {return item.get(); });
 	}
 
+	// Remove a registered item
+	template<typename C> void IRegisterable<C>::deleteData(strv name)
+	{
+		registered().erase(name);
+	}
+
 	// Get every single instantiation of this class as a list
 	template<typename C> vec<C*> IRegisterable<C>::allAsList()
 	{
@@ -48,12 +57,12 @@ namespace fbc {
 	}
 
 	// Get a particular instantation of this class matching the given id.
-	template<typename C> C* IRegisterable<C>::get(strv name)
+	template<typename C> C* IRegisterable<C>::getOrDefault(strv name, C* defaultValue)
 	{
 		auto& values = registered();
 		auto it = values.find(name);
 		if (it == values.end()) {
-			return nullptr;
+			return defaultValue;
 		}
 		return it->second.get();
 	}

@@ -103,10 +103,10 @@ namespace glz::detail
    concept pair_t = requires(T pair) {
       {
          pair.first
-      } -> std::same_as<typename T::first_type&>;
+      };
       {
          pair.second
-      } -> std::same_as<typename T::second_type&>;
+      };
    };
 
    template <class T>
@@ -246,4 +246,13 @@ namespace glz
       }
 #endif
    }
+}
+
+namespace glz
+{
+   template <class Buffer>
+   concept raw_buffer = std::same_as<std::decay_t<Buffer>, char*> && non_const_buffer<Buffer>;
+
+   template <class Buffer>
+   concept output_buffer = range<Buffer> && (sizeof(range_value_t<Buffer>) == sizeof(char)) && non_const_buffer<Buffer>;
 }

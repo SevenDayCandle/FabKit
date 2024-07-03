@@ -1,7 +1,12 @@
 module;
 
+import fbc.Card;
+import fbc.CardData;
 import fbc.CombatInstance;
+import fbc.CombatSquare;
 import fbc.GameRun;
+import fbc.Passive;
+import fbc.PassiveData;
 
 module fbc.Creature;
 
@@ -10,8 +15,9 @@ namespace fbc {
 	// Otherwise, the turn is dependent on user input
 	bool Creature::onTurnBegin()
 	{
-		// TODO draw cards from deck
-		// TODO energy, etc. value setup
+		drawForStartOfTurn();
+		refreshValuesForStartOfTurn();
+
 		// TODO start turn hooks
 		// TODO status updates
 		if (behavior) {
@@ -50,16 +56,14 @@ namespace fbc {
 	// Move a card from one pile to another, returning the moved card
 	Card& Creature::cardFromToPile(Card& card, const PileType& source, const PileType& dest)
 	{
-		vec<uptr<Card>>& sourcePile = getPile(source);
+		PileGroup& sourcePile = getPile(source);
 		auto it = std::ranges::find_if(sourcePile, [&card](const uptr<Card>& ptr) {
 			return ptr.get() == &card;
 		});
 
 		if (it != sourcePile.end()) {
-			vec<uptr<Card>>& destPile = getPile(dest);
-			destPile.push_back(move(*it));
-			sourcePile.erase(it);
-			// TODO hooks only if not from play
+			PileGroup& destPile = getPile(dest);
+			moveBetweenPiles(it, sourcePile, destPile);
 		}
 		return card;
 	}
@@ -108,25 +112,96 @@ namespace fbc {
 	// A value that determines how "quickly" this creature will onTurnBegin. The higher the value, the higher in the action queue this creature's turns will be placed
 	int Creature::getActionSpeed()
 	{
-		int base = data.actSpeed + data.actSpeedUpgrade * upgrades;
+		int base = data.getResultActSpeed(upgrades);
+		// TODO subscribers
+		// TODO statuses
+		return base;
+	}
+
+	// How many cards this creature draws at the start of its turn
+	int Creature::getCardDraw()
+	{
+		int base = data.getResultHandDraw(upgrades);
+		// TODO subscribers
+		// TODO statuses
+		return base;
+	}
+
+	// How much energy this creature gains at the start of its turn
+	int Creature::getEnergyGain()
+	{
+		int base = data.getResultEnergyGain(upgrades);
 		// TODO subscribers
 		// TODO statuses
 		return base;
 	}
 
 	// Get the actual card list associated with this pile type
-	vec<uptr<Card>>& Creature::getPile(const PileType& type)
+	Creature::PileGroup& Creature::getPile(const PileType& type)
 	{
 		if (type == piletype::DISCARD) {
 			return discardPile;
 		}
 		if (type == piletype::DRAW) {
-			return discardPile;
+			return drawPile;
 		}
 		if (type == piletype::EXPEND) {
-			return discardPile;
+			return expendPile;
 		}
 		return hand;
 		// TODO support custom pile types
+	}
+
+	// At the start of turn, discard hand and draw new hand
+	void Creature::drawForStartOfTurn()
+	{
+		for (PileGroup::iterator it = hand.begin(); it != hand.end(); ++it) {
+			// TODO check for destination pile based on card properties
+			moveBetweenPiles(it, hand, discardPile, false);
+		}
+
+		int draw = getCardDraw();
+		for (PileGroup::iterator it = drawPile.begin(); it != drawPile.end() && it < drawPile.begin() + draw && hand.size() < handSize; ++it) {
+			moveBetweenPiles(it, drawPile, hand, false);
+		}
+	}
+
+	// Set up cards and passives for this creature
+	void Creature::initialize(vec<pair<str, int>>& setupCards, vec<pair<str, int>>& setupPassives)
+	{
+		for (pair<str, int>& dataPair : setupCards) {
+			CardData* data = CardData::get(dataPair.first);
+			if (data) {
+				drawPile.push_back(make_unique<Card>(*data, dataPair.second));
+			}
+		}
+
+		// TODO shuffle draw pile based on rng
+
+		// TODO passives
+		for (pair<str, int>& dataPair : setupPassives) {
+			PassiveData* data = PassiveData::get(dataPair.first);
+			if (data) {
+				uptr<Passive> pa = make_unique<Passive>(*data, dataPair.second);
+				passives.push_back(move(pa));
+			}
+		}
+	}
+
+	// Refresh energy, movement, etc. on this creature
+	void Creature::refreshValuesForStartOfTurn()
+	{
+		energy = std::min(energy + getEnergyGain(), energyMax);
+		movement = movementMax;
+		// TODO visuals
+		// TODO hooks
+	}
+
+	void Creature::moveBetweenPiles(Creature::PileGroup::iterator it, Creature::PileGroup& sourcePile, Creature::PileGroup& destPile, bool manual)
+	{
+		destPile.push_back(move(*it));
+		sourcePile.erase(it);
+		// TODO hand size check
+		// TODO hooks only if not from play
 	}
 }

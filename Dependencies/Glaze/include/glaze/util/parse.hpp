@@ -113,17 +113,7 @@ namespace glz::detail
       return t;
    }();
 
-   template <class T>
-   consteval uint32_t repeat_byte4(const T repeat)
-   {
-      const auto byte = uint8_t(repeat);
-      uint32_t res{};
-      res |= uint32_t(byte) << 24;
-      res |= uint32_t(byte) << 16;
-      res |= uint32_t(byte) << 8;
-      res |= uint32_t(byte);
-      return res;
-   }
+   consteval uint32_t repeat_byte4(const auto repeat) { return 0x01010101u * uint8_t(repeat); }
 
    GLZ_ALWAYS_INLINE constexpr uint32_t has_zero_u32(const uint32_t chunk) noexcept
    {
@@ -135,21 +125,9 @@ namespace glz::detail
       return has_zero_u32(chunk & repeat_byte4(0b11110000u));
    }
 
-   template <class T>
-   consteval uint64_t repeat_byte8(const T repeat)
-   {
-      const auto byte = uint8_t(repeat);
-      uint64_t res{};
-      res |= uint64_t(byte) << 56;
-      res |= uint64_t(byte) << 48;
-      res |= uint64_t(byte) << 40;
-      res |= uint64_t(byte) << 32;
-      res |= uint64_t(byte) << 24;
-      res |= uint64_t(byte) << 16;
-      res |= uint64_t(byte) << 8;
-      res |= uint64_t(byte);
-      return res;
-   }
+   consteval uint64_t repeat_byte8(const uint8_t repeat) { return 0x0101010101010101ull * repeat; }
+
+   consteval uint64_t not_repeat_byte8(const uint8_t repeat) { return ~(0x0101010101010101ull * repeat); }
 
    [[nodiscard]] GLZ_ALWAYS_INLINE uint32_t hex_to_u32(const char* c) noexcept
    {
@@ -396,6 +374,42 @@ namespace glz::detail
       ++it;                                   \
    }
 
+#define GLZ_MATCH_OPEN_BRACKET                  \
+   if (*it != '[') [[unlikely]] {               \
+      ctx.error = error_code::expected_bracket; \
+      return;                                   \
+   }                                            \
+   else [[likely]] {                            \
+      ++it;                                     \
+   }
+
+#define GLZ_MATCH_CLOSE_BRACKET                 \
+   if (*it != ']') [[unlikely]] {               \
+      ctx.error = error_code::expected_bracket; \
+      return;                                   \
+   }                                            \
+   else [[likely]] {                            \
+      ++it;                                     \
+   }
+
+#define GLZ_MATCH_OPEN_BRACE                  \
+   if (*it != '{') [[unlikely]] {             \
+      ctx.error = error_code::expected_brace; \
+      return;                                 \
+   }                                          \
+   else [[likely]] {                          \
+      ++it;                                   \
+   }
+
+#define GLZ_MATCH_CLOSE_BRACE                 \
+   if (*it != '}') [[unlikely]] {             \
+      ctx.error = error_code::expected_brace; \
+      return;                                 \
+   }                                          \
+   else [[likely]] {                          \
+      ++it;                                   \
+   }
+
    template <char c>
    GLZ_ALWAYS_INLINE void match(is_context auto&& ctx, auto&& it) noexcept
    {
@@ -507,10 +521,9 @@ namespace glz::detail
       return (chunk & repeat_byte8(0b11110000u));
    }
 
-   // Macro behaves like skip_ws_no_pre_check, since we want to remove skip_ws in the long run
 #define GLZ_SKIP_WS                                \
    if constexpr (!Opts.minified) {                 \
-      if constexpr (!Opts.force_conformance) {     \
+      if constexpr (Opts.comments) {               \
          while (whitespace_comment_table[*it]) {   \
             if (*it == '/') [[unlikely]] {         \
                skip_comment(ctx, it, end);         \
@@ -530,11 +543,12 @@ namespace glz::detail
       }                                            \
    }
 
+   // skip whitespace
    template <opts Opts>
-   GLZ_ALWAYS_INLINE void skip_ws_no_pre_check(is_context auto&& ctx, auto&& it, auto&& end) noexcept
+   GLZ_ALWAYS_INLINE void skip_ws(is_context auto&& ctx, auto&& it, auto&& end) noexcept
    {
       if constexpr (!Opts.minified) {
-         if constexpr (!Opts.force_conformance) {
+         if constexpr (Opts.comments) {
             while (whitespace_comment_table[*it]) {
                if (*it == '/') [[unlikely]] {
                   skip_comment(ctx, it, end);
@@ -552,16 +566,6 @@ namespace glz::detail
                ++it;
             }
          }
-      }
-   }
-
-   template <opts Opts>
-   GLZ_ALWAYS_INLINE void skip_ws(is_context auto&& ctx, auto&& it, auto&& end) noexcept
-   {
-      if constexpr (!Opts.minified) {
-         if (bool(ctx.error)) [[unlikely]]
-            return;
-         skip_ws_no_pre_check<Opts>(ctx, it, end);
       }
    }
 
@@ -895,7 +899,7 @@ namespace glz::detail
 
       if constexpr (Opts.force_conformance) {
          while (true) {
-            if (*it < 32) [[unlikely]] {
+            if ((*it & 0b11100000) == 0) [[unlikely]] {
                ctx.error = error_code::syntax_error;
                return;
             }
@@ -937,12 +941,11 @@ namespace glz::detail
       }
    }
 
-   template <opts Opts, char open, char close>
+   template <opts Opts, char open, char close, size_t Depth = 1>
       requires(Opts.is_padded)
    GLZ_ALWAYS_INLINE void skip_until_closed(is_context auto&& ctx, auto&& it, auto&& end) noexcept
    {
-      ++it;
-      size_t depth = 1;
+      size_t depth = Depth;
 
       while (it < end) [[likely]] {
          uint64_t chunk;
@@ -993,12 +996,11 @@ namespace glz::detail
       ctx.error = error_code::unexpected_end;
    }
 
-   template <opts Opts, char open, char close>
+   template <opts Opts, char open, char close, size_t Depth = 1>
       requires(!Opts.is_padded)
    GLZ_ALWAYS_INLINE void skip_until_closed(is_context auto&& ctx, auto&& it, auto&& end) noexcept
    {
-      ++it;
-      size_t depth = 1;
+      size_t depth = Depth;
 
       for (const auto fin = end - 7; it < fin;) {
          uint64_t chunk;

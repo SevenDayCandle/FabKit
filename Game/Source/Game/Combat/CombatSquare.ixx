@@ -22,12 +22,4 @@ namespace fbc {
 	private:
 		FieldObject* occupant = nullptr;
 	};
-
-	CombatSquare& CombatSquare::setOccupant(FieldObject* occupant)
-	{
-		this->occupant = occupant;
-		// TODO hooks
-		// TODO power triggers
-		return *this;
-	}
 }

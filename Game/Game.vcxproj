@@ -170,7 +170,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Content\DynamicContent.ixx">
+    <ClCompile Include="Source\Game\Content\DynamicContent.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -178,7 +178,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Content\DynamicStrings.ixx">
+    <ClCompile Include="Source\Game\Content\DynamicStrings.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -280,7 +280,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Content\DynamicLoadables.ixx" />
+    <ClCompile Include="Source\Game\Content\DynamicLoadables.ixx" />
     <ClCompile Include="Source\Engine\Base\VFX\VFX.ixx">
       <SubType>
       </SubType>
@@ -442,6 +442,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Game\Combat\CombatSquare.cpp" />
     <ClCompile Include="Source\Game\Effect\Effect.ixx">
       <SubType>
       </SubType>

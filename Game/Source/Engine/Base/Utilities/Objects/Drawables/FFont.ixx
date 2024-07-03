@@ -32,7 +32,7 @@ namespace fbc {
         int measureH(strv text);
         int measureW(strv text);
         pair<int, int> measureDim(strv text);
-        sdl::FontRender makeTexture(strv text, uint32 w, float x, float y, sdl::Color color, sdl::Color outlineColor, sdl::Color shadowColor);
+        sdl::FontRender makeTexture(strv text, uint32 w = 0, float x = 0, float y = 0, sdl::Color color = sdl::COLOR_WHITE, sdl::Color outlineColor = sdl::COLOR_BLACK, sdl::Color shadowColor = sdl::COLOR_BLACK_SHADOW);
         void dispose();
         void reload();
     private:
@@ -100,7 +100,7 @@ namespace fbc {
     }
 
     // Create a texture snapshot of the text rendered with this font in the given colors. Text must NOT be empty
-    sdl::FontRender FFont::makeTexture(strv text, uint32 w = 0, float x = 0, float y = 0, sdl::Color color = sdl::COLOR_WHITE, sdl::Color outlineColor = sdl::COLOR_BLACK, sdl::Color shadowColor = sdl::COLOR_BLACK_SHADOW)
+    sdl::FontRender FFont::makeTexture(strv text, uint32 w, float x, float y, sdl::Color color, sdl::Color outlineColor, sdl::Color shadowColor)
     {
         const char* texDat = text.data();
         sdl::Surface* targetSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, color, w);

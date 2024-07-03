@@ -6,8 +6,20 @@ import fbc.KeyedItem;
 import std;
 
 namespace fbc {
-	export class CommonBehavior : public KeyedItem<CommonBehavior>, public Creature::Behavior {
+	export class GreedyBehavior : public Creature::Behavior {
 	public:
-		CommonBehavior(strv key): KeyedItem<CommonBehavior>(key) {}
+		GreedyBehavior(): Behavior(ID) {}
+
+		static constexpr strv ID = "GreedyBehavior";
+
+		void act(Creature& source) override;
 	};
+
+	export const GreedyBehavior instance;
+
+
+	void GreedyBehavior::act(Creature& source)
+	{
+		// TODO implement
+	}
 }

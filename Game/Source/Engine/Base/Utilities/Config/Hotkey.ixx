@@ -73,7 +73,7 @@ namespace fbc {
 	{
 		map<str, pair<int, int>> output = futil::transformMap<str, Hotkey, pair<int, int>>(keys, [](const Hotkey& row) { return pair<int,int>(row.key, row.pad); });
 		str configPath = Hotkey::configPath();
-		glz::write_error error = glz::write_file_json(output, configPath, str{});
+		auto error = glz::write_file_json(output, configPath, str{});
 		if (error) {
 			sdl::logError("Failed to save hotkeys at path %s", configPath.data());
 		}
@@ -85,7 +85,7 @@ namespace fbc {
 		str configPath = Hotkey::configPath();
 		if (std::filesystem::exists(configPath)) {
 			map<str, pair<int, int>> input;
-			glz::parse_error error = glz::read_file_json(input, configPath, str{});
+			auto error = glz::read_file_json(input, configPath, str{});
 			if (error) {
 				sdl::logError("Failed to read hotkeys at path %s: %s", configPath.data(), error.includer_error.data());
 			}

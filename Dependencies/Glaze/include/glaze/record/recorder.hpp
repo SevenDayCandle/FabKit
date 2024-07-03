@@ -125,10 +125,7 @@ namespace glz
 
             if constexpr (!Options.opening_handled) {
                GLZ_SKIP_WS;
-               match<'{'>(ctx, it);
-               if (bool(ctx.error)) [[unlikely]] {
-                  return;
-               }
+               GLZ_MATCH_OPEN_BRACE;
             }
 
             GLZ_SKIP_WS;
@@ -178,7 +175,7 @@ namespace glz
                const size_t n = value.data.size();
                for (size_t i = 0; i < n; ++i) {
                   auto& [name, v] = value.data[i];
-                  dump(name, args...);
+                  dump_maybe_empty(name, args...);
 
                   dump<','>(args...);
 
@@ -198,7 +195,7 @@ namespace glz
                const auto n = value.data.size();
                size_t i = 0;
                for (auto& [name, data] : value.data) {
-                  dump(name, args...);
+                  dump_maybe_empty(name, args...);
                   ++i;
                   if (i < n) {
                      dump<','>(args...);

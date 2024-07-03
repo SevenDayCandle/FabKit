@@ -25,11 +25,14 @@ namespace glz
    // and we want a power of 2 buffer
    constexpr uint32_t padding_bytes = 16;
 
+   // Write padding bytes simplifies our dump calculations by making sure we have significant excess
+   constexpr uint32_t write_padding_bytes = 256;
+
    struct opts
    {
       // USER CONFIGURABLE
       uint32_t format = json;
-      bool comments = false; // Write out comments
+      bool comments = false; // Write out or support reading in JSONC style comments
       bool error_on_unknown_keys = true; // Error when an unknown key is encountered
       bool skip_null_members = true; // Skip writing out params in an object if the value is null
       bool use_hash_comparison = true; // Will replace some string equality checks with hash checks
@@ -40,7 +43,7 @@ namespace glz
       bool new_lines_in_arrays = true; // Whether prettified arrays should have new lines for each element
       bool shrink_to_fit = false; // Shrinks dynamic containers to new size to save memory
       bool write_type_info = true; // Write type info for meta objects in variants
-      bool force_conformance = false; // Do not allow invalid json normally accepted such as comments, nan, inf.
+      bool force_conformance = false; // Do not allow invalid json normally accepted such as nan, inf.
       bool error_on_missing_keys = false; // Require all non nullable keys to be present in the object. Use
                                           // skip_null_members = false to require nullable members
 
@@ -52,14 +55,21 @@ namespace glz
       // The maximum precision type used for writing floats, higher precision floats will be cast down to this precision
       float_precision float_max_write_precision{};
 
+      bool bools_as_numbers = false; // Read and write booleans with 1's and 0's
+
       bool quoted_num = false; // treat numbers as quoted or array-like types as having quoted numbers
       bool number = false; // read numbers as strings and write these string as numbers
       bool raw = false; // write out string like values without quotes
       bool raw_string = false; // do not decode/encode escaped characters for strings (improves read/write performance)
-      bool structs_as_arrays = false; // Handle structs (reading/writing) without keys, which applies to reflectable and
+      bool structs_as_arrays = false; // Handle structs (reading/writing) without keys, which applies
+      bool allow_conversions = true; // Whether conversions between convertible types are
+      // allowed in binary, e.g. double -> float
+
+      bool partial_read =
+         false; // Reads into only existing fields and elements and then exits without parsing the rest of the input
 
       // glaze_object_t concepts
-      bool partial_read_nested = false; // Rewind forward the partially readed struct to the end of the struct
+      bool partial_read_nested = false; // Advance the partially read struct to the end of the struct
       bool concatenate = true; // Concatenates ranges of std::pair into single objects when writing
 
       bool hide_non_invocable =
@@ -73,6 +83,8 @@ namespace glz
       bool write_unknown = true; // whether to write unkwown fields
       bool is_padded = false; // whether or not the read buffer is padded
       bool disable_padding = false; // to explicitly disable padding for contexts like includers
+      bool write_unchecked = false; // the write buffer has sufficient space and does not need to be checked
+      // sufficient space is only applicable to writing certain types and based on the write_padding_bytes
 
       [[nodiscard]] constexpr bool operator==(const opts&) const noexcept = default;
    };

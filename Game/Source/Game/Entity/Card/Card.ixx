@@ -12,12 +12,12 @@ import std;
 namespace fbc {
 	export class Card : public GameObjectDerived<CardData> {
 	public:
-		Card(CardData& data) : GameObjectDerived<CardData>(data) {}
+		Card(CardData& data, int upgrades = 0) : GameObjectDerived<CardData>(data), upgrades(upgrades) {}
 
 		int upgrades;
 		opt<vec<uptr<Effect>>> effectOverride;
 
-		inline int cost() const { return data.costBase + data.costUp * upgrades; };
+		inline int cost() const { return data.getCost(upgrades); };
 		inline vec<uptr<Effect>>& getEffects() { return effectOverride ? effectOverride.value() : data.effects; }
 
 		bool isPlayable();

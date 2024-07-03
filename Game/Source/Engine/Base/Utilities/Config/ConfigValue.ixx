@@ -11,8 +11,6 @@ namespace fbc {
             config.registerEntry(this);
         }
 
-        const str id;
-
         operator T() { return value; }
 
         inline void setOnReload(const func<void(const T&)>& onChange) {this->onChange = onChange;}

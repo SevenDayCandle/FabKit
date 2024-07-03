@@ -2,6 +2,8 @@ module;
 
 import fbc.CombatSquare;
 import fbc.CombatTurn;
+import fbc.Creature;
+import fbc.CreatureData;
 import fbc.FieldObject;
 import fbc.FUtil;
 import fbc.IActionable;
@@ -13,9 +15,13 @@ namespace fbc {
 	/*
  * 1. Generates squares based on the given dimensions
  */
-	void CombatInstance::initialize()
+	void CombatInstance::initialize(int columns, int rows, int roundTime, vec<CombatRunCreatureEntry>& inputFieldObjects)
 	{
 		// Generates squares based on the given dimensions
+		this->fieldColumns = columns;
+		this->fieldRows = rows;
+		this->roundTime = roundTime;
+		squares.clear();
 		for (int i = 0; i < fieldColumns; i++) {
 			for (int j = 0; j < fieldRows; j++) {
 				squares.emplace_back(i, j);
@@ -24,12 +30,32 @@ namespace fbc {
 		distances.resize(squares.size(), -1);
 
 		// Creates field members based on the room parameters
+		// TODO handle other fieldobject types besides creature
+		for (CombatRunCreatureEntry& entry : inputFieldObjects) {
+			CreatureData* data = CreatureData::get(entry.dataId);
+			if (data) {
+				Creature::Behavior* behavior = Creature::Behavior::optGet(entry.behaviorId);
+				if (!behavior) {
+					behavior = Creature::Behavior::optGet(data->data.defaultBehavior);
+				}
+
+				CombatSquare* square = getSquare(entry.posCol, entry.posRow);
+
+				if (behavior && square) {
+					uptr<Creature> pt = make_unique<Creature>(*data, behavior, entry.faction, entry.upgrades, entry.health);
+					Creature& creature = *pt;
+					fieldObjects.push_back(move(pt));
+					square->setOccupant(&creature);
+					creature.initialize(entry.cards, entry.passives);
+				}
+			}
+		}
 
 		// Setup subscribers
 
 		// Setup initial turns
 
-		// Initialize all field members
+		// Start of combat hooks for all field members
 	}
 
 	// Queue an action to be executed

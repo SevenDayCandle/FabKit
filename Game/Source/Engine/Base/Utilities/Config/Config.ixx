@@ -47,7 +47,7 @@ namespace fbc {
     // Save the contents of the values_map to an external file
     void Config::commit() {
         str configPath = getConfigPath();
-        glz::write_error error = glz::write_file_json(values_map, configPath, str{});
+        auto error = glz::write_file_json(values_map, configPath, str{});
         if (error) {
             sdl::logError("Failed to save config at path %s", configPath.data());
         }
@@ -60,7 +60,7 @@ namespace fbc {
     void Config::load() {
         str configPath = getConfigPath();
         if (std::filesystem::exists(configPath)) {
-            glz::parse_error error = glz::read_file_json(values_map, configPath, str{});
+            auto error = glz::read_file_json(values_map, configPath, str{});
             if (error) {
                 sdl::logError("Failed to read config at path %s", configPath.data());
             }

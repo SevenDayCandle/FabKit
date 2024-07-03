@@ -1,35 +1,40 @@
 export module fbc.Creature;
 
+import fbc.AttributeObject;
 import fbc.Card;
 import fbc.CombatSquare;
 import fbc.CreatureData;
 import fbc.FieldObject;
 import fbc.FUtil;
 import fbc.GameObject;
+import fbc.KeyedItem;
 import fbc.PileType;
-import fbc.RunCreatureEntry;
 import sdl;
 import std;
 
 namespace fbc {
 	export class Creature : public GameObjectDerived<CreatureData>, public FieldObject {
 	public:
-		class Behavior {
+		class Behavior : public KeyedItem<Behavior> {
 		public:
-			Behavior()  {}
-			virtual ~Behavior() = default;
+			Behavior(strv key) : KeyedItem<Behavior>(key) {}
 
 			virtual void act(Creature& source) = 0;
 		};
+		class PileGroup : public vec<uptr<Card>> {
+		public:
+			PileGroup(const PileType& type) : vec<uptr<Card>>(), type(type) {}
 
-		Creature(CreatureData& data, int upgrades, int startingHealth, vec<str>& cards, vec<str>& passives) :
-			GameObjectDerived(data), upgrades(upgrades), health(startingHealth), energyMax(data.getResultEnergyMax(upgrades)), handSize(data.getResultHandSize(upgrades)), healthMax(data.getResultHealth(upgrades)), movementMax(data.getResultMove(upgrades)) {
+			const PileType& type;
+		};
+
+		Creature(CreatureData& data, Behavior* behavior, int faction, int upgrades, int startingHealth) :
+			GameObjectDerived(data), behavior(behavior), faction(faction), upgrades(upgrades), health(startingHealth), energyMax(data.getResultEnergyMax(upgrades)), handSize(data.getResultHandSize(upgrades)), healthMax(data.getResultHealth(upgrades)), movementMax(data.getResultMovement(upgrades)) {
 			// TODO create cards
 		}
-		Creature(CreatureData& data, int upgrades) : Creature(data, upgrades, data.getResultHealth(upgrades), data.defaultCards, data.passives) {}
-		Creature(RunCreatureEntry& entry) : Creature(entry.data, entry.upgrades, entry.health, entry.cards, entry.passives) {}
+		Creature(CreatureData& data, Behavior* behavior, int faction, int upgrades) : Creature(data, behavior, faction, upgrades, data.getResultHealth(upgrades)) {}
 
-		Creature::Behavior* behavior;
+		Behavior* behavior;
 		int energy;
 		int energyMax;
 		int faction;
@@ -43,17 +48,23 @@ namespace fbc {
 		virtual bool onTurnBegin() override;
 		virtual void onTurnEnd() override;
 		bool moveTo(CombatSquare& square);
-		Card& cardFromToPile(Card& card, const PileType& source, const PileType& dest);
-		Card& cardToPile(uptr<Card>&& card, const PileType& type);
+		Card& cardFromToPile(Card& card, const PileType& source, const PileType& dest); // TODO refactor to use conditions, refactor into action
+		Card& cardToPile(uptr<Card>&& card, const PileType& type); // TODO refactor to use conditions, refactor into action
 		Card& useCard(Card& card, CombatSquare& square);
 		int getActionSpeed();
 		int getCardDraw();
-		vec<uptr<Card>>& getPile(const PileType& type);
+		int getEnergyGain();
+		PileGroup& getPile(const PileType& type);
+		void drawForStartOfTurn();
+		void initialize(vec<pair<str, int>>& cards, vec<pair<str, int>>& passives);
+		void refreshValuesForStartOfTurn();
 	private:
-		CombatSquare* currentSquare;
-		vec<uptr<Card>> discardPile;
-		vec<uptr<Card>> drawPile;
-		vec<uptr<Card>> expend;
-		vec<uptr<Card>> hand;
+		PileGroup discardPile = PileGroup(piletype::DISCARD);
+		PileGroup drawPile = PileGroup(piletype::DRAW);
+		PileGroup expendPile = PileGroup(piletype::EXPEND);
+		PileGroup hand = PileGroup(piletype::HAND);
+		vec<uptr<AttributeObject>> passives;
+
+		void moveBetweenPiles(PileGroup::iterator cardIt, PileGroup& sourcePile, PileGroup& destPile, bool manual = true);
 	};
 }

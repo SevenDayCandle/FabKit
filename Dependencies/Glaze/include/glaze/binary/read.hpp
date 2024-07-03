@@ -18,7 +18,28 @@ namespace glz
       template <>
       struct read<binary>
       {
+         template <auto Opts, class T, class Tag, is_context Ctx, class It0, class It1>
+            requires(Opts.no_header)
+         GLZ_ALWAYS_INLINE static void op(T&& value, Tag&& tag, Ctx&& ctx, It0&& it, It1&& end) noexcept
+         {
+            if constexpr (std::is_const_v<std::remove_reference_t<T>>) {
+               if constexpr (Opts.error_on_const_read) {
+                  ctx.error = error_code::attempt_const_read;
+               }
+               else {
+                  // do not read anything into the const value
+                  skip_value_binary<Opts>(std::forward<Ctx>(ctx), std::forward<It0>(it), std::forward<It1>(end));
+               }
+            }
+            else {
+               using V = std::remove_cvref_t<T>;
+               from_binary<V>::template op<Opts>(std::forward<T>(value), std::forward<Tag>(tag), std::forward<Ctx>(ctx),
+                                                 std::forward<It0>(it), std::forward<It1>(end));
+            }
+         }
+
          template <auto Opts, class T, is_context Ctx, class It0, class It1>
+            requires(not Opts.no_header)
          GLZ_ALWAYS_INLINE static void op(T&& value, Ctx&& ctx, It0&& it, It1&& end) noexcept
          {
             if constexpr (std::is_const_v<std::remove_reference_t<T>>) {
@@ -38,15 +59,40 @@ namespace glz
          }
       };
 
-      template <glaze_value_t T>
+      template <class T>
+         requires(glaze_value_t<T> && !custom_read<T>)
       struct from_binary<T>
       {
-         template <auto Opts, is_context Ctx, class It0, class It1>
-         GLZ_ALWAYS_INLINE static void op(auto&& value, Ctx&& ctx, It0&& it, It1&& end)
+         template <auto Opts, class Value, is_context Ctx, class It0, class It1>
+         GLZ_ALWAYS_INLINE static void op(Value&& value, Ctx&& ctx, It0&& it, It1&& end) noexcept
          {
-            using V = decltype(get_member(std::declval<T>(), meta_wrapper_v<T>));
-            from_binary<V>::template op<Opts>(get_member(value, meta_wrapper_v<T>), std::forward<Ctx>(ctx),
-                                              std::forward<It0>(it), std::forward<It1>(end));
+            using V = std::decay_t<decltype(get_member(std::declval<Value>(), meta_wrapper_v<T>))>;
+            from_binary<V>::template op<Opts>(get_member(std::forward<Value>(value), meta_wrapper_v<T>),
+                                              std::forward<Ctx>(ctx), std::forward<It0>(it), std::forward<It1>(end));
+         }
+      };
+
+      template <always_null_t T>
+      struct from_binary<T>
+      {
+         template <auto Opts>
+         GLZ_ALWAYS_INLINE static void op(auto&&, is_context auto&& ctx, auto&& it, auto&&) noexcept
+         {
+            if (uint8_t(*it)) [[unlikely]] {
+               ctx.error = error_code::syntax_error;
+               return;
+            }
+            ++it;
+         }
+      };
+
+      template <>
+      struct from_binary<hidden>
+      {
+         template <auto Opts>
+         GLZ_ALWAYS_INLINE static void op(auto&&, is_context auto&& ctx, auto&&...) noexcept
+         {
+            ctx.error = error_code::attempt_read_hidden;
          }
       };
 
@@ -109,7 +155,7 @@ namespace glz
             constexpr auto Length = byte_length<T>();
             uint8_t data[Length];
 
-            std::memcpy(data, &(*it), Length);
+            std::memcpy(data, it, Length);
             it += Length;
 
             for_each<N>([&](auto I) {
@@ -124,31 +170,109 @@ namespace glz
          requires(num_t<T> || char_t<T> || glaze_enum_t<T>)
       struct from_binary<T>
       {
-         template <auto Opts>
-         GLZ_ALWAYS_INLINE static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&&) noexcept
-         {
-            if constexpr (Opts.no_header) {
-               using V = std::decay_t<T>;
-               std::memcpy(&value, &(*it), sizeof(V));
-               it += sizeof(V);
-            }
-            else {
-               constexpr uint8_t type =
-                  std::floating_point<T> ? 0 : (std::is_signed_v<T> ? 0b000'01'000 : 0b000'10'000);
-               constexpr uint8_t header = tag::number | type | (byte_count<T> << 5);
+         static constexpr uint8_t type =
+            std::floating_point<T> ? 0 : (std::is_signed_v<T> ? 0b000'01'000 : 0b000'10'000);
+         static constexpr uint8_t header = tag::number | type | (byte_count<T> << 5);
 
-               const auto tag = uint8_t(*it);
-               if (tag != header) {
+         template <auto Opts>
+            requires(Opts.no_header)
+         GLZ_ALWAYS_INLINE static void op(auto&& value, const uint8_t tag, is_context auto&& ctx, auto&& it,
+                                          auto&&) noexcept
+         {
+            using V = std::decay_t<decltype(value)>;
+
+            constexpr auto is_volatile = std::is_volatile_v<std::remove_reference_t<decltype(value)>>;
+
+            if (tag != header) {
+               if constexpr (Opts.allow_conversions) {
+                  if constexpr (num_t<T>) {
+                     if ((tag & 0b00000111) != tag::number) {
+                        ctx.error = error_code::syntax_error;
+                        return;
+                     }
+
+                     auto decode = [&](auto&& i) {
+                        std::memcpy(&i, it, sizeof(i));
+                        value = static_cast<V>(i);
+                        it += sizeof(i);
+                     };
+
+                     switch (tag) {
+                     case tag::f32: {
+                        static_assert(sizeof(float) == 4);
+                        // TODO: use float32_t in C++23
+                        decode(float{});
+                        return;
+                     }
+                     case tag::f64: {
+                        static_assert(sizeof(double) == 8);
+                        // TODO: use float64_t in C++23
+                        decode(double{});
+                        return;
+                     }
+                     case tag::i8: {
+                        decode(int8_t{});
+                        return;
+                     }
+                     case tag::i16: {
+                        decode(int16_t{});
+                        return;
+                     }
+                     case tag::i32: {
+                        decode(int32_t{});
+                        return;
+                     }
+                     case tag::i64: {
+                        decode(int64_t{});
+                        return;
+                     }
+                     case tag::u8: {
+                        decode(uint8_t{});
+                        return;
+                     }
+                     case tag::u16: {
+                        decode(uint16_t{});
+                        return;
+                     }
+                     case tag::u32: {
+                        decode(uint32_t{});
+                        return;
+                     }
+                     case tag::u64: {
+                        decode(uint64_t{});
+                        return;
+                     }
+                     default: {
+                        ctx.error = error_code::syntax_error;
+                        return;
+                     }
+                     }
+                  }
+               }
+               else {
                   ctx.error = error_code::syntax_error;
                   return;
                }
-
-               ++it;
-
-               using V = std::decay_t<decltype(value)>;
-               std::memcpy(&value, &(*it), sizeof(V));
-               it += sizeof(V);
             }
+
+            if constexpr (is_volatile) {
+               V temp;
+               std::memcpy(&temp, it, sizeof(V));
+               value = temp;
+            }
+            else {
+               std::memcpy(&value, it, sizeof(V));
+            }
+            it += sizeof(V);
+         }
+
+         template <auto Opts>
+            requires(not Opts.no_header)
+         GLZ_ALWAYS_INLINE static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
+         {
+            const auto tag = uint8_t(*it);
+            ++it;
+            op<opt_true<Opts, &opts::no_header>>(value, tag, ctx, it, end);
          }
       };
 
@@ -162,7 +286,7 @@ namespace glz
             using V = std::underlying_type_t<std::decay_t<T>>;
 
             if constexpr (Opts.no_header) {
-               std::memcpy(&value, &(*it), sizeof(V));
+               std::memcpy(&value, it, sizeof(V));
                it += sizeof(V);
             }
             else {
@@ -178,7 +302,7 @@ namespace glz
 
                ++it;
 
-               std::memcpy(&value, &(*it), sizeof(V));
+               std::memcpy(&value, it, sizeof(V));
                it += sizeof(V);
             }
          }
@@ -193,7 +317,7 @@ namespace glz
          {
             if constexpr (Opts.no_header) {
                using V = std::decay_t<T>;
-               std::memcpy(&value, &(*it), sizeof(V));
+               std::memcpy(&value, it, sizeof(V));
                it += sizeof(V);
             }
             else {
@@ -219,7 +343,7 @@ namespace glz
                }
                ++it;
 
-               std::memcpy(&value, &(*it), 2 * sizeof(V));
+               std::memcpy(&value, it, 2 * sizeof(V));
                it += 2 * sizeof(V);
             }
          }
@@ -255,9 +379,10 @@ namespace glz
       struct from_binary<T>
       {
          template <auto Opts>
-         GLZ_ALWAYS_INLINE static void op(auto&& /*value*/, is_context auto&& /*ctx*/, auto&& /*it*/,
-                                          auto&& /*end*/) noexcept
-         {}
+         GLZ_ALWAYS_INLINE static void op(auto&& /*value*/, is_context auto&& ctx, auto&& it, auto&& end) noexcept
+         {
+            skip_string_binary(ctx, it, end);
+         }
       };
 
       template <class T>
@@ -305,42 +430,52 @@ namespace glz
       template <str_t T>
       struct from_binary<T> final
       {
+         using V = typename std::decay_t<T>::value_type;
+         static_assert(sizeof(V) == 1);
+
          template <auto Opts>
+            requires(Opts.no_header)
+         GLZ_ALWAYS_INLINE static void op(auto&& value, const uint8_t, is_context auto&& ctx, auto&& it,
+                                          auto&& end) noexcept
+         {
+            const auto n = int_from_compressed(ctx, it, end);
+            if ((it + n) > end) [[unlikely]] {
+               ctx.error = error_code::unexpected_end;
+               return;
+            }
+            value.resize(n);
+            std::memcpy(value.data(), it, n);
+            it += n;
+         }
+
+         template <auto Opts>
+            requires(not Opts.no_header)
          GLZ_ALWAYS_INLINE static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
          {
-            using V = typename std::decay_t<T>::value_type;
-            static_assert(sizeof(V) == 1);
+            constexpr uint8_t header = tag::string;
 
-            if constexpr (Opts.no_header) {
-               const auto n = int_from_compressed(ctx, it, end);
-               if ((it + n) > end) [[unlikely]] {
-                  ctx.error = error_code::unexpected_end;
-                  return;
-               }
-               value.resize(n);
-               std::memcpy(value.data(), &(*it), n);
-               it += n;
+            const auto tag = uint8_t(*it);
+            if (tag != header) [[unlikely]] {
+               ctx.error = error_code::syntax_error;
+               return;
+            }
+
+            ++it;
+
+            const auto n = int_from_compressed(ctx, it, end);
+            if ((it + n) > end) [[unlikely]] {
+               ctx.error = error_code::unexpected_end;
+               return;
+            }
+
+            if constexpr (string_view_t<T>) {
+               value = {it, n};
             }
             else {
-               constexpr uint8_t header = tag::string;
-
-               const auto tag = uint8_t(*it);
-               if (tag != header) [[unlikely]] {
-                  ctx.error = error_code::syntax_error;
-                  return;
-               }
-
-               ++it;
-
-               const auto n = int_from_compressed(ctx, it, end);
-               if ((it + n) > end) [[unlikely]] {
-                  ctx.error = error_code::unexpected_end;
-                  return;
-               }
                value.resize(n);
-               std::memcpy(value.data(), &(*it), n);
-               it += n;
+               std::memcpy(value.data(), it, n);
             }
+            it += n;
          }
       };
 
@@ -514,34 +649,88 @@ namespace glz
                   std::floating_point<V> ? 0 : (std::is_signed_v<V> ? 0b000'01'000 : 0b000'10'000);
                constexpr uint8_t header = tag::typed_array | type | (byte_count<V> << 5);
 
-               if (tag != header) [[unlikely]] {
-                  ctx.error = error_code::syntax_error;
-                  return;
+               auto prepare = [&](const size_t element_size) -> size_t {
+                  ++it;
+
+                  std::conditional_t<Opts.partial_read, size_t, const size_t> n = int_from_compressed(ctx, it, end);
+                  if (bool(ctx.error)) [[unlikely]] {
+                     return 0;
+                  }
+
+                  if constexpr (Opts.partial_read) {
+                     n = value.size();
+                  }
+
+                  if ((it + n * element_size) > end) [[unlikely]] {
+                     ctx.error = error_code::unexpected_end;
+                     return 0;
+                  }
+
+                  if constexpr (resizable<T>) {
+                     value.resize(n);
+
+                     if constexpr (Opts.shrink_to_fit) {
+                        value.shrink_to_fit();
+                     }
+                  }
+
+                  return n;
+               };
+
+               if (tag != header) {
+                  if constexpr (Opts.allow_conversions) {
+                     if (tag != header) [[unlikely]] {
+                        if constexpr (Opts.allow_conversions) {
+                           if ((tag & 0b00000111) != tag::typed_array) {
+                              ctx.error = error_code::syntax_error;
+                              return;
+                           }
+
+                           const uint8_t byte_count = byte_count_lookup[tag >> 5];
+                           prepare(byte_count);
+                           if (bool(ctx.error)) [[unlikely]] {
+                              return;
+                           }
+
+                           for (auto&& x : value) {
+                              const uint8_t number_tag = tag::number | (tag & 0b11111000);
+                              read<binary>::op<opt_true<Opts, &opts::no_header>>(x, number_tag, ctx, it, end);
+                           }
+                           return;
+                        }
+                        else {
+                           ctx.error = error_code::syntax_error;
+                           return;
+                        }
+                     }
+                  }
+                  else {
+                     ctx.error = error_code::syntax_error;
+                     return;
+                  }
                }
 
-               ++it;
-
-               const auto n = int_from_compressed(ctx, it, end);
+               const auto n = prepare(sizeof(V));
                if (bool(ctx.error)) [[unlikely]] {
                   return;
                }
 
-               if ((it + n * sizeof(V)) > end) [[unlikely]] {
-                  ctx.error = error_code::unexpected_end;
-                  return;
-               }
-
-               if constexpr (resizable<T>) {
-                  value.resize(n);
-
-                  if constexpr (Opts.shrink_to_fit) {
-                     value.shrink_to_fit();
-                  }
-               }
-
                if constexpr (contiguous<T>) {
-                  std::memcpy(value.data(), it, n * sizeof(V));
-                  it += n * sizeof(V);
+                  constexpr auto is_volatile =
+                     std::is_volatile_v<std::remove_reference_t<std::remove_pointer_t<decltype(value.data())>>>;
+
+                  if constexpr (is_volatile) {
+                     V temp;
+                     for (size_t i = 0; i < n; ++i) {
+                        std::memcpy(&temp, it, sizeof(V));
+                        value[i] = temp;
+                        it += sizeof(V);
+                     }
+                  }
+                  else {
+                     std::memcpy(value.data(), it, n * sizeof(V));
+                     it += n * sizeof(V);
+                  }
                }
                else {
                   for (auto&& x : value) {
@@ -562,9 +751,13 @@ namespace glz
 
                ++it;
 
-               const auto n = int_from_compressed(ctx, it, end);
+               std::conditional_t<Opts.partial_read, size_t, const size_t> n = int_from_compressed(ctx, it, end);
                if (bool(ctx.error)) [[unlikely]] {
                   return;
+               }
+
+               if constexpr (Opts.partial_read) {
+                  n = value.size();
                }
 
                if constexpr (resizable<T>) {
@@ -610,9 +803,13 @@ namespace glz
                }
                ++it;
 
-               const auto n = int_from_compressed(ctx, it, end);
+               std::conditional_t<Opts.partial_read, size_t, const size_t> n = int_from_compressed(ctx, it, end);
                if (bool(ctx.error)) [[unlikely]] {
                   return;
+               }
+
+               if constexpr (Opts.partial_read) {
+                  n = value.size();
                }
 
                if ((it + n * sizeof(V)) > end) [[unlikely]] {
@@ -646,9 +843,13 @@ namespace glz
                }
                ++it;
 
-               const auto n = int_from_compressed(ctx, it, end);
+               std::conditional_t<Opts.partial_read, size_t, const size_t> n = int_from_compressed(ctx, it, end);
                if (bool(ctx.error)) [[unlikely]] {
                   return;
+               }
+
+               if constexpr (Opts.partial_read) {
+                  n = value.size();
                }
 
                if constexpr (resizable<T>) {
@@ -695,7 +896,8 @@ namespace glz
                return;
             }
 
-            read<binary>::op<opt_true<Opts, &opts::no_header>>(value.first, ctx, it, end);
+            constexpr uint8_t key_tag = type == 0 ? tag::string : (tag::number | (byte_cnt << 5));
+            read<binary>::op<opt_true<Opts, &opts::no_header>>(value.first, key_tag, ctx, it, end);
             read<binary>::op<Opts>(value.second, ctx, it, end);
          }
       };
@@ -714,29 +916,69 @@ namespace glz
 
             const auto tag = uint8_t(*it);
             if (tag != header) [[unlikely]] {
-               ctx.error = error_code::syntax_error;
-               return;
+               if constexpr (Opts.allow_conversions) {
+                  const auto key_type = tag & 0b000'11'000;
+                  if constexpr (str_t<Key>) {
+                     if (key_type != 0) {
+                        ctx.error = error_code::syntax_error;
+                        return;
+                     }
+                  }
+                  else {
+                     if (key_type == 0) {
+                        ctx.error = error_code::syntax_error;
+                        return;
+                     }
+                  }
+               }
+               else {
+                  ctx.error = error_code::syntax_error;
+                  return;
+               }
             }
 
             ++it;
 
-            const auto n = int_from_compressed(ctx, it, end);
+            std::conditional_t<Opts.partial_read, size_t, const size_t> n = int_from_compressed(ctx, it, end);
             if (bool(ctx.error)) [[unlikely]] {
                return;
             }
 
+            if constexpr (Opts.partial_read) {
+               n = value.size();
+            }
+
             if constexpr (std::is_arithmetic_v<std::decay_t<Key>>) {
+               constexpr uint8_t key_tag = tag::number | type | (byte_cnt << 5);
                Key key;
                for (size_t i = 0; i < n; ++i) {
-                  read<binary>::op<opt_true<Opts, &opts::no_header>>(key, ctx, it, end);
-                  read<binary>::op<Opts>(value[key], ctx, it, end);
+                  if constexpr (Opts.partial_read) {
+                     read<binary>::op<opt_true<Opts, &opts::no_header>>(key, key_tag, ctx, it, end);
+                     if (auto element = value.find(key); element != value.end()) {
+                        read<binary>::op<Opts>(element->second, ctx, it, end);
+                     }
+                  }
+                  else {
+                     // convert the object tag to the key type tag
+                     read<binary>::op<opt_true<Opts, &opts::no_header>>(key, key_tag, ctx, it, end);
+                     read<binary>::op<Opts>(value[key], ctx, it, end);
+                  }
                }
             }
             else {
+               constexpr uint8_t key_tag = tag::string;
                static thread_local Key key;
                for (size_t i = 0; i < n; ++i) {
-                  read<binary>::op<opt_true<Opts, &opts::no_header>>(key, ctx, it, end);
-                  read<binary>::op<Opts>(value[key], ctx, it, end);
+                  if constexpr (Opts.partial_read) {
+                     read<binary>::op<opt_true<Opts, &opts::no_header>>(key, key_tag, ctx, it, end);
+                     if (auto element = value.find(key); element != value.end()) {
+                        read<binary>::op<Opts>(element->second, ctx, it, end);
+                     }
+                  }
+                  else {
+                     read<binary>::op<opt_true<Opts, &opts::no_header>>(key, key_tag, ctx, it, end);
+                     read<binary>::op<Opts>(value[key], ctx, it, end);
+                  }
                }
             }
          }
@@ -824,7 +1066,7 @@ namespace glz
       {
          template <auto Opts>
             requires(Opts.structs_as_arrays == true)
-         GLZ_FLATTEN static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
+         static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
          {
             if constexpr (reflectable<T>) {
                auto t = to_tuple(value);
@@ -857,7 +1099,7 @@ namespace glz
 
          template <auto Opts>
             requires(Opts.structs_as_arrays == false)
-         GLZ_FLATTEN static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
+         static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
          {
             constexpr uint8_t type = 0; // string key
             constexpr uint8_t header = tag::object | type;
@@ -870,7 +1112,24 @@ namespace glz
 
             ++it;
 
-            constexpr auto N = reflection_count<T>;
+            static constexpr auto N = reflection_count<T>;
+
+            static constexpr bit_array<N> all_fields = [] {
+               bit_array<N> arr{};
+               for (size_t i = 0; i < N; ++i) {
+                  arr[i] = true;
+               }
+               return arr;
+            }();
+
+            decltype(auto) fields = [&]() -> decltype(auto) {
+               if constexpr (is_partial_read<T> || Opts.partial_read) {
+                  return bit_array<N>{};
+               }
+               else {
+                  return nullptr;
+               }
+            }();
 
             const auto n_keys = int_from_compressed(ctx, it, end);
             if (bool(ctx.error)) [[unlikely]] {
@@ -878,11 +1137,12 @@ namespace glz
             }
 
             decltype(auto) storage = [&]() -> decltype(auto) {
+               using V = decay_keep_volatile_t<decltype(value)>;
                if constexpr (reflectable<T>) {
 #if ((defined _MSC_VER) && (!defined __clang__))
-                  static thread_local auto cmap = make_map<T, Opts.use_hash_comparison>();
+                  static thread_local auto cmap = make_map<V, Opts.use_hash_comparison>();
 #else
-                  static thread_local constinit auto cmap = make_map<T, Opts.use_hash_comparison>();
+                  static thread_local constinit auto cmap = make_map<V, Opts.use_hash_comparison>();
 #endif
                   populate_map(value, cmap); // Function required for MSVC to build
                   return cmap;
@@ -894,6 +1154,12 @@ namespace glz
             }();
 
             for (size_t i = 0; i < n_keys; ++i) {
+               if constexpr (is_partial_read<T> || Opts.partial_read) {
+                  if ((all_fields & fields) == all_fields) {
+                     return;
+                  }
+               }
+
                const auto length = int_from_compressed(ctx, it, end);
                if (bool(ctx.error)) [[unlikely]] {
                   return;
@@ -905,6 +1171,11 @@ namespace glz
 
                if constexpr (N > 0) {
                   if (const auto& p = storage.find(key); p != storage.end()) [[likely]] {
+                     if constexpr (is_partial_read<T> || Opts.partial_read) {
+                        auto index = p - storage.begin();
+                        fields[index] = true;
+                     }
+
                      std::visit(
                         [&](auto&& member_ptr) { read<binary>::op<Opts>(get_member(value, member_ptr), ctx, it, end); },
                         p->second);
@@ -980,16 +1251,40 @@ namespace glz
 
             using V = std::decay_t<T>;
             constexpr auto N = glz::tuple_size_v<V>;
-            if (int_from_compressed(ctx, it, end) != N) {
-               ctx.error = error_code::syntax_error;
-               return;
-            }
+            if constexpr (Opts.partial_read) {
+               const auto n = int_from_compressed(ctx, it, end);
 
-            if constexpr (is_std_tuple<T>) {
-               for_each<N>([&](auto I) { read<binary>::op<Opts>(std::get<I>(value), ctx, it, end); });
+               if constexpr (is_std_tuple<T>) {
+                  for_each_short_circuit<N>([&](auto I) {
+                     if (I < n) {
+                        read<binary>::op<Opts>(std::get<I>(value), ctx, it, end);
+                        return false; // continue
+                     }
+                     return true; // short circuit
+                  });
+               }
+               else {
+                  for_each_short_circuit<N>([&](auto I) {
+                     if (I < n) {
+                        read<binary>::op<Opts>(glz::get<I>(value), ctx, it, end);
+                        return false; // continue
+                     }
+                     return true; // short circuit
+                  });
+               }
             }
             else {
-               for_each<N>([&](auto I) { read<binary>::op<Opts>(glz::get<I>(value), ctx, it, end); });
+               if (int_from_compressed(ctx, it, end) != N) {
+                  ctx.error = error_code::syntax_error;
+                  return;
+               }
+
+               if constexpr (is_std_tuple<T>) {
+                  for_each<N>([&](auto I) { read<binary>::op<Opts>(std::get<I>(value), ctx, it, end); });
+               }
+               else {
+                  for_each<N>([&](auto I) { read<binary>::op<Opts>(glz::get<I>(value), ctx, it, end); });
+               }
             }
          }
       };
@@ -1011,13 +1306,13 @@ namespace glz
    }
 
    template <read_binary_supported T, class Buffer>
-   [[nodiscard]] inline parse_error read_binary(T&& value, Buffer&& buffer) noexcept
+   [[nodiscard]] inline error_ctx read_binary(T&& value, Buffer&& buffer) noexcept
    {
       return read<opts{.format = binary}>(value, std::forward<Buffer>(buffer));
    }
 
    template <read_binary_supported T, class Buffer>
-   [[nodiscard]] inline expected<T, parse_error> read_binary(Buffer&& buffer) noexcept
+   [[nodiscard]] inline expected<T, error_ctx> read_binary(Buffer&& buffer) noexcept
    {
       T value{};
       const auto pe = read<opts{.format = binary}>(value, std::forward<Buffer>(buffer));
@@ -1028,7 +1323,7 @@ namespace glz
    }
 
    template <opts Opts = opts{}, read_binary_supported T>
-   [[nodiscard]] inline parse_error read_file_binary(T& value, const sv file_name, auto&& buffer) noexcept
+   [[nodiscard]] inline error_ctx read_file_binary(T& value, const sv file_name, auto&& buffer) noexcept
    {
       context ctx{};
       ctx.current_file = file_name;
@@ -1036,21 +1331,21 @@ namespace glz
       const auto file_error = file_to_buffer(buffer, ctx.current_file);
 
       if (bool(file_error)) [[unlikely]] {
-         return parse_error{file_error};
+         return error_ctx{file_error};
       }
 
       return read<set_binary<Opts>()>(value, buffer, ctx);
    }
 
    template <read_binary_supported T, class Buffer>
-   [[nodiscard]] inline parse_error read_binary_untagged(T&& value, Buffer&& buffer) noexcept
+   [[nodiscard]] inline error_ctx read_binary_untagged(T&& value, Buffer&& buffer) noexcept
    {
       return read<opts{.format = binary, .structs_as_arrays = true}>(std::forward<T>(value),
                                                                      std::forward<Buffer>(buffer));
    }
 
    template <read_binary_supported T, class Buffer>
-   [[nodiscard]] inline expected<T, parse_error> read_binary_untagged(Buffer&& buffer) noexcept
+   [[nodiscard]] inline expected<T, error_ctx> read_binary_untagged(Buffer&& buffer) noexcept
    {
       T value{};
       const auto pe = read<opts{.format = binary, .structs_as_arrays = true}>(value, std::forward<Buffer>(buffer));
@@ -1061,8 +1356,8 @@ namespace glz
    }
 
    template <opts Opts = opts{}, read_binary_supported T>
-   [[nodiscard]] inline parse_error read_file_binary_untagged(T& value, const std::string& file_name,
-                                                              auto&& buffer) noexcept
+   [[nodiscard]] inline error_ctx read_file_binary_untagged(T& value, const std::string& file_name,
+                                                            auto&& buffer) noexcept
    {
       return read_file_binary<opt_true<Opts, &opts::structs_as_arrays>>(value, file_name, buffer);
    }

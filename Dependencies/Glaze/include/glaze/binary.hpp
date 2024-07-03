@@ -3,7 +3,9 @@
 
 #pragma once
 
+#include "glaze/binary/custom.hpp"
 #include "glaze/binary/header.hpp"
 #include "glaze/binary/ptr.hpp"
 #include "glaze/binary/read.hpp"
+#include "glaze/binary/wrappers.hpp"
 #include "glaze/binary/write.hpp"

@@ -11,11 +11,16 @@ import std;
 namespace fbc {
 	export class PassiveData : public GameObjectDataDerived<PassiveData> {
 	public:
-		PassiveData(BaseContent& source, strv id) : GameObjectDataDerived(source, id) {}
+		struct Fields {
+			int maxUpgrades = 0;
+			ObjectRarity* rarity;
+			vec<str> upgradeBranches;
+		};
 
-		int maxUpgrades = 0;
-		ObjectRarity* rarity;
+		PassiveData(BaseContent& source, strv id) : GameObjectDataDerived(source, id) {}
+		PassiveData(BaseContent& source, strv id, const Fields& fields) : GameObjectDataDerived(source, id), data(fields) {}
+
+		Fields data;
 		vec<uptr<Effect>> effects;
-		vec<str> upgradeBranches;
 	};
 }

@@ -16,7 +16,7 @@ namespace fbc {
 
 		bool operator<(const KeyedItem<C>& other) const { return this->id < other.id; }
 		bool operator>(const KeyedItem<C>& other) const { return this->id > other.id; }
-		bool operator==(const KeyedItem<C>& other) const { return this->id == other.id; }
+		bool operator==(const KeyedItem<C>& other) const { return this == &other; }
 		std::filesystem::path operator/(const std::filesystem::path& other) const {return std::filesystem::path(id) / other;}
 		friend std::ostream& operator<<(std::ostream& os, const KeyedItem& obj) { return os << obj.id; }
 		operator std::string_view() const { return id; }
@@ -26,14 +26,14 @@ namespace fbc {
 		static C& get(std::string_view name);
 		static C* optGet(std::string_view name);
 	protected:
-		constexpr KeyedItem(std::string_view name) : id(name) {
+		KeyedItem(std::string_view name) : id(name) {
 			auto& values = registered();
 			if (!values.emplace(this->id, static_cast<C*>(this)).second) {
 				throw std::logic_error("Duplicate KeyedItem");
 			}
 		}
-		static constexpr std::unordered_map<std::string_view, C*>& registered() {
-			static std::unordered_map<std::string_view, C*> values;
+		static std::map<std::string_view, C*>& registered() {
+			static std::map<std::string_view, C*> values;
 			return values;
 		}
 	};
@@ -52,7 +52,7 @@ namespace fbc {
 		for (const auto& pair : values) {
 			result.emplace_back(static_cast<C*>(pair.second));
 		}
-		std::ranges::sort(result, std::less<C*>());
+		//std::ranges::sort(result, std::less<C*>());
 		return result;
 	}
 

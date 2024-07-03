@@ -11,8 +11,10 @@ import std;
 namespace fbc {
 	export class Passive : public GameObjectDerived<PassiveData>, public AttributeObject {
 	public:
-		Passive(PassiveData& data) : GameObjectDerived<PassiveData>(data) {}
+		Passive(PassiveData& data, int upgrades = 0) : GameObjectDerived<PassiveData>(data), upgrades(upgrades) {}
 
 		int upgrades;
+
+		virtual void act() {}
 	};
 }

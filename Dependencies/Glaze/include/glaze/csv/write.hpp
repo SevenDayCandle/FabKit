@@ -102,7 +102,7 @@ namespace glz
          template <auto Opts, class B>
          static void op(auto&& value, is_context auto&&, B&& b, auto&& ix) noexcept
          {
-            dump(value, b, ix);
+            dump_maybe_empty(value, b, ix);
          }
       };
 
@@ -114,7 +114,7 @@ namespace glz
          {
             if constexpr (Opts.layout == rowwise) {
                for (auto& [name, data] : value) {
-                  dump(name, b, ix);
+                  dump_maybe_empty(name, b, ix);
                   dump<','>(b, ix);
                   const auto n = data.size();
                   for (size_t i = 0; i < n; ++i) {
@@ -131,7 +131,7 @@ namespace glz
                const auto n = value.size();
                size_t i = 0;
                for (auto& [name, data] : value) {
-                  dump(name, b, ix);
+                  dump_maybe_empty(name, b, ix);
                   ++i;
                   if (i < n) {
                      dump<','>(b, ix);
@@ -342,23 +342,24 @@ namespace glz
    }
 
    template <uint32_t layout = rowwise, write_csv_supported T, class Buffer>
-   GLZ_ALWAYS_INLINE auto write_csv(T&& value, Buffer&& buffer) noexcept
+   [[nodiscard]] auto write_csv(T&& value, Buffer&& buffer) noexcept
    {
       return write<opts{.format = csv, .layout = layout}>(std::forward<T>(value), std::forward<Buffer>(buffer));
    }
 
    template <uint32_t layout = rowwise, write_csv_supported T>
-   GLZ_ALWAYS_INLINE auto write_csv(T&& value) noexcept
+   [[nodiscard]] expected<std::string, error_ctx> write_csv(T&& value) noexcept
    {
-      std::string buffer{};
-      write<opts{.format = csv, .layout = layout}>(std::forward<T>(value), buffer);
-      return buffer;
+      return write<opts{.format = csv, .layout = layout}>(std::forward<T>(value));
    }
 
    template <uint32_t layout = rowwise, write_csv_supported T>
-   [[nodiscard]] inline write_error write_file_csv(T&& value, const std::string& file_name, auto&& buffer) noexcept
+   [[nodiscard]] error_ctx write_file_csv(T&& value, const std::string& file_name, auto&& buffer) noexcept
    {
-      write<opts{.format = csv, .layout = layout}>(std::forward<T>(value), buffer);
+      const auto ec = write<opts{.format = csv, .layout = layout}>(std::forward<T>(value), buffer);
+      if (bool(ec)) [[unlikely]] {
+         return ec;
+      }
       return {buffer_to_file(buffer, file_name)};
    }
 }

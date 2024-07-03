@@ -886,7 +886,7 @@ namespace glz
     These digits are named as "aabbccddeeffgghhii" here.
     For example, input 1234567890123000, output "1234567890123".
     */
-   inline char* write_u64_len_15_to_17_trim(char* buf, uint64_t sig) noexcept
+   inline auto* write_u64_len_15_to_17_trim(auto* buf, uint64_t sig) noexcept
    {
       uint32_t tz1, tz2, tz; /* trailing zero */
 
@@ -970,24 +970,24 @@ namespace glz
    consteval uint32_t numbits(uint32_t x) noexcept { return x < 2 ? x : 1 + numbits(x >> 1); }
 
    template <std::floating_point T>
-   inline char* to_chars(char* buffer, T val) noexcept
+   inline auto* to_chars(auto* buffer, T val) noexcept
    {
       static_assert(std::numeric_limits<T>::is_iec559);
       static_assert(std::numeric_limits<T>::radix == 2);
       static_assert(std::is_same_v<float, T> || std::is_same_v<double, T>);
       static_assert(sizeof(float) == 4 && sizeof(double) == 8);
-      using raw_t = std::conditional_t<std::is_same_v<float, T>, uint32_t, uint64_t>;
+      using Raw = std::conditional_t<std::is_same_v<float, T>, uint32_t, uint64_t>;
 
-      raw_t raw;
+      Raw raw;
       std::memcpy(&raw, &val, sizeof(T));
 
       /* decode from raw bytes from IEEE-754 double format. */
       constexpr uint32_t exponent_bits =
          numbits(std::numeric_limits<T>::max_exponent - std::numeric_limits<T>::min_exponent + 1);
-      constexpr raw_t sig_mask = raw_t(-1) >> (exponent_bits + 1);
+      constexpr Raw sig_mask = Raw(-1) >> (exponent_bits + 1);
       bool sign = (raw >> (sizeof(T) * 8 - 1));
       uint64_t sig_raw = raw & sig_mask;
-      int32_t exp_raw = raw << 1 >> (sizeof(raw_t) * 8 - exponent_bits);
+      int32_t exp_raw = raw << 1 >> (sizeof(Raw) * 8 - exponent_bits);
 
       if (exp_raw == (uint32_t(1) << exponent_bits) - 1) [[unlikely]] {
          // NaN or Infinity

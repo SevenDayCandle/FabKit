@@ -5,6 +5,7 @@ import fbc.CombatTurn;
 import fbc.FieldObject;
 import fbc.FUtil;
 import fbc.IActionable;
+import fbc.RunCreatureEntry;
 import std;
 
 namespace fbc {
@@ -12,7 +13,7 @@ namespace fbc {
 
 	export class CombatInstance {
 	public:
-		CombatInstance(int columns, int rows, int roundTime = DEFAULT_ROUND_LENGTH): fieldColumns(columns), fieldRows(rows), roundTime(roundTime) {}
+		CombatInstance() {}
 
 		inline bool hasAction() const { return currentAction != nullptr; }
 		inline CombatTurn* getCurrentTurn() const { return currentTurn; }
@@ -27,7 +28,7 @@ namespace fbc {
 		int getDistanceTo(CombatSquare* square);
 		vec<CombatSquare*> findShortestPath(CombatSquare* targ);
 		void fillDistances(CombatSquare* source);
-		void initialize();
+		void initialize(int columns, int rows, int roundTime, vec<CombatRunCreatureEntry>& fieldObjects);
 		void queueAction(uptr<IActionable>&& action);
 		void queueCompleteTurn();
 		void queueTurn(FieldObject& source, int actionValue);

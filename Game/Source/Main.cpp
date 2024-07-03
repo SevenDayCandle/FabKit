@@ -1,6 +1,7 @@
 import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.ConfigHotkey;
+import fbc.DynamicContent;
 import fbc.ScreenManager;
 import fbc.TitleScreen;
 import sdl;
@@ -38,6 +39,8 @@ bool initialize() {
 	cfg.postInitialize();
 	cfg.setupWindow();
 	cct.initialize();
+	DynamicContent::loadDynamicContent();
+	//cct.initializeContents();
 	cct.postInitialize();
 
 	screenManager::subscribeToConfig();
