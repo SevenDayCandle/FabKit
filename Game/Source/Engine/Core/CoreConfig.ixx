@@ -94,7 +94,7 @@ namespace fbc {
 	// Get the game language, defaulting to English if it is invalid
 	const Language& CoreConfig::getLanguage() {
 		try {
-			return Language::get(textLanguage.get());
+			return Language::forceGet(textLanguage.get());
 		}
 		catch (exception e) {
 			sdl::logError("Language failed to load: %s. Defaulting to ENG", e);

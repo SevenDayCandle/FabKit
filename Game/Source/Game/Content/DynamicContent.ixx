@@ -1,3 +1,7 @@
+module;
+
+#include "glaze/glaze.hpp"
+
 export module fbc.DynamicContent;
 
 import fbc.BaseContent;
@@ -37,6 +41,7 @@ namespace fbc {
 		inline FMusic* getMusic(strv key) override { return music.get(key); }
 		inline FSound* getSound(strv key) override { return sounds.get(key); }
 		inline FTexture* getTexture(strv key) override { return images.get(key); }
+		inline void processCards() { setupFolder(PATH_CREATURE, [this](const dir_entry& entry) {processCard(entry.path()); }); }
 		inline void processCreatures() { setupFolder(PATH_CREATURE, [this](const dir_entry& entry) {processCreature(entry.path()); }); }
 
 		void dispose() override;
@@ -48,6 +53,7 @@ namespace fbc {
 
 		static void loadDynamicContent();
 	private:
+		void processCard(const path& entry);
 		void processCreature(const path& entry);
 		void setupFolder(strv base, const func<void(const dir_entry&)>& onRead);
 	};
@@ -69,7 +75,7 @@ namespace fbc {
 
 	void DynamicContent::postInitialize()
 	{
-		// processCreatures();
+		processCreatures();
 		// TODO process other types of stuff
 	}
 
@@ -80,11 +86,25 @@ namespace fbc {
 
 	void DynamicContent::reloadImages() { images.initialize(); }
 
+	// Attempt to parse a card entry
+	void DynamicContent::processCard(const path& entry)
+	{
+		CardData::ExportFields fields;
+
+		auto error = glz::read_file_json(fields, entry.string(), str{});
+		if (error) {
+			sdl::logError("Failed to load card at path %s", entry.string());
+		}
+		else {
+			CardData::registerData(make_unique<CardData>(*this, entry.filename().string(), fields));
+		}
+	}
+
 	// Attempt to parse a creature entry
 	void DynamicContent::processCreature(const path& entry)
 	{
 		CreatureData::Fields fields;
-		/*
+		
 		auto error = glz::read_file_json(fields, entry.string(), str{});
 		if (error) {
 			sdl::logError("Failed to load creature at path %s", entry.string());
@@ -92,7 +112,7 @@ namespace fbc {
 		else {
 			CreatureData::registerData(make_unique<CreatureData>(*this, entry.filename().string(), fields));
 		}
-		*/
+		
 	}
 
 	void DynamicContent::setupFolder(strv base, const func<void(const dir_entry&)>& onRead)

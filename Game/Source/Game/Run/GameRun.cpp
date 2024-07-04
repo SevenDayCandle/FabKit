@@ -8,8 +8,14 @@ import std;
 module fbc.GameRun;
 
 namespace fbc {
+
+	void GameRun::initialize()
+	{
+		// TODO
+	}
+
 	void GameRun::startCombat()
 	{
-
+		// TODO
 	}
 }

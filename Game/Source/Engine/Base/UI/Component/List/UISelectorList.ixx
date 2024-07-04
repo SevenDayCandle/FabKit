@@ -43,7 +43,7 @@ namespace fbc {
 		inline UISelectorList& setOnSelectionUpdate(const func<void(vec<const UIEntry<T>*>&)>& onSelectionUpdate) {return this->onSelectionUpdate = onSelectionUpdate, *this;}
 
 		inline int getMinSelections() const { return selectionMin; }
-		inline int selectedSize() const { return currentIndices.size(); }
+		inline int selectedSize() const { return static_cast<int>(currentIndices.size()); }
 
 		UISelectorList& setSelectionLimit(int rows);
 		UISelectorList& setSelectionMin(int rows);
@@ -410,9 +410,9 @@ namespace fbc {
 	void UISelectorList<T>::autosize() {
 		int rowCount = getVisibleRowCount();
 		float rMarg = rMargin();
-		float sizeY = rowCount * (this->rows.size() > 0 ? this->rows[0]->hb->h : 0);
+		float sizeY = rowCount * (this->rows.size() > 0 ? this->rows[0]->hb->h : 0.0);
 		if (this->canAutosize) {
-			float maxWidth = std::transform_reduce(this->rows.begin(), this->rows.end(), 0,
+			float maxWidth = std::transform_reduce(this->rows.begin(), this->rows.end(), 0.0,
 			                                       [](float a, float b) { return std::max(a, b); },
 			                                       [](const uptr<UIEntry<T>>& row) {
 				                                       return row->getProjectedWidth();
@@ -445,7 +445,7 @@ namespace fbc {
 
 	// Whenever the scrollbar position changes, we should update the top visible row and row positions
 	template <typename T> void UISelectorList<T>::onScroll(float percent) {
-		int limit = rowsForRender.size() - getVisibleRowCount();
+		int limit = static_cast<int>(rowsForRender.size()) - getVisibleRowCount();
 		int newIndex = std::clamp(static_cast<int>(percent * limit), 0, limit);
 		if (newIndex != this->topVisibleRowIndex) {
 			this->topVisibleRowIndex = newIndex;
@@ -503,7 +503,7 @@ namespace fbc {
 	template<typename T> void UISelectorList<T>::updateTopVisibleRowIndex(int value)
 	{
 		UIList<T>::updateTopVisibleRowIndex(value);
-		int count = rowsForRender.size() - getVisibleRowCount();
+		int count = static_cast<int>(rowsForRender.size()) - getVisibleRowCount();
 		scrollbar.setScrollPos(count > 0 ? value / static_cast<float>(count) : 0);
 	}
 

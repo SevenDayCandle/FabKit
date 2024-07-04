@@ -12,6 +12,6 @@ namespace fbc {
 
 		const str id;
 
-		inline strv registrationID() const override { return id; }
+		operator strv() const override { return id; }
 	};
 }

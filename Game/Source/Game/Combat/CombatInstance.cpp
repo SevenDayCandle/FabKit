@@ -34,9 +34,9 @@ namespace fbc {
 		for (CombatRunCreatureEntry& entry : inputFieldObjects) {
 			CreatureData* data = CreatureData::get(entry.dataId);
 			if (data) {
-				Creature::Behavior* behavior = Creature::Behavior::optGet(entry.behaviorId);
+				Creature::Behavior* behavior = Creature::Behavior::get(entry.behaviorId);
 				if (!behavior) {
-					behavior = Creature::Behavior::optGet(data->data.defaultBehavior);
+					behavior = Creature::Behavior::get(data->data.defaultBehavior);
 				}
 
 				CombatSquare* square = getSquare(entry.posCol, entry.posRow);

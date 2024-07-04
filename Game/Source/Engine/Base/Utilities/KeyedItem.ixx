@@ -21,10 +21,12 @@ namespace fbc {
 		friend std::ostream& operator<<(std::ostream& os, const KeyedItem& obj) { return os << obj.id; }
 		operator std::string_view() const { return id; }
 
+		inline static C* get(std::string_view name) { return getOrDefault(name, nullptr); }
+
 		static auto all();
 		static std::vector<C*> allSorted();
-		static C& get(std::string_view name);
-		static C* optGet(std::string_view name);
+		static C& forceGet(std::string_view name);
+		static C* getOrDefault(std::string_view name, C* defaultValue);
 	protected:
 		KeyedItem(std::string_view name) : id(name) {
 			auto& values = registered();
@@ -57,7 +59,7 @@ namespace fbc {
 	}
 
 	// Get a particular instantation of this class matching the given id
-	template<typename C> C& KeyedItem<C>::get(std::string_view name)
+	template<typename C> C& KeyedItem<C>::forceGet(std::string_view name)
 	{
 		auto& values = registered();
 		auto it = values.find(name);
@@ -67,13 +69,13 @@ namespace fbc {
 		return *(it->second);
 	}
 
-	// Get a particular instantation of this class matching the given id. Does not throw on a missing key
-	template<typename C> C* KeyedItem<C>::optGet(std::string_view name)
+	// Get a particular instantation of this class matching the given id. Returns the provided value if not found
+	template<typename C> C* KeyedItem<C>::getOrDefault(std::string_view name, C* defaultValue)
 	{
 		auto& values = registered();
 		auto it = values.find(name);
 		if (it == values.end()) {
-			return nullptr;
+			return defaultValue;
 		}
 		return it->second;
 	}

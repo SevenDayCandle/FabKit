@@ -40,7 +40,7 @@ bool initialize() {
 	cfg.setupWindow();
 	cct.initialize();
 	DynamicContent::loadDynamicContent();
-	//cct.initializeContents();
+	cct.initializeContents();
 	cct.postInitialize();
 
 	screenManager::subscribeToConfig();

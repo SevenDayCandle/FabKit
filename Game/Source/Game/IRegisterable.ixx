@@ -12,8 +12,6 @@ namespace fbc {
 		IRegisterable() {}
 		virtual ~IRegisterable() = default;
 
-		operator str() const { return registrationID(); }
-
 		inline static C* get(strv name) { return getOrDefault(name, nullptr); }
 
 		static auto all();
@@ -24,9 +22,9 @@ namespace fbc {
 		static void deleteData(strv name);
 		template <typename Pred> auto findAll(Pred predicate);
 
-	protected:
-		virtual strv registrationID() const = 0;
 
+		virtual operator strv() const = 0;
+	protected:
 		static map<strv, uptr<C>>& registered() {
 			static map<strv, uptr<C>> values;
 			return values;
@@ -56,7 +54,7 @@ namespace fbc {
 		return result;
 	}
 
-	// Get a particular instantation of this class matching the given id.
+	// Get a particular instantation of this class matching the given id, returning the defaultValue if not found
 	template<typename C> C* IRegisterable<C>::getOrDefault(strv name, C* defaultValue)
 	{
 		auto& values = registered();
@@ -77,10 +75,12 @@ namespace fbc {
 	template<typename C> C* IRegisterable<C>::registerData(uptr<C>&& copy)
 	{
 		auto& values = registered();
-		if (!values.try_emplace(copy->registrationID(), move(copy)).second) {
-			sdl::logInfo("IRegisterable with id already exists: " + copy->registrationID());
+		strv id = static_cast<strv>(*copy);
+		auto [it, inserted] = values.try_emplace(id, move(copy));
+		if (!inserted) {
+			sdl::logInfo("IRegisterable with id already exists: " + str(id));
 		}
-		return copy;
+		return it->second.get();
 	}
 
 	template<typename C> template<typename Pred> auto IRegisterable<C>::findAll(Pred predicate)

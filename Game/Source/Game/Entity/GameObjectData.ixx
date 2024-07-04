@@ -9,6 +9,7 @@ import std;
 namespace fbc {
 	export class GameObjectData {
 	public:
+		GameObjectData(GameObjectData&& other) = default;
 		virtual ~GameObjectData() = default;
 
 		const str id;
@@ -21,9 +22,9 @@ namespace fbc {
 	};
 
 	export template <typename T> class GameObjectDataDerived : public GameObjectData, public IRegisterable<T> {
+	public:
+		operator strv() const override { return id; }
 	protected:
 		GameObjectDataDerived(BaseContent& source, strv id) : GameObjectData(source, id) {}
-
-		inline strv registrationID() const override { return id; } // Used for IRegisterable
 	};
 }

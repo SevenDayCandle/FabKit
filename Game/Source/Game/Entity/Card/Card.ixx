@@ -18,7 +18,7 @@ namespace fbc {
 		opt<vec<uptr<Effect>>> effectOverride;
 
 		inline int cost() const { return data.getCost(upgrades); };
-		inline vec<uptr<Effect>>& getEffects() { return effectOverride ? effectOverride.value() : data.effects; }
+		inline vec<uptr<Effect>>& getEffects() { return effectOverride ? effectOverride.value() : data.data.effects; }
 
 		bool isPlayable();
 		Card& setUpgrade(int upgrades);

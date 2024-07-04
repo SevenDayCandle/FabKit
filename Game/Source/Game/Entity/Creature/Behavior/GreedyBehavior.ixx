@@ -1,4 +1,4 @@
-export module fbc.RegisteredCreatureBehavior;
+export module fbc.GreedyBehavior;
 
 import fbc.Creature;
 import fbc.FUtil;

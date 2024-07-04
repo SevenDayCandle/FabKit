@@ -82,6 +82,7 @@ namespace fbc {
 	export template<typename T> concept c_str = requires(T t) {
 		std::string_view{ t };
 	};
+	export template<typename T> concept c_tuple = is_specialization_v<T, std::tuple>;
 	export template<typename T, typename... Args> concept c_varg = (std::same_as<T, Args> && ...);;
 	export template<typename T> concept c_vec = is_specialization_v<T, std::vector>;
 
@@ -305,6 +306,18 @@ namespace fbc::futil {
 			result += "]";
 			return result;
 		}
+		else if constexpr (c_tuple<T>) {
+			std::string result = "[";
+			std::apply([&result](const auto&... elems) {
+				((result += toStringWrapped(elems) + ", "), ...);
+				if (!result.empty()) {
+					result.pop_back();
+					result.pop_back();
+				}
+				}, obj);
+			result += "]";
+			return result;
+		}
 		else if constexpr (c_keyed<T>) {
 			return obj;
 		}
@@ -513,7 +526,7 @@ namespace fbc::futil {
 				return static_cast<T>(ind);
 			}
 			else if constexpr (c_keyed<T>) {
-				return T::get(substr);
+				return T::forceGet(substr);
 			}
 		}
 		return T();

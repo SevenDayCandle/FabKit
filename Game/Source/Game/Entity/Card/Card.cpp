@@ -7,6 +7,21 @@ module fbc.Card;
 
 namespace fbc {
 
+	// Whether this card can be played
+	bool Card::isPlayable()
+	{
+		// TODO
+		return true;
+	}
+
+	// Set the upgrade level of the card and refresh values
+	Card& Card::setUpgrade(int upgrades)
+	{
+		this->upgrades = upgrades;
+		// TODO refresh values
+		return *this;
+	}
+
 	// Get the pile that the card should be moved to once used
 	const PileType& Card::getPileAfterUse()
 	{
