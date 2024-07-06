@@ -509,7 +509,15 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
     </ClCompile>
     <ClCompile Include="Source\Game\Entity\Status\StatusTurnMode.ixx" />
     <ClCompile Include="Source\Game\Entity\AttributeObject.ixx" />
-    <ClCompile Include="Source\Game\IRegisterable.ixx">
+    <ClCompile Include="Source\Engine\Base\Content\ContentRegisterable.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Run\CombatEntry\EncounterCreatureEntry.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Run\GameRNG.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -518,7 +526,11 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Game\Run\RunCreatureEntry.ixx">
+    <ClCompile Include="Source\Game\Run\CombatEntry\SavedCreatureEntry.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Run\RunEncounter.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -556,6 +568,9 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
     <Image Include="Resources\Images\UI\SquareButton.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Content\test\Objects\Cards\TestCard.json" />
+    <None Include="Content\test\Objects\Creatures\TestCreature.json" />
+    <None Include="Content\test\Objects\Encounters\TestEncounter.json" />
     <None Include="Resources\Strings\ENG\KeywordStrings.json" />
     <None Include="Resources\Strings\ENG\UIStrings.json" />
   </ItemGroup>
@@ -582,7 +597,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties Resources_4Localization_4ENG_4UIStrings_1json__JsonSchema="https://appsemble.app/api.json" />
+      <UserProperties />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

@@ -2,10 +2,12 @@ export module fbc.CombatInstance;
 
 import fbc.CombatSquare;
 import fbc.CombatTurn;
+import fbc.EncounterCreatureEntry;
 import fbc.FieldObject;
 import fbc.FUtil;
 import fbc.IActionable;
-import fbc.RunCreatureEntry;
+import fbc.RunEncounter;
+import fbc.SavedCreatureEntry;
 import std;
 
 namespace fbc {
@@ -28,7 +30,7 @@ namespace fbc {
 		int getDistanceTo(CombatSquare* square);
 		vec<CombatSquare*> findShortestPath(CombatSquare* targ);
 		void fillDistances(CombatSquare* source);
-		void initialize(int columns, int rows, int roundTime, vec<CombatRunCreatureEntry>& fieldObjects);
+		void initialize(RunEncounter& encounter, vec<SavedCreatureEntry>& runCreatures, int playerFaction);
 		void queueAction(uptr<IActionable>&& action);
 		void queueCompleteTurn();
 		void queueTurn(FieldObject& source, int actionValue);

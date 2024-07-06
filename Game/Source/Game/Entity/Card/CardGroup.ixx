@@ -2,10 +2,10 @@ export module fbc.CardGroup;
 
 import fbc.BaseContent;
 import fbc.FUtil;
-import fbc.IRegisterable;
+import fbc.ContentRegisterable;
 
 namespace fbc {
-	export class CardGroup : public IRegisterable<CardGroup> {
+	export class CardGroup : public ContentRegisterable<CardGroup> {
 	public:
 		CardGroup(BaseContent& source, strv id) : source(source), id(id) {}
 

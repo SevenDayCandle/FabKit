@@ -39,6 +39,7 @@ namespace fbc {
 	export using std::hash;
 	export using std::list;
 	export using std::set;
+	export using std::type_info;
 
 	export using std::make_shared;
 	export using std::make_unique;

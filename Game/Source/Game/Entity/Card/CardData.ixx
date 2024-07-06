@@ -13,6 +13,9 @@ namespace fbc {
 	export class CardData : public GameObjectDataDerived<CardData> {
 	public:
 		struct CardTargeting {
+			bool targetAlly = false;
+			bool targetEnemy = true;
+			bool targetSquare = false;
 			int targetRangeMax = 1;
 			int targetRangeMaxUp = 0;
 			int targetRangeMin = 1;
@@ -52,13 +55,13 @@ namespace fbc {
 			RuntimeFields() {}
 			RuntimeFields(const ExportFields& fields) {
 				isUpgradeBranchOptional = fields.isUpgradeBranchOptional;
-				targetAlly = fields.targetAlly;
-				targetEnemy = fields.targetEnemy;
-				targetSquare = fields.targetSquare;
 				costBase = fields.costBase;
 				costUp = fields.costUp;
 				maxCopies = fields.maxCopies;
 				maxUpgrades = fields.maxUpgrades;
+				target.targetAlly = fields.targetAlly;
+				target.targetEnemy = fields.targetEnemy;
+				target.targetSquare = fields.targetSquare;
 				target.targetRangeMax = fields.targetRangeMax;
 				target.targetRangeMaxUp = fields.targetRangeMaxUp;
 				target.targetRangeMin = fields.targetRangeMin;
@@ -77,9 +80,6 @@ namespace fbc {
 			RuntimeFields(RuntimeFields&& other) = default;
 
 			bool isUpgradeBranchOptional = true;
-			bool targetAlly = false;
-			bool targetEnemy = true;
-			bool targetSquare = false;
 			CardGroup* group;
 			CardTargeting target;
 			CardType* type;
@@ -108,13 +108,13 @@ namespace fbc {
 	{
 		ExportFields fields = ExportFields();
 		fields.isUpgradeBranchOptional = data.isUpgradeBranchOptional;
-		fields.targetAlly = data.targetAlly;
-		fields.targetEnemy = data.targetEnemy;
-		fields.targetSquare = data.targetSquare;
 		fields.costBase = data.costBase;
 		fields.costUp = data.costUp;
 		fields.maxCopies = data.maxCopies;
 		fields.maxUpgrades = data.maxUpgrades;
+		fields.targetAlly = data.target.targetAlly;
+		fields.targetEnemy = data.target.targetEnemy;
+		fields.targetSquare = data.target.targetSquare;
 		fields.targetRangeMax = data.target.targetRangeMax;
 		fields.targetRangeMaxUp = data.target.targetRangeMaxUp;
 		fields.targetRangeMin = data.target.targetRangeMin;

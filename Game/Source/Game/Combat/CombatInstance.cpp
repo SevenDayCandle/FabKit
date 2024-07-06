@@ -4,9 +4,11 @@ import fbc.CombatSquare;
 import fbc.CombatTurn;
 import fbc.Creature;
 import fbc.CreatureData;
+import fbc.EncounterCreatureEntry;
 import fbc.FieldObject;
 import fbc.FUtil;
 import fbc.IActionable;
+import fbc.SavedCreatureEntry;
 import std;
 
 module fbc.CombatInstance;
@@ -15,11 +17,13 @@ namespace fbc {
 	/*
  * 1. Generates squares based on the given dimensions
  */
-	void CombatInstance::initialize(int columns, int rows, int roundTime, vec<CombatRunCreatureEntry>& inputFieldObjects)
+
+
+	void CombatInstance::initialize(RunEncounter& encounter, vec<SavedCreatureEntry>& runCreatures, int playerFaction)
 	{
 		// Generates squares based on the given dimensions
-		this->fieldColumns = columns;
-		this->fieldRows = rows;
+		this->fieldColumns = encounter.data.fieldCols;
+		this->fieldRows = encounter.data.fieldRows;
 		this->roundTime = roundTime;
 		squares.clear();
 		for (int i = 0; i < fieldColumns; i++) {
@@ -31,22 +35,58 @@ namespace fbc {
 
 		// Creates field members based on the room parameters
 		// TODO handle other fieldobject types besides creature
-		for (CombatRunCreatureEntry& entry : inputFieldObjects) {
-			CreatureData* data = CreatureData::get(entry.dataId);
+		for (EncounterCreatureEntry& entry : encounter.data.inputFieldObjects) {
+			CreatureData* data = CreatureData::get(entry.id);
 			if (data) {
-				Creature::Behavior* behavior = Creature::Behavior::get(entry.behaviorId);
-				if (!behavior) {
-					behavior = Creature::Behavior::get(data->data.defaultBehavior);
-				}
-
+				Creature::Behavior* behavior = Creature::Behavior::get(data->data.defaultBehavior);
 				CombatSquare* square = getSquare(entry.posCol, entry.posRow);
 
 				if (behavior && square) {
-					uptr<Creature> pt = make_unique<Creature>(*data, behavior, entry.faction, entry.upgrades, entry.health);
+					uptr<Creature> pt = make_unique<Creature>(*data, behavior, entry.faction, entry.upgrades);
 					Creature& creature = *pt;
 					fieldObjects.push_back(move(pt));
 					square->setOccupant(&creature);
-					creature.initialize(entry.cards, entry.passives);
+					creature.initialize(data->data.defaultCards, data->data.passives);
+				}
+			}
+		}
+
+		// Places player characters on the field based on specified available spots in the room. If available spots are not enough, just stack horizontally (starting from the map center if there were no spots period)
+		int startCol;
+		int startRow;
+		int index = 0;
+		if (encounter.data.startPos.size() > index) {
+			startCol = encounter.data.startPos[index].first;
+			startRow = encounter.data.startPos[index].second;
+		}
+		else {
+			startCol = encounter.data.fieldCols / 2;
+			startRow = encounter.data.fieldRows / 2;
+		}
+
+		for (SavedCreatureEntry& entry : runCreatures) {
+			// Do not spawn dead creatures
+			if (entry.health > 0) {
+				CreatureData* data = CreatureData::get(entry.id);
+				if (data) {
+					Creature::Behavior* behavior = Creature::Behavior::get(entry.behaviorId);
+					CombatSquare* square = getSquare(startCol, startRow);
+
+					if (square) {
+						uptr<Creature> pt = make_unique<Creature>(*data, behavior, playerFaction, entry.upgrades, entry.health);
+						Creature& creature = *pt;
+						fieldObjects.push_back(move(pt));
+						square->setOccupant(&creature);
+						creature.initialize(entry.cards, entry.passives);
+					}
+					++index;
+					if (encounter.data.startPos.size() > index) {
+						startCol = encounter.data.startPos[index].first;
+						startRow = encounter.data.startPos[index].second;
+					}
+					else {
+						startCol = startCol + 1;
+					}
 				}
 			}
 		}

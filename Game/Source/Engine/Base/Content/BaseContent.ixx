@@ -6,6 +6,7 @@ import fbc.FTexture;
 import fbc.FUtil;
 import fbc.KeywordStrings;
 import fbc.ObjectStrings;
+import std;
 
 namespace fbc {
 	export constexpr strv CONTENT_ROOT = "/Content";
@@ -30,5 +31,28 @@ namespace fbc {
 
 		virtual void dispose() = 0;
 		virtual void initialize() = 0;
+
+		static str sanitizeID(strv input);
 	};
+
+	/* Processes prospective IDs as follows
+	 * 1. Replace all whitespace with underscores
+	 * 2. Remove all punctuation
+	 */
+	str BaseContent::sanitizeID(strv input)
+	{
+		str res;
+		res.reserve(input.size());
+
+		std::ranges::for_each(input.begin(), input.end(),
+			[&res](unsigned char c) {
+				if (std::isspace(c)) {
+					res.push_back('_');
+				}
+				else if (!std::ispunct(c)) {
+					res.push_back(c);
+				}
+			});
+		return res;
+	}
 }

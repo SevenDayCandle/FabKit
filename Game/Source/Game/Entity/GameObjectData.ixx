@@ -2,7 +2,7 @@ export module fbc.GameObjectData;
 
 import fbc.BaseContent;
 import fbc.FUtil;
-import fbc.IRegisterable;
+import fbc.ContentRegisterable;
 import fbc.ObjectStrings;
 import std;
 
@@ -21,7 +21,7 @@ namespace fbc {
 		//map<str,str> customFields;
 	};
 
-	export template <typename T> class GameObjectDataDerived : public GameObjectData, public IRegisterable<T> {
+	export template <typename T> class GameObjectDataDerived : public GameObjectData, public ContentRegisterable<T> {
 	public:
 		operator strv() const override { return id; }
 	protected:

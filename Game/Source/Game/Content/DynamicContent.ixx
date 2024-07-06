@@ -15,6 +15,7 @@ import fbc.FSound;
 import fbc.FTexture;
 import fbc.FUtil;
 import fbc.PassiveData;
+import fbc.RunEncounter;
 import fbc.StatusData;
 import sdl;
 import std;
@@ -41,8 +42,9 @@ namespace fbc {
 		inline FMusic* getMusic(strv key) override { return music.get(key); }
 		inline FSound* getSound(strv key) override { return sounds.get(key); }
 		inline FTexture* getTexture(strv key) override { return images.get(key); }
-		inline void processCards() { setupFolder(PATH_CREATURE, [this](const dir_entry& entry) {processCard(entry.path()); }); }
+		inline void processCards() { setupFolder(PATH_CARD, [this](const dir_entry& entry) {processCard(entry.path()); }); }
 		inline void processCreatures() { setupFolder(PATH_CREATURE, [this](const dir_entry& entry) {processCreature(entry.path()); }); }
+		inline void processEncounters() { setupFolder(PATH_ENCOUNTER, [this](const dir_entry& entry) {processEncounter(entry.path()); }); }
 
 		void dispose() override;
 		void initialize() override;
@@ -55,6 +57,7 @@ namespace fbc {
 	private:
 		void processCard(const path& entry);
 		void processCreature(const path& entry);
+		void processEncounter(const path& entry);
 		void setupFolder(strv base, const func<void(const dir_entry&)>& onRead);
 	};
 
@@ -75,7 +78,9 @@ namespace fbc {
 
 	void DynamicContent::postInitialize()
 	{
+		processCards();
 		processCreatures();
+		processEncounters();
 		// TODO process other types of stuff
 	}
 
@@ -93,10 +98,11 @@ namespace fbc {
 
 		auto error = glz::read_file_json(fields, entry.string(), str{});
 		if (error) {
-			sdl::logError("Failed to load card at path %s", entry.string());
+			sdl::logError("Failed to load card at path %s", entry.string().data());
 		}
 		else {
 			CardData::registerData(make_unique<CardData>(*this, entry.filename().string(), fields));
+			sdl::logInfo("Loaded card at path %s", entry.string().data());
 		}
 	}
 
@@ -107,12 +113,28 @@ namespace fbc {
 		
 		auto error = glz::read_file_json(fields, entry.string(), str{});
 		if (error) {
-			sdl::logError("Failed to load creature at path %s", entry.string());
+			sdl::logError("Failed to load creature at path %s", entry.string().data());
 		}
 		else {
 			CreatureData::registerData(make_unique<CreatureData>(*this, entry.filename().string(), fields));
+			sdl::logInfo("Loaded creature at path %s", entry.string().data());
 		}
 		
+	}
+
+	// Attempt to parse a encounter entry
+	void DynamicContent::processEncounter(const path& entry)
+	{
+		RunEncounter::Data fields;
+
+		auto error = glz::read_file_json(fields, entry.string(), str{});
+		if (error) {
+			sdl::logError("Failed to load encounter at path %s", entry.string().data());
+		}
+		else {
+			RunEncounter::registerData(make_unique<RunEncounter>(entry.filename().string(), fields));
+			sdl::logInfo("Loaded encounter at path %s", entry.string().data());
+		}
 	}
 
 	void DynamicContent::setupFolder(strv base, const func<void(const dir_entry&)>& onRead)
@@ -145,13 +167,16 @@ namespace fbc {
 				path subdir = entry.path();
 				path manifestPath = subdir / MANIFEST;
 
+				sdl::logInfo("Loading content at path %s", subdir.string().data());
+
 				// TODO process content manifest
 				if (std::filesystem::exists(manifestPath)) {
 					//processManifest(manifestPath, id);
 				}
 				else {
-					str id = subdir.filename().string();
+					str id = sanitizeID(subdir.filename().string());
 					cct.registerContent(std::make_unique<DynamicContent>(id, subdir.string()));
+					sdl::logInfo("Registered content without manifest with ID %s", id.data());
 				}
 			}
 		}
