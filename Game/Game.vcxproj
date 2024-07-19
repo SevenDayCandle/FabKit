@@ -517,6 +517,10 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Game\Run\CombatEntry\ItemListing.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Game\Run\GameRNG.ixx">
       <SubType>
       </SubType>
@@ -530,11 +534,23 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Game\Run\Room\BossRoom.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Run\Room\CombatRoom.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Game\Run\RunEncounter.ixx">
       <SubType>
       </SubType>
     </ClCompile>
     <ClCompile Include="Source\Game\Run\RunRoom.ixx" />
+    <ClCompile Include="Source\Game\Run\RunZone.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Game\UI\Screens\TitleScreen.ixx" />
     <ClCompile Include="Source\Main.cpp">
       <DeploymentContent>false</DeploymentContent>

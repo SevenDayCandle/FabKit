@@ -5,10 +5,11 @@ import std;
 
 namespace fbc {
 	export struct EncounterCreatureEntry {
-		int faction;
+		int faction = 1;
 		int posCol;
 		int posRow;
-		int upgrades;
+		int upgrades = 0;
+		str content;
 		str id;
 	};
 }

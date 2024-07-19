@@ -9,7 +9,7 @@ import sdl;
 import std;
 
 namespace fbc {
-	export class PassiveData : public GameObjectDataDerived<PassiveData> {
+	export class PassiveData : public GameObjectData<PassiveData> {
 	public:
 		struct ExportFields {
 			int maxUpgrades;
@@ -34,8 +34,8 @@ namespace fbc {
 			vec<uptr<Effect>> effects;
 		};
 
-		PassiveData(BaseContent& source, strv id) : GameObjectDataDerived(source, id) {}
-		PassiveData(BaseContent& source, strv id, const ExportFields& fields) : GameObjectDataDerived(source, id), data(fields) {}
+		PassiveData(BaseContent& source, strv id) : GameObjectData(source, id) {}
+		PassiveData(BaseContent& source, strv id, const ExportFields& fields) : GameObjectData(source, id), data(fields) {}
 
 		RuntimeFields data;
 	};

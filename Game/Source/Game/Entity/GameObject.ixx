@@ -19,7 +19,7 @@ namespace fbc {
 		virtual strv id() = 0;
 	};
 
-	export template <c_ext<GameObjectData> T> class GameObjectDerived : public GameObject {
+	export template <typename T> requires c_ext<T, GameObjectData<T>> class GameObjectDerived : public GameObject {
 	public:
 		GameObjectDerived(T& data) : data(data), GameObject() {}
 

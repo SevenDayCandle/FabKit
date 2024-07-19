@@ -3,33 +3,34 @@ export module fbc.CreatureData;
 import fbc.BaseContent;
 import fbc.GameObjectData;
 import fbc.FUtil;
+import fbc.ItemListing;
 import std;
 
 namespace fbc {
-	export class CreatureData : public GameObjectDataDerived<CreatureData> {
+	export class CreatureData : public GameObjectData<CreatureData> {
 	public:
 		struct Fields {
-			int actSpeed;
-			int actSpeedUpgrade;
-			int energyGain;
-			int energyGainUpgrade;
-			int energyMax;
-			int energyMaxUpgrade;
-			int handDraw;
-			int handDrawUpgrade;
-			int handSize;
-			int handSizeUpgrade;
-			int health;
-			int healthUpgrade;
-			int movement;
-			int movementUpgrade;
+			int actSpeed = 100;
+			int actSpeedUpgrade = 0;
+			int energyGain = 9;
+			int energyGainUpgrade = 0;
+			int energyMax = 9;
+			int energyMaxUpgrade = 0;
+			int handDraw = 5;
+			int handDrawUpgrade = 0;
+			int handSize = 5;
+			int handSizeUpgrade = 0;
+			int health = 300;
+			int healthUpgrade = 30;
+			int movement = 3;
+			int movementUpgrade = 0;
 			str defaultBehavior;
-			vec<pair<str, int>> defaultCards;
-			vec<pair<str, int>> passives;
+			vec<ItemListing> defaultCards;
+			vec<ItemListing> passives;
 		};
 
-		CreatureData(BaseContent& source, strv id): GameObjectDataDerived(source, id) {}
-		CreatureData(BaseContent& source, strv id, const Fields& fields) : GameObjectDataDerived(source, id), data(fields) {}
+		CreatureData(BaseContent& source, strv id): GameObjectData(source, id) {}
+		CreatureData(BaseContent& source, strv id, const Fields& fields) : GameObjectData(source, id), data(fields) {}
 		Fields data;
 
 		inline int getResultActSpeed(int upgrade) const { return data.actSpeed + upgrade * data.actSpeedUpgrade; }

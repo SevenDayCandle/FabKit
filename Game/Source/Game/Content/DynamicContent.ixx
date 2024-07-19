@@ -132,7 +132,7 @@ namespace fbc {
 			sdl::logError("Failed to load encounter at path %s", entry.string().data());
 		}
 		else {
-			RunEncounter::registerData(make_unique<RunEncounter>(entry.filename().string(), fields));
+			RunEncounter::registerData(make_unique<RunEncounter>(*this, entry.filename().string(), fields));
 			sdl::logInfo("Loaded encounter at path %s", entry.string().data());
 		}
 	}

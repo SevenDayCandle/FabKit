@@ -10,7 +10,7 @@ import fbc.ObjectRarity;
 import std;
 
 namespace fbc {
-	export class CardData : public GameObjectDataDerived<CardData> {
+	export class CardData : public GameObjectData<CardData> {
 	public:
 		struct CardTargeting {
 			bool targetAlly = false;
@@ -27,23 +27,23 @@ namespace fbc {
 		};
 
 		struct ExportFields {
-			bool isUpgradeBranchOptional;
-			bool targetAlly;
-			bool targetEnemy;
-			bool targetSquare;
-			int costBase;
-			int costUp;
-			int maxCopies;
-			int maxUpgrades;
-			int targetRangeMax;
-			int targetRangeMaxUp;
-			int targetRangeMin;
-			int targetRangeMinUp;
-			int targetSizeX;
-			int targetSizeXUp;
-			int targetSizeY;
-			int targetSizeYUp;
-			str group;
+			bool isUpgradeBranchOptional = true;
+			bool targetAlly = false;
+			bool targetEnemy = true;
+			bool targetSquare = false;
+			int costBase = 3;
+			int costUp = 0;
+			int maxCopies = -1;
+			int maxUpgrades = 1;
+			int targetRangeMax = 1;
+			int targetRangeMaxUp = 0;
+			int targetRangeMin = 1;
+			int targetRangeMinUp = 0;
+			int targetSizeX = 1;
+			int targetSizeXUp = 0;
+			int targetSizeY = 1;
+			int targetSizeYUp = 0;
+			pair<str,str> group;
 			str type;
 			str rarity;
 			vec<str> effects;
@@ -83,7 +83,7 @@ namespace fbc {
 			CardGroup* group;
 			CardTargeting target;
 			CardType* type;
-			int costBase = 1;
+			int costBase = 3;
 			int costUp = 0;
 			int maxCopies = -1;
 			int maxUpgrades = 1;
@@ -93,8 +93,8 @@ namespace fbc {
 			vec<str> upgradeBranches;
 		};
 
-		CardData(BaseContent& source, strv id) : GameObjectDataDerived(source, id) {}
-		CardData(BaseContent& source, strv id, const ExportFields& fields) : GameObjectDataDerived(source, id) {}
+		CardData(BaseContent& source, strv id) : GameObjectData(source, id) {}
+		CardData(BaseContent& source, strv id, const ExportFields& fields) : GameObjectData(source, id) {}
 
 		RuntimeFields data;
 
@@ -123,7 +123,7 @@ namespace fbc {
 		fields.targetSizeXUp = data.target.targetSizeXUp;
 		fields.targetSizeY = data.target.targetSizeY;
 		fields.targetSizeYUp = data.target.targetSizeYUp;
-		fields.group = data.group ? data.group->id : "";
+		fields.group = data.group ? data.group->toPair() : pair<str,str>();
 		fields.type = data.type ? data.type->id : "";
 		fields.rarity = data.rarity ? data.rarity->id : "";
 		fields.tags = data.tags;

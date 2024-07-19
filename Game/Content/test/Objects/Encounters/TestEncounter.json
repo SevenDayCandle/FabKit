@@ -1,2 +1,8 @@
 {
+  "creatures": [
+    {
+      "content": "test",
+      "id": "TestCreature"
+    }
+  ]
 }

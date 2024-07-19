@@ -8,7 +8,7 @@ import fbc.StatusTurnMode;
 import std;
 
 namespace fbc {
-	export class StatusData : public GameObjectDataDerived<StatusData> {
+	export class StatusData : public GameObjectData<StatusData> {
 	public:
 		struct Fields {
 			bool removable;
@@ -21,8 +21,8 @@ namespace fbc {
 			StatusTurnMode turnMode = StatusTurnMode::NONE;
 		};
 
-		StatusData(BaseContent& source, strv id): GameObjectDataDerived(source, id) {}
-		StatusData(BaseContent& source, strv id, const Fields& fields) : GameObjectDataDerived(source, id), data(fields) {}
+		StatusData(BaseContent& source, strv id): GameObjectData(source, id) {}
+		StatusData(BaseContent& source, strv id, const Fields& fields) : GameObjectData(source, id), data(fields) {}
 
 		Fields data;
 		vec<uptr<Effect>> effects;

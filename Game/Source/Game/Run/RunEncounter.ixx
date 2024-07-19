@@ -1,5 +1,6 @@
 export module fbc.RunEncounter;
 
+import fbc.BaseContent;
 import fbc.FUtil;
 import fbc.EncounterCreatureEntry;
 import fbc.ContentRegisterable;
@@ -9,22 +10,19 @@ namespace fbc {
 	export class RunEncounter : public ContentRegisterable<RunEncounter> {
 	public:
 		struct Data {
-			bool boss;
-			int fieldCols;
-			int fieldRows;
-			int level;
-			int time;
-			str zone;
+			bool boss = false;
+			int fieldCols = 6;
+			int fieldRows = 6;
+			int level = 1;
+			int time = 100;
+			pair<str,str> zone;
 			vec<pair<int, int>> startPos;
-			vec<EncounterCreatureEntry> inputFieldObjects;
+			vec<EncounterCreatureEntry> creatures;
 		};
 
-		RunEncounter(strv id, Data& data): id(id), data(data) {}
+		RunEncounter(BaseContent& source, strv id, Data& data): ContentRegisterable(source, id), data(data) {}
 		virtual ~RunEncounter() {}
 
-		const str id;
 		Data data;
-
-		operator strv() const override { return id; }
 	};
 }

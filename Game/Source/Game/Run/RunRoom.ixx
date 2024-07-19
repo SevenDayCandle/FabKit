@@ -4,6 +4,7 @@ import fbc.FUtil;
 import fbc.GameRNG;
 import fbc.KeyedItem;
 import fbc.RunEncounter;
+import fbc.RunZone;
 import std;
 
 namespace fbc {
@@ -11,7 +12,13 @@ namespace fbc {
 	public:
 		class RoomType : public KeyedItem<RoomType> {
 		public:
-			RoomType(strv key) : KeyedItem<RoomType>(key) {}
+			RoomType(strv key, int rate, bool allowRepeat = true) : KeyedItem<RoomType>(key), rate(rate), allowRepeat(allowRepeat) {}
+
+			const bool allowRepeat;
+			const int rate;
+
+			virtual bool isEncounterValid(RunEncounter* encounter) { return true; }
+			virtual void onEnter() {}
 		};
 
 		RunRoom(RoomType& type): type(type) {}
@@ -19,26 +26,24 @@ namespace fbc {
 
 		RoomType& type;
 
-		RunEncounter* getEncounter(GameRNG& rng);
-	};
+		inline void onEnter() { type.onEnter(); };
 
-	export namespace roomtype {
-		export const RunRoom::RoomType BOSS("BOSS");
-		export const RunRoom::RoomType COMBAT("COMBAT");
-		export const RunRoom::RoomType ELITE("ELITE");
-		export const RunRoom::RoomType EVENT("EVENT");
-		export const RunRoom::RoomType REST("REST");
-		export const RunRoom::RoomType SHOP("SHOP");
-	}
+		RunEncounter* getEncounter(RunZone& zone, GameRNG& rng);
+	};
 
 	/* Returns any room meeting the following criteria:
 	 * Eligible for the current zone (i.e. zone id matches or is common encounter and zone allows for common encounters)
-	 * For boss rooms, is a boss encounter and has not been encountered yet
-	 * For non-boss rooms, if level is equal to the room difficulty
+	 * Has not been encountered yet in the run (TODO)
+	 * Eligible in the current room type (room specific implementations)
 	 */
-	RunEncounter* RunRoom::getEncounter(GameRNG& rng)
+	RunEncounter* RunRoom::getEncounter(RunZone& zone, GameRNG& rng)
 	{
-		// TODO
+		pair<str, str> toPair = zone.toPair();
+		vec<RunEncounter*> encounters = RunEncounter::findAllAsList([toPair, this](RunEncounter* encounter) {return encounter && encounter->data.zone == toPair && type.isEncounterValid(encounter); });
+		if (encounters.size() > 0) {
+			int index = rng.random(0, encounters.size() - 1);
+			return encounters[index];
+		}
 		return nullptr;
 	}
 }

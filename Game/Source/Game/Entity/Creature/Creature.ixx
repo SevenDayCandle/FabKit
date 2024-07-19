@@ -8,6 +8,7 @@ import fbc.FieldObject;
 import fbc.FUtil;
 import fbc.GameObject;
 import fbc.KeyedItem;
+import fbc.ItemListing;
 import fbc.PileType;
 import sdl;
 import std;
@@ -56,7 +57,7 @@ namespace fbc {
 		int getEnergyGain();
 		PileGroup& getPile(const PileType& type);
 		void drawForStartOfTurn();
-		void initialize(vec<pair<str, int>>& cards, vec<pair<str, int>>& passives);
+		void initialize(vec<ItemListing>& cards, vec<ItemListing>& passives);
 		void refreshValuesForStartOfTurn();
 	private:
 		PileGroup discardPile = PileGroup(piletype::DISCARD);

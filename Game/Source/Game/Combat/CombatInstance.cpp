@@ -35,8 +35,8 @@ namespace fbc {
 
 		// Creates field members based on the room parameters
 		// TODO handle other fieldobject types besides creature
-		for (EncounterCreatureEntry& entry : encounter.data.inputFieldObjects) {
-			CreatureData* data = CreatureData::get(entry.id);
+		for (EncounterCreatureEntry& entry : encounter.data.creatures) {
+			CreatureData* data = CreatureData::get(entry.content, entry.id);
 			if (data) {
 				Creature::Behavior* behavior = Creature::Behavior::get(data->data.defaultBehavior);
 				CombatSquare* square = getSquare(entry.posCol, entry.posRow);
@@ -67,7 +67,7 @@ namespace fbc {
 		for (SavedCreatureEntry& entry : runCreatures) {
 			// Do not spawn dead creatures
 			if (entry.health > 0) {
-				CreatureData* data = CreatureData::get(entry.id);
+				CreatureData* data = CreatureData::get(entry.content, entry.id);
 				if (data) {
 					Creature::Behavior* behavior = Creature::Behavior::get(entry.behaviorId);
 					CombatSquare* square = getSquare(startCol, startRow);
