@@ -119,15 +119,17 @@ namespace fbc {
 		return it->second.get();
 	}
 
+	// Get every single instantiation of this class that passes the specified condition
 	template<typename C> template<typename Pred> auto ContentRegisterable<C>::findAll(Pred predicate)
 	{
 		return all() | std::views::filter(predicate);
 	}
 
+	// Get every single instantiation of this class that passes the specified condition as a list
 	template<typename C> template<typename Pred> vec<C*> ContentRegisterable<C>::findAllAsList(Pred predicate)
 	{
 		const auto& values = registered();
-		std::vector<C*> result;
+		vec<C*> result;
 		for (const auto& pair : values) {
 			for (const auto& inner : pair.second) {
 				C* item = inner.second.get();

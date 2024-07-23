@@ -124,7 +124,7 @@ namespace fbc::futil {
 	export strv getView(strv input, size_t& pos);
 	export template <c_itr<strv> SCo> str joinStr(strv delimiter, SCo items);
 	export template <typename T, c_itr<T> TCo> bool has(const TCo& container, const T& value);
-	export template <typename T, c_itr<T> TCo> T* find(const TCo& container, const T& value);
+	export template <typename T, c_itr<T> TCo> const T* find(const TCo& container, const T& value);
 	export template <typename T, typename Pred> bool all(const T& container, Pred predicate);
 	export template <typename T, typename Pred> bool any(const T& container, Pred predicate);
 	export template <typename T, typename U, c_itr<T> TCo, c_invc<T, U> Func> vec<U> transform(const TCo& container, Func mapFunc);
@@ -201,7 +201,7 @@ namespace fbc::futil {
 	}
 
 	// Find the first item in the container that matches the given value
-	export template<typename T, c_itr<T> TCo> T* find(const TCo& container, const T& value) {
+	export template<typename T, c_itr<T> TCo> const T* find(const TCo& container, const T& value) {
 		if constexpr (c_set<T, TCo>) {
 			auto it = container.find(value);
 			if (it != container.end()) {
@@ -214,12 +214,13 @@ namespace fbc::futil {
 				return &(*it);
 			}
 		}
-		return std::nullopt;
+		return nullptr;
 	}
 
 	// Check whether the given container contains the given value
 	export template<typename T, c_itr<T> TCo> bool has(const TCo& container, const T& value) {
-		return find(container, value) != nullptr;
+		const T* res = find<T, TCo>(container, value);
+		return res != nullptr;
 	}
 
 	// Check whether the text can be converted into a number

@@ -16,6 +16,7 @@ import fbc.FTexture;
 import fbc.FUtil;
 import fbc.PassiveData;
 import fbc.RunEncounter;
+import fbc.RunZone;
 import fbc.StatusData;
 import sdl;
 import std;
@@ -28,6 +29,7 @@ namespace fbc {
 	export constexpr strv PATH_KEYWORDS = "Objects/Keywords";
 	export constexpr strv PATH_PASSIVE = "Objects/Passives";
 	export constexpr strv PATH_STATUS = "Objects/Statuses";
+	export constexpr strv PATH_ZONE = "Objects/Zones";
 
 	export class DynamicContent : public BaseContent {
 	public:
@@ -45,6 +47,11 @@ namespace fbc {
 		inline void processCards() { setupFolder(PATH_CARD, [this](const dir_entry& entry) {processCard(entry.path()); }); }
 		inline void processCreatures() { setupFolder(PATH_CREATURE, [this](const dir_entry& entry) {processCreature(entry.path()); }); }
 		inline void processEncounters() { setupFolder(PATH_ENCOUNTER, [this](const dir_entry& entry) {processEncounter(entry.path()); }); }
+		inline void processKeywords() { setupFolder(PATH_KEYWORDS, [this](const dir_entry& entry) {processEncounter(entry.path()); }); }
+		inline void processPassives() { setupFolder(PATH_PASSIVE, [this](const dir_entry& entry) {processEncounter(entry.path()); }); }
+		inline void processStatuses() { setupFolder(PATH_STATUS, [this](const dir_entry& entry) {processEncounter(entry.path()); }); }
+		inline void processZones() { setupFolder(PATH_ZONE, [this](const dir_entry& entry) {processZone(entry.path()); }); }
+
 
 		void dispose() override;
 		void initialize() override;
@@ -58,6 +65,10 @@ namespace fbc {
 		void processCard(const path& entry);
 		void processCreature(const path& entry);
 		void processEncounter(const path& entry);
+		void processKeyword(const path& entry);
+		void processPassive(const path& entry);
+		void processStatus(const path& entry);
+		void processZone(const path& entry);
 		void setupFolder(strv base, const func<void(const dir_entry&)>& onRead);
 	};
 
@@ -80,6 +91,7 @@ namespace fbc {
 	{
 		processCards();
 		processCreatures();
+		processZones();
 		processEncounters();
 		// TODO process other types of stuff
 	}
@@ -134,6 +146,27 @@ namespace fbc {
 		else {
 			RunEncounter::registerData(make_unique<RunEncounter>(*this, entry.filename().string(), fields));
 			sdl::logInfo("Loaded encounter at path %s", entry.string().data());
+		}
+	}
+
+	// TODO Attempt to parse a keyword entry
+	void DynamicContent::processKeyword(const path& entry)
+	{
+
+	}
+
+	// Attempt to parse a zone entry
+	void DynamicContent::processZone(const path& entry)
+	{
+		RunZone::Data fields;
+
+		auto error = glz::read_file_json(fields, entry.string(), str{});
+		if (error) {
+			sdl::logError("Failed to load zone at path %s", entry.string().data());
+		}
+		else {
+			RunZone::registerData(make_unique<RunZone>(*this, entry.filename().string(), fields));
+			sdl::logInfo("Loaded zone at path %s", entry.string().data());
 		}
 	}
 

@@ -91,11 +91,11 @@ namespace fbc {
 			}
 		}
 
-		// Setup subscribers
+		// TODO Setup subscribers
 
-		// Setup initial turns
+		// TODO Setup initial turns
 
-		// Start of combat hooks for all field members
+		// TODO Start of combat hooks for all field members
 	}
 
 	// Queue an action to be executed

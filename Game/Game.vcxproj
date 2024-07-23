@@ -551,6 +551,10 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Game\UI\Screens\RunScreen.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Game\UI\Screens\TitleScreen.ixx" />
     <ClCompile Include="Source\Main.cpp">
       <DeploymentContent>false</DeploymentContent>
@@ -607,6 +611,9 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
     <Media Include="Resources\Audio\UI\Click2.wav" />
     <Media Include="Resources\Audio\UI\Hover1.wav" />
     <Media Include="Resources\Audio\UI\Hover2.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Content\test\Objects\Zones\TestZone.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

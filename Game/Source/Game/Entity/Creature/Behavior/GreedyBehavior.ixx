@@ -15,8 +15,7 @@ namespace fbc {
 		void act(Creature& source) override;
 	};
 
-	export const GreedyBehavior instance;
-
+	export const GreedyBehavior instance = GreedyBehavior();
 
 	void GreedyBehavior::act(Creature& source)
 	{

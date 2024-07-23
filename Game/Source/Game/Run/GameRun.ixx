@@ -9,11 +9,29 @@ import fbc.RunZone;
 import fbc.SavedCreatureEntry;
 import std;
 
+// TODO save data
 namespace fbc {
 	export class GameRun {
 	public:
+		struct SaveData {
+			int faction;
+			int posCol;
+			int posRow;
+			int rngCard;
+			int rngEncounter;
+			int rngMap;
+			int rngReward;
+			unsigned int seed;
+			pair<str, str> currentZone;
+			set<str> encounteredZones;
+			vec<SavedCreatureEntry> creatures;
+		};
+
 		GameRun(int seed): seed(seed) {
 			initialize();
+		}
+		GameRun(SaveData& save): GameRun(save.seed) {
+			loadFromSave(save);
 		}
 
 		GameRNG rngCard;
@@ -29,18 +47,25 @@ namespace fbc {
 		inline unsigned int getSeed() const { return seed; }
 
 		RunRoom* getRoomAt(int col, int row);
+		RunZone* getValidZone();
+		SaveData generateSave();
 		void initialize();
+		void loadFromSave(SaveData& save);
 		void startCombat();
 		void startCombat(RunEncounter* encounter);
 		void startRoom(int col, int row, RunRoom* room);
 		void startZone(RunZone* zone);
+
+		static void loadRun(SaveData& save);
+		static void startRun(int seed);
 	private:
+		int lastRngMap;
 		int posCol;
 		int posRow;
-		int roomCols;
 		unsigned int seed;
 		RunRoom* currentRoom;
 		RunZone* currentZone;
+		set<str> encounteredZones;
 		uptr<CombatInstance> combatInstance;
 		vec<RunRoom> rooms;
 	};

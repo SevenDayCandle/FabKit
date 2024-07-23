@@ -11,6 +11,7 @@ namespace fbc {
 		struct Data {
 			int sizeCols = 5;
 			int sizeRows = 8;
+			umap<str, int> roomWeights;
 			vec<int> levels;
 		};
 		RunZone(BaseContent& source, strv id, Data& data) : ContentRegisterable(source, id), data(data) {}

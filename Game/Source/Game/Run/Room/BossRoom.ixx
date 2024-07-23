@@ -13,8 +13,8 @@ namespace fbc {
 
 		static constexpr strv ID = "BossRoom";
 
-		virtual bool isEncounterValid(RunEncounter* encounter) {
-			return encounter->data.boss;
-		}
+		inline virtual bool isEncounterValid(RunEncounter* encounter) override { return encounter->data.boss;}
 	};
+
+	export const BossRoom instance = BossRoom();
 }
