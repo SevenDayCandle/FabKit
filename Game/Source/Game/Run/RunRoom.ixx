@@ -21,9 +21,11 @@ namespace fbc {
 			virtual void onEnter() {}
 		};
 
-		RunRoom(RoomType& type): type(type) {}
+		RunRoom(RoomType& type, int col, int row): type(type), col(col), row(row) {}
 		virtual ~RunRoom() = default;
 
+		int col;
+		int row;
 		RoomType& type;
 
 		inline void onEnter() { type.onEnter(); };

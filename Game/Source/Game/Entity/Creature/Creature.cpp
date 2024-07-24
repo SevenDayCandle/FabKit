@@ -32,7 +32,7 @@ namespace fbc {
 	void Creature::onTurnEnd()
 	{
 		int actionValue = DEFAULT_ROUND_LENGTH * 100 / (1 + getActionSpeed());
-		currentRun->getCombatInstance()->queueTurn(*this, actionValue);
+		GameRun::current->getCombatInstance()->queueTurn(*this, actionValue);
 		// TODO end turn hooks
 		// TODO status updates
 	}
@@ -104,7 +104,7 @@ namespace fbc {
 		}
 
 		// TODO graphical updates
-		// if (currentRun->getCombatInstance()->getCurrentTurn()->owner == this) do card pile animations
+		// if (current->getCombatInstance()->getCurrentTurn()->owner == this) do card pile animations
 
 		return card;
 	}

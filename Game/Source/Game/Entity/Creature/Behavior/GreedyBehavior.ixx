@@ -11,11 +11,12 @@ namespace fbc {
 		GreedyBehavior(): Behavior(ID) {}
 
 		static constexpr strv ID = "GreedyBehavior";
+		static const GreedyBehavior instance;
 
 		void act(Creature& source) override;
 	};
 
-	export const GreedyBehavior instance = GreedyBehavior();
+	const GreedyBehavior GreedyBehavior::instance = GreedyBehavior();
 
 	void GreedyBehavior::act(Creature& source)
 	{

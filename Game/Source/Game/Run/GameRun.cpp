@@ -114,10 +114,10 @@ namespace fbc {
 	}
 
 	// Save coordinates of the current room and start it
-	void GameRun::startRoom(int col, int row, RunRoom* room)
+	void GameRun::startRoom(RunRoom* room)
 	{
-		this->posCol = col;
-		this->posRow = row;
+		this->posCol = room->col;
+		this->posRow = room->row;
 		this->currentRoom = room;
 		room->onEnter();
 	}
@@ -172,7 +172,7 @@ namespace fbc {
 				}
 				// TODO Check for consecutive type with previous row and current column
 
-				rooms.push_back(RunRoom(*type));
+				rooms.push_back(RunRoom(*type, j, i));
 			}
 		}
 
@@ -184,15 +184,15 @@ namespace fbc {
 
 	/* STATICS */
 	void GameRun::loadRun(GameRun::SaveData& save) {
-		currentRun = make_unique<GameRun>(save);
+		current = make_unique<GameRun>(save);
 	}
 
 	void GameRun::startRun(int seed)
 	{
-		currentRun = make_unique<GameRun>(seed);
-		RunZone* zone = currentRun->getValidZone();
+		current = make_unique<GameRun>(seed);
+		RunZone* zone = current->getValidZone();
 		if (zone) {
-			currentRun->startZone(zone);
+			current->startZone(zone);
 		}
 		else {
 			throw std::runtime_error("No zones available for run");

@@ -12,9 +12,10 @@ namespace fbc {
 		BossRoom() : RunRoom::RoomType(ID, 0) {}
 
 		static constexpr strv ID = "BossRoom";
+		static const BossRoom instance;
 
 		inline virtual bool isEncounterValid(RunEncounter* encounter) override { return encounter->data.boss;}
 	};
 
-	export const BossRoom instance = BossRoom();
+	const BossRoom BossRoom::instance = BossRoom();
 }

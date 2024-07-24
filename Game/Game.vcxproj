@@ -542,6 +542,10 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Game\Run\Room\EventRoom.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Game\Run\RunEncounter.ixx">
       <SubType>
       </SubType>
@@ -551,7 +555,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Game\UI\Screens\RunScreen.ixx">
+    <ClCompile Include="Source\Game\UI\Screens\Run\RunScreen.ixx">
       <SubType>
       </SubType>
     </ClCompile>

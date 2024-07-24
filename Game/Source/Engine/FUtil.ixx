@@ -19,7 +19,6 @@ namespace fbc {
 	export template <typename T> using pqueue_max = std::priority_queue<T>;
 	export template <typename T> using pqueue_min = std::priority_queue<T, std::vector<T>, std::greater<T>>;
 	export template <typename T> using ref = std::reference_wrapper<T>;
-	export template <typename T> using span = std::span<T>;
 	export template <typename T> using sptr = std::shared_ptr<T>;
 	export template <typename T> using uptr = std::unique_ptr<T>;
 	export template <typename T> using vec = std::vector<T>;
@@ -38,7 +37,9 @@ namespace fbc {
 	export using std::exception;
 	export using std::hash;
 	export using std::list;
+	export using std::ranges::ref_view;
 	export using std::set;
+	export using std::span;
 	export using std::type_info;
 
 	export using std::make_shared;

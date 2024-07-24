@@ -12,15 +12,16 @@ namespace fbc {
 		CombatRoom(): RunRoom::RoomType(ID, 45) {}
 
 		static constexpr strv ID = "CombatRoom";
+		static const CombatRoom instance;
 
 		void onEnter() override;
 	};
 
-	export const CombatRoom instance = CombatRoom();
+	const CombatRoom CombatRoom::instance = CombatRoom();
 
 	// Start combat upon entering
 	void CombatRoom::onEnter()
 	{
-		currentRun->startCombat();
+		GameRun::current->startCombat();
 	}
 }

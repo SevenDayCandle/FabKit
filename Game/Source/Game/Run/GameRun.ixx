@@ -41,7 +41,10 @@ namespace fbc {
 		int faction = 0;
 		vec<SavedCreatureEntry> creatures;
 
+		static uptr<GameRun> current;
+
 		inline CombatInstance* getCombatInstance() const { return combatInstance.get(); }
+		inline ref_view<const vec<RunRoom>> getRooms() const { return std::views::all(rooms); }
 		inline RunRoom* getCurrentRoom() const { return currentRoom; }
 		inline RunZone* getCurrentZone() const { return currentZone; }
 		inline unsigned int getSeed() const { return seed; }
@@ -53,7 +56,7 @@ namespace fbc {
 		void loadFromSave(SaveData& save);
 		void startCombat();
 		void startCombat(RunEncounter* encounter);
-		void startRoom(int col, int row, RunRoom* room);
+		void startRoom(RunRoom* room);
 		void startZone(RunZone* zone);
 
 		static void loadRun(SaveData& save);
@@ -70,5 +73,5 @@ namespace fbc {
 		vec<RunRoom> rooms;
 	};
 
-	export uptr<GameRun> currentRun;
+	uptr<GameRun> GameRun::current = nullptr;
 }
