@@ -17,8 +17,13 @@ namespace fbc {
 		BaseContent& source;
 
 		inline pair<str, str> toPair() const { return { source.id, id }; }
+		inline str toString() const { return source.id + ":" + id; }
 
 		inline static C* get(const pair<str,str>& idSearch) { return getOrDefault(idSearch.first, idSearch.second, nullptr); }
+		inline static C* get(strv idSearch) {
+			size_t pos = idSearch.find(':');
+			return getOrDefault(idSearch.substr(0, pos), idSearch.substr(pos + 1), nullptr);
+		}
 		inline static C* get(strv contentID, strv name) { return getOrDefault(contentID, name, nullptr); }
 
 		static auto all();
@@ -48,7 +53,13 @@ namespace fbc {
 	// Remove a registered item
 	template<typename C> void ContentRegisterable<C>::deleteData(strv contentID, strv name)
 	{
-		registered().erase(name);
+		map<strv, uptr<C>>* inner = getInnerMap(contentID);
+		if (inner) {
+			inner.erase(name);
+		}
+		else {
+			sdl::logInfo("Tried to delete item " + str(name) + " from nonexistent content: " + str(contentID));
+		}
 	}
 
 	// Get a mapping corresponding to the content. Return null if none was found

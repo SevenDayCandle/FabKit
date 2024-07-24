@@ -16,8 +16,8 @@ namespace fbc {
 		BaseContent(strv id, strv contentFolder): id(id), contentFolder(contentFolder) {}
 		virtual ~BaseContent() = default;
 
+		const path contentFolder;
 		const str id;
-		const str contentFolder;
 
 		inline virtual FMusic* getMusic(strv path) { return nullptr; }
 		inline virtual FSound* getSound(strv path) { return nullptr; }

@@ -1,0 +1,9 @@
+{
+  "testEncounter": {
+    "creatures": [
+      {
+        "id": "test:TestCreature"
+      }
+    ]
+  }
+}

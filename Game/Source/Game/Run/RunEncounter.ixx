@@ -15,7 +15,7 @@ namespace fbc {
 			int fieldRows = 6;
 			int level = 1;
 			int time = 100;
-			pair<str,str> zone;
+			str zone;
 			vec<pair<int, int>> startPos;
 			vec<EncounterCreatureEntry> creatures;
 		};

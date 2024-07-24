@@ -16,8 +16,6 @@ namespace fbc {
 	export constexpr strv DEFAULT_KEYWORDS = "KeywordStrings";
 	export constexpr strv DEFAULT_UI = "UIStrings";
 
-	export template <typename T> using strumap = umap<str, T, str_hash, equal_to<>>;
-
 	export class BaseStrings : public ContentLoadables {
 	public:
 		BaseStrings(const BaseContent& content) : ContentLoadables(content) {}
@@ -32,8 +30,7 @@ namespace fbc {
 			return getPathForLanguage(cfg.getLanguage(), suffix);
 		};
 		inline path getPathForLanguage(const Language& lang, const strv& suffix) const {
-			path p = content.contentFolder;
-			return (p / STRINGS_PATH / lang.id / suffix).replace_extension(futil::JSON_EXT);
+			return (content.contentFolder / STRINGS_PATH / lang.id / suffix).replace_extension(futil::JSON_EXT);
 		};
 		void loadKeywordStrings(strumap<KeywordStrings>& res, const strv& suffix = DEFAULT_KEYWORDS);
 		void loadObjectStrings(strumap<ObjectStrings>& res, const strv& suffix);

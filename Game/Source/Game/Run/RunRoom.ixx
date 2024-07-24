@@ -34,14 +34,16 @@ namespace fbc {
 	};
 
 	/* Returns any room meeting the following criteria:
-	 * Eligible for the current zone (i.e. zone id matches or is common encounter and zone allows for common encounters)
+	 * Eligible for the current zone (i.e. zone id matches or is common encounter (empty zone) and zone allows for common encounters)
 	 * Has not been encountered yet in the run (TODO)
 	 * Eligible in the current room type (room specific implementations)
 	 */
 	RunEncounter* RunRoom::getEncounter(RunZone& zone, GameRNG& rng)
 	{
-		pair<str, str> toPair = zone.toPair();
-		vec<RunEncounter*> encounters = RunEncounter::findAllAsList([toPair, this](RunEncounter* encounter) {return encounter && encounter->data.zone == toPair && type.isEncounterValid(encounter); });
+		str id = zone.toString();
+		vec<RunEncounter*> encounters = RunEncounter::findAllAsList([&zone, &id, this](RunEncounter* encounter) {
+			return encounter && (encounter->data.zone == id || (zone.data.allowCommonEncounters && encounter->data.zone.empty())) && type.isEncounterValid(encounter);
+		});
 		if (encounters.size() > 0) {
 			int index = rng.random(0, encounters.size() - 1);
 			return encounters[index];

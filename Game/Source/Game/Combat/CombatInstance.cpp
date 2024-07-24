@@ -36,7 +36,7 @@ namespace fbc {
 		// Creates field members based on the room parameters
 		// TODO handle other fieldobject types besides creature
 		for (EncounterCreatureEntry& entry : encounter.data.creatures) {
-			CreatureData* data = CreatureData::get(entry.content, entry.id);
+			CreatureData* data = CreatureData::get(entry.id);
 			if (data) {
 				Creature::Behavior* behavior = Creature::Behavior::get(data->data.defaultBehavior);
 				CombatSquare* square = getSquare(entry.posCol, entry.posRow);

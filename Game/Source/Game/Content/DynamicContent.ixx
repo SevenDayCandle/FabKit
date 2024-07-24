@@ -22,14 +22,14 @@ import sdl;
 import std;
 
 namespace fbc {
+	export constexpr strv FILE_ENCOUNTER = "Objects/Encounters.json";
+	export constexpr strv FILE_ZONE = "Objects/Zones.json";
 	export constexpr strv MANIFEST = "manifest.json";
 	export constexpr strv PATH_CARD = "Objects/Cards";
 	export constexpr strv PATH_CREATURE = "Objects/Creatures";
-	export constexpr strv PATH_ENCOUNTER = "Objects/Encounters";
 	export constexpr strv PATH_KEYWORDS = "Objects/Keywords";
 	export constexpr strv PATH_PASSIVE = "Objects/Passives";
 	export constexpr strv PATH_STATUS = "Objects/Statuses";
-	export constexpr strv PATH_ZONE = "Objects/Zones";
 
 	export class DynamicContent : public BaseContent {
 	public:
@@ -44,13 +44,11 @@ namespace fbc {
 		inline FMusic* getMusic(strv key) override { return music.get(key); }
 		inline FSound* getSound(strv key) override { return sounds.get(key); }
 		inline FTexture* getTexture(strv key) override { return images.get(key); }
-		inline void processCards() { setupFolder(PATH_CARD, [this](const dir_entry& entry) {processCard(entry.path()); }); }
-		inline void processCreatures() { setupFolder(PATH_CREATURE, [this](const dir_entry& entry) {processCreature(entry.path()); }); }
-		inline void processEncounters() { setupFolder(PATH_ENCOUNTER, [this](const dir_entry& entry) {processEncounter(entry.path()); }); }
-		inline void processKeywords() { setupFolder(PATH_KEYWORDS, [this](const dir_entry& entry) {processEncounter(entry.path()); }); }
-		inline void processPassives() { setupFolder(PATH_PASSIVE, [this](const dir_entry& entry) {processEncounter(entry.path()); }); }
-		inline void processStatuses() { setupFolder(PATH_STATUS, [this](const dir_entry& entry) {processEncounter(entry.path()); }); }
-		inline void processZones() { setupFolder(PATH_ZONE, [this](const dir_entry& entry) {processZone(entry.path()); }); }
+		inline void processCards() { setupFolder(PATH_CARD, [this](const path& entry) {processCard(entry); }); }
+		inline void processCreatures() { setupFolder(PATH_CREATURE, [this](const path& entry) {processCreature(entry); }); }
+		inline void processKeywords() { setupFolder(PATH_KEYWORDS, [this](const path& entry) {processKeyword(entry); }); }
+		inline void processPassives() { setupFolder(PATH_PASSIVE, [this](const path& entry) {processKeyword(entry); }); }
+		inline void processStatuses() { setupFolder(PATH_STATUS, [this](const path& entry) {processKeyword(entry); }); }
 
 
 		void dispose() override;
@@ -64,12 +62,12 @@ namespace fbc {
 	private:
 		void processCard(const path& entry);
 		void processCreature(const path& entry);
-		void processEncounter(const path& entry);
+		void processEncounters();
 		void processKeyword(const path& entry);
 		void processPassive(const path& entry);
 		void processStatus(const path& entry);
-		void processZone(const path& entry);
-		void setupFolder(strv base, const func<void(const dir_entry&)>& onRead);
+		void processZones();
+		void setupFolder(strv base, const func<void(const path&)>& onRead);
 	};
 
 	void DynamicContent::dispose() {
@@ -113,7 +111,7 @@ namespace fbc {
 			sdl::logError("Failed to load card at path %s", entry.string().data());
 		}
 		else {
-			CardData::registerData(make_unique<CardData>(*this, entry.filename().string(), fields));
+			CardData::registerData(make_unique<CardData>(*this, entry.stem().string(), fields));
 			sdl::logInfo("Loaded card at path %s", entry.string().data());
 		}
 	}
@@ -128,24 +126,29 @@ namespace fbc {
 			sdl::logError("Failed to load creature at path %s", entry.string().data());
 		}
 		else {
-			CreatureData::registerData(make_unique<CreatureData>(*this, entry.filename().string(), fields));
+			CreatureData::registerData(make_unique<CreatureData>(*this, entry.stem().string(), fields));
 			sdl::logInfo("Loaded creature at path %s", entry.string().data());
 		}
 		
 	}
 
 	// Attempt to parse a encounter entry
-	void DynamicContent::processEncounter(const path& entry)
+	void DynamicContent::processEncounters()
 	{
-		RunEncounter::Data fields;
-
-		auto error = glz::read_file_json(fields, entry.string(), str{});
-		if (error) {
-			sdl::logError("Failed to load encounter at path %s", entry.string().data());
-		}
-		else {
-			RunEncounter::registerData(make_unique<RunEncounter>(*this, entry.filename().string(), fields));
-			sdl::logInfo("Loaded encounter at path %s", entry.string().data());
+		path file = contentFolder / FILE_ENCOUNTER;
+		if (std::filesystem::exists(file)) {
+			umap<str, RunEncounter::Data> zones;
+			str fn = file.string();
+			auto error = glz::read_file_json(zones, fn, str{});
+			if (error) {
+				sdl::logError("Failed to load encounters at path %s", fn.data());
+			}
+			else {
+				for (auto& pair : zones) {
+					RunEncounter* encounter = RunEncounter::registerData(make_unique<RunEncounter>(*this, pair.first, pair.second));
+					sdl::logInfo("Loaded encounter with ID %s", encounter->id.data());
+				}
+			}
 		}
 	}
 
@@ -156,28 +159,32 @@ namespace fbc {
 	}
 
 	// Attempt to parse a zone entry
-	void DynamicContent::processZone(const path& entry)
+	void DynamicContent::processZones()
 	{
-		RunZone::Data fields;
-
-		auto error = glz::read_file_json(fields, entry.string(), str{});
-		if (error) {
-			sdl::logError("Failed to load zone at path %s", entry.string().data());
-		}
-		else {
-			RunZone::registerData(make_unique<RunZone>(*this, entry.filename().string(), fields));
-			sdl::logInfo("Loaded zone at path %s", entry.string().data());
+		path file = contentFolder / FILE_ZONE;
+		if (std::filesystem::exists(file)) {
+			umap<str, RunZone::Data> zones;
+			str fn = file.string();
+			auto error = glz::read_file_json(zones, fn, str{});
+			if (error) {
+				sdl::logError("Failed to load zones at path %s", fn.data());
+			}
+			else {
+				for (auto& pair : zones) {
+					RunZone* zone = RunZone::registerData(make_unique<RunZone>(*this, pair.first, pair.second));
+					sdl::logInfo("Loaded zone with ID %s", zone->id.data());
+				}
+			}
 		}
 	}
 
-	void DynamicContent::setupFolder(strv base, const func<void(const dir_entry&)>& onRead)
+	void DynamicContent::setupFolder(strv base, const func<void(const path&)>& onRead)
 	{
-		path folder = contentFolder;
-		folder /= base;
+		path folder = contentFolder / base;
 		if (std::filesystem::exists(folder)) {
 			for (const dir_entry& entry : std::filesystem::directory_iterator(folder)) {
 				if (entry.is_regular_file()) {
-					onRead(entry);
+					onRead(entry.path());
 				}
 			}
 		}

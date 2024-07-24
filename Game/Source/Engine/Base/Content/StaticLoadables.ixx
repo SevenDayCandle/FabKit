@@ -51,9 +51,7 @@ namespace fbc {
 	// Get the path for a texture
 	str StaticLoadables::getPath(const strv& key, const strv& folder) const
 	{
-		path pathImpl = content.contentFolder;
-		pathImpl /= folder;
-		pathImpl /= key;
+		path pathImpl = content.contentFolder / folder / key;
 		return pathImpl.string();
 	}
 }

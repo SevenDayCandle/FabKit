@@ -110,7 +110,9 @@ namespace fbc {
 			combatInstance->initialize(*encounter, creatures, faction);
 			// TODO open combat screen (or overlay)
 		}
-		sdl::logInfo("Tried to start combat with no encounter.");
+		else {
+			sdl::logInfo("Tried to start combat with no encounter.");
+		}
 	}
 
 	// Save coordinates of the current room and start it

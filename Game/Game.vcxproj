@@ -594,7 +594,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
   <ItemGroup>
     <None Include="Content\test\Objects\Cards\TestCard.json" />
     <None Include="Content\test\Objects\Creatures\TestCreature.json" />
-    <None Include="Content\test\Objects\Encounters\TestEncounter.json" />
+    <None Include="Content\test\Objects\Encounters.json" />
     <None Include="Resources\Strings\ENG\KeywordStrings.json" />
     <None Include="Resources\Strings\ENG\UIStrings.json" />
   </ItemGroup>
@@ -617,7 +617,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
     <Media Include="Resources\Audio\UI\Hover2.wav" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Content\test\Objects\Zones\TestZone.json" />
+    <Text Include="Content\test\Objects\Zones.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

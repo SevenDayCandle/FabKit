@@ -20,7 +20,7 @@ namespace fbc {
 		virtual void initialize() override;
 	private:
 		T* loadItem(strv key);
-		umap<strv, uptr<T>> items;
+		strumap<uptr<T>> items;
 	};
 
 	// Attempt to fetch a cached texture. If none are found, generate one and put it into the map
@@ -43,9 +43,7 @@ namespace fbc {
 	// Attempt to load a texture from disk, saving it into the map
 	template <c_ext<ILoadable> T> T* DynamicLoadables<T>::loadItem(strv key)
 	{
-		path pathImpl = content.contentFolder;
-		pathImpl /= ContentLoadables::getDirectoryPath<T>();
-		pathImpl /= key;
+		path pathImpl = content.contentFolder / ContentLoadables::getDirectoryPath<T>() / key;
 		str pathStr = pathImpl.string();
 		auto [it, inserted] = items.emplace(std::piecewise_construct,
 			std::forward_as_tuple(key),

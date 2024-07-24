@@ -5,6 +5,17 @@ import fbc.ISerializable;
 import std;
 
 namespace fbc {
+	// Hasing structure for string_view lookup on str containers
+	export struct str_hash
+	{
+		using hash_type = std::hash<std::string_view>;
+		using is_transparent = void;
+
+		std::size_t operator()(const char* str) const { return hash_type{}(str); }
+		std::size_t operator()(std::string_view str) const { return hash_type{}(str); }
+		std::size_t operator()(std::string const& str) const { return hash_type{}(str); }
+	};
+
 	// std shorthands. Sorry peeps
 	export template <typename R> using func = std::function<R>;
 	export template <typename T, class Comp = std::less<T>, class Alloc = std::allocator<T>> using mset = std::multiset<T, Comp, Alloc>;
@@ -20,6 +31,7 @@ namespace fbc {
 	export template <typename T> using pqueue_min = std::priority_queue<T, std::vector<T>, std::greater<T>>;
 	export template <typename T> using ref = std::reference_wrapper<T>;
 	export template <typename T> using sptr = std::shared_ptr<T>;
+	export template <typename T> using strumap = umap<std::string, T, str_hash, std::equal_to<>>;
 	export template <typename T> using uptr = std::unique_ptr<T>;
 	export template <typename T> using vec = std::vector<T>;
 	export using dir_entry = std::filesystem::directory_entry;
@@ -33,7 +45,6 @@ namespace fbc {
 
 	export using std::any;
 	export using std::deque;
-	export using std::equal_to;
 	export using std::exception;
 	export using std::hash;
 	export using std::list;
@@ -87,17 +98,6 @@ namespace fbc {
 	export template<typename T> concept c_tuple = is_specialization_v<T, std::tuple>;
 	export template<typename T, typename... Args> concept c_varg = (std::same_as<T, Args> && ...);;
 	export template<typename T> concept c_vec = is_specialization_v<T, std::vector>;
-
-	// Hasing structure for string_view lookup on str containers
-	export struct str_hash
-	{
-		using hash_type = std::hash<std::string_view>;
-		using is_transparent = void;
-
-		std::size_t operator()(const char* str) const { return hash_type{}(str); }
-		std::size_t operator()(std::string_view str) const { return hash_type{}(str); }
-		std::size_t operator()(std::string const& str) const { return hash_type{}(str); }
-	};
 }
 
 // Utility functions

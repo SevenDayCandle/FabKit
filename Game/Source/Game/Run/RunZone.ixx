@@ -9,6 +9,7 @@ namespace fbc {
 	export class RunZone : public ContentRegisterable<RunZone> {
 	public:
 		struct Data {
+			bool allowCommonEncounters = true;
 			int sizeCols = 5;
 			int sizeRows = 8;
 			umap<str, int> roomWeights;
