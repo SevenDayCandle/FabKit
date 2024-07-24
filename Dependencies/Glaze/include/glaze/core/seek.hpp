@@ -4,8 +4,9 @@
 #pragma once
 
 #include "glaze/core/read.hpp"
+#include "glaze/core/refl.hpp"
 #include "glaze/core/write.hpp"
-#include "glaze/reflection/reflect.hpp"
+#include "glaze/util/fast_float.hpp"
 
 // Use JSON Pointer syntax to seek to a specific element
 // https://github.com/stephenberry/JSON-Pointer
@@ -25,7 +26,7 @@ namespace glz::detail
    bool seek_impl(F&& func, T&& value, sv json_ptr) noexcept;
 
    template <class F, class T>
-      requires readable_map_t<std::decay_t<T>> || glaze_object_t<T> || reflectable<T>
+      requires readable_map_t<T> || glaze_object_t<T> || reflectable<T>
    bool seek_impl(F&& func, T&& value, sv json_ptr) noexcept;
 
    template <class F, class T>
@@ -40,7 +41,7 @@ namespace glz::detail
 
    // TODO: compile time search for `~` and optimize if escape does not exist
    template <class F, class T>
-      requires readable_map_t<std::decay_t<T>> || glaze_object_t<T> || reflectable<T>
+      requires readable_map_t<T> || glaze_object_t<T> || reflectable<T>
    bool seek_impl(F&& func, T&& value, sv json_ptr) noexcept
    {
       if (json_ptr.empty()) {
@@ -81,11 +82,14 @@ namespace glz::detail
          }
          json_ptr = json_ptr.substr(i);
       }
-      else if constexpr (std::is_floating_point_v<Key>) {
-         auto it = json_ptr.data();
-         auto s = parse_float<Key>(key, it);
-         if (!s) return false;
-         json_ptr = json_ptr.substr(size_t(it - json_ptr.data()));
+      else if constexpr (std::floating_point<Key>) {
+         static constexpr fast_float::parse_options options{fast_float::chars_format::json};
+         auto [ptr, ec] =
+            fast_float::from_chars_advanced(json_ptr.data(), json_ptr.data() + json_ptr.size(), key, options);
+         if (ec != std::errc()) [[unlikely]] {
+            return false;
+         }
+         json_ptr = json_ptr.substr(size_t(ptr - json_ptr.data()));
       }
       else {
          auto [p, ec] = std::from_chars(&json_ptr[1], json_ptr.data() + json_ptr.size(), key);
@@ -113,9 +117,7 @@ namespace glz::detail
          const auto& member_it = frozen_map.find(key);
          if (member_it != frozen_map.end()) [[likely]] {
             return std::visit(
-               [&](auto&& member_ptr) {
-                  return seek_impl(std::forward<F>(func), get_member(value, member_ptr), json_ptr);
-               },
+               [&](auto&& element) { return seek_impl(std::forward<F>(func), get_member(value, element), json_ptr); },
                member_it->second);
          }
          else [[unlikely]] {
@@ -146,9 +148,7 @@ namespace glz::detail
          static constexpr auto member_array = glz::detail::make_array<decay_keep_volatile_t<T>>();
          if (index >= member_array.size()) return false;
          return std::visit(
-            [&](auto&& member_ptr) {
-               return seek_impl(std::forward<F>(func), get_member(value, member_ptr), json_ptr);
-            },
+            [&](auto&& element) { return seek_impl(std::forward<F>(func), get_member(value, element), json_ptr); },
             member_array[index]);
       }
       else if constexpr (tuple_t<std::decay_t<T>> || is_std_tuple<std::decay_t<T>>) {

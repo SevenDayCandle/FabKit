@@ -23,10 +23,10 @@ namespace glz
          int64_t indent{};
 
          while (it < end) {
-            switch (json_types[size_t(*it)]) {
+            switch (json_types[uint8_t(*it)]) {
             case String: {
                const auto value = read_json_string<Opts>(it, end);
-               dump_not_empty(value, b, ix);
+               dump_maybe_empty(value, b, ix);
                break;
             }
             case Comma: {
@@ -69,10 +69,10 @@ namespace glz
                dump<'['>(b, ix);
                ++it;
                ++indent;
-               state[indent] = Array_Start;
                if (size_t(indent) >= state.size()) [[unlikely]] {
                   state.resize(state.size() * 2);
                }
+               state[indent] = Array_Start;
                if constexpr (Opts.new_lines_in_arrays) {
                   if (*it != ']') {
                      append_new_line<use_tabs, indent_width>(b, ix, indent);
@@ -116,10 +116,10 @@ namespace glz
                dump<'{'>(b, ix);
                ++it;
                ++indent;
-               state[indent] = Object_Start;
                if (size_t(indent) >= state.size()) [[unlikely]] {
                   state.resize(state.size() * 2);
                }
+               state[indent] = Object_Start;
                if (*it != '}') {
                   append_new_line<use_tabs, indent_width>(b, ix, indent);
                }

@@ -66,7 +66,7 @@ namespace glz::detail
    };
 
    template <opts Opts>
-      requires(Opts.is_padded)
+      requires(has_is_padded(Opts))
    sv read_json_string(auto&& it, auto&& end) noexcept
    {
       auto start = it;
@@ -97,7 +97,7 @@ namespace glz::detail
    }
 
    template <opts Opts>
-      requires(!Opts.is_padded)
+      requires(!has_is_padded(Opts))
    sv read_json_string(auto&& it, auto&& end) noexcept
    {
       auto start = it;
@@ -181,7 +181,7 @@ namespace glz::detail
    inline sv read_json_number(auto&& it) noexcept
    {
       auto start = it;
-      while (numeric_table[*it]) {
+      while (numeric_table[uint8_t(*it)]) {
          ++it;
       }
       return {start, size_t(it - start)};

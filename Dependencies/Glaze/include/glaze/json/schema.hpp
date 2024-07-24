@@ -25,7 +25,7 @@ namespace glz
 {
    namespace detail
    {
-      enum struct defined_formats : std::uint8_t;
+      enum struct defined_formats : uint32_t;
       struct ExtUnits final
       {
          std::optional<std::string_view> unitAscii{}; // ascii representation of the unit, e.g. "m^2" for square meters
@@ -135,27 +135,27 @@ namespace glz
          std::optional<std::vector<std::string_view>> examples{};
          schema attributes{};
       };
-      enum struct defined_formats : std::uint8_t {
-         datetime,
-         date,
-         time,
-         duration,
-         email,
-         idn_email,
-         hostname,
-         idn_hostname,
-         ipv4,
-         ipv6,
-         uri,
-         uri_reference,
-         iri,
-         iri_reference,
-         uuid,
-         uri_template,
-         json_pointer,
-         relative_json_pointer,
-         regex
-      };
+
+      GLZ_ENUM_MAP(defined_formats, //
+                   "date-time", datetime, //
+                   "date", date, //
+                   "time", time, //
+                   "duration", duration, //
+                   "email", email, //
+                   "idn-email", idn_email, //
+                   "hostname", hostname, //
+                   "idn-hostname", idn_hostname, //
+                   "ipv4", ipv4, //
+                   "ipv6", ipv6, //
+                   "uri", uri, //
+                   "uri-reference", uri_reference, //
+                   "iri", iri, //
+                   "iri-reference", iri_reference, //
+                   "uuid", uuid, //
+                   "uri-template", uri_template, //
+                   "json-pointer", json_pointer, //
+                   "relative-json-pointer", relative_json_pointer, //
+                   "regex", regex);
    }
 }
 
@@ -205,27 +205,7 @@ struct glz::meta<glz::detail::schematic>
 template <>
 struct glz::meta<glz::detail::defined_formats>
 {
-   using enum detail::defined_formats;
    static constexpr std::string_view name = "defined_formats";
-   static constexpr auto value = enumerate("date-time", datetime, //
-                                           "date", date, //
-                                           "time", time, //
-                                           "duration", duration, //
-                                           "email", email, //
-                                           "idn-email", idn_email, //
-                                           "hostname", hostname, //
-                                           "idn-hostname", idn_hostname, //
-                                           "ipv4", ipv4, //
-                                           "ipv6", ipv6, //
-                                           "uri", uri, //
-                                           "uri-reference", uri_reference, //
-                                           "iri", iri, //
-                                           "iri-reference", iri_reference, //
-                                           "uuid", uuid, //
-                                           "uri-template", uri_template, //
-                                           "json-pointer", json_pointer, //
-                                           "relative-json-pointer", relative_json_pointer, //
-                                           "regex", regex);
 };
 
 namespace glz
@@ -245,7 +225,7 @@ namespace glz
             constexpr auto& names = member_names<json_schema_type<T>>;
             return [&]<size_t... I>(std::index_sequence<I...>) {
                return detail::normal_map<sv, schema, N>(
-                  std::array<pair<sv, schema>, N>{pair{names[I], std::get<I>(tuple)}...});
+                  std::array<pair<sv, schema>, N>{pair{names[I], get<I>(tuple)}...});
             }(std::make_index_sequence<N>{});
          }
          else {
@@ -304,12 +284,12 @@ namespace glz
             if constexpr (std::integral<V>) {
                s.type = {"integer"};
                s.attributes.minimum = static_cast<std::int64_t>(std::numeric_limits<V>::lowest());
-               s.attributes.maximum = static_cast<std::uint64_t>(std::numeric_limits<V>::max());
+               s.attributes.maximum = static_cast<std::uint64_t>((std::numeric_limits<V>::max)());
             }
             else {
                s.type = {"number"};
                s.attributes.minimum = std::numeric_limits<V>::lowest();
-               s.attributes.maximum = std::numeric_limits<V>::max();
+               s.attributes.maximum = (std::numeric_limits<V>::max)();
             }
          }
       };
@@ -345,8 +325,7 @@ namespace glz
             s.type = {"string"};
 
             // TODO use oneOf instead of enum to handle doc comments
-            using V = std::decay_t<T>;
-            static constexpr auto N = glz::tuple_size_v<meta_t<V>>;
+            static constexpr auto N = refl<T>.N;
             // s.enumeration = std::vector<std::string_view>(N);
             // for_each<N>([&](auto I) {
             //    static constexpr auto item = std::get<I>(meta_v<V>);
@@ -354,27 +333,13 @@ namespace glz
             // });
             s.oneOf = std::vector<schematic>(N);
             for_each<N>([&](auto I) {
-               static constexpr auto item = get<I>(meta_v<V>);
-               using T0 = std::decay_t<decltype(get<0>(item))>;
                auto& enumeration = (*s.oneOf)[I];
-               static constexpr size_t member_index = std::is_enum_v<T0> ? 0 : 1;
-               static constexpr size_t comment_index = member_index + 1;
-               constexpr auto Size = glz::tuple_size_v<decltype(item)>;
-               if constexpr (Size > comment_index) {
-                  using additional_data_type = decltype(get<comment_index>(item));
-                  if constexpr (std::is_convertible_v<additional_data_type, std::string_view>) {
-                     enumeration.attributes.description = get<comment_index>(item);
-                  }
-                  else if constexpr (std::is_convertible_v<additional_data_type, schema>) {
-                     enumeration.attributes = get<comment_index>(item);
-                  }
-               }
                // Do not override if already set
                if (!enumeration.attributes.constant.has_value()) {
-                  enumeration.attributes.constant = get_enum_key<V, I>();
+                  enumeration.attributes.constant = refl<T>.keys[I];
                }
                if (!enumeration.attributes.title.has_value()) {
-                  enumeration.attributes.title = get_enum_key<V, I>();
+                  enumeration.attributes.title = refl<T>.keys[I];
                }
             });
          }
@@ -434,7 +399,8 @@ namespace glz
          {
             using V = std::decay_t<decltype(*std::declval<std::decay_t<T>>())>;
             to_json_schema<V>::template op<Opts>(s, defs);
-            auto& type = *s.type;
+            // to_json_schema above should populate the correct type, let's throw if it wasn't set
+            auto& type = s.type.value();
             auto it = std::find_if(type.begin(), type.end(), [&](const auto& str) { return str == "null"; });
             if (it == type.end()) {
                type.emplace_back("null");
@@ -502,12 +468,9 @@ namespace glz
 
       template <class T>
       inline constexpr auto glaze_names = []() {
-         constexpr auto N = reflection_count<T>;
+         constexpr auto N = refl<T>.N;
          std::array<sv, N> names{};
-         for_each<N>([&](auto I) {
-            using Element = glaze_tuple_element<I, N, T>;
-            names[I] = key_name<I, T, Element::use_reflection>;
-         });
+         for_each<N>([&](auto I) { names[I] = refl<T>.keys[I]; });
          return names;
       }();
 
@@ -577,19 +540,17 @@ namespace glz
                }
             }
 
-            static constexpr auto N = reflection_count<T>;
+            static constexpr auto N = refl<T>.N;
 
             static constexpr auto schema_map = make_reflection_schema_map<T>();
 
             s.properties = std::map<sv, schema, std::less<>>();
             for_each<N>([&](auto I) {
-               using Element = glaze_tuple_element<I, N, T>;
-               static constexpr size_t member_index = Element::member_index;
-               using val_t = std::decay_t<typename Element::type>;
+               using val_t = std::decay_t<refl_t<T, I>>;
 
                auto& def = defs[name_v<val_t>];
 
-               constexpr sv key = key_name<I, T, Element::use_reflection>;
+               constexpr sv key = refl<T>.keys[I];
 
                schema ref_val{};
                if constexpr (schema_map.size()) {
@@ -601,22 +562,6 @@ namespace glz
                if (!ref_val.ref) {
                   validate_ref<name_v<val_t>>();
                   ref_val.ref = join_v<chars<"#/$defs/">, name_v<val_t>>;
-               }
-
-               static constexpr size_t comment_index = member_index + 1;
-               static constexpr auto Size = glz::tuple_size_v<typename Element::Item>;
-
-               if constexpr (Size > comment_index && glaze_object_t<T>) {
-                  static constexpr auto item = glz::get<I>(meta_v<V>);
-                  using additional_data_type = decltype(get<comment_index>(item));
-                  if constexpr (std::is_convertible_v<additional_data_type, sv>) {
-                     ref_val.description = get<comment_index>(item);
-                  }
-                  else if constexpr (std::is_convertible_v<additional_data_type, schema>) {
-                     ref_val = get<comment_index>(item);
-                     validate_ref<name_v<val_t>>();
-                     ref_val.ref = join_v<chars<"#/$defs/">, name_v<val_t>>;
-                  }
                }
 
                if (!def.type) {

@@ -62,12 +62,12 @@ namespace fbc {
 		ConfigNumeric soundVolumeMusic = ConfigNumeric(*this, "SoundVolumeMusic", 100, 0, 100);
 		ConfigNumeric textFontScale = ConfigNumeric(*this, "TextFontScale", 1, 1, 4);
 
-		Hotkey actDirDown = Hotkey::add("ActDirDown", sdl::SCAN_DOWN, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_DOWN);
-		Hotkey actDirLeft = Hotkey::add("ActDirLeft", sdl::SCAN_LEFT, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_LEFT);
-		Hotkey actDirRight = Hotkey::add("ActDirRight", sdl::SCAN_RIGHT, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_RIGHT);
-		Hotkey actDirUp = Hotkey::add("ActDirUp", sdl::SCAN_UP, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_UP);
-		Hotkey actEsc = Hotkey::add("ActEsc", sdl::SCAN_ESC, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_INVALID);
-		Hotkey actSelect = Hotkey::add("ActSelect", sdl::SCAN_RETURN, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_START);
+		Hotkey actDirDown = Hotkey("ActDirDown", sdl::SCAN_DOWN, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_DOWN);
+		Hotkey actDirLeft = Hotkey("ActDirLeft", sdl::SCAN_LEFT, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_LEFT);
+		Hotkey actDirRight = Hotkey("ActDirRight", sdl::SCAN_RIGHT, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_RIGHT);
+		Hotkey actDirUp = Hotkey("ActDirUp", sdl::SCAN_UP, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_UP);
+		Hotkey actEsc = Hotkey("ActEsc", sdl::SCAN_ESC, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_INVALID);
+		Hotkey actSelect = Hotkey("ActSelect", sdl::SCAN_RETURN, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_START);
 
 		inline int getScreenXSize() { return graphicsResolution.get().first; }
 		inline int getScreenYSize() { return graphicsResolution.get().second; };

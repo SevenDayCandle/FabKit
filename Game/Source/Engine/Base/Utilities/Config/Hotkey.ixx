@@ -6,19 +6,17 @@ export module fbc.ConfigHotkey;
 
 import fbc.Config;
 import fbc.FUtil;
-import fbc.ISerializable;
+import fbc.KeyedItem;
 import sdl;
 import std;
 
 namespace fbc {
 	export constexpr strv BASE_HOTKEY_FILE = "hotkeys.json";
 
-	export class Hotkey {
+	export class Hotkey : public KeyedItem<Hotkey> {
 	public:
-		Hotkey(strv id, sdl::Scancode key, sdl::GamepadButton gamepad): id(id), key(key), keyDefault(key), pad(gamepad), padDefault(gamepad) {}
+		Hotkey(strv id, sdl::Scancode key, sdl::GamepadButton gamepad): KeyedItem(id), key(key), keyDefault(key), pad(gamepad), padDefault(gamepad) {}
 		virtual ~Hotkey() = default;
-
-		const str id;
 
 		inline bool isKeyJustPressed() const { return key > 0 && sdl::keyboardJustPressed(key); }
 		inline int getKey() const { return key; }
@@ -29,9 +27,8 @@ namespace fbc {
 		void reset();
 		void set(int key, int pad);
 
-		static inline str configPath() { return sdl::dirPref(futil::FBC.data(), BASE_HOTKEY_FILE.data()); }
+		inline static str configPath() { return sdl::dirPref(futil::FBC.data(), BASE_HOTKEY_FILE.data()); }
 
-		static Hotkey& add(strv id, sdl::Scancode key, sdl::GamepadButton pad);
 		static void commit();
 		static void reload();
 	private:
@@ -39,9 +36,6 @@ namespace fbc {
 		int keyDefault;
 		int pad;
 		int padDefault;
-
-		static inline umap<str, Hotkey> keys = umap<str, Hotkey>();
-
 	};
 
 	// Reset keys and pad to defaults
@@ -58,20 +52,11 @@ namespace fbc {
 		this->pad = pad;
 	}
 
-	// Register a hotkey to be tracked for saving and reloading
-	Hotkey& Hotkey::add(strv id, sdl::Scancode key, sdl::GamepadButton pad)
-	{
-		auto [it, inserted] = keys.try_emplace(str(id), Hotkey(id, key, pad));
-		if (!inserted) {
-			throw std::logic_error("Duplicate Hotkey with id: " + str(id));
-		}
-		return it->second;
-	}
-
 	// Save the contents of the hotkeys to an external file
 	void Hotkey::commit()
 	{
-		map<str, pair<int, int>> output = futil::transformMap<str, Hotkey, pair<int, int>>(keys, [](const Hotkey& row) { return pair<int,int>(row.key, row.pad); });
+		map<strv, Hotkey*>& regist = registered();
+		map<strv, pair<int, int>> output = futil::transformMap<strv, Hotkey*, pair<int, int>>(regist, [](const Hotkey* row) { return pair<int,int>(row->key, row->pad); });
 		str configPath = Hotkey::configPath();
 		auto error = glz::write_file_json(output, configPath, str{});
 		if (error) {
@@ -84,22 +69,21 @@ namespace fbc {
 	{
 		str configPath = Hotkey::configPath();
 		if (std::filesystem::exists(configPath)) {
-			map<str, pair<int, int>> input;
+			strumap<pair<int, int>> input = strumap<pair<int, int>>();
 			auto error = glz::read_file_json(input, configPath, str{});
 			if (error) {
 				sdl::logError("Failed to read hotkeys at path %s: %s", configPath.data(), error.includer_error.data());
 			}
 
 			// If a hotkey is in the map, set it to whatever values were read from the map. Otherwise, reset them to their defaults
-			for (const auto& hk : keys) {
-				Hotkey key = hk.second;
+			for (auto& hk : registered()) {
 				auto entry = input.find(hk.first);
 				if (entry != input.end()) {
 					pair<int, int> found = entry->second;
-					key.set(found.first, found.second);
+					hk.second->set(found.first, found.second);
 				}
 				else {
-					key.reset();
+					hk.second->reset();
 				}
 			}
 		}

@@ -113,17 +113,7 @@ namespace glz::detail
       return t;
    }();
 
-   consteval uint32_t repeat_byte4(const auto repeat) { return 0x01010101u * uint8_t(repeat); }
-
-   GLZ_ALWAYS_INLINE constexpr uint32_t has_zero_u32(const uint32_t chunk) noexcept
-   {
-      return (((chunk - 0x01010101u) & ~chunk) & 0x80808080u);
-   }
-
-   GLZ_ALWAYS_INLINE constexpr uint32_t is_less_16_u32(const uint32_t chunk) noexcept
-   {
-      return has_zero_u32(chunk & repeat_byte4(0b11110000u));
-   }
+   consteval uint32_t repeat_byte4(const auto repeat) { return uint32_t(0x01010101u) * uint8_t(repeat); }
 
    consteval uint64_t repeat_byte8(const uint8_t repeat) { return 0x0101010101010101ull * repeat; }
 
@@ -131,21 +121,23 @@ namespace glz::detail
 
    [[nodiscard]] GLZ_ALWAYS_INLINE uint32_t hex_to_u32(const char* c) noexcept
    {
-      const auto& t = digit_hex_table;
-      const uint8_t arr[4]{t[c[3]], t[c[2]], t[c[1]], t[c[0]]};
+      constexpr auto& t = digit_hex_table;
+      const uint8_t arr[4]{t[uint8_t(c[3])], t[uint8_t(c[2])], t[uint8_t(c[1])], t[uint8_t(c[0])]};
       uint32_t chunk;
       std::memcpy(&chunk, arr, 4);
       // check that all hex characters are valid
-      if (is_less_16_u32(chunk)) [[likely]] {
-         // now pack into first four bytes of uint32_t
-         uint32_t packed{};
-         packed |= (chunk & 0x0000000F);
-         packed |= (chunk & 0x00000F00) >> 4;
-         packed |= (chunk & 0x000F0000) >> 8;
-         packed |= (chunk & 0x0F000000) >> 12;
-         return packed;
+      if (chunk & repeat_byte4(0b11110000u)) [[unlikely]] {
+         return 0xFFFFFFFFu;
       }
-      return 0xFFFFFFFFu;
+
+      // TODO: can you use std::bit_cast here?
+      // now pack into first four bytes of uint32_t
+      uint32_t packed{};
+      packed |= (chunk & 0x0000000F);
+      packed |= (chunk & 0x00000F00) >> 4;
+      packed |= (chunk & 0x000F0000) >> 8;
+      packed |= (chunk & 0x0F000000) >> 12;
+      return packed;
    }
 
    template <class Char>
@@ -208,7 +200,7 @@ namespace glz::detail
    }
 
    template <class Char>
-   [[nodiscard]] GLZ_ALWAYS_INLINE bool handle_unicode_code_point(const Char*& it, Char*& dst)
+   [[nodiscard]] GLZ_ALWAYS_INLINE uint32_t handle_unicode_code_point(const Char*& it, Char*& dst) noexcept
    {
       using namespace unicode;
 
@@ -234,7 +226,7 @@ namespace glz::detail
          }
          it += 4;
 
-         if ((low & surrogate_mask) != low_surrogate_value) {
+         if ((low & surrogate_mask) != low_surrogate_value) [[unlikely]] {
             return false;
          }
 
@@ -247,66 +239,18 @@ namespace glz::detail
       }
       const uint32_t offset = code_point_to_utf8(code_point, dst);
       dst += offset;
-      return offset > 0;
+      return offset;
    }
 
    template <class Char>
-   [[nodiscard]] GLZ_ALWAYS_INLINE bool handle_unicode_code_point(const Char*& it, Char*& dst, const Char* end)
+   [[nodiscard]] GLZ_ALWAYS_INLINE uint32_t handle_unicode_code_point(const Char*& it, Char*& dst,
+                                                                      const Char* end) noexcept
    {
       using namespace unicode;
 
-      const uint32_t high = hex_to_u32(it);
-      if (high == 0xFFFFFFFFu) [[unlikely]] {
-         return false;
-      }
       if (it + 4 >= end) [[unlikely]] {
          return false;
       }
-      it += 4; // skip the code point characters
-
-      uint32_t code_point;
-
-      if ((high & generic_surrogate_mask) == generic_surrogate_value) {
-         // surrogate pair code points
-         if ((high & surrogate_mask) != high_surrogate_value) {
-            return false;
-         }
-
-         if (it + 6 >= end) [[unlikely]] {
-            return false;
-         }
-         it += 2;
-         // verify that second unicode escape sequence is present
-         const uint32_t low = hex_to_u32(it);
-         if (low == 0xFFFFFFFFu) [[unlikely]] {
-            return false;
-         }
-         it += 4;
-
-         if ((low & surrogate_mask) != low_surrogate_value) {
-            return false;
-         }
-
-         code_point = (high & surrogate_codepoint_mask) << surrogate_codepoint_bits;
-         code_point |= (low & surrogate_codepoint_mask);
-         code_point += surrogate_codepoint_offset;
-      }
-      else {
-         code_point = high;
-      }
-      const uint32_t offset = code_point_to_utf8(code_point, dst);
-      dst += offset;
-      return offset > 0;
-   }
-
-   template <class Char>
-   [[nodiscard]] GLZ_ALWAYS_INLINE bool skip_unicode_code_point(const Char*& it, const Char* end)
-   {
-      using namespace unicode;
-      if (it + 4 >= end) [[unlikely]] {
-         return false;
-      }
-
       const uint32_t high = hex_to_u32(it);
       if (high == 0xFFFFFFFFu) [[unlikely]] {
          return false;
@@ -332,7 +276,56 @@ namespace glz::detail
          }
          it += 4;
 
-         if ((low & surrogate_mask) != low_surrogate_value) {
+         if ((low & surrogate_mask) != low_surrogate_value) [[unlikely]] {
+            return false;
+         }
+
+         code_point = (high & surrogate_codepoint_mask) << surrogate_codepoint_bits;
+         code_point |= (low & surrogate_codepoint_mask);
+         code_point += surrogate_codepoint_offset;
+      }
+      else {
+         code_point = high;
+      }
+      const uint32_t offset = code_point_to_utf8(code_point, dst);
+      dst += offset;
+      return offset;
+   }
+
+   template <class Char>
+   [[nodiscard]] GLZ_ALWAYS_INLINE bool skip_unicode_code_point(const Char*& it, const Char* end) noexcept
+   {
+      using namespace unicode;
+      if (it + 4 >= end) [[unlikely]] {
+         return false;
+      }
+
+      const uint32_t high = hex_to_u32(it);
+      if (high == 0xFFFFFFFFu) [[unlikely]] {
+         return false;
+      }
+      it += 4; // skip the code point characters
+
+      uint32_t code_point;
+
+      if ((high & generic_surrogate_mask) == generic_surrogate_value) {
+         // surrogate pair code points
+         if ((high & surrogate_mask) != high_surrogate_value) [[unlikely]] {
+            return false;
+         }
+
+         if (it + 6 >= end) [[unlikely]] {
+            return false;
+         }
+         it += 2;
+         // verify that second unicode escape sequence is present
+         const uint32_t low = hex_to_u32(it);
+         if (low == 0xFFFFFFFFu) [[unlikely]] {
+            return false;
+         }
+         it += 4;
+
+         if ((low & surrogate_mask) != low_surrogate_value) [[unlikely]] {
             return false;
          }
 
@@ -365,10 +358,10 @@ namespace glz::detail
       ++it;                                   \
    }
 
-#define GLZ_MATCH_COLON                       \
+#define GLZ_MATCH_COLON(RETURN)               \
    if (*it != ':') [[unlikely]] {             \
       ctx.error = error_code::expected_colon; \
-      return;                                 \
+      return RETURN;                          \
    }                                          \
    else [[likely]] {                          \
       ++it;                                   \
@@ -434,7 +427,7 @@ namespace glz::detail
    }
 
    template <string_literal str, opts Opts>
-      requires(Opts.is_padded && str.size() <= padding_bytes)
+      requires(has_is_padded(Opts) && str.size() <= padding_bytes)
    GLZ_ALWAYS_INLINE void match(is_context auto&& ctx, auto&& it, auto&&) noexcept
    {
       if (!compare<str.size()>(it, str.value)) [[unlikely]] {
@@ -446,7 +439,7 @@ namespace glz::detail
    }
 
    template <string_literal str, opts Opts>
-      requires(!Opts.is_padded)
+      requires(!has_is_padded(Opts))
    GLZ_ALWAYS_INLINE void match(is_context auto&& ctx, auto&& it, auto&& end) noexcept
    {
       const auto n = size_t(end - it);
@@ -521,26 +514,26 @@ namespace glz::detail
       return (chunk & repeat_byte8(0b11110000u));
    }
 
-#define GLZ_SKIP_WS                                \
-   if constexpr (!Opts.minified) {                 \
-      if constexpr (Opts.comments) {               \
-         while (whitespace_comment_table[*it]) {   \
-            if (*it == '/') [[unlikely]] {         \
-               skip_comment(ctx, it, end);         \
-               if (bool(ctx.error)) [[unlikely]] { \
-                  return;                          \
-               }                                   \
-            }                                      \
-            else [[likely]] {                      \
-               ++it;                               \
-            }                                      \
-         }                                         \
-      }                                            \
-      else {                                       \
-         while (whitespace_table[*it]) {           \
-            ++it;                                  \
-         }                                         \
-      }                                            \
+#define GLZ_SKIP_WS(RETURN)                               \
+   if constexpr (!Opts.minified) {                        \
+      if constexpr (Opts.comments) {                      \
+         while (whitespace_comment_table[uint8_t(*it)]) { \
+            if (*it == '/') [[unlikely]] {                \
+               skip_comment(ctx, it, end);                \
+               if (bool(ctx.error)) [[unlikely]] {        \
+                  return RETURN;                          \
+               }                                          \
+            }                                             \
+            else [[likely]] {                             \
+               ++it;                                      \
+            }                                             \
+         }                                                \
+      }                                                   \
+      else {                                              \
+         while (whitespace_table[uint8_t(*it)]) {         \
+            ++it;                                         \
+         }                                                \
+      }                                                   \
    }
 
    // skip whitespace
@@ -549,7 +542,7 @@ namespace glz::detail
    {
       if constexpr (!Opts.minified) {
          if constexpr (Opts.comments) {
-            while (whitespace_comment_table[*it]) {
+            while (whitespace_comment_table[uint8_t(*it)]) {
                if (*it == '/') [[unlikely]] {
                   skip_comment(ctx, it, end);
                   if (bool(ctx.error)) [[unlikely]] {
@@ -562,7 +555,7 @@ namespace glz::detail
             }
          }
          else {
-            while (whitespace_table[*it]) {
+            while (whitespace_table[uint8_t(*it)]) {
                ++it;
             }
          }
@@ -655,7 +648,7 @@ namespace glz::detail
    }
 
    template <opts Opts>
-      requires(Opts.is_padded)
+      requires(has_is_padded(Opts))
    GLZ_ALWAYS_INLINE void skip_string_view(is_context auto&& ctx, auto&& it, auto&& end) noexcept
    {
       static_assert(std::contiguous_iterator<std::decay_t<decltype(it)>>);
@@ -685,7 +678,7 @@ namespace glz::detail
    }
 
    template <opts Opts>
-      requires(!Opts.is_padded)
+      requires(!has_is_padded(Opts))
    GLZ_ALWAYS_INLINE void skip_string_view(is_context auto&& ctx, auto&& it, auto&& end) noexcept
    {
       static_assert(std::contiguous_iterator<std::decay_t<decltype(it)>>);
@@ -893,11 +886,11 @@ namespace glz::detail
    template <opts Opts>
    GLZ_ALWAYS_INLINE void skip_string(is_context auto&& ctx, auto&& it, auto&& end) noexcept
    {
-      if constexpr (!Opts.opening_handled) {
+      if constexpr (!has_opening_handled(Opts)) {
          ++it;
       }
 
-      if constexpr (Opts.force_conformance) {
+      if constexpr (Opts.validate_skipped) {
          while (true) {
             if ((*it & 0b11100000) == 0) [[unlikely]] {
                ctx.error = error_code::syntax_error;
@@ -911,7 +904,7 @@ namespace glz::detail
             }
             case '\\': {
                ++it;
-               if (char_unescape_table[*it]) {
+               if (char_unescape_table[uint8_t(*it)]) {
                   ++it;
                   continue;
                }
@@ -942,7 +935,7 @@ namespace glz::detail
    }
 
    template <opts Opts, char open, char close, size_t Depth = 1>
-      requires(Opts.is_padded)
+      requires(has_is_padded(Opts))
    GLZ_ALWAYS_INLINE void skip_until_closed(is_context auto&& ctx, auto&& it, auto&& end) noexcept
    {
       size_t depth = Depth;
@@ -997,7 +990,7 @@ namespace glz::detail
    }
 
    template <opts Opts, char open, char close, size_t Depth = 1>
-      requires(!Opts.is_padded)
+      requires(!has_is_padded(Opts))
    GLZ_ALWAYS_INLINE void skip_until_closed(is_context auto&& ctx, auto&& it, auto&& end) noexcept
    {
       size_t depth = Depth;
@@ -1148,8 +1141,8 @@ namespace glz::detail
    template <opts Opts>
    GLZ_ALWAYS_INLINE void skip_number(is_context auto&& ctx, auto&& it, auto&& end) noexcept
    {
-      if constexpr (!Opts.force_conformance) {
-         while (numeric_table[*it]) {
+      if constexpr (!Opts.validate_skipped) {
+         while (numeric_table[uint8_t(*it)]) {
             ++it;
          }
       }

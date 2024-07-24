@@ -123,6 +123,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <BuildStlModules>true</BuildStlModules>
       <EnableModules>true</EnableModules>
+      <AdditionalOptions>/Zc:preprocessor %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -265,10 +266,6 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       </SubType>
     </ClCompile>
     <ClCompile Include="Source\Engine\Base\Utilities\ILoadable.ixx">
-      <SubType>
-      </SubType>
-    </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Utilities\ISerializable.ixx">
       <SubType>
       </SubType>
     </ClCompile>

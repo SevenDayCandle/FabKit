@@ -57,10 +57,10 @@ namespace glz
 
       if (buffer.empty()) [[unlikely]] {
          ctx.error = error_code::no_read_input;
-         return {ctx.error, 0, ctx.includer_error};
+         return {ctx.error, ctx.custom_error_message, 0, ctx.includer_error};
       }
 
-      constexpr bool use_padded = resizable<Buffer> && non_const_buffer<Buffer> && !Opts.disable_padding;
+      constexpr bool use_padded = resizable<Buffer> && non_const_buffer<Buffer> && !has_disable_padding(Opts);
 
       if constexpr (use_padded) {
          // Pad the buffer for SWAR
@@ -74,18 +74,20 @@ namespace glz
       }
 
       if constexpr (use_padded) {
-         detail::read<Opts.format>::template op<opt_true<Opts, &opts::is_padded>>(value, ctx, it, end);
+         detail::read<Opts.format>::template op<is_padded_on<Opts>()>(value, ctx, it, end);
       }
       else {
-         detail::read<Opts.format>::template op<opt_false<Opts, &opts::is_padded>>(value, ctx, it, end);
+         detail::read<Opts.format>::template op<is_padded_off<Opts>()>(value, ctx, it, end);
       }
 
       if (bool(ctx.error)) [[unlikely]] {
          goto finish;
       }
 
-      if constexpr (Opts.force_conformance) {
-         // Trailing whitespace is not allowed
+      // The JSON RFC 8259 defines: JSON-text = ws value ws
+      // So, trailing whitespace is permitted and sometimes we want to
+      // validate this, even though this memory will not affect Glaze.
+      if constexpr (Opts.validate_trailing_whitespace) {
          if (it < end) {
             detail::skip_ws<Opts>(ctx, it, end);
             if (bool(ctx.error)) [[unlikely]] {
@@ -103,7 +105,7 @@ namespace glz
          buffer.resize(buffer.size() - padding_bytes);
       }
 
-      return {ctx.error, size_t(it - start), ctx.includer_error};
+      return {ctx.error, ctx.custom_error_message, size_t(it - start), ctx.includer_error};
    }
 
    template <opts Opts, class T>
@@ -124,7 +126,7 @@ namespace glz
    {
       const auto str = std::string_view{std::forward<Buffer>(buffer)};
       if (str.empty()) {
-         return {error_code::no_read_input, 0};
+         return {error_code::no_read_input};
       }
       return read<Opts>(value, str, ctx);
    }

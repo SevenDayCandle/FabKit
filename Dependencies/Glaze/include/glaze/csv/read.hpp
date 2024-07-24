@@ -7,10 +7,10 @@
 
 #include "glaze/core/opts.hpp"
 #include "glaze/core/read.hpp"
+#include "glaze/core/refl.hpp"
 #include "glaze/file/file_ops.hpp"
-#include "glaze/reflection/reflect.hpp"
+#include "glaze/util/fast_float.hpp"
 #include "glaze/util/parse.hpp"
-#include "glaze/util/strod.hpp"
 
 namespace glz
 {
@@ -62,7 +62,7 @@ namespace glz
       struct from_csv<T>
       {
          template <auto Opts, class It>
-         static void op(auto&& value, is_context auto&& ctx, It&& it, auto&&) noexcept
+         static void op(auto&& value, is_context auto&& ctx, It&& it, auto&& end) noexcept
          {
             if (bool(ctx.error)) [[unlikely]] {
                return;
@@ -109,11 +109,13 @@ namespace glz
                }
             }
             else {
-               auto s = parse_float<V, Opts.force_conformance>(value, it);
-               if (!s) [[unlikely]] {
+               static constexpr fast_float::parse_options options{fast_float::chars_format::json};
+               auto [ptr, ec] = fast_float::from_chars_advanced(it, end, value, options);
+               if (ec != std::errc()) [[unlikely]] {
                   ctx.error = error_code::parse_number_failure;
                   return;
                }
+               it = ptr;
             }
          }
       };
@@ -411,7 +413,7 @@ namespace glz
          template <auto Opts, class It>
          static void op(auto&& value, is_context auto&& ctx, It&& it, auto&& end)
          {
-            static constexpr auto num_members = reflection_count<T>;
+            static constexpr auto num_members = refl<T>.N;
 
             decltype(auto) frozen_map = [&]() -> decltype(auto) {
                if constexpr (reflectable<T> && num_members > 0) {

@@ -12,7 +12,7 @@ namespace fbc {
 		KeyedItem(const KeyedItem&) = delete;
 		virtual ~KeyedItem() = default;
 
-		const std::string_view id;
+		const std::string id;
 
 		bool operator<(const KeyedItem<C>& other) const { return this->id < other.id; }
 		bool operator>(const KeyedItem<C>& other) const { return this->id > other.id; }

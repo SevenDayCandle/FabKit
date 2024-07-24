@@ -162,7 +162,7 @@ namespace glz::repe
       glz::detail::read<Opts.format>::template op<Opts>(std::forward<Value>(value), ctx, b, e);
 
       if (bool(ctx.error)) {
-         error_ctx ec{ctx.error, size_t(b - start), ctx.includer_error};
+         error_ctx ec{ctx.error, ctx.custom_error_message, size_t(b - start), ctx.includer_error};
          std::ignore =
             write<Opts>(std::forward_as_tuple(header{.error = true},
                                               error_t{error_e::parse_error, format_error(ec, state.message)}),
@@ -220,7 +220,7 @@ namespace glz::repe
 
       auto handle_error = [&](auto& it) {
          ctx.error = error_code::syntax_error;
-         error_ctx pe{ctx.error, size_t(it - start), ctx.includer_error};
+         error_ctx pe{ctx.error, ctx.custom_error_message, size_t(it - start), ctx.includer_error};
          return error_t{error_e::parse_error, format_error(pe, buffer)};
       };
 
@@ -234,7 +234,7 @@ namespace glz::repe
       glz::detail::read<Opts.format>::template op<Opts>(h, ctx, b, e);
 
       if (bool(ctx.error)) {
-         error_ctx pe{ctx.error, size_t(b - start), ctx.includer_error};
+         error_ctx pe{ctx.error, ctx.custom_error_message, size_t(b - start), ctx.includer_error};
          return {error_e::parse_error, format_error(pe, buffer)};
       }
 
@@ -255,7 +255,7 @@ namespace glz::repe
          glz::detail::read<Opts.format>::template op<Opts>(result, ctx, b, e);
 
          if (bool(ctx.error)) {
-            error_ctx pe{ctx.error, size_t(b - start), ctx.includer_error};
+            error_ctx pe{ctx.error, ctx.custom_error_message, size_t(b - start), ctx.includer_error};
             return {error_e::parse_error, format_error(pe, buffer)};
          }
       }
@@ -325,7 +325,7 @@ namespace glz::repe
    {
       using Mtx = std::mutex*;
       using namespace glz::detail;
-      constexpr auto N = reflection_count<T>;
+      constexpr auto N = refl<T>.N;
       return [&]<size_t... I>(std::index_sequence<I...>) {
          return normal_map<sv, Mtx, N>(
             std::array<pair<sv, Mtx>, N>{pair<sv, Mtx>{join_v<parent, chars<"/">, key_name_v<I, T>>, Mtx{}}...});
@@ -737,10 +737,10 @@ namespace glz::repe
       void on(T& value)
       {
          using namespace glz::detail;
-         static constexpr auto N = reflection_count<T>;
+         static constexpr auto N = refl<T>.N;
 
-         [[maybe_unused]] decltype(auto) t = [&] {
-            if constexpr (reflectable<T>) {
+         [[maybe_unused]] decltype(auto) t = [&]() -> decltype(auto) {
+            if constexpr (reflectable<T> && requires { to_tuple(value); }) {
                return to_tuple(value);
             }
             else {
@@ -748,7 +748,8 @@ namespace glz::repe
             }
          }();
 
-         if constexpr (parent == root && (glaze_object_t<T> || reflectable<T>)) {
+         if constexpr (parent == root && (glaze_object_t<T> ||
+                                          reflectable<T>)&&!std::same_as<std::decay_t<decltype(t)>, std::nullptr_t>) {
             // build read/write calls to the top level object
             methods[root] = [&value, chain = get_chain(root)](repe::state&& state) mutable {
                if (not state.header.empty) {
@@ -783,30 +784,28 @@ namespace glz::repe
          }
 
          for_each<N>([&](auto I) {
-            using Element = glaze_tuple_element<I, N, T>;
-
-            // size_t Index is to fix MSVC
-            decltype(auto) func = [&]<size_t Index>() -> decltype(auto) {
+            decltype(auto) func = [&]<size_t I>() -> decltype(auto) {
                if constexpr (reflectable<T>) {
-                  return std::get<I>(t);
+                  return get_member(value, get<I>(t));
                }
                else {
-                  // To fix MSVC
-                  using LocalElement = glaze_tuple_element<Index, N, T>;
-                  return get_member(value, get<LocalElement::member_index>(get<I>(meta_v<T>)));
+                  return get_member(value, get<I>(refl<T>.values));
                }
             }.template operator()<I>();
 
+            static constexpr auto key = refl<T>.keys[I];
+
             static constexpr std::string_view full_key = [&] {
                if constexpr (parent == detail::empty_path) {
-                  return join_v<chars<"/">, key_name<I, T, Element::use_reflection>>;
+                  return join_v<chars<"/">, key>;
                }
                else {
-                  return join_v<parent, chars<"/">, key_name<I, T, Element::use_reflection>>;
+                  return join_v<parent, chars<"/">, key>;
                }
             }();
 
-            using E = typename Element::type;
+            // static_assert(std::same_as<decltype(func), refl_t<T, I>>);
+            using E = std::remove_cvref_t<decltype(func)>;
 
             // This logic chain should match glz::cli_menu
             using Func = decltype(func);
@@ -879,7 +878,7 @@ namespace glz::repe
                };
             }
             else if constexpr (glaze_object_t<E> || reflectable<E>) {
-               on<root, std::decay_t<E>, full_key>(get_member(value, func));
+               on<root, E, full_key>(func);
 
                // build read/write calls to the object as a variable
                methods[full_key] = [&func, chain = get_chain(full_key)](repe::state&& state) mutable {
@@ -1125,7 +1124,7 @@ namespace glz::repe
 
          auto handle_error = [&](auto& it) {
             ctx.error = error_code::syntax_error;
-            error_ctx pe{ctx.error, size_t(it - start), ctx.includer_error};
+            error_ctx pe{ctx.error, ctx.custom_error_message, size_t(it - start), ctx.includer_error};
             std::ignore = write<Opts>(
                std::forward_as_tuple(header{.error = true}, error_t{error_e::parse_error, format_error(pe, msg)}),
                response);
@@ -1174,7 +1173,7 @@ namespace glz::repe
          glz::detail::read<Opts.format>::template op<Opts>(h, ctx, b, e);
 
          if (bool(ctx.error)) [[unlikely]] {
-            error_ctx pe{ctx.error, size_t(b - start), ctx.includer_error};
+            error_ctx pe{ctx.error, ctx.custom_error_message, size_t(b - start), ctx.includer_error};
             response = format_error(pe, msg);
             return finish();
          }

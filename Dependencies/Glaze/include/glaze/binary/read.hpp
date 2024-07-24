@@ -7,8 +7,8 @@
 #include "glaze/binary/skip.hpp"
 #include "glaze/core/opts.hpp"
 #include "glaze/core/read.hpp"
+#include "glaze/core/refl.hpp"
 #include "glaze/file/file_ops.hpp"
-#include "glaze/reflection/reflect.hpp"
 #include "glaze/util/dump.hpp"
 
 namespace glz
@@ -19,7 +19,7 @@ namespace glz
       struct read<binary>
       {
          template <auto Opts, class T, class Tag, is_context Ctx, class It0, class It1>
-            requires(Opts.no_header)
+            requires(has_no_header(Opts))
          GLZ_ALWAYS_INLINE static void op(T&& value, Tag&& tag, Ctx&& ctx, It0&& it, It1&& end) noexcept
          {
             if constexpr (std::is_const_v<std::remove_reference_t<T>>) {
@@ -39,7 +39,7 @@ namespace glz
          }
 
          template <auto Opts, class T, is_context Ctx, class It0, class It1>
-            requires(not Opts.no_header)
+            requires(not has_no_header(Opts))
          GLZ_ALWAYS_INLINE static void op(T&& value, Ctx&& ctx, It0&& it, It1&& end) noexcept
          {
             if constexpr (std::is_const_v<std::remove_reference_t<T>>) {
@@ -150,7 +150,7 @@ namespace glz
          template <auto Opts, is_context Ctx, class It0, class It1>
          GLZ_ALWAYS_INLINE static void op(auto&& value, Ctx&&, It0&& it, It1&&)
          {
-            constexpr auto N = glz::tuple_size_v<meta_t<T>>;
+            constexpr auto N = refl<T>.N;
 
             constexpr auto Length = byte_length<T>();
             uint8_t data[Length];
@@ -158,10 +158,8 @@ namespace glz
             std::memcpy(data, it, Length);
             it += Length;
 
-            for_each<N>([&](auto I) {
-               static constexpr auto item = glz::get<I>(meta_v<T>);
-
-               get_member(value, glz::get<1>(item)) = data[I / 8] & (uint8_t{1} << (7 - (I % 8)));
+            for_each_flatten<N>([&](auto I) {
+               get_member(value, get<I>(refl<T>.values)) = data[I / 8] & (uint8_t{1} << (7 - (I % 8)));
             });
          }
       };
@@ -175,7 +173,7 @@ namespace glz
          static constexpr uint8_t header = tag::number | type | (byte_count<T> << 5);
 
          template <auto Opts>
-            requires(Opts.no_header)
+            requires(has_no_header(Opts))
          GLZ_ALWAYS_INLINE static void op(auto&& value, const uint8_t tag, is_context auto&& ctx, auto&& it,
                                           auto&&) noexcept
          {
@@ -267,12 +265,12 @@ namespace glz
          }
 
          template <auto Opts>
-            requires(not Opts.no_header)
+            requires(not has_no_header(Opts))
          GLZ_ALWAYS_INLINE static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
          {
             const auto tag = uint8_t(*it);
             ++it;
-            op<opt_true<Opts, &opts::no_header>>(value, tag, ctx, it, end);
+            op<no_header_on<Opts>()>(value, tag, ctx, it, end);
          }
       };
 
@@ -285,7 +283,7 @@ namespace glz
          {
             using V = std::underlying_type_t<std::decay_t<T>>;
 
-            if constexpr (Opts.no_header) {
+            if constexpr (has_no_header(Opts)) {
                std::memcpy(&value, it, sizeof(V));
                it += sizeof(V);
             }
@@ -315,7 +313,7 @@ namespace glz
          template <auto Opts>
          GLZ_ALWAYS_INLINE static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&&) noexcept
          {
-            if constexpr (Opts.no_header) {
+            if constexpr (has_no_header(Opts)) {
                using V = std::decay_t<T>;
                std::memcpy(&value, it, sizeof(V));
                it += sizeof(V);
@@ -434,7 +432,7 @@ namespace glz
          static_assert(sizeof(V) == 1);
 
          template <auto Opts>
-            requires(Opts.no_header)
+            requires(has_no_header(Opts))
          GLZ_ALWAYS_INLINE static void op(auto&& value, const uint8_t, is_context auto&& ctx, auto&& it,
                                           auto&& end) noexcept
          {
@@ -449,7 +447,7 @@ namespace glz
          }
 
          template <auto Opts>
-            requires(not Opts.no_header)
+            requires(not has_no_header(Opts))
          GLZ_ALWAYS_INLINE static void op(auto&& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
          {
             constexpr uint8_t header = tag::string;
@@ -694,7 +692,7 @@ namespace glz
 
                            for (auto&& x : value) {
                               const uint8_t number_tag = tag::number | (tag & 0b11111000);
-                              read<binary>::op<opt_true<Opts, &opts::no_header>>(x, number_tag, ctx, it, end);
+                              read<binary>::op<no_header_on<Opts>()>(x, number_tag, ctx, it, end);
                            }
                            return;
                         }
@@ -897,7 +895,7 @@ namespace glz
             }
 
             constexpr uint8_t key_tag = type == 0 ? tag::string : (tag::number | (byte_cnt << 5));
-            read<binary>::op<opt_true<Opts, &opts::no_header>>(value.first, key_tag, ctx, it, end);
+            read<binary>::op<no_header_on<Opts>()>(value.first, key_tag, ctx, it, end);
             read<binary>::op<Opts>(value.second, ctx, it, end);
          }
       };
@@ -953,14 +951,14 @@ namespace glz
                Key key;
                for (size_t i = 0; i < n; ++i) {
                   if constexpr (Opts.partial_read) {
-                     read<binary>::op<opt_true<Opts, &opts::no_header>>(key, key_tag, ctx, it, end);
+                     read<binary>::op<no_header_on<Opts>()>(key, key_tag, ctx, it, end);
                      if (auto element = value.find(key); element != value.end()) {
                         read<binary>::op<Opts>(element->second, ctx, it, end);
                      }
                   }
                   else {
                      // convert the object tag to the key type tag
-                     read<binary>::op<opt_true<Opts, &opts::no_header>>(key, key_tag, ctx, it, end);
+                     read<binary>::op<no_header_on<Opts>()>(key, key_tag, ctx, it, end);
                      read<binary>::op<Opts>(value[key], ctx, it, end);
                   }
                }
@@ -970,13 +968,13 @@ namespace glz
                static thread_local Key key;
                for (size_t i = 0; i < n; ++i) {
                   if constexpr (Opts.partial_read) {
-                     read<binary>::op<opt_true<Opts, &opts::no_header>>(key, key_tag, ctx, it, end);
+                     read<binary>::op<no_header_on<Opts>()>(key, key_tag, ctx, it, end);
                      if (auto element = value.find(key); element != value.end()) {
                         read<binary>::op<Opts>(element->second, ctx, it, end);
                      }
                   }
                   else {
-                     read<binary>::op<opt_true<Opts, &opts::no_header>>(key, key_tag, ctx, it, end);
+                     read<binary>::op<no_header_on<Opts>()>(key, key_tag, ctx, it, end);
                      read<binary>::op<Opts>(value[key], ctx, it, end);
                   }
                }
@@ -1041,7 +1039,7 @@ namespace glz
          template <auto Opts>
          GLZ_ALWAYS_INLINE static void op(auto&&, is_context auto&& ctx, auto&& it, auto&& end) noexcept
          {
-            if constexpr (Opts.no_header) {
+            if constexpr (has_no_header(Opts)) {
                skip_compressed_int(ctx, it, end);
             }
             else {
@@ -1081,19 +1079,14 @@ namespace glz
                ++it;
 
                using V = std::decay_t<T>;
-               constexpr auto N = glz::tuple_size_v<meta_t<V>>;
+               constexpr auto N = refl<V>.N;
                if (int_from_compressed(ctx, it, end) != N) {
                   ctx.error = error_code::syntax_error;
                   return;
                }
 
-               for_each<N>([&](auto I) {
-                  static constexpr auto item = get<I>(meta_v<V>);
-                  using T0 = std::decay_t<decltype(get<0>(item))>;
-                  constexpr bool use_reflection = std::is_member_pointer_v<T0>;
-                  constexpr auto member_index = use_reflection ? 0 : 1;
-                  read<binary>::op<Opts>(get_member(value, get<member_index>(item)), ctx, it, end);
-               });
+               for_each_flatten<N>(
+                  [&](auto I) { read<binary>::op<Opts>(get_member(value, get<I>(refl<V>.values)), ctx, it, end); });
             }
          }
 
@@ -1112,7 +1105,7 @@ namespace glz
 
             ++it;
 
-            static constexpr auto N = reflection_count<T>;
+            static constexpr auto N = refl<T>.N;
 
             static constexpr bit_array<N> all_fields = [] {
                bit_array<N> arr{};
@@ -1177,7 +1170,7 @@ namespace glz
                      }
 
                      std::visit(
-                        [&](auto&& member_ptr) { read<binary>::op<Opts>(get_member(value, member_ptr), ctx, it, end); },
+                        [&](auto&& element) { read<binary>::op<Opts>(get_member(value, element), ctx, it, end); },
                         p->second);
 
                      if (bool(ctx.error)) [[unlikely]] {
@@ -1223,15 +1216,14 @@ namespace glz
             }
             ++it;
 
-            using V = std::decay_t<T>;
-            constexpr auto N = glz::tuple_size_v<meta_t<V>>;
+            constexpr auto N = refl<T>.N;
             if (int_from_compressed(ctx, it, end) != N) {
                ctx.error = error_code::syntax_error;
                return;
             }
 
-            for_each<N>(
-               [&](auto I) { read<binary>::op<Opts>(get_member(value, glz::get<I>(meta_v<V>)), ctx, it, end); });
+            for_each_flatten<N>(
+               [&](auto I) { read<binary>::op<Opts>(get_member(value, get<I>(refl<T>.values)), ctx, it, end); });
          }
       };
 
@@ -1255,7 +1247,7 @@ namespace glz
                const auto n = int_from_compressed(ctx, it, end);
 
                if constexpr (is_std_tuple<T>) {
-                  for_each_short_circuit<N>([&](auto I) {
+                  for_each_short_circuit_flatten<N>([&](auto I) {
                      if (I < n) {
                         read<binary>::op<Opts>(std::get<I>(value), ctx, it, end);
                         return false; // continue
@@ -1264,7 +1256,7 @@ namespace glz
                   });
                }
                else {
-                  for_each_short_circuit<N>([&](auto I) {
+                  for_each_short_circuit_flatten<N>([&](auto I) {
                      if (I < n) {
                         read<binary>::op<Opts>(glz::get<I>(value), ctx, it, end);
                         return false; // continue
@@ -1280,10 +1272,10 @@ namespace glz
                }
 
                if constexpr (is_std_tuple<T>) {
-                  for_each<N>([&](auto I) { read<binary>::op<Opts>(std::get<I>(value), ctx, it, end); });
+                  for_each_flatten<N>([&](auto I) { read<binary>::op<Opts>(std::get<I>(value), ctx, it, end); });
                }
                else {
-                  for_each<N>([&](auto I) { read<binary>::op<Opts>(glz::get<I>(value), ctx, it, end); });
+                  for_each_flatten<N>([&](auto I) { read<binary>::op<Opts>(glz::get<I>(value), ctx, it, end); });
                }
             }
          }

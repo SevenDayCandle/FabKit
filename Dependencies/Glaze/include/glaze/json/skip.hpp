@@ -10,13 +10,13 @@ namespace glz::detail
    template <opts Opts>
    void skip_object(is_context auto&& ctx, auto&& it, auto&& end) noexcept
    {
-      if constexpr (!Opts.force_conformance) {
+      if constexpr (!Opts.validate_skipped) {
          ++it;
          skip_until_closed<Opts, '{', '}'>(ctx, it, end);
       }
       else {
          ++it;
-         GLZ_SKIP_WS;
+         GLZ_SKIP_WS();
          if (*it == '}') {
             ++it;
             return;
@@ -29,16 +29,16 @@ namespace glz::detail
             skip_string<Opts>(ctx, it, end);
             if (bool(ctx.error)) [[unlikely]]
                return;
-            GLZ_SKIP_WS;
-            GLZ_MATCH_COLON;
-            GLZ_SKIP_WS;
+            GLZ_SKIP_WS();
+            GLZ_MATCH_COLON();
+            GLZ_SKIP_WS();
             skip_value<Opts>(ctx, it, end);
             if (bool(ctx.error)) [[unlikely]]
                return;
-            GLZ_SKIP_WS;
+            GLZ_SKIP_WS();
             if (*it != ',') break;
             ++it;
-            GLZ_SKIP_WS;
+            GLZ_SKIP_WS();
          }
          match<'}'>(ctx, it);
       }
@@ -47,13 +47,13 @@ namespace glz::detail
    template <opts Opts>
    void skip_array(is_context auto&& ctx, auto&& it, auto&& end) noexcept
    {
-      if constexpr (!Opts.force_conformance) {
+      if constexpr (!Opts.validate_skipped) {
          ++it;
          skip_until_closed<Opts, '[', ']'>(ctx, it, end);
       }
       else {
          ++it;
-         GLZ_SKIP_WS;
+         GLZ_SKIP_WS();
          if (*it == ']') {
             ++it;
             return;
@@ -62,10 +62,10 @@ namespace glz::detail
             skip_value<Opts>(ctx, it, end);
             if (bool(ctx.error)) [[unlikely]]
                return;
-            GLZ_SKIP_WS;
+            GLZ_SKIP_WS();
             if (*it != ',') break;
             ++it;
-            GLZ_SKIP_WS;
+            GLZ_SKIP_WS();
          }
          match<']'>(ctx, it);
       }
@@ -74,9 +74,9 @@ namespace glz::detail
    template <opts Opts>
    void skip_value(is_context auto&& ctx, auto&& it, auto&& end) noexcept
    {
-      if constexpr (!Opts.force_conformance) {
-         if constexpr (!Opts.ws_handled) {
-            GLZ_SKIP_WS;
+      if constexpr (!Opts.validate_skipped) {
+         if constexpr (!has_ws_handled(Opts)) {
+            GLZ_SKIP_WS();
          }
          while (true) {
             switch (*it) {
@@ -119,8 +119,8 @@ namespace glz::detail
          }
       }
       else {
-         if constexpr (!Opts.ws_handled) {
-            GLZ_SKIP_WS;
+         if constexpr (!has_ws_handled(Opts)) {
+            GLZ_SKIP_WS();
          }
          switch (*it) {
          case '{': {

@@ -1,7 +1,6 @@
 export module fbc.FUtil;
 
 import fbc.KeyedItem;
-import fbc.ISerializable;
 import std;
 
 namespace fbc {
@@ -91,7 +90,6 @@ namespace fbc {
 	export template<typename It, typename T> concept c_set = c_itr<T, It>&& requires(It a, T v) {
 		{ a.find(v) } -> std::convertible_to<typename It::iterator>;
 	};
-	export template<typename T> concept c_serial = std::is_base_of_v<ISerializable, T>;
 	export template<typename T> concept c_str = requires(T t) {
 		std::string_view{ t };
 	};
