@@ -4,9 +4,8 @@ import fbc.FUtil;
 
 namespace fbc {
 	export struct ItemListing {
-		str content;
 		str id;
-		int count;
-		int upgrades;
+		int count = 1;
+		int upgrades = 0;
 	};
 }

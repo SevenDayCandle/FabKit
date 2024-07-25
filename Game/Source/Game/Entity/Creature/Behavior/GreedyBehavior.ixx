@@ -10,7 +10,7 @@ namespace fbc {
 	public:
 		GreedyBehavior(): Behavior(ID) {}
 
-		static constexpr strv ID = "GreedyBehavior";
+		static constexpr strv ID = "GREEDY";
 		static const GreedyBehavior instance;
 
 		void act(Creature& source) override;

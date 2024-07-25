@@ -22,7 +22,7 @@ namespace fbc {
 		inline static C* get(const pair<str,str>& idSearch) { return getOrDefault(idSearch.first, idSearch.second, nullptr); }
 		inline static C* get(strv idSearch) {
 			size_t pos = idSearch.find(':');
-			return getOrDefault(idSearch.substr(0, pos), idSearch.substr(pos + 1), nullptr);
+			return pos > 0 ? getOrDefault(idSearch.substr(0, pos), idSearch.substr(pos + 1), nullptr) : nullptr;
 		}
 		inline static C* get(strv contentID, strv name) { return getOrDefault(contentID, name, nullptr); }
 

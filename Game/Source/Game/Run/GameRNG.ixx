@@ -33,6 +33,7 @@ namespace fbc {
 		return *this;
 	}
 
+	// Returns true with a chance represented by a decimal between 0 and 1
 	bool GameRNG::chance(float chance)
 	{
 		++counter;
@@ -40,6 +41,7 @@ namespace fbc {
 		return dist(rng);
 	}
 
+	// Returns a random value between begin and end, inclusive on both ends
 	float GameRNG::random(float begin, float end)
 	{
 		++counter;
@@ -47,6 +49,7 @@ namespace fbc {
 		return dist(rng);
 	}
 
+	// Returns a random value between begin and end, inclusive on both ends
 	int GameRNG::random(int begin, int end)
 	{
 		++counter;

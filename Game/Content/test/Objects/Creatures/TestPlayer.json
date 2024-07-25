@@ -1,7 +1,6 @@
 {
-  "behavior": "GREEDY",
   "energyMax": 10,
-  "health": 150,
+  "health": 200,
   "cards": [
     {
       "id": "test:TestCard"

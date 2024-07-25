@@ -11,7 +11,7 @@ namespace fbc {
 	public:
 		BossRoom() : RunRoom::RoomType(ID, 0) {}
 
-		static constexpr strv ID = "BossRoom";
+		static constexpr strv ID = "BOSS";
 		static const BossRoom instance;
 
 		inline virtual bool isEncounterValid(RunEncounter* encounter) override { return encounter->data.boss;}

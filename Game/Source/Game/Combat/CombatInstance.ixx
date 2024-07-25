@@ -48,7 +48,10 @@ namespace fbc {
 		vec<int> distances;
 		vec<uptr<FieldObject>> fieldObjects;
 
+		inline int getSquareIndex(int col, int row) const {return col + fieldColumns * row;}
+
 		int* getDistanceSquare(int col, int row);
+		int getSquareIndexAllowRandom(int col, int row);
 		void fillDistancesImpl(int col, int row, int dist);
 	};
 }

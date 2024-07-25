@@ -43,7 +43,7 @@ namespace fbc {
 			int targetSizeXUp = 0;
 			int targetSizeY = 1;
 			int targetSizeYUp = 0;
-			pair<str,str> group;
+			str group;
 			str type;
 			str rarity;
 			vec<str> effects;
@@ -123,7 +123,7 @@ namespace fbc {
 		fields.targetSizeXUp = data.target.targetSizeXUp;
 		fields.targetSizeY = data.target.targetSizeY;
 		fields.targetSizeYUp = data.target.targetSizeYUp;
-		fields.group = data.group ? data.group->toPair() : pair<str,str>();
+		fields.group = data.group ? data.group->toString() : "";
 		fields.type = data.type ? data.type->id : "";
 		fields.rarity = data.rarity ? data.rarity->id : "";
 		fields.tags = data.tags;

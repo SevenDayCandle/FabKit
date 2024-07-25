@@ -6,9 +6,12 @@ import fbc.Creature;
 import fbc.CreatureData;
 import fbc.EncounterCreatureEntry;
 import fbc.FieldObject;
+import fbc.GameRun;
 import fbc.FUtil;
 import fbc.IActionable;
+import fbc.RunEncounter;
 import fbc.SavedCreatureEntry;
+import sdl;
 import std;
 
 module fbc.CombatInstance;
@@ -35,33 +38,40 @@ namespace fbc {
 
 		// Creates field members based on the room parameters
 		// TODO handle other fieldobject types besides creature
+		int squarePos;
 		for (EncounterCreatureEntry& entry : encounter.data.creatures) {
 			CreatureData* data = CreatureData::get(entry.id);
 			if (data) {
-				Creature::Behavior* behavior = Creature::Behavior::get(data->data.defaultBehavior);
-				CombatSquare* square = getSquare(entry.posCol, entry.posRow);
+				Creature::Behavior* behavior = Creature::Behavior::get(data->data.behavior);
+				squarePos = getSquareIndexAllowRandom(entry.posCol, entry.posRow);
 
-				if (behavior && square) {
+				// If square is occupied, find an unoccupied one
+				CombatSquare* square = squarePos < squares.size() ? &squares[squarePos] : nullptr;
+				while (squarePos < squares.size() - 1 && square->getOccupant() != nullptr) {
+					squarePos += 1;
+					square = &squares[squarePos];
+				}
+
+				if (square) {
 					uptr<Creature> pt = make_unique<Creature>(*data, behavior, entry.faction, entry.upgrades);
 					Creature& creature = *pt;
 					fieldObjects.push_back(move(pt));
 					square->setOccupant(&creature);
-					creature.initialize(data->data.defaultCards, data->data.passives);
+					creature.initialize(data->data.cards, data->data.passives);
+				}
+				else {
+					sdl::logInfo("Failed to allocate creature %s on combat grid", entry.id.data());
 				}
 			}
 		}
 
 		// Places player characters on the field based on specified available spots in the room. If available spots are not enough, just stack horizontally (starting from the map center if there were no spots period)
-		int startCol;
-		int startRow;
 		int index = 0;
 		if (encounter.data.startPos.size() > index) {
-			startCol = encounter.data.startPos[index].first;
-			startRow = encounter.data.startPos[index].second;
+			squarePos = getSquareIndexAllowRandom(encounter.data.startPos[index].first, encounter.data.startPos[index].second);
 		}
 		else {
-			startCol = encounter.data.fieldCols / 2;
-			startRow = encounter.data.fieldRows / 2;
+			squarePos = getSquareIndex(encounter.data.fieldCols / 2, encounter.data.fieldRows / 2);
 		}
 
 		for (SavedCreatureEntry& entry : runCreatures) {
@@ -70,7 +80,13 @@ namespace fbc {
 				CreatureData* data = CreatureData::get(entry.content, entry.id);
 				if (data) {
 					Creature::Behavior* behavior = Creature::Behavior::get(entry.behaviorId);
-					CombatSquare* square = getSquare(startCol, startRow);
+
+					// If square is occupied, find an unoccupied one
+					CombatSquare* square = squarePos < squares.size() ? &squares[squarePos] : nullptr;
+					while (squarePos < squares.size() - 1 && square->getOccupant() != nullptr) {
+						squarePos += 1;
+						square = &squares[squarePos];
+					}
 
 					if (square) {
 						uptr<Creature> pt = make_unique<Creature>(*data, behavior, playerFaction, entry.upgrades, entry.health);
@@ -79,13 +95,16 @@ namespace fbc {
 						square->setOccupant(&creature);
 						creature.initialize(entry.cards, entry.passives);
 					}
+					else {
+						sdl::logInfo("Failed to allocate creature %s on combat grid", entry.id.data());
+					}
+
 					++index;
 					if (encounter.data.startPos.size() > index) {
-						startCol = encounter.data.startPos[index].first;
-						startRow = encounter.data.startPos[index].second;
+						squarePos = getSquareIndexAllowRandom(encounter.data.startPos[index].first, encounter.data.startPos[index].second);
 					}
 					else {
-						startCol = startCol + 1;
+						squarePos += 1;
 					}
 				}
 			}
@@ -211,14 +230,22 @@ namespace fbc {
 	// Get the distance to the col/row position from the source. Return null if invalid
 	int* CombatInstance::getDistanceSquare(int col, int row)
 	{
-		int targetSquare = col + fieldColumns * row;
+		int targetSquare = getSquareIndex(col, row);
 		return (targetSquare < distances.size() && targetSquare >= 0 ? &distances[targetSquare] : nullptr);
+	}
+
+	// Wrapper around getSquareIndex that treats negative values as random
+	int CombatInstance::getSquareIndexAllowRandom(int col, int row)
+	{
+		int squareCol = col < 0 ? GameRun::current->rngEncounter.random(0, fieldColumns - 1) : col;
+		int squareRow = row < 0 ? GameRun::current->rngEncounter.random(0, fieldRows - 1) : row;
+		return getSquareIndex(squareCol, squareRow);
 	}
 
 	// Get the square at the col/row position
 	CombatSquare* CombatInstance::getSquare(int col, int row)
 	{
-		int targetSquare = col + fieldColumns * row;
+		int targetSquare = getSquareIndex(col, row);
 		return (targetSquare < squares.size() && targetSquare >= 0 ? &squares[targetSquare] : nullptr);
 	}
 }

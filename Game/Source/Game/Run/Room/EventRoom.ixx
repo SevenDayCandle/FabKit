@@ -11,7 +11,7 @@ namespace fbc {
 	public:
 		EventRoom() : RunRoom::RoomType(ID, 25) {}
 
-		static constexpr strv ID = "EventRoom";
+		static constexpr strv ID = "EVENT";
 		static const EventRoom instance;
 	};
 

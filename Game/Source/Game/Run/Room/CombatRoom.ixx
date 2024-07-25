@@ -11,7 +11,7 @@ namespace fbc {
 	public:
 		CombatRoom(): RunRoom::RoomType(ID, 45) {}
 
-		static constexpr strv ID = "CombatRoom";
+		static constexpr strv ID = "COMBAT";
 		static const CombatRoom instance;
 
 		void onEnter() override;

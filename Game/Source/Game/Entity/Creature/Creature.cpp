@@ -169,20 +169,20 @@ namespace fbc {
 	// Set up cards and passives for this creature
 	void Creature::initialize(vec<ItemListing>& setupCards, vec<ItemListing>& setupPassives)
 	{
-		for (ItemListing& dataPair : setupCards) {
-			CardData* data = CardData::get(dataPair.content, dataPair.id);
+		for (ItemListing& listing : setupCards) {
+			CardData* data = CardData::get(listing.id);
 			if (data) {
-				drawPile.push_back(make_unique<Card>(*data, dataPair.upgrades));
+				drawPile.push_back(make_unique<Card>(*data, listing.upgrades));
 			}
 		}
 
 		// TODO shuffle draw pile based on rng
 
 		// TODO passives
-		for (ItemListing& dataPair : setupPassives) {
-			PassiveData* data = PassiveData::get(dataPair.content, dataPair.id);
+		for (ItemListing& listing : setupPassives) {
+			PassiveData* data = PassiveData::get(listing.id);
 			if (data) {
-				uptr<Passive> pa = make_unique<Passive>(*data, dataPair.upgrades);
+				uptr<Passive> pa = make_unique<Passive>(*data, listing.upgrades);
 				passives.push_back(move(pa));
 			}
 		}
