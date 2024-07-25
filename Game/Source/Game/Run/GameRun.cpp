@@ -1,6 +1,7 @@
 module;
 
 import fbc.CombatInstance;
+import fbc.CombatScreen;
 import fbc.FUtil;
 import fbc.RunEncounter;
 import fbc.RunRoom;
@@ -108,7 +109,6 @@ namespace fbc {
 		if (encounter) {
 			combatInstance = make_unique<CombatInstance>();
 			combatInstance->initialize(*encounter, creatures, faction);
-			// TODO open combat screen (or overlay)
 		}
 		else {
 			sdl::logInfo("Tried to start combat with no encounter.");

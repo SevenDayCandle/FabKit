@@ -29,7 +29,7 @@ namespace fbc {
 
 	void UIButton::renderImpl() {
 		UIInteractable::renderImpl();
-		if (hb->isHovered()) {
+		if (hb->isHovered() && interactable) {
 			image.draw(hb.get(), sdl::BlendMode::SDL_BLENDMODE_ADD, color, origin, rotation, flip);
 		}
 	}

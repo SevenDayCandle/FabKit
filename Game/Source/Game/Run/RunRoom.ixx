@@ -17,7 +17,9 @@ namespace fbc {
 			const bool allowRepeat;
 			const int rate;
 
+
 			virtual bool isEncounterValid(RunEncounter* encounter) { return true; }
+			virtual void onAfterClick() {}
 			virtual void onEnter() {}
 		};
 
@@ -28,6 +30,7 @@ namespace fbc {
 		int row;
 		RoomType& type;
 
+		inline void onAfterClick() { type.onAfterClick(); }
 		inline void onEnter() { type.onEnter(); };
 
 		RunEncounter* getEncounter(RunZone& zone, GameRNG& rng);

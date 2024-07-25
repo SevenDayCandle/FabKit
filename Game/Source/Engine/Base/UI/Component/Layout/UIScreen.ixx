@@ -3,12 +3,14 @@ export module fbc.UIScreen;
 import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.IOverlay;
+import fbc.ScreenSizeHitbox;
 import fbc.UICanvas;
 import std;
 
 namespace fbc {
 	export class UIScreen : public UICanvas {
 	public:
+		UIScreen() : UICanvas(new ScreenSizeHitbox()) {}
 		UIScreen(Hitbox* hb) : UICanvas(hb) {}
 		UIScreen(uptr<Hitbox>&& hb) : UICanvas(std::move(hb)) {}
 

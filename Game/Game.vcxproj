@@ -171,6 +171,10 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Base\UI\Tooltip\GenericTip.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Game\Content\DynamicContent.ixx">
       <SubType>
       </SubType>
@@ -458,7 +462,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       </SubType>
     </ClCompile>
     <ClCompile Include="Source\Game\Entity\Card\CardData.ixx" />
-    <ClCompile Include="Source\Game\Entity\Card\CardRenderable.ixx">
+    <ClCompile Include="Source\Game\UI\Screens\Combat\CardRenderable.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -552,6 +556,12 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Game\UI\Screens\Combat\CombatScreen.cpp" />
+    <ClCompile Include="Source\Game\UI\Screens\Combat\CombatScreen.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\UI\Screens\Run\RunScreen.cpp" />
     <ClCompile Include="Source\Game\UI\Screens\Run\RunScreen.ixx">
       <SubType>
       </SubType>

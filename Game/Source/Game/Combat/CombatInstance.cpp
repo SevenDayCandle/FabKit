@@ -17,11 +17,8 @@ import std;
 module fbc.CombatInstance;
 
 namespace fbc {
-	/*
- * 1. Generates squares based on the given dimensions
- */
 
-
+	// Sets up a combat instance based on the given data
 	void CombatInstance::initialize(RunEncounter& encounter, vec<SavedCreatureEntry>& runCreatures, int playerFaction)
 	{
 		// Generates squares based on the given dimensions
@@ -58,6 +55,7 @@ namespace fbc {
 					fieldObjects.push_back(move(pt));
 					square->setOccupant(&creature);
 					creature.initialize(data->data.cards, data->data.passives);
+					sdl::logInfo("Added creature %s on combat grid to square %d", entry.id.data(), squarePos);
 				}
 				else {
 					sdl::logInfo("Failed to allocate creature %s on combat grid", entry.id.data());
@@ -94,6 +92,7 @@ namespace fbc {
 						fieldObjects.push_back(move(pt));
 						square->setOccupant(&creature);
 						creature.initialize(entry.cards, entry.passives);
+						sdl::logInfo("Added creature %s on combat grid to square %d", entry.id.data(), squarePos);
 					}
 					else {
 						sdl::logInfo("Failed to allocate creature %s on combat grid", entry.id.data());
@@ -149,8 +148,10 @@ namespace fbc {
 		}
 	}
 
+	// Calculate the distance from this particular square to the source
 	void CombatInstance::fillDistancesImpl(int col, int row, int dist)
 	{
+		// TODO check for square passability
 		int* sq = getDistanceSquare(col, row);
 		if (sq && *sq > -1) {
 			*sq = dist;
@@ -247,5 +248,12 @@ namespace fbc {
 	{
 		int targetSquare = getSquareIndex(col, row);
 		return (targetSquare < squares.size() && targetSquare >= 0 ? &squares[targetSquare] : nullptr);
+	}
+
+	// Get the distance from the distance source to the given square. Return -1 if unreachable
+	int CombatInstance::getDistanceTo(CombatSquare* square)
+	{
+		int* distance = getDistanceSquare(square->col, square->row);
+		return distance != nullptr ? *distance : -1;
 	}
 }

@@ -22,12 +22,15 @@ namespace fbc {
 		inline IActionable* getCurrentAction() const { return currentAction; }
 		inline int getCurrentRound() const { return totalActionTime / roundTime; }
 		inline int getTotalActionTime() const { return totalActionTime; }
+		inline ref_view<const vec<CombatSquare>> getSquares() const { return std::views::all(squares); }
+		inline ref_view<const vec<int>> getDistances() const { return std::views::all(distances); }
 
 		bool modifyTurnOrder(const FieldObject& target, int diff);
 		bool nextTurn();
 		bool update();
 		CombatSquare* getSquare(int col, int row);
 		int getDistanceTo(CombatSquare* square);
+		int* getDistanceSquare(int col, int row);
 		vec<CombatSquare*> findShortestPath(CombatSquare* targ);
 		void fillDistances(CombatSquare* source);
 		void initialize(RunEncounter& encounter, vec<SavedCreatureEntry>& runCreatures, int playerFaction);
@@ -50,7 +53,6 @@ namespace fbc {
 
 		inline int getSquareIndex(int col, int row) const {return col + fieldColumns * row;}
 
-		int* getDistanceSquare(int col, int row);
 		int getSquareIndexAllowRandom(int col, int row);
 		void fillDistancesImpl(int col, int row, int dist);
 	};
