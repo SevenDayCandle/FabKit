@@ -52,7 +52,7 @@ namespace fbc {
 				if (square) {
 					uptr<Creature> pt = make_unique<Creature>(*data, behavior, entry.faction, entry.upgrades);
 					Creature& creature = *pt;
-					fieldObjects.push_back(move(pt));
+					occupants.push_back(move(pt));
 					square->setOccupant(&creature);
 					creature.initialize(data->data.cards, data->data.passives);
 					sdl::logInfo("Added creature %s on combat grid to square %d", entry.id.data(), squarePos);
@@ -89,7 +89,7 @@ namespace fbc {
 					if (square) {
 						uptr<Creature> pt = make_unique<Creature>(*data, behavior, playerFaction, entry.upgrades, entry.health);
 						Creature& creature = *pt;
-						fieldObjects.push_back(move(pt));
+						occupants.push_back(move(pt));
 						square->setOccupant(&creature);
 						creature.initialize(entry.cards, entry.passives);
 						sdl::logInfo("Added creature %s on combat grid to square %d", entry.id.data(), squarePos);

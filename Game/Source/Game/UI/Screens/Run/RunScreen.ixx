@@ -13,7 +13,7 @@ import fbc.FUtil;
 import std;
 
 namespace fbc {
-	constexpr float ROOM_OFFSET = 300;
+	constexpr float TILE_OFFSET = 300;
 	constexpr float ROOM_SIZE = 128;
 
 	export class RunScreen : public UIScreen {

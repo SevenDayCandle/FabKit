@@ -18,6 +18,7 @@ namespace fbc {
             }
         }
 
+        inline bool loaded() const { return texture != nullptr; }
         inline const sdl::RectF* getBaseRec() const override { return &dim; }
         inline float getHeight() const override { return dim.h; }
         inline float getWidth() const override { return dim.w; }

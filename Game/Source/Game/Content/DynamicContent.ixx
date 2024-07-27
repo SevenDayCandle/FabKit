@@ -14,6 +14,7 @@ import fbc.FMusic;
 import fbc.FSound;
 import fbc.FTexture;
 import fbc.FUtil;
+import fbc.Keyword;
 import fbc.PassiveData;
 import fbc.RunEncounter;
 import fbc.RunZone;
@@ -22,14 +23,10 @@ import sdl;
 import std;
 
 namespace fbc {
-	export constexpr strv FILE_ENCOUNTER = "Objects/Encounters.json";
-	export constexpr strv FILE_ZONE = "Objects/Zones.json";
+	export constexpr strv PATH_OBJECTS = "Objects";
+	export constexpr strv FILE_ENCOUNTER = "Encounters.json";
+	export constexpr strv FILE_ZONE = "Zones.json";
 	export constexpr strv MANIFEST = "manifest.json";
-	export constexpr strv PATH_CARD = "Objects/Cards";
-	export constexpr strv PATH_CREATURE = "Objects/Creatures";
-	export constexpr strv PATH_KEYWORDS = "Objects/Keywords";
-	export constexpr strv PATH_PASSIVE = "Objects/Passives";
-	export constexpr strv PATH_STATUS = "Objects/Statuses";
 
 	export class DynamicContent : public BaseContent {
 	public:
@@ -44,11 +41,11 @@ namespace fbc {
 		inline FMusic* getMusic(strv key) override { return music.get(key); }
 		inline FSound* getSound(strv key) override { return sounds.get(key); }
 		inline FTexture* getTexture(strv key) override { return images.get(key); }
-		inline void processCards() { setupFolder(PATH_CARD, [this](const path& entry) {processCard(entry); }); }
-		inline void processCreatures() { setupFolder(PATH_CREATURE, [this](const path& entry) {processCreature(entry); }); }
-		inline void processKeywords() { setupFolder(PATH_KEYWORDS, [this](const path& entry) {processKeyword(entry); }); }
-		inline void processPassives() { setupFolder(PATH_PASSIVE, [this](const path& entry) {processKeyword(entry); }); }
-		inline void processStatuses() { setupFolder(PATH_STATUS, [this](const path& entry) {processKeyword(entry); }); }
+		inline void processCards() { setupContentFolder(PATH_CARD, [this](const path& entry) {processCard(entry); }); }
+		inline void processCreatures() { setupContentFolder(PATH_CREATURE, [this](const path& entry) {processCreature(entry); }); }
+		inline void processKeywords() { setupContentFolder(PATH_KEYWORDS, [this](const path& entry) {processKeyword(entry); }); }
+		inline void processPassives() { setupContentFolder(PATH_PASSIVE, [this](const path& entry) {processKeyword(entry); }); }
+		inline void processStatuses() { setupContentFolder(PATH_STATUS, [this](const path& entry) {processKeyword(entry); }); }
 
 
 		void dispose() override;
@@ -67,7 +64,7 @@ namespace fbc {
 		void processPassive(const path& entry);
 		void processStatus(const path& entry);
 		void processZones();
-		void setupFolder(strv base, const func<void(const path&)>& onRead);
+		void setupContentFolder(strv base, const func<void(const path&)>& onRead);
 	};
 
 	void DynamicContent::dispose() {
@@ -135,7 +132,7 @@ namespace fbc {
 	// Attempt to parse a encounter entry
 	void DynamicContent::processEncounters()
 	{
-		path file = contentFolder / FILE_ENCOUNTER;
+		path file = contentFolder / PATH_OBJECTS / FILE_ENCOUNTER;
 		if (std::filesystem::exists(file)) {
 			umap<str, RunEncounter::Data> zones;
 			str fn = file.string();
@@ -161,7 +158,7 @@ namespace fbc {
 	// Attempt to parse a zone entry
 	void DynamicContent::processZones()
 	{
-		path file = contentFolder / FILE_ZONE;
+		path file = contentFolder / PATH_OBJECTS / FILE_ZONE;
 		if (std::filesystem::exists(file)) {
 			umap<str, RunZone::Data> zones;
 			str fn = file.string();
@@ -178,9 +175,9 @@ namespace fbc {
 		}
 	}
 
-	void DynamicContent::setupFolder(strv base, const func<void(const path&)>& onRead)
+	void DynamicContent::setupContentFolder(strv base, const func<void(const path&)>& onRead)
 	{
-		path folder = contentFolder / base;
+		path folder = contentFolder / PATH_OBJECTS / base;
 		if (std::filesystem::exists(folder)) {
 			for (const dir_entry& entry : std::filesystem::directory_iterator(folder)) {
 				if (entry.is_regular_file()) {

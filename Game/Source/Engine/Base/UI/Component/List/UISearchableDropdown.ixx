@@ -6,27 +6,29 @@ import fbc.FFont;
 import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.IDrawable;
-import fbc.ScreenManager;
-import fbc.TextInfo;
 import fbc.ITextInputter;
+import fbc.ScaleHitbox;
+import fbc.ScreenManager;
+import fbc.SelectView;
+import fbc.TextInfo;
 import fbc.UIDropdown;
 import fbc.UIEntry;
 import fbc.UIInteractable;
 import fbc.UISelectorList;
-import fbc.ScaleHitbox;
 import sdl;
 import std;
 
 namespace fbc {
 	export template <typename T> class UISearchableDropdown : public UIDropdown<T>, public ITextInputter {
 	public:
+
 		UISearchableDropdown(Hitbox* hb,
 			UISelectorList<T>* menu,
 			IDrawable& image = cct.images.panel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
-			func<str(vec<const UIEntry<T>*>)>& buttonLabelFunc = {}
+			func<str(EntryView<T>&)>& buttonLabelFunc = {}
 		) : UIDropdown<T>(hb, menu, image, arrow, clear, textFont, buttonLabelFunc) {
 			initSearchable();
 		}
@@ -36,7 +38,7 @@ namespace fbc {
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
-			func<str(vec<const UIEntry<T>*>)>& buttonLabelFunc = {}
+			func<str(EntryView<T>&)>& buttonLabelFunc = {}
 		) : UIDropdown<T>(hb, std::move(menu), image, arrow, clear, textFont, buttonLabelFunc) {
 			initSearchable();
 		}
@@ -53,7 +55,7 @@ namespace fbc {
 
 		static uptr<UISearchableDropdown> multiSearch(Hitbox* hb,
 			func<str(const T&)> labelFunc = futil::toString<T>,
-			func<str(vec<const UIEntry<T>*>)> buttonLabelFunc = {},
+			func<str(EntryView<T>&)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
 			IDrawable& background = cct.images.darkPanelRound,
@@ -62,7 +64,7 @@ namespace fbc {
 			IDrawable& clear = cct.images.uiClearSmall);
 		static uptr<UISearchableDropdown> singleSearch(Hitbox* hb,
 			func<str(const T&)> labelFunc = futil::toString<T>,
-			func<str(vec<const UIEntry<T>*>)> buttonLabelFunc = {},
+			func<str(EntryView<T>&)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
 			IDrawable& background = cct.images.darkPanelRound,
@@ -72,7 +74,7 @@ namespace fbc {
 	protected:
 		void updateCaretPos() override;
 
-		virtual void onSelectionUpdate(vec<const UIEntry<T>*>& items) override;
+		virtual void onSelectionUpdate(EntryView<T>& items) override;
 	private:
 		str lowerBuffer;
 
@@ -127,7 +129,7 @@ namespace fbc {
 	}
 
 	// Directly set the textInfo text to avoid updating the display textureCache and hiding your text input
-	template<typename T> void UISearchableDropdown<T>::onSelectionUpdate(vec<const UIEntry<T>*>& items) {
+	template<typename T> void UISearchableDropdown<T>::onSelectionUpdate(EntryView<T>& items) {
 		if (this->isOpen()) {
 			TextInfo::text = this->getButtonText(items);
 		}
@@ -181,7 +183,7 @@ namespace fbc {
 	}
 
 	template<typename T> uptr<UISearchableDropdown<T>> UISearchableDropdown<T>::multiSearch(
-		Hitbox* hb, func<str(const T&)> labelFunc, func<str(vec<const UIEntry<T>*>)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
+		Hitbox* hb, func<str(const T&)> labelFunc, func<str(EntryView<T>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
 	{
 		return std::make_unique<UISearchableDropdown<T>>(
 			hb,
@@ -195,7 +197,7 @@ namespace fbc {
 	}
 
 	template<typename T> uptr<UISearchableDropdown<T>> UISearchableDropdown<T>::singleSearch(
-		Hitbox* hb, func<str(const T&)> labelFunc, func<str(vec<const UIEntry<T>*>)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
+		Hitbox* hb, func<str(const T&)> labelFunc, func<str(EntryView<T>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
 	{
 		return std::make_unique<UISearchableDropdown<T>>(
 			hb,

@@ -7,8 +7,10 @@ import fbc.ConfigNumeric;
 import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.RelativeHitbox;
+import fbc.SelectView;
 import fbc.UICanvas;
 import fbc.UIDropdown;
+import fbc.UIEntry;
 import fbc.UINumberInput;
 import fbc.UITextInput;
 import fbc.UISlider;
@@ -94,7 +96,7 @@ namespace fbc {
 		SettingsDialogCache<T>& cache = static_cast<SettingsDialogCache<T>&>(*confs.emplace_back(std::make_unique<SettingsDialogCache<T>>(conf)));
 		UIDropdown<T>& dr = stackElementYDir(UIDropdown<T>::singleList(new RelativeHitbox(*hb, xOff, 0, hb->getScaleOffsetSizeX() * 0.8f, 100), labelFunc), 8, getOffsetFromLast());
 		dr.setItems(items)
-			.setOnChange([&cache](vec<const T*> res) { if (res.size() > 0) cache.value = *res[0]; })
+			.setOnChange([&cache](EntryView<T>& res) { if (res.size() > 0) cache.value = *res.begin(); })
 			.withLabel(name, cct.fontBold(), -xOff, 25);
 		dr.updateSingle(conf.get());
 		if (min > 0) {
@@ -109,7 +111,7 @@ namespace fbc {
 		SettingsDialogCache<T>& cache = static_cast<SettingsDialogCache<T>&>(*confs.emplace_back(std::make_unique<SettingsDialogCache<T>>(conf)));
 		UIDropdown<U>& dr = stackElementYDir(UIDropdown<U>::singleList(new RelativeHitbox(*hb, xOff, 0, hb->getScaleOffsetSizeX() * 0.8f, 100), labelFunc), 8, getOffsetFromLast());
 		dr.setItems(items)
-			.setOnChange([&cache, convFunc](vec<const U*> res) { if (res.size() > 0) cache.value = convFunc(res[0]); })
+			.setOnChange([&cache, convFunc](EntryView<T>& res) { if (res.size() > 0) cache.value = convFunc(res.begin()); })
 			.withLabel(name, cct.fontBold(), -xOff, 25);
 		dr.updateSingle(conf.get());
 		if (min > 0) {

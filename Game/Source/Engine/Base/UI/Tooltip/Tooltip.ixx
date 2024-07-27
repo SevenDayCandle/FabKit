@@ -4,39 +4,32 @@ import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FUtil;
-import fbc.ScreenManager;
+import fbc.GenericTip;
 import fbc.UIBase;
 import fbc.IDrawable;
-import fbc.IOverlay;
 import fbc.TextInfo;
 import sdl;
 import std;
 
 namespace fbc {
-	export constexpr float DEFAULT_SIZE = 100;
 	export constexpr float PADDING = 24;
-	export constexpr float QUEUE_OFFSET_X = 36;
-	export constexpr float QUEUE_OFFSET_Y = 18;
 
-	export class Tooltip : public TextInfo, public IOverlay {
+	export class Tooltip : public TextInfo, public GenericTip {
 	public:
-		Tooltip(strv text, FFont& font = cct.fontSmall(), float boxSize = DEFAULT_SIZE, IDrawable& background = cct.images.darkPanelRound) : TextInfo(font, text), bounds(0, 0, boxSize, 0), background(background) {
-			updateBounds();
-		}
+		Tooltip(strv text, FFont& font = cct.fontSmall(), float boxSize = DEFAULT_SIZE, IDrawable& background = cct.images.darkPanelRound) : TextInfo(font, text), GenericTip(boxSize), background(background) {}
+		virtual ~Tooltip() override = default;
 
 		inline virtual void update() override {}
 
-		Tooltip& setBoxSize(float boxSize);
 		virtual void open() override;
-		virtual void queue(float x = sdl::mouseGetX() + cfg.renderScale(QUEUE_OFFSET_X), float y = sdl::mouseGetY() + cfg.renderScale(QUEUE_OFFSET_Y));
+		virtual void refreshDimensions() override;
 		virtual void render() override;
 	protected:
 		IDrawable& background;
-		sdl::RectF bounds;
 
 		inline virtual int getLimitWidth() override { return bounds.w - cfg.renderScale(PADDING * 2); }
 
-		virtual void updateBounds();
+		virtual void updateBounds() override;
 		void updateCache(strv text, const sdl::Color& color, const sdl::Color& colorOutline) override;
 	};
 
@@ -48,14 +41,9 @@ namespace fbc {
 		}
 	}
 
-	// Queue this tooltip for rendering at a specific position
-	void Tooltip::queue(float x, float y)
+	void Tooltip::refreshDimensions()
 	{
-		float xBound = cfg.getScreenXSize();
-		float yBound = cfg.getScreenYSize();
-		bounds.x = x + bounds.w >= xBound ? xBound - bounds.w : x;
-		bounds.y = y + bounds.h >= xBound ? xBound - bounds.h : y;
-		screenManager::queueTip(this);
+		TextInfo::refreshCache();
 	}
 
 	void Tooltip::render()

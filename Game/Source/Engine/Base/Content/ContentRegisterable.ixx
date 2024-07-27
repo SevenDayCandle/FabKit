@@ -47,7 +47,7 @@ namespace fbc {
 	// Get every single instantiation of this class
 	template<typename C> auto ContentRegisterable<C>::all()
 	{
-		return registered() | std::views::values | std::views::join | std::views::values | std::views::transform([](uptr<C>* item) {return item.get(); });
+		return registered() | std::views::values | std::views::join | std::views::values | std::views::transform([](uptr<C>& item) {return item.get(); });
 	}
 
 	// Remove a registered item

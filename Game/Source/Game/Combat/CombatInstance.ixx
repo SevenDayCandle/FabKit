@@ -17,6 +17,7 @@ namespace fbc {
 	public:
 		CombatInstance() {}
 
+		inline auto getOccupants() { return std::views::transform(occupants, [](uptr<OccupantObject>& item) {return item.get(); }); }
 		inline bool hasAction() const { return currentAction != nullptr; }
 		inline CombatTurn* getCurrentTurn() const { return currentTurn; }
 		inline IActionable* getCurrentAction() const { return currentAction; }
@@ -49,7 +50,7 @@ namespace fbc {
 		int totalActionTime = 0;
 		vec<CombatSquare> squares;
 		vec<int> distances;
-		vec<uptr<FieldObject>> fieldObjects;
+		vec<uptr<OccupantObject>> occupants;
 
 		inline int getSquareIndex(int col, int row) const {return col + fieldColumns * row;}
 

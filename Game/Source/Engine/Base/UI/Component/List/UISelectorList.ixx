@@ -3,16 +3,17 @@ export module fbc.UISelectorList;
 import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.FFont;
+import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.IOverlay;
 import fbc.RelativeHitbox;
 import fbc.ScreenManager;
+import fbc.SelectView;
 import fbc.UIBase;
 import fbc.UIEntry;
 import fbc.UIList;
 import fbc.UIVerticalScrollbar;
-import fbc.FUtil;
 import sdl;
 import std;
 
@@ -20,7 +21,6 @@ namespace fbc {
 	constexpr int MARGIN = 16;
 
 	export template <typename T> class UISelectorList : public UIList<T> {
-
 	public:
 		UISelectorList(Hitbox* hb,
 		       func<str(const T&)> labelFunc = futil::toString<T>,
@@ -32,22 +32,23 @@ namespace fbc {
 
 		~UISelectorList() override {}
 
+		inline auto getSelectedItems() { return std::views::transform(currentIndices, [this](int i) { return &(this->rows[i]->item); }); }
 		inline bool isOpen() const { return proxy != nullptr; }
 		inline UISelectorList& setFilterFunc(const func<bool(const UIEntry<T>*)>& filterFunc) { return this->filterFunc = filterFunc, *this; }
 		inline UISelectorList& setItemFont(const FFont& itemFont) { return UIList<T>::setItemFont(itemFont), * this; }
-		inline UISelectorList& setLabelFunc(const func<const str(T&)>& labelFunc) { return UIList<T>::setLabelFunc(labelFunc), * this; }
+		inline UISelectorList& setLabelFunc(const func<str(const T&)>& labelFunc) { return UIList<T>::setLabelFunc(labelFunc), * this; }
 		inline UISelectorList& setMaxRows(int rows) { return UIList<T>::setMaxRows(rows), *this; }
-		inline UISelectorList& setOnChange(const func<void(vec<const T*>)>& onChange) { return this->onChange = onChange, *this; }
+		inline UISelectorList& setOnChange(const func<void(EntryView<T>&)>& onChange) { return this->onChange = onChange, *this; }
 		inline UISelectorList& setOnClose(const func<void()>& onClose) { return this->onClose = onClose, *this; }
 		inline UISelectorList& setOnOpen(const func<void()>& onOpen) { return this->onOpen = onOpen, *this; }
-		inline UISelectorList& setOnSelectionUpdate(const func<void(vec<const UIEntry<T>*>&)>& onSelectionUpdate) {return this->onSelectionUpdate = onSelectionUpdate, *this;}
+		inline UISelectorList& setOnSelectionUpdate(const func<void(EntryView<T>&)>& onSelectionUpdate) {return this->onSelectionUpdate = onSelectionUpdate, *this;}
 
 		inline int getMinSelections() const { return selectionMin; }
 		inline int selectedSize() const { return static_cast<int>(currentIndices.size()); }
 
 		UISelectorList& setSelectionLimit(int rows);
 		UISelectorList& setSelectionMin(int rows);
-		vec<const T*> getSelectedItems();
+		vec<const T*> getSelectedItemsAsList();
 		void clearSelection();
 		void forceClosePopup();
 		void openPopup();
@@ -85,12 +86,14 @@ namespace fbc {
 		int selectionLimit = std::numeric_limits<int>::max();
 		int selectionMin = 0;
 		func<bool(const UIEntry<T>*)> filterFunc;
-		func<void(vec<const T*>)> onChange;
 		func<void()> onClose;
 		func<void()> onOpen;
-		func<void(vec<const UIEntry<T>*>&)> onSelectionUpdate;
+		func<void(EntryView<T>&)> onChange;
+		func<void(EntryView<T>&)> onSelectionUpdate;
 		UIVerticalScrollbar scrollbar;
 		IOverlay* proxy;
+
+		inline EntryView<T> selectView() { return EntryView<T>(currentIndices, this->rows); }
 
 		inline static float rMargin() { return cfg.renderScale(MARGIN); }
 
@@ -267,8 +270,8 @@ namespace fbc {
 	}
 
 	// Returns the entries corresponding with the currently selected indices
-	template <typename T> vec<const T*> UISelectorList<T>::getSelectedItems() {
-		vec<const T*> items;
+	template <typename T> vec<const T*> UISelectorList<T>::getSelectedItemsAsList() {
+		vec<const T*> items(currentIndices.size());
 		for (int i : currentIndices) { items.push_back(&(this->rows[i]->item)); }
 		return items;
 	}
@@ -439,7 +442,8 @@ namespace fbc {
 
 	template<typename T> void UISelectorList<T>::changeEvent() {
 		if (onChange) {
-			onChange(getSelectedItems());
+			SelectView view = this->selectView();
+			onChange(view);
 		}
 	}
 
@@ -464,9 +468,8 @@ namespace fbc {
 	// Hook used to update dropdowns to update their display strings
 	template <typename T> void UISelectorList<T>::updateForSelection() {
 		if (onSelectionUpdate) {
-			vec<const UIEntry<T>*> items;
-			for (int i : currentIndices) { items.push_back(this->rows[i].get()); }
-			onSelectionUpdate(items);
+			SelectView view = this->selectView();
+			onSelectionUpdate(view);
 		}
 	}
 

@@ -14,20 +14,20 @@ import fbc.UIEntry;
 import fbc.UIInteractable;
 import fbc.UISelectorList;
 import fbc.ScaleHitbox;
+import fbc.SelectView;
 import sdl;
 import std;
 
 namespace fbc {
 	export template <typename T> class UIDropdown : public UITitledInteractable, public TextInfo {
 	public:
-
 		UIDropdown(Hitbox* hb, 
 			UISelectorList<T>* menu, 
 			IDrawable& image = cct.images.panel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
-			func<str(vec<const UIEntry<T>*>&)>& buttonLabelFunc = {}
+			func<str(EntryView<T>&)>& buttonLabelFunc = {}
 		): UITitledInteractable(hb, image), TextInfo(textFont), menu(menu), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
 			init();
 		}
@@ -37,7 +37,7 @@ namespace fbc {
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
-			func<str(vec<const UIEntry<T>*>&)>& buttonLabelFunc = {}
+			func<str(EntryView<T>&)>& buttonLabelFunc = {}
 		): UITitledInteractable(hb, image), TextInfo(textFont), menu(std::move(menu)), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
 			init();
 		}
@@ -47,15 +47,16 @@ namespace fbc {
 		inline bool isOpen() const { return proxy != nullptr; }
 		inline int selectedSize() const { return menu->selectedSize(); }
 		inline int size() { return menu->size(); }
-		inline UIDropdown& setEntryFunc(const func<UIEntry<T>*(const UISelectorList<T>&, T&, str&, int)>& entryFunc) { return menu->setEntryFunc(entryFunc), *this; }
 		inline UIDropdown& setItemFont(const FFont& itemFont) { return menu->setItemFont(itemFont), * this; }
 		inline UIDropdown& setMaxRows(int rows) { return menu->setMaxRows(rows), * this; }
-		inline UIDropdown& setOnChange(const func<void(vec<const T*>)>& onChange) { return menu->setOnChange(onChange), * this; }
+		inline UIDropdown& setOnChange(const func<void(EntryView<T>&)>& onChange) { return menu->setOnChange(onChange), * this; }
 		inline UIDropdown& setOnOpen(const func<void()>& onOpen) { return this->onOpen = onOpen, *this; }
 		inline UIDropdown& setSelectionLimit(int rows) { return menu->setSelectionLimit(rows), * this; }
 		inline UIDropdown& setSelectionMin(int rows) { return menu->setSelectionMin(rows), * this; }
-		inline vec<T*> getAllItems() { return menu->getAllItems(); }
-		inline vec<T*> getSelectedItems() { return menu->getSelectedItems(); }
+		inline vec<const T*> getAllItemsAsList() { return menu->toVec(); }
+		inline vec<const T*> getSelectedItemsAsList() { return menu->getSelectedItemsAsList(); }
+		inline EntryView<T>& getAllItems() { return menu->getAllItems(); }
+		inline EntryView<T>& getSelectedItems() { return menu->getSelectedItems(); }
 		inline virtual UIDropdown& setOnClose(const func<void()>& onClose) { return this->onClose = onClose, *this; }
 		inline void clearItems() { menu->clearItems(); }
 		inline void clearSelection() { menu->clearSelection(); }
@@ -92,7 +93,7 @@ namespace fbc {
 
 		static uptr<UIDropdown> multiList(Hitbox* hb, 
 			func<str(const T&)> labelFunc = futil::toString<T>,
-			func<str(vec<const UIEntry<T>*>&)> buttonLabelFunc = {},
+			func<str(EntryView<T>&)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
 			IDrawable& background = cct.images.darkPanelRound,
@@ -101,7 +102,7 @@ namespace fbc {
 			IDrawable& clear = cct.images.uiClearSmall);
 		static uptr<UIDropdown> singleList(Hitbox* hb, 
 			func<str(const T&)> labelFunc = futil::toString<T>,
-			func<str(vec<const UIEntry<T>*>&)> buttonLabelFunc = {},
+			func<str(EntryView<T>&)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
 			IDrawable& background = cct.images.darkPanelRound,
@@ -113,12 +114,12 @@ namespace fbc {
 		IDrawable& clear;
 		sdl::RectF arrowRect;
 
-		str getButtonText(vec<const UIEntry<T>*>& items);
+		str getButtonText(EntryView<T>& items);
 		virtual void clickLeftEvent() override;
 		virtual inline void onChangeItems() {}
-		virtual void onSelectionUpdate(vec<const UIEntry<T>*>& items);
+		virtual void onSelectionUpdate(EntryView<T>& items);
 	private:
-		func<str(vec<const UIEntry<T>*>&)> buttonLabelFunc;
+		func<str(EntryView<T>&)> buttonLabelFunc;
 		func<void()> onClose;
 		func<void()> onOpen;
 		IOverlay* proxy;
@@ -197,19 +198,19 @@ namespace fbc {
 	}
 
 	// Updates the text shown on the button by default, this may be overriden in derivative types
-	template<typename T> void UIDropdown<T>::onSelectionUpdate(vec<const UIEntry<T>*>& items) {
+	template<typename T> void UIDropdown<T>::onSelectionUpdate(EntryView<T>& items) {
 		setText(getButtonText(items));
 	}
 
 	template<typename T> void UIDropdown<T>::init()
 	{
-		this->menu->setOnSelectionUpdate([this](vec<const UIEntry<T>*>& items) { this->onSelectionUpdate(items); });
+		this->menu->setOnSelectionUpdate([this](EntryView<T>& items) { this->onSelectionUpdate(items); });
 		this->menu->hb->setExactPos(hb->x, hb->y);
 		UIDropdown<T>::onSizeUpdated();
 	}
 
 	template<typename T> uptr<UIDropdown<T>> UIDropdown<T>::multiList(
-		Hitbox* hb, func<str(const T&)> labelFunc, func<str(vec<const UIEntry<T>*>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
+		Hitbox* hb, func<str(const T&)> labelFunc, func<str(EntryView<T>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
 	{
 		return std::make_unique<UIDropdown<T>>(
 			hb,
@@ -223,7 +224,7 @@ namespace fbc {
 	}
 
 	template<typename T> uptr<UIDropdown<T>> UIDropdown<T>::singleList(
-		Hitbox* hb, func<str(const T&)> labelFunc, func<str(vec<const UIEntry<T>*>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
+		Hitbox* hb, func<str(const T&)> labelFunc, func<str(EntryView<T>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
 	{
 		return std::make_unique<UIDropdown<T>>(
 			hb,
@@ -238,13 +239,13 @@ namespace fbc {
 
 	// The text on the dropdown should reflect the contents of the selected menu items.
 	// If no button label function is set, this will default to joining the string representations of each entry. If this text is too long, the displayed text will instead show the number of items selected
-	template<typename T> str UIDropdown<T>::getButtonText(vec<const UIEntry<T>*>& items)
+	template<typename T> str UIDropdown<T>::getButtonText(EntryView<T>& items)
 	{
 		if (buttonLabelFunc) {
 			return buttonLabelFunc(items);
 		}
 		else {
-			str displayText = (futil::joinStrMap(", ", items, [](const UIEntry<T>* entry) {return entry->getText(); }));
+			str displayText = (futil::joinStrMap(", ", items, [](UIEntry<T>& entry) {return entry.getText(); }));
 			if (this->font.measureW(displayText) > hb->w) {
 				return str(cct.strings.ui_items(this->selectedSize()));
 			}

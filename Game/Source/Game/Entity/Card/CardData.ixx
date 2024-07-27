@@ -10,6 +10,8 @@ import fbc.ObjectRarity;
 import std;
 
 namespace fbc {
+	export constexpr strv PATH_CARD = "Cards";
+
 	export class CardData : public GameObjectData<CardData> {
 	public:
 		struct CardTargeting {

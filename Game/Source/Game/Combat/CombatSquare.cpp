@@ -11,7 +11,7 @@ module fbc.CombatSquare;
 namespace fbc {
 
 	// Assign the given occupant to this square
-	CombatSquare& CombatSquare::setOccupant(FieldObject* occupant)
+	CombatSquare& CombatSquare::setOccupant(OccupantObject* occupant)
 	{
 		this->occupant = occupant;
 		if (occupant) {

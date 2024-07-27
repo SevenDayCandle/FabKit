@@ -4,6 +4,8 @@
       {
         "id": "test:TestCreature"
       }
-    ]
+    ],
+    "fieldCols": 5,
+    "fieldRows": 4
   }
 }

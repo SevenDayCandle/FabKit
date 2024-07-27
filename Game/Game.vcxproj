@@ -171,6 +171,10 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Base\UI\Component\List\SelectView.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Engine\Base\UI\Tooltip\GenericTip.ixx">
       <SubType>
       </SubType>
@@ -561,6 +565,8 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Game\UI\Screens\Combat\CombatSquareRenderable.ixx" />
+    <ClCompile Include="Source\Game\UI\Screens\Combat\CreatureRenderable.ixx" />
     <ClCompile Include="Source\Game\UI\Screens\Run\RunScreen.cpp" />
     <ClCompile Include="Source\Game\UI\Screens\Run\RunScreen.ixx">
       <SubType>

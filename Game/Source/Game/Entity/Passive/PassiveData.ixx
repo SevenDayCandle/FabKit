@@ -9,6 +9,8 @@ import sdl;
 import std;
 
 namespace fbc {
+	export constexpr strv PATH_PASSIVE = "Passives";
+
 	export class PassiveData : public GameObjectData<PassiveData> {
 	public:
 		struct ExportFields {

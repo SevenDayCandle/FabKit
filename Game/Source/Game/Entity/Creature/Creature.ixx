@@ -4,17 +4,17 @@ import fbc.AttributeObject;
 import fbc.Card;
 import fbc.CombatSquare;
 import fbc.CreatureData;
-import fbc.FieldObject;
 import fbc.FUtil;
 import fbc.GameObject;
 import fbc.KeyedItem;
+import fbc.IDrawable;
 import fbc.ItemListing;
 import fbc.PileType;
 import sdl;
 import std;
 
 namespace fbc {
-	export class Creature : public GameObjectDerived<CreatureData>, public FieldObject {
+	export class Creature : public GameObjectDerived<CreatureData>, public CombatSquare::OccupantObject {
 	public:
 		class Behavior : public KeyedItem<Behavior> {
 		public:
@@ -36,6 +36,8 @@ namespace fbc {
 		Creature(CreatureData& data, Behavior* behavior, int faction, int upgrades) : Creature(data, behavior, faction, upgrades, data.getResultHealth(upgrades)) {}
 
 		Behavior* behavior;
+		IDrawable* imageFieldOverride;
+		IDrawable* imagePortraitOverride;
 		int energy;
 		int energyMax;
 		int faction;
@@ -52,6 +54,8 @@ namespace fbc {
 		Card& cardFromToPile(Card& card, const PileType& source, const PileType& dest); // TODO refactor to use conditions, refactor into action
 		Card& cardToPile(uptr<Card>&& card, const PileType& type); // TODO refactor to use conditions, refactor into action
 		Card& useCard(Card& card, CombatSquare& square);
+		IDrawable& getImageField() final override;
+		IDrawable& getImagePortrait() final override;
 		int getActionSpeed();
 		int getCardDraw();
 		int getEnergyGain();

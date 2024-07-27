@@ -1,6 +1,7 @@
 export module fbc.UITipHoverable;
 
 import fbc.FUtil;
+import fbc.GenericTip;
 import fbc.Hitbox;
 import fbc.Tooltip;
 import fbc.UIBase;
@@ -8,7 +9,7 @@ import fbc.UIBase;
 namespace fbc {
 	export class UITipHoverable : public UIBase {
 	public:
-		Tooltip* tooltip;
+		GenericTip* tooltip;
 
 		UITipHoverable(Hitbox* hb) : UIBase(hb), tooltip(nullptr) {}
 		~UITipHoverable() override {}
@@ -17,18 +18,18 @@ namespace fbc {
 		virtual void updateImpl() override;
 
 		inline UITipHoverable& setOwnedTip(strv text) { return setOwnedTip(new Tooltip(text)); }
-		inline virtual UITipHoverable& setTooltip(Tooltip* tooltip) { return this->tooltip = tooltip, *this; } // Assigns a non-owned tooltip to this object
+		inline virtual UITipHoverable& setTooltip(GenericTip* tooltip) { return this->tooltip = tooltip, *this; } // Assigns a non-owned tooltip to this object
 
-		UITipHoverable& setOwnedTip(Tooltip* tooltip);
+		UITipHoverable& setOwnedTip(GenericTip* tooltip);
 	private:
-		uptr<Tooltip> ownedTip;
+		uptr<GenericTip> ownedTip;
 	};
 
 	void UITipHoverable::refreshDimensions()
 	{
 		UIBase::refreshDimensions();
 		if (tooltip) {
-			tooltip->refreshCache();
+			tooltip->refreshDimensions();
 		}
 	}
 
@@ -41,9 +42,9 @@ namespace fbc {
 	}
 
 	// Assigns an owned tooltip to this object (i.e. a tooltip that gets destroyed when this object is destroyed)
-	UITipHoverable& UITipHoverable::setOwnedTip(Tooltip* tooltip)
+	UITipHoverable& UITipHoverable::setOwnedTip(GenericTip* tooltip)
 	{
-		ownedTip = uptr<Tooltip>(tooltip);
+		ownedTip = uptr<GenericTip>(tooltip);
 		this->tooltip = ownedTip.get();
 		return *this;
 	}

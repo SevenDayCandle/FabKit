@@ -28,6 +28,7 @@ namespace fbc {
 	protected:
 		inline virtual void clickLeftEvent() {}
 		inline virtual void clickRightEvent() {}
+		inline virtual void justHoveredEvent() {}
 	};
 
 	void UIInteractable::updateImpl()
@@ -37,6 +38,7 @@ namespace fbc {
 			if (screenManager::activeElement == nullptr && interactable) {
 				if (hb->isJust() && soundHover) {
 					soundHover->play();
+					justHoveredEvent();
 				}
 
 				if (sdl::mouseIsLeftJustClicked() || sdl::mouseIsRightJustClicked()) {

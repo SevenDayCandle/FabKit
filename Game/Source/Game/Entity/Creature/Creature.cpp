@@ -109,6 +109,24 @@ namespace fbc {
 		return card;
 	}
 
+	// For field images, use the field override if it exists, otherwise fall back to the data
+	IDrawable& Creature::getImageField()
+	{
+		if (imageFieldOverride) {
+			return *imageFieldOverride;
+		}
+		return data.getImageField();
+	}
+
+	// For portrait images, use theportrait override if it exists, otherwise fall back to the data
+	IDrawable& Creature::getImagePortrait()
+	{
+		if (imagePortraitOverride) {
+			return *imagePortraitOverride;
+		}
+		return data.getImagePortrait();
+	}
+
 	// A value that determines how "quickly" this creature will onTurnBegin. The higher the value, the higher in the action queue this creature's turns will be placed
 	int Creature::getActionSpeed()
 	{

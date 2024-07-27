@@ -20,12 +20,11 @@ namespace fbc {
 			item(item), index(index), onClick(onClick), baseColor(baseColor), hoverColor(hoverColor), UIInteractable(hb, image), TextInfo(f, text), checkImage(checkImage) {
 		}
 
-		sdl::Color baseColor;
-		sdl::Color hoverColor;
+		operator const T*() const { return &item; }
+		operator const T&() const { return item; }
+
 		bool active = false;
 		bool toggled = false;
-		IDrawable& checkImage;
-		func<void(UIEntry<T>&)> onClick;
 		const T& item;
 		int index;
 
@@ -39,6 +38,11 @@ namespace fbc {
 		virtual void refreshDimensions() override;
 		virtual void renderImpl() override;
 	protected:
+		sdl::Color baseColor;
+		sdl::Color hoverColor;
+		IDrawable& checkImage;
+		func<void(UIEntry<T>&)> onClick;
+
 		inline virtual void clickLeftEvent() override { onClick(*this); }
 	};
 

@@ -9,6 +9,7 @@ import fbc.RelativeHitbox;
 import fbc.ScreenManager;
 import fbc.ScreenSizeHitbox;
 import fbc.SettingsDialogPage;
+import fbc.UIEntry;
 import fbc.UINavigation;
 import fbc.UIButton;
 import fbc.UITextButton;
@@ -79,9 +80,11 @@ namespace fbc {
 
 	void SettingsDialog::applyAll()
 	{
-		for (const SettingsDialogPage* page : navigation.getAllItems()) {
-			const_cast<SettingsDialogPage*>(page)->commit();
+		for (const UIEntry<SettingsDialogPage>& page : navigation) {
+			SettingsDialogPage& item = const_cast<SettingsDialogPage&>(page.item);
+			item.commit();
 		}
+
 		cfg.commit();
 	}
 

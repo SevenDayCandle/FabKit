@@ -15,47 +15,6 @@ namespace fbc {
 		std::size_t operator()(std::string const& str) const { return hash_type{}(str); }
 	};
 
-	// std shorthands. Sorry peeps
-	export template <typename R> using func = std::function<R>;
-	export template <typename T, class Comp = std::less<T>, class Alloc = std::allocator<T>> using mset = std::multiset<T, Comp, Alloc>;
-	export template <typename T, class Hash = std::hash<T>, class Eq = std::equal_to<T>, class Alloc = std::allocator<T>> using uset = std::unordered_set<T, Hash, Eq, Alloc>;
-	export template <typename T, size_t U> using arr = std::array<T, U>;
-	export template <typename T, typename U, class Comp = std::less<T>, class Alloc = std::allocator<std::pair<const T, U>>> using map = std::map<T, U, Comp, Alloc>;
-	export template <typename T, typename U, class Hash = std::hash<T>, class Eq = std::equal_to<T>, class Alloc = std::allocator<std::pair<const T, U>>> using umap = std::unordered_map<T, U, Hash, Eq, Alloc>;
-	export template <typename T, typename U> using pair = std::pair<T, U>;
-	export template <typename T> using dec_t = std::decay_t<T>;
-	export template <typename T> using ilist = std::initializer_list<T>;
-	export template <typename T> using opt = std::optional<T>;
-	export template <typename T> using pqueue_max = std::priority_queue<T>;
-	export template <typename T> using pqueue_min = std::priority_queue<T, std::vector<T>, std::greater<T>>;
-	export template <typename T> using ref = std::reference_wrapper<T>;
-	export template <typename T> using sptr = std::shared_ptr<T>;
-	export template <typename T> using strumap = umap<std::string, T, str_hash, std::equal_to<>>;
-	export template <typename T> using uptr = std::unique_ptr<T>;
-	export template <typename T> using vec = std::vector<T>;
-	export using dir_entry = std::filesystem::directory_entry;
-	export using dir_itr = std::filesystem::directory_iterator;
-	export using file_type = std::filesystem::file_type;
-	export using int32 = std::int32_t;
-	export using path = std::filesystem::path;
-	export using str = std::string;
-	export using strv = std::string_view;
-	export using uint32 = std::uint32_t;
-
-	export using std::any;
-	export using std::deque;
-	export using std::exception;
-	export using std::hash;
-	export using std::list;
-	export using std::ranges::ref_view;
-	export using std::set;
-	export using std::span;
-	export using std::type_info;
-
-	export using std::make_shared;
-	export using std::make_unique;
-	export using std::move;
-
 	// Const stuff, adapted from https://github.com/stephenberry/glaze
 	// TODO just use the glz module version once it is available
 	export template <typename, template <typename...> typename> inline constexpr bool is_specialization_v = false;
@@ -96,6 +55,48 @@ namespace fbc {
 	export template<typename T> concept c_tuple = is_specialization_v<T, std::tuple>;
 	export template<typename T, typename... Args> concept c_varg = (std::same_as<T, Args> && ...);;
 	export template<typename T> concept c_vec = is_specialization_v<T, std::vector>;
+
+	// std shorthands. Sorry peeps
+	export template <typename R> using func = std::function<R>;
+	export template <typename T, class Comp = std::less<T>, class Alloc = std::allocator<T>> using mset = std::multiset<T, Comp, Alloc>;
+	export template <typename T, class Hash = std::hash<T>, class Eq = std::equal_to<T>, class Alloc = std::allocator<T>> using uset = std::unordered_set<T, Hash, Eq, Alloc>;
+	export template <typename T, size_t U> using arr = std::array<T, U>;
+	export template <typename T, typename U, class Comp = std::less<T>, class Alloc = std::allocator<std::pair<const T, U>>> using map = std::map<T, U, Comp, Alloc>;
+	export template <typename T, typename U, class Hash = std::hash<T>, class Eq = std::equal_to<T>, class Alloc = std::allocator<std::pair<const T, U>>> using umap = std::unordered_map<T, U, Hash, Eq, Alloc>;
+	export template <typename T, typename U> using pair = std::pair<T, U>;
+	export template <typename T> using dec_t = std::decay_t<T>;
+	export template <typename T> using ilist = std::initializer_list<T>;
+	export template <typename T> using opt = std::optional<T>;
+	export template <typename T> using pqueue_max = std::priority_queue<T>;
+	export template <typename T> using pqueue_min = std::priority_queue<T, std::vector<T>, std::greater<T>>;
+	export template <typename T> using ref = std::reference_wrapper<T>;
+	export template <typename T> using sptr = std::shared_ptr<T>;
+	export template <typename T> using strumap = umap<std::string, T, str_hash, std::equal_to<>>;
+	export template <typename T> using uptr = std::unique_ptr<T>;
+	export template <typename T> using vec = std::vector<T>;
+	export using dir_entry = std::filesystem::directory_entry;
+	export using dir_itr = std::filesystem::directory_iterator;
+	export using file_type = std::filesystem::file_type;
+	export using int32 = std::int32_t;
+	export using path = std::filesystem::path;
+	export using str = std::string;
+	export using strv = std::string_view;
+	export using uint32 = std::uint32_t;
+
+	export using std::any;
+	export using std::deque;
+	export using std::exception;
+	export using std::hash;
+	export using std::list;
+	export using std::ranges::ref_view;
+	export using std::ranges::transform_view;
+	export using std::set;
+	export using std::span;
+	export using std::type_info;
+
+	export using std::make_shared;
+	export using std::make_unique;
+	export using std::move;
 }
 
 // Utility functions
