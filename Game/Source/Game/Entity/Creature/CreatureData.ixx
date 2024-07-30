@@ -38,8 +38,6 @@ namespace fbc {
 		CreatureData(BaseContent& source, strv id): GameObjectData(source, id) {}
 		CreatureData(BaseContent& source, strv id, const Fields& fields) : GameObjectData(source, id), data(fields) {}
 		Fields data;
-		IDrawable* imageField;
-		IDrawable* imagePortrait;
 
 		inline int getResultActSpeed(int upgrade) const { return data.actSpeed + upgrade * data.actSpeedUp; }
 		inline int getResultEnergyGain(int upgrade) const { return data.energyGain + upgrade * data.energyGainUp; }
@@ -48,12 +46,17 @@ namespace fbc {
 		inline int getResultHandSize(int upgrade) const { return data.handSize + upgrade * data.handSizeUp; }
 		inline int getResultHealth(int upgrade) const { return data.health + upgrade * data.healthUp; }
 		inline int getResultMovement(int upgrade) const { return data.movement + upgrade * data.movementUp; }
+		inline void clearImageField() { imageField = nullptr; }
+		inline void clearImagePortrait() { imagePortrait = nullptr; }
 
-		IDrawable& getImageField();
-		IDrawable& getImagePortrait();
+		IDrawable& getImageField() const;
+		IDrawable& getImagePortrait() const;
+	protected:
+		mutable IDrawable* imageField;
+		mutable IDrawable* imagePortrait;
 	};
 
-	IDrawable& CreatureData::getImageField()
+	IDrawable& CreatureData::getImageField() const
 	{
 		if (!imageField) {
 			if (data.imageField.size() > 0) {
@@ -75,7 +78,7 @@ namespace fbc {
 		return *imageField;
 	}
 
-	IDrawable& CreatureData::getImagePortrait()
+	IDrawable& CreatureData::getImagePortrait() const
 	{
 		if (!imagePortrait) {
 			FTexture* tex = source.getTexture(str(PATH_CREATURE) + "/" + id + ".png");

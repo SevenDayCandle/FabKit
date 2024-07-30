@@ -29,9 +29,9 @@ namespace fbc {
 		inline FFont& fontSmall() const { return *fontSmallData; }
 
 		BaseContent* getContent(strv content);
-		FMusic* getMusic(strv content, strv path);
-		FSound* getSound(strv content, strv path);
-		FTexture* getTexture(strv content, strv path);
+		FMusic* getMusic(strv content, strv path) const;
+		FSound* getSound(strv content, strv path) const;
+		FTexture* getTexture(strv content, strv path) const;
 		template <c_ext<BaseContent> T> T& registerContent(uptr<T>&& element);
 		void dispose() override;
 		void initialize() override;
@@ -61,7 +61,7 @@ namespace fbc {
 		return nullptr;
 	}
 
-	FMusic* CoreContent::getMusic(strv content, strv path)
+	FMusic* CoreContent::getMusic(strv content, strv path) const
 	{
 		auto found = registeredContents.find(content);
 		if (found != registeredContents.end()) {
@@ -70,7 +70,7 @@ namespace fbc {
 		return nullptr;
 	}
 
-	FSound* CoreContent::getSound(strv content, strv path)
+	FSound* CoreContent::getSound(strv content, strv path) const
 	{
 		auto found = registeredContents.find(content);
 		if (found != registeredContents.end()) {
@@ -79,7 +79,7 @@ namespace fbc {
 		return nullptr;
 	}
 
-	FTexture* CoreContent::getTexture(strv content, strv path)
+	FTexture* CoreContent::getTexture(strv content, strv path) const
 	{
 		auto found = registeredContents.find(content);
 		if (found != registeredContents.end()) {

@@ -25,15 +25,15 @@ namespace fbc {
 
         void dispose() override;
         void drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) override;
-        void reload() override;
+        void reload() const override;
         void setDrawBlend(const sdl::BlendMode bl) override;
         void setDrawColor(const sdl::Color& tint) override;
     private:
+        mutable sdl::RectF dim;
+        mutable sdl::Texture* texture;
+        mutable sdl::PixelFormatEnum format;
+        mutable int access;
         str path;
-        sdl::RectF dim;
-        sdl::Texture* texture;
-        sdl::PixelFormatEnum format;
-        int access;
 	};
 
     void FTexture::dispose()
@@ -47,7 +47,7 @@ namespace fbc {
         sdl::renderCopyEx(texture, sourceRec, destRec, rotation, &origin, flip);
     }
 
-    void FTexture::reload()
+    void FTexture::reload() const
     {
         if (texture) {
             sdl::textureDestroy(texture);

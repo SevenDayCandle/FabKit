@@ -1,5 +1,6 @@
 export module fbc.CombatScreen;
 
+import fbc.CombatSquare;
 import fbc.FUtil;
 import fbc.UIButton;
 import fbc.UIScreen;
@@ -15,6 +16,7 @@ namespace fbc {
 		CombatScreen(): UIScreen() {}
 		virtual ~CombatScreen() = default;
 
+		void createCreatureRender(const OccupantObject* occupant);
 		void open() override;
 	};
 }

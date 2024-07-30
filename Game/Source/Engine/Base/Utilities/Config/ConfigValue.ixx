@@ -14,7 +14,7 @@ namespace fbc {
         operator T() { return value; }
 
         inline void setOnReload(const func<void(const T&)>& onChange) {this->onChange = onChange;}
-        inline T get() {return value;}
+        inline T get() const {return value;}
 
         void reload() override;
         void set(const T& newValue);

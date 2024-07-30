@@ -110,7 +110,7 @@ namespace fbc {
 	}
 
 	// For field images, use the field override if it exists, otherwise fall back to the data
-	IDrawable& Creature::getImageField()
+	IDrawable& Creature::getImageField() const
 	{
 		if (imageFieldOverride) {
 			return *imageFieldOverride;
@@ -119,7 +119,7 @@ namespace fbc {
 	}
 
 	// For portrait images, use theportrait override if it exists, otherwise fall back to the data
-	IDrawable& Creature::getImagePortrait()
+	IDrawable& Creature::getImagePortrait() const
 	{
 		if (imagePortraitOverride) {
 			return *imagePortraitOverride;

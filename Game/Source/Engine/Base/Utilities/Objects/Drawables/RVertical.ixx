@@ -15,12 +15,12 @@ namespace fbc {
 		inline float getWidth() const override { return base.getWidth(); }
 
 		void drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) override;
-		void reload() override;
+		void reload() const override;
 		void setDrawBlend(const sdl::BlendMode bl) override;
 		void setDrawColor(const sdl::Color& tint) override;
 	private:
 		IDrawable& base;
-		float patchSize;
+		mutable float patchSize;
 	};
 
 	/* Assuming that the underlying base drawable consists of two seamless edges of size patchSize x patchSize stacked vertically, we infer the center to be the top-most column of the bottom edge */
@@ -45,7 +45,7 @@ namespace fbc {
 
 	// If the patch size was not manually set, automatically adjust it based on the source texture
 	// Note that this working relies on the original texture being reloaded before this; this should normally be enforced when creating drawables in StaticLoadables through its helper methods
-	void RVertical::reload()
+	void RVertical::reload() const
 	{
 		if (patchSize <= 0) {
 			patchSize = base.getHeight() / 2.0f;

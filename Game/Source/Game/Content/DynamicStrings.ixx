@@ -11,13 +11,13 @@ namespace fbc {
 	public:
 		DynamicStrings(const BaseContent& content): BaseStrings(content) {}
 
-		KeywordStrings* getKeywordStrings(strv path) override;
+		KeywordStrings* getKeywordStrings(strv path) const override;
 		void initialize() override;
 	private:
-		strumap<KeywordStrings> keywordStrings;
+		mutable strumap<KeywordStrings> keywordStrings;
 	};
 
-	KeywordStrings* DynamicStrings::getKeywordStrings(strv path)
+	KeywordStrings* DynamicStrings::getKeywordStrings(strv path) const
 	{
 		auto it = keywordStrings.find(path);
 		if (it != keywordStrings.end()) {

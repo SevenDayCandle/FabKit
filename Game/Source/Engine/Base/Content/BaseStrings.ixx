@@ -20,8 +20,8 @@ namespace fbc {
 	public:
 		BaseStrings(const BaseContent& content) : ContentLoadables(content) {}
 
-		inline virtual KeywordStrings* getKeywordStrings(strv path) { return nullptr; }
-		inline virtual ObjectStrings* getObjectStrings(strv type, strv path) { return nullptr; }
+		inline virtual KeywordStrings* getKeywordStrings(strv path) const { return nullptr; }
+		inline virtual ObjectStrings* getObjectStrings(strv type, strv path) const { return nullptr; }
 
 		virtual void dispose() {};
 		virtual void initialize() {};

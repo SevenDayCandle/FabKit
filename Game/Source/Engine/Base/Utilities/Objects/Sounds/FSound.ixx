@@ -22,10 +22,10 @@ namespace fbc {
 		inline void playFade(int fade, int loops = 0, int time = -1) const { sdl::soundPlayFade(sound, fade, loops, time); }
 
 		void dispose() override;
-		void reload() override;
+		void reload() const override;
 	private:
+		mutable sdl::Sound* sound;
 		str path;
-		sdl::Sound* sound;
 	};
 
 	void FSound::dispose()
@@ -34,7 +34,7 @@ namespace fbc {
 		sound = nullptr;
 	}
 
-	void FSound::reload()
+	void FSound::reload() const
 	{
 		if (sound) {
 			sdl::soundFree(sound);

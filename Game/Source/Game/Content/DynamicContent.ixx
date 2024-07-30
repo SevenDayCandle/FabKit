@@ -38,9 +38,9 @@ namespace fbc {
 		DynamicLoadables<FSound> sounds = DynamicLoadables<FSound>(*this);
 		DynamicLoadables<FTexture> images = DynamicLoadables<FTexture>(*this);
 
-		inline FMusic* getMusic(strv key) override { return music.get(key); }
-		inline FSound* getSound(strv key) override { return sounds.get(key); }
-		inline FTexture* getTexture(strv key) override { return images.get(key); }
+		inline FMusic* getMusic(strv key) const override { return music.get(key); }
+		inline FSound* getSound(strv key) const override { return sounds.get(key); }
+		inline FTexture* getTexture(strv key) const override { return images.get(key); }
 		inline void processCards() { setupContentFolder(PATH_CARD, [this](const path& entry) {processCard(entry); }); }
 		inline void processCreatures() { setupContentFolder(PATH_CREATURE, [this](const path& entry) {processCreature(entry); }); }
 		inline void processKeywords() { setupContentFolder(PATH_KEYWORDS, [this](const path& entry) {processKeyword(entry); }); }

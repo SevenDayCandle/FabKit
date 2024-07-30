@@ -54,8 +54,8 @@ namespace fbc {
 		Card& cardFromToPile(Card& card, const PileType& source, const PileType& dest); // TODO refactor to use conditions, refactor into action
 		Card& cardToPile(uptr<Card>&& card, const PileType& type); // TODO refactor to use conditions, refactor into action
 		Card& useCard(Card& card, CombatSquare& square);
-		IDrawable& getImageField() final override;
-		IDrawable& getImagePortrait() final override;
+		IDrawable& getImageField() const final override;
+		IDrawable& getImagePortrait() const final override;
 		int getActionSpeed();
 		int getCardDraw();
 		int getEnergyGain();

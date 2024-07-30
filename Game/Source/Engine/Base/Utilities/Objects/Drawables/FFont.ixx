@@ -29,14 +29,14 @@ namespace fbc {
         FFont& setOutlineSize(int size);
         FFont& setShadowSize(int size);
         FFont& setSize(int size);
-        int measureH(strv text);
-        int measureW(strv text);
-        pair<int, int> measureDim(strv text);
+        int measureH(strv text) const;
+        int measureW(strv text) const;
+        pair<int, int> measureDim(strv text) const;
         sdl::FontRender makeTexture(strv text, uint32 w = 0, float x = 0, float y = 0, sdl::Color color = sdl::COLOR_WHITE, sdl::Color outlineColor = sdl::COLOR_BLACK, sdl::Color shadowColor = sdl::COLOR_BLACK_SHADOW);
         void dispose();
-        void reload();
+        void reload() const override;
     private:
-        sdl::Font* font;
+        mutable sdl::Font* font;
         str path;
         int outlineSize;
         int shadowSize;
@@ -44,7 +44,7 @@ namespace fbc {
 	};
 
     // Get the x and y sizes of the given text written with this font
-    pair<int, int> FFont::measureDim(strv text)
+    pair<int, int> FFont::measureDim(strv text) const
     {
         pair<int, int> pair;
         sdl::fontSizeText(font, text.data(), &pair.first, &pair.second);
@@ -52,7 +52,7 @@ namespace fbc {
     }
 
     // Get the x size of the given text written with this font
-    int FFont::measureH(strv text)
+    int FFont::measureH(strv text) const
     {
         int w, h;
         sdl::fontSizeText(font, text.data(), &w, &h);
@@ -60,7 +60,7 @@ namespace fbc {
     }
 
     // Get the y size of the given text written with this font
-    int FFont::measureW(strv text)
+    int FFont::measureW(strv text) const
     {
         int w, h;
         sdl::fontSizeText(font, text.data(), &w, &h);
@@ -129,7 +129,7 @@ namespace fbc {
         }
 
         sdl::Texture* tex = sdl::textureCreateFromSurface(targetSurf);
-        sdl::FontRender f = {  x, y, targetSurf->w, targetSurf->h , tex };
+        sdl::FontRender f = {  x, y, static_cast<float>(targetSurf->w), static_cast<float>(targetSurf->h), tex };
         sdl::surfaceDestroy(targetSurf);
         return f;
     }
@@ -142,7 +142,7 @@ namespace fbc {
     }
 
     /* Refreshes the font to match its size */
-    void FFont::reload()
+    void FFont::reload() const
     {
         int res = cfg.fontScale(size);
         font = sdl::fontOpen(path.c_str(), res);

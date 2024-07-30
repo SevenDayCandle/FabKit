@@ -19,11 +19,11 @@ namespace fbc {
 		const path contentFolder;
 		const str id;
 
-		inline virtual FMusic* getMusic(strv path) { return nullptr; }
-		inline virtual FSound* getSound(strv path) { return nullptr; }
-		inline virtual FTexture* getTexture(strv path) { return nullptr; }
-		inline virtual KeywordStrings* getKeywordStrings(strv path) { return nullptr; }
-		inline virtual ObjectStrings* getObjectStrings(strv type, strv path) { return nullptr; }
+		inline virtual FMusic* getMusic(strv path) const { return nullptr; }
+		inline virtual FSound* getSound(strv path) const { return nullptr; }
+		inline virtual FTexture* getTexture(strv path) const { return nullptr; }
+		inline virtual KeywordStrings* getKeywordStrings(strv path) const { return nullptr; }
+		inline virtual ObjectStrings* getObjectStrings(strv type, strv path) const { return nullptr; }
 
 		virtual void postInitialize() {}
 		virtual void reloadAudio() {}

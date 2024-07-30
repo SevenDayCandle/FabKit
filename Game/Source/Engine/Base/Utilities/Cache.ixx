@@ -14,7 +14,7 @@ namespace fbc {
 		operator T& () const { return get(); }
 
 		void dispose() override;
-		void reload() override;
+		void reload() const override;
 		T& get() const;
 	private:
 		func<T*()> fetchFunc;
@@ -30,7 +30,7 @@ namespace fbc {
 	}
 
 	// If the item was previously fetched, reload it. Does NOT fill in the object if it had not yet been fetched
-	template<typename T> void Cache<T>::reload()
+	template<typename T> void Cache<T>::reload() const
 	{
 		if (object != nullptr) {
 			if constexpr (std::is_base_of_v<ILoadable, T>) {

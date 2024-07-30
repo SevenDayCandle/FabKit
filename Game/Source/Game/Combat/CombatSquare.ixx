@@ -17,8 +17,8 @@ namespace fbc {
 
 			CombatSquare* currentSquare;
 
-			virtual IDrawable& getImageField() = 0;
-			virtual IDrawable& getImagePortrait() = 0;
+			virtual IDrawable& getImageField() const = 0;
+			virtual IDrawable& getImagePortrait() const = 0;
 		};
 
 		CombatSquare(int col, int row): col(col), row(row) {}

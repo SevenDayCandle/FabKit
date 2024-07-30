@@ -69,8 +69,8 @@ namespace fbc {
 		Hotkey actEsc = Hotkey("ActEsc", sdl::SCAN_ESC, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_INVALID);
 		Hotkey actSelect = Hotkey("ActSelect", sdl::SCAN_RETURN, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_START);
 
-		inline int getScreenXSize() { return graphicsResolution.get().first; }
-		inline int getScreenYSize() { return graphicsResolution.get().second; };
+		inline int getScreenXSize() const { return graphicsResolution.get().first; }
+		inline int getScreenYSize() const { return graphicsResolution.get().second; };
 		inline float fontScale() const noexcept { return fontScalePrivate; } // Gets the scale factor to setExactSize fonts by. Resolution uses the height of a 4k screen as a base
 		inline float fontScale(float mult) const noexcept { return fontScalePrivate * mult; } // Multiplies the constant by the screen scale factor. ONLY USE THIS when you need to modify offsets within methods by some constant factor or by a size variable in a class, and NOT when initializing sizes on UI components.
 		inline float renderScale() const noexcept { return renderScalePrivate; } // Gets the scale factor to setExactSize elements by. Resolution uses the height of a 4k screen as a base

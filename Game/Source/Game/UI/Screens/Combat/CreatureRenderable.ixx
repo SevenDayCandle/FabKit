@@ -11,9 +11,9 @@ import std;
 namespace fbc {
 	export class CreatureRenderable : public UIInteractable {
 	public:
-		CreatureRenderable(OccupantObject& creature, Hitbox* hb): UIInteractable(hb, creature.getImageField()), creature(creature) {}
+		CreatureRenderable(const OccupantObject& creature, Hitbox* hb): UIInteractable(hb, creature.getImageField()), creature(creature) {}
 
-		OccupantObject& creature;
+		const OccupantObject& creature;
 
 		virtual void renderImpl() override;
 	};
