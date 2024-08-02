@@ -31,7 +31,7 @@ namespace fbc {
 			Iterator(typename vec<uptr<UIEntry<T>>>::iterator it) : it(it) {}
 
 			reference operator*() const { return *(*it); }
-			pointer operator->() { return (*it).get(); }
+			pointer operator->() const { return (*it).get(); }
 
 			Iterator& operator++() {return ++it, *this;}
 			Iterator operator++(int) {
@@ -61,7 +61,7 @@ namespace fbc {
 		inline FFont& getItemFont() const { return itemFont; }
 		inline Iterator begin() { return Iterator(rows.begin()); }
 		inline Iterator end() { return Iterator(rows.end()); }
-		inline int size() const { return rows.size(); }
+		inline size_t size() const { return rows.size(); }
 		inline vec<const T*> toVec() { return futil::transform<uptr<UIEntry<T>>, T*>(rows, [](uptr<UIEntry<T>>& row) { return &(row->item); }); }
 		inline void clearItems() { setItems(); }
 
@@ -76,7 +76,6 @@ namespace fbc {
 		UIList& setItemFont(const FFont& itemFont);
 		UIList& setLabelFunc(const func<str(const T&)>& labelFunc);
 		UIList& setMaxRows(int rows);
-		void forEach(func<void(T&)>& func);
 		void refreshDimensions() override;
 		void renderImpl() override;
 		void updateImpl() override;
@@ -197,14 +196,6 @@ namespace fbc {
 		this->maxRows = rows;
 		autosize();
 		return *this;
-	}
-
-	// Execute a function on every item in the list
-	template<typename T> void UIList<T>::forEach(func<void(T&)>& func)
-	{
-		for (const uptr<UIEntry<T>>& row : rows) {
-			func(row->item);
-		}
 	}
 
 	// Updates the dimensions of all children too

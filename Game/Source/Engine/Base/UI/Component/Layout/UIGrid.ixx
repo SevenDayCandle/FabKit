@@ -12,6 +12,33 @@ namespace fbc {
 
 	export template <c_ext<UIBase> T> class UIGrid : public UIBase {
 	public:
+		class Iterator {
+		public:
+			using iterator_category = std::forward_iterator_tag;
+			using value_type = T;
+			using difference_type = std::ptrdiff_t;
+			using pointer = T*;
+			using reference = T&;
+
+			Iterator(typename vec<uptr<T>>::iterator it) : it(it) {}
+
+			reference operator*() const { return *(*it); }
+			pointer operator->() const { return (*it).get(); }
+
+			Iterator& operator++() { return ++it, * this; }
+			Iterator operator++(int) {
+				Iterator tmp = *this;
+				++it;
+				return tmp;
+			}
+
+			friend bool operator==(const Iterator& a, const Iterator& b) { return a.it == b.it; }
+			friend bool operator!=(const Iterator& a, const Iterator& b) { return a.it != b.it; }
+
+		private:
+			typename vec<uptr<T>>::iterator it;
+		};
+
 		UIGrid(Hitbox* hb, float spacingX = 100, float spacingY = 100, float scrollSpeed = 1) : UIBase(hb),
 			spacingX(spacingX),
 			spacingY(spacingY),
@@ -22,7 +49,9 @@ namespace fbc {
 
 		inline float getSpacingX() const { return spacingX; }
 		inline float getSpacingY() const { return spacingY; }
-		inline int size() { return items.size(); }
+		inline Iterator begin() { return Iterator(items.begin()); }
+		inline Iterator end() { return Iterator(items.end()); }
+		inline size_t size() { return items.size(); }
 
 		template <c_itr<uptr<T>> Iterable> UIGrid& addItems(const Iterable& added);
 		template <c_itr<uptr<T>> Iterable> UIGrid& setItems(const Iterable& items);
@@ -47,7 +76,7 @@ namespace fbc {
 
 	template<c_ext<UIBase> T> bool UIGrid<T>::isHovered()
 	{
-		return futil::any(items, [](const uptr<T>& i) { return i->isHovered(); });
+		return std::ranges::any_of(items, [](const uptr<T>& i) { return i->isHovered(); });
 	}
 
 	// Updates the dimensions of all children too

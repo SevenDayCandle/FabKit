@@ -1,22 +1,23 @@
 export module fbc.CombatTurn;
 
-import fbc.FieldObject;
 import fbc.FUtil;
-import fbc.UIBase;
+import fbc.IDrawable;
+import fbc.TurnObject;
 import std;
 
 namespace fbc {
 	export class CombatTurn {
 	public:
-		CombatTurn(FieldObject& source, int actionValue): source(source), actionValue(actionValue) {}
+		CombatTurn(TurnObject& source, int actionValue): source(source), actionValue(actionValue) {}
 
 		bool isDone = false;
-		FieldObject& source;
+		TurnObject& source;
 		int actionValue;
-		UIBase* uiElement;
 
 		bool operator<(const CombatTurn& other) const { return actionValue < other.actionValue; }
 		bool operator>(const CombatTurn& other) const { return actionValue > other.actionValue; }
+
+		inline IDrawable& getPortrait() { return source.getImagePortrait(); }
 
 		void end();
 		void start();

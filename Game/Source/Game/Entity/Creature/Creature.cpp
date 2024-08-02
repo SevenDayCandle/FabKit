@@ -31,8 +31,7 @@ namespace fbc {
 	// Reinsert a turn into queue based on current speed
 	void Creature::onTurnEnd()
 	{
-		int actionValue = DEFAULT_ROUND_LENGTH * 100 / (1 + getActionSpeed());
-		GameRun::current->getCombatInstance()->queueTurn(*this, actionValue);
+		queueTurn();
 		// TODO end turn hooks
 		// TODO status updates
 	}
@@ -204,6 +203,12 @@ namespace fbc {
 				passives.push_back(move(pa));
 			}
 		}
+	}
+
+	void Creature::queueTurn()
+	{
+		int actionValue = DEFAULT_ROUND_LENGTH * 100 / (1 + getActionSpeed());
+		GameRun::current->getCombatInstance()->queueTurn(*this, actionValue);
 	}
 
 	// Refresh energy, movement, etc. on this creature

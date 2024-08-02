@@ -1,8 +1,5 @@
 export module fbc.AttributeObject;
 
-import fbc.FUtil;
-import std;
-
 namespace fbc {
 	export class AttributeObject {
 	public:

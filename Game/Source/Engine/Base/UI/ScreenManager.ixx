@@ -19,6 +19,7 @@ namespace fbc::screenManager {
 
 	export UIBase* activeElement;
 
+	export bool hasOverlay(IOverlay* target);
 	export IOverlay* getActiveOverlay();
 	export UIBase* currentScreen();
 	export void addVFX(std::unique_ptr<IOverlay>&& vfx);
@@ -65,6 +66,12 @@ namespace fbc::screenManager {
 	void dispose() {
 		overlays.clear();
 		screens.clear();
+	}
+
+	// Check if a given overlay is present
+	bool hasOverlay(IOverlay* target)
+	{
+		return std::ranges::any_of(overlays, [target](uptr<IOverlay>& o) {return o.get() == target; });
 	}
 
 	// Get the active overlay

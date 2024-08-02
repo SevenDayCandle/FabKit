@@ -1,10 +1,9 @@
 export module fbc.RunEncounter;
 
 import fbc.BaseContent;
-import fbc.FUtil;
-import fbc.EncounterCreatureEntry;
 import fbc.ContentRegisterable;
-import std;
+import fbc.EncounterCreatureEntry;
+import fbc.FUtil;
 
 namespace fbc {
 	export class RunEncounter : public ContentRegisterable<RunEncounter> {

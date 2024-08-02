@@ -88,6 +88,7 @@ namespace fbc {
 	export using std::exception;
 	export using std::hash;
 	export using std::list;
+	export using std::queue;
 	export using std::ranges::ref_view;
 	export using std::ranges::transform_view;
 	export using std::set;
@@ -125,8 +126,6 @@ namespace fbc::futil {
 	export template <c_itr<strv> SCo> str joinStr(strv delimiter, SCo items);
 	export template <typename T, c_itr<T> TCo> bool has(const TCo& container, const T& value);
 	export template <typename T, c_itr<T> TCo> const T* find(const TCo& container, const T& value);
-	export template <typename T, typename Pred> bool all(const T& container, Pred predicate);
-	export template <typename T, typename Pred> bool any(const T& container, Pred predicate);
 	export template <typename T, typename U, c_itr<T> TCo, c_invc<T, U> Func> vec<U> transform(const TCo& container, Func mapFunc);
 	export template <typename T, typename U, typename V, c_map_of<T, U> TCo, c_invc<U, V> Func> map<T, V> transformMap(const TCo& src, Func mapFunc);
 	export template <typename T, typename U, typename V, c_map_of<T, U> TCo, c_invc<U, V> Func> umap<T, V> transformUmap(const TCo& src, Func mapFunc);
@@ -138,16 +137,6 @@ namespace fbc::futil {
 }
 
 namespace fbc::futil {
-	// Wrapper function around std::all_of to check the entire container
-	export template <typename T, typename Pred> bool all(const T& container, Pred predicate) {
-		return std::all_of(container.begin(), container.end(), predicate);
-	}
-
-	// Wrapper function around std::any_of to check the entire container
-	export template <typename T, typename Pred> bool any(const T& container, Pred predicate) {
-		return std::any_of(container.begin(), container.end(), predicate);
-	}
-
 	// Format a pair as a dimension
 	export str dimensionString(int x, int y) {
 		return std::to_string(x) + "x" + std::to_string(y);

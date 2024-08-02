@@ -62,6 +62,7 @@ namespace fbc {
 		PileGroup& getPile(const PileType& type);
 		void drawForStartOfTurn();
 		void initialize(vec<ItemListing>& cards, vec<ItemListing>& passives);
+		void queueTurn() override;
 		void refreshValuesForStartOfTurn();
 	private:
 		PileGroup discardPile = PileGroup(piletype::DISCARD);

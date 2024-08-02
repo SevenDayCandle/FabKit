@@ -10,10 +10,41 @@ namespace fbc {
 
 	export class UICanvas : public UIBase {
 	public:
+		class Iterator {
+		public:
+			using iterator_category = std::forward_iterator_tag;
+			using value_type = UIBase;
+			using difference_type = std::ptrdiff_t;
+			using pointer = UIBase*;
+			using reference = UIBase&;
+
+			Iterator(typename vec<uptr<UIBase>>::iterator it) : it(it) {}
+
+			reference operator*() const { return *(*it); }
+			pointer operator->() const { return it->get(); }
+
+			Iterator& operator++() { return ++it, * this; }
+			Iterator operator++(int) {
+				Iterator tmp = *this;
+				++it;
+				return tmp;
+			}
+
+			friend bool operator==(const Iterator& a, const Iterator& b) { return a.it == b.it; }
+			friend bool operator!=(const Iterator& a, const Iterator& b) { return a.it != b.it; }
+
+		private:
+			typename vec<uptr<UIBase>>::iterator it;
+		};
+
 		UICanvas(Hitbox* hb) : UIBase(hb) {}
 		UICanvas(uptr<Hitbox>&& hb) : UIBase(std::move(hb)) {}
 		~UICanvas() override {}
 
+		inline bool empty() { return elements.empty(); }
+		inline Iterator begin() { return Iterator(elements.begin()); }
+		inline Iterator end() { return Iterator(elements.end()); }
+		inline size_t size() const { return elements.size(); }
 		inline void clear() { elements.clear(); }
 
 		template<typename T> requires std::is_base_of_v<UIBase, T> T& addElement(uptr<T>&& element);
@@ -21,6 +52,7 @@ namespace fbc {
 		template<typename T> requires std::is_base_of_v<UIBase, T> T& stackElementYDir(uptr<T>&& element, float spacing = 8, float xOff = 0);
 		UIBase* getLastItem() const;
 		virtual bool isHovered() override;
+		virtual bool removeElement(UIBase* item);
 		virtual void refreshDimensions() override;
 		virtual void renderImpl() override;
 		virtual void updateImpl() override;
@@ -47,7 +79,7 @@ namespace fbc {
 
 	// Is considered hovered if any child element is hovered; own hitbox is ignored
 	bool UICanvas::isHovered() {
-		return futil::any(elements, [](const uptr<UIBase>& i) { return i->isHovered(); });
+		return std::ranges::any_of(elements, [](const uptr<UIBase>& i) { return i->isHovered(); });
 	}
 
 	// Updates the dimensions of all children too
@@ -57,6 +89,18 @@ namespace fbc {
 		for (const uptr<UIBase>& element : elements) {
 			element->refreshDimensions();
 		}
+	}
+
+	// Removes a specified element from the canvas. Return true if the element was erased
+	bool UICanvas::removeElement(UIBase* item)
+	{
+		for (auto it = elements.begin(); it != elements.end(); ++it) {
+			if (it->get() == item) {
+				elements.erase(it);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	void UICanvas::renderImpl()

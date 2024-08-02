@@ -1,10 +1,9 @@
 export module fbc.GameObjectData;
 
 import fbc.BaseContent;
-import fbc.FUtil;
 import fbc.ContentRegisterable;
+import fbc.FUtil;
 import fbc.ObjectStrings;
-import std;
 
 namespace fbc {
 	export template <typename T> class GameObjectData : public ContentRegisterable<T> {

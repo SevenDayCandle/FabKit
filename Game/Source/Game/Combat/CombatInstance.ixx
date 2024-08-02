@@ -1,17 +1,20 @@
 export module fbc.CombatInstance;
 
+import fbc.Action;
 import fbc.CombatSquare;
 import fbc.CombatTurn;
 import fbc.EncounterCreatureEntry;
 import fbc.FieldObject;
 import fbc.FUtil;
-import fbc.IActionable;
 import fbc.RunEncounter;
 import fbc.SavedCreatureEntry;
+import fbc.TurnObject;
 import std;
 
 namespace fbc {
 	export constexpr int DEFAULT_ROUND_LENGTH = 100;
+	constexpr arr<int, 4> DIR_X = { -1, 1, 0, 0 };
+	constexpr arr<int, 4> DIR_Y = { 0, 0, -1, 1 };
 
 	export class CombatInstance {
 	public:
@@ -19,42 +22,42 @@ namespace fbc {
 
 		inline auto getOccupants() { return std::views::transform(occupants, [](uptr<OccupantObject>& item) {return item.get(); }); }
 		inline bool hasAction() const { return currentAction != nullptr; }
+		inline bool isCompleted() const { return completed; }
 		inline CombatTurn* getCurrentTurn() const { return currentTurn; }
-		inline IActionable* getCurrentAction() const { return currentAction; }
+		inline Action* getCurrentAction() const { return currentAction; }
 		inline int getCurrentRound() const { return totalActionTime / roundTime; }
 		inline int getTotalActionTime() const { return totalActionTime; }
+		inline ref_view<const mset<CombatTurn>> getTurns() const { return std::views::all(turns); }
 		inline ref_view<const vec<CombatSquare>> getSquares() const { return std::views::all(squares); }
-		inline ref_view<const vec<int>> getDistances() const { return std::views::all(distances); }
 
-		bool modifyTurnOrder(const FieldObject& target, int diff);
+		bool modifyTurnOrder(const TurnObject& target, int diff);
 		bool nextTurn();
 		bool update();
 		CombatSquare* getSquare(int col, int row);
 		int getDistanceTo(CombatSquare* square);
-		int* getDistanceSquare(int col, int row);
 		vec<CombatSquare*> findShortestPath(CombatSquare* targ);
+		void endCombat();
 		void fillDistances(CombatSquare* source);
 		void initialize(RunEncounter& encounter, vec<SavedCreatureEntry>& runCreatures, int playerFaction);
-		void queueAction(uptr<IActionable>&& action);
+		void queueAction(uptr<Action>&& action);
 		void queueCompleteTurn();
-		void queueTurn(FieldObject& source, int actionValue);
+		void queueTurn(TurnObject& source, int actionValue);
 	private:
+		bool completed;
 		CombatSquare* distanceSource;
 		CombatTurn* currentTurn;
-		deque<uptr<IActionable>> actionQueue;
-		IActionable* currentAction;
+		deque<uptr<Action>> actionQueue;
+		Action* currentAction;
 		mset<CombatTurn> turns;
 		int fieldColumns = 1;
 		int fieldRows = 1;
 		int roundTime = DEFAULT_ROUND_LENGTH;
 		int totalActionTime = 0;
 		vec<CombatSquare> squares;
-		vec<int> distances;
 		vec<uptr<OccupantObject>> occupants;
 
 		inline int getSquareIndex(int col, int row) const {return col + fieldColumns * row;}
 
 		int getSquareIndexAllowRandom(int col, int row);
-		void fillDistancesImpl(int col, int row, int dist);
 	};
 }

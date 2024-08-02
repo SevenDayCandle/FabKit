@@ -4,7 +4,6 @@ import fbc.BaseContent;
 import fbc.FUtil;
 import fbc.GameObjectData;
 import fbc.ObjectStrings;
-import sdl;
 import std;
 
 namespace fbc {

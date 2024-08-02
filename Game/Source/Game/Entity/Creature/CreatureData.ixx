@@ -83,7 +83,7 @@ namespace fbc {
 		if (!imagePortrait) {
 			FTexture* tex = source.getTexture(str(PATH_CREATURE) + "/" + id + ".png");
 			if (tex && tex->loaded()) {
-				imageField = tex;
+				imagePortrait = tex;
 			}
 			if (!imagePortrait) {
 				imagePortrait = &cct.images.none;

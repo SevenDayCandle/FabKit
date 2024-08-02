@@ -6,7 +6,6 @@ import fbc.FFont;
 import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.IDrawable;
-import fbc.ScreenManager;
 import fbc.TextInfo;
 import fbc.UIInteractable;
 import sdl;

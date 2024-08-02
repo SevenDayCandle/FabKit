@@ -179,6 +179,14 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Base\VFX\CallbackVFX.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\Combat\Action\VFXAction.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Game\Content\DynamicContent.ixx">
       <SubType>
       </SubType>
@@ -443,7 +451,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Game\Combat\IActionable.ixx">
+    <ClCompile Include="Source\Game\Combat\Action\Action.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -466,6 +474,10 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       </SubType>
     </ClCompile>
     <ClCompile Include="Source\Game\Entity\Card\CardData.ixx" />
+    <ClCompile Include="Source\Game\Entity\TurnObject.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Game\UI\Screens\Combat\CardRenderable.ixx">
       <SubType>
       </SubType>
@@ -566,6 +578,10 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       </SubType>
     </ClCompile>
     <ClCompile Include="Source\Game\UI\Screens\Combat\CombatSquareRenderable.ixx" />
+    <ClCompile Include="Source\Game\UI\Screens\Combat\CombatTurnRenderable.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Game\UI\Screens\Combat\CreatureRenderable.ixx" />
     <ClCompile Include="Source\Game\UI\Screens\Run\RunScreen.cpp" />
     <ClCompile Include="Source\Game\UI\Screens\Run\RunScreen.ixx">
@@ -573,6 +589,10 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       </SubType>
     </ClCompile>
     <ClCompile Include="Source\Game\UI\Screens\TitleScreen.ixx" />
+    <ClCompile Include="Source\Game\VFX\UI\HitboxMoveVFX.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Main.cpp">
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>

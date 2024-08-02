@@ -1,16 +1,17 @@
 module;
 
+import fbc.Action;
 import fbc.CombatSquare;
 import fbc.CombatTurn;
 import fbc.Creature;
 import fbc.CreatureData;
 import fbc.EncounterCreatureEntry;
 import fbc.FieldObject;
-import fbc.GameRun;
 import fbc.FUtil;
-import fbc.IActionable;
+import fbc.GameRun;
 import fbc.RunEncounter;
 import fbc.SavedCreatureEntry;
+import fbc.TurnObject;
 import sdl;
 import std;
 
@@ -31,7 +32,6 @@ namespace fbc {
 				squares.emplace_back(i, j);
 			}
 		}
-		distances.resize(squares.size(), -1);
 
 		// Creates field members based on the room parameters
 		// TODO handle other fieldobject types besides creature
@@ -111,13 +111,19 @@ namespace fbc {
 
 		// TODO Setup subscribers
 
-		// TODO Setup initial turns
+		// Setup initial turns
+		for (OccupantObject* occupant : getOccupants()) {
+			occupant->queueTurn();
+		}
 
 		// TODO Start of combat hooks for all field members
+		for (OccupantObject* occupant : getOccupants()) {
+			occupant->postInitialize();
+		}
 	}
 
 	// Queue an action to be executed
-	void CombatInstance::queueAction(uptr<IActionable>&& action)
+	void CombatInstance::queueAction(uptr<Action>&& action)
 	{
 		actionQueue.push_back(move(action));
 		// TODO vfx & hooks
@@ -132,39 +138,55 @@ namespace fbc {
 	}
 
 	// Queue a turn to be executed. Turn queue is always sorted by ascending action order. ActionValue is relative to the total action time that has already elapsed
-	void CombatInstance::queueTurn(FieldObject& source, int actionValue)
+	void CombatInstance::queueTurn(TurnObject& source, int actionValue)
 	{
 		const CombatTurn& turn = *turns.emplace(source, totalActionTime + actionValue);
 		// TODO vfx & hooks
+	}
+
+	// Ends the combat
+	void CombatInstance::endCombat()
+	{
+		// TODO hooks
+		completed = true;
 	}
 
 	// Generate a distance map from the source to all other squares
 	void CombatInstance::fillDistances(CombatSquare* source)
 	{
 		if (source != distanceSource) {
-			std::ranges::fill(distances, -1);
 			distanceSource = source;
-			fillDistancesImpl(source->col, source->row, 0);
-		}
-	}
+			deque<CombatSquare*> queue {source};
+			for (CombatSquare& sq : squares) {
+				sq.sDist = futil::INT_MAX;
+			}
 
-	// Calculate the distance from this particular square to the source
-	void CombatInstance::fillDistancesImpl(int col, int row, int dist)
-	{
-		// TODO check for square passability
-		int* sq = getDistanceSquare(col, row);
-		if (sq && *sq > -1) {
-			*sq = dist;
-			int next = dist + 1;
-			fillDistancesImpl(col - 1, row - 1, next);
-			fillDistancesImpl(col - 1, row + 1, next);
-			fillDistancesImpl(col + 1, row - 1, next);
-			fillDistancesImpl(col + 1, row + 1, next);
+			while (!queue.empty()) {
+				CombatSquare* square = queue.front();
+				queue.pop_front();
+				int scol = square->col;
+				int srow = square->row;
+				int tDist = square->sDist + 1;
+				for (int i = 0; i < DIR_X.size(); i++) {
+					int tcol = scol + DIR_X[i];
+					int trow = srow + DIR_Y[i];
+					CombatSquare* tsquare = getSquare(tcol, trow);
+					if (tsquare && tsquare->sDist > tDist) {
+						if (tsquare->passable()) {
+							tsquare->sDist = tDist;
+							queue.push_back(tsquare);
+						}
+						else {
+							tsquare->sDist = -1; // Unreachable
+						}
+					}
+				}
+			}
 		}
 	}
 
 	// Change the action order for all turns corresponding with the target
-	bool CombatInstance::modifyTurnOrder(const FieldObject& target, int diff)
+	bool CombatInstance::modifyTurnOrder(const TurnObject& target, int diff)
 	{
 		for (auto it = turns.begin(); it != turns.end(); ) {
 			if (&(it->source) == &target) {
@@ -180,16 +202,17 @@ namespace fbc {
 		return false;
 	}
 
-	// Drops the current turn and starts the next turn in the queue. Returns true if there are no more turns left
+	// Drops the current turn and starts the next turn in the queue. Returns true if there are no more turns left or if combat condition is satisfied
 	bool CombatInstance::nextTurn()
 	{
+		// TODO combat end condition check (i.e. only one faction alive)
 		if (!turns.empty()) {
 			auto it = turns.begin();
-			CombatTurn* turn = const_cast<CombatTurn*>(&*it);
-			turn->end();
-			totalActionTime = turn->actionValue;
+			CombatTurn& turn = const_cast<CombatTurn&>(*it);
+			turn.end();
+			totalActionTime = turn.actionValue;
 			turns.erase(it);
-			// TODO round end logic
+			// TODO round end logic (whenever totalActionTime exceeds a multiple of round time)
 		}
 		currentTurn = nullptr;
 		if (!turns.empty()) {
@@ -208,7 +231,7 @@ namespace fbc {
 	{
 		// Run current action
 		if (currentAction) {
-			if (currentAction->isDone()) {
+			if (currentAction->run()) {
 				currentAction = nullptr;
 				actionQueue.pop_front();
 			}
@@ -226,13 +249,6 @@ namespace fbc {
 		}
 		// Otherwise poll the next turn if it is present
 		return nextTurn();
-	}
-
-	// Get the distance to the col/row position from the source. Return null if invalid
-	int* CombatInstance::getDistanceSquare(int col, int row)
-	{
-		int targetSquare = getSquareIndex(col, row);
-		return (targetSquare < distances.size() && targetSquare >= 0 ? &distances[targetSquare] : nullptr);
 	}
 
 	// Wrapper around getSquareIndex that treats negative values as random
@@ -253,7 +269,33 @@ namespace fbc {
 	// Get the distance from the distance source to the given square. Return -1 if unreachable
 	int CombatInstance::getDistanceTo(CombatSquare* square)
 	{
-		int* distance = getDistanceSquare(square->col, square->row);
-		return distance != nullptr ? *distance : -1;
+		CombatSquare* sq = getSquare(square->col, square->row);
+		return sq != nullptr ? sq->sDist : -1;
+	}
+
+	// Find a shortest path from the target square (inclusive) to the source square (exclusive)
+	vec<CombatSquare*> CombatInstance::findShortestPath(CombatSquare* targ)
+	{
+		vec<CombatSquare*> path;
+		int targDist = targ->sDist;
+		// Distance of -1 or INT_MAX means that the square cannot be reached
+		if (targDist >= 0 && targDist != futil::INT_MAX) {
+			CombatSquare* current = targ;
+			while (current != distanceSource) {
+				path.push_back(current);
+				int scol = current->col;
+				int srow = current->row;
+				for (int i = 0; i < DIR_X.size(); i++) {
+					int tcol = scol + DIR_X[i];
+					int trow = srow + DIR_Y[i];
+					CombatSquare* tsquare = getSquare(tcol, trow);
+					if (tsquare && tsquare->sDist >= 0 && tsquare->sDist < current->sDist) {
+						current = tsquare;
+						break;
+					}
+				}
+			}
+		}
+		return path;
 	}
 }

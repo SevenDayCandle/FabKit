@@ -2,7 +2,7 @@ export module fbc.FieldObject;
 
 import fbc.AttributeObject;
 import fbc.FUtil;
-import fbc.UIBase;
+import fbc.IDrawable;
 import std;
 
 namespace fbc {
@@ -13,9 +13,5 @@ namespace fbc {
 		virtual ~FieldObject() = default;
 
 		vec<uptr<AttributeObject>> statuses;
-
-		inline virtual void onTurnEnd() {}
-
-		virtual bool onTurnBegin() = 0;
 	};
 }

@@ -24,6 +24,7 @@ namespace fbc {
 		std::mt19937 rng;
 	};
 
+	// Advances the counter by the specified amount
 	GameRNG& GameRNG::addCounter(int add)
 	{
 		this->counter += add;

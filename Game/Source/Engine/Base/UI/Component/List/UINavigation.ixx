@@ -127,7 +127,7 @@ namespace fbc {
 	template<c_ext<UIBase> T> void UINavigation<T>::refreshRows()
 	{
 		UIList<T>::refreshRows();
-		if ((currentItem == nullptr && !this->empty()) || !futil::any(this->rows, [this](const uptr<UIEntry<T>>& row) {return &row->item == currentItem; })) {
+		if ((currentItem == nullptr && !this->empty()) || !std::ranges::any_of(this->rows, [this](const uptr<UIEntry<T>>& row) {return &row->item == currentItem; })) {
 			select(0);
 		}
 		else if (this->empty()) {

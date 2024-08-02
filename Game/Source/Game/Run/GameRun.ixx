@@ -45,6 +45,7 @@ namespace fbc {
 
 		inline CombatInstance* getCombatInstance() const { return combatInstance.get(); }
 		inline ref_view<const vec<RunRoom>> getRooms() const { return std::views::all(rooms); }
+		inline ref_view<vec<RunRoom>> getRooms() { return std::views::all(rooms); }
 		inline RunRoom* getCurrentRoom() const { return currentRoom; }
 		inline RunZone* getCurrentZone() const { return currentZone; }
 		inline unsigned int getSeed() const { return seed; }
