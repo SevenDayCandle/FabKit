@@ -5,6 +5,7 @@ import fbc.CallbackVFX;
 import fbc.FUtil;
 import fbc.IOverlay;
 import fbc.ScreenManager;
+import fbc.UIBase;
 import std;
 
 namespace fbc {
@@ -22,7 +23,13 @@ namespace fbc {
 
 	void VFXAction::start()
 	{
-		vfx->setOnComplete([this](CallbackVFX& v) {isDone = true; });
-		screenManager::addVFX(move(vfx));
+		UIBase* screen = screenManager::currentScreen();
+		if (screen) {
+			vfx->setOnComplete([this](CallbackVFX& v) {isDone = true; });
+			screen->addVFX(move(vfx));
+		}
+		else {
+			isDone = true;
+		}
 	}
 }

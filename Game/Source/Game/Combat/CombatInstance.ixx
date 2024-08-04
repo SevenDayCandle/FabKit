@@ -18,6 +18,13 @@ namespace fbc {
 
 	export class CombatInstance {
 	public:
+		struct IViewSubscriber {
+			virtual void onPlayerTurnBegin(const CombatTurn* turn) = 0;
+			virtual void onPlayerTurnEnd(const CombatTurn* turn) = 0;
+			virtual void onTurnAdded(const CombatTurn& turn) = 0;
+			virtual void onTurnChanged(ref_view<const mset<CombatTurn>> turns) = 0;
+			virtual void onTurnRemoved(const CombatTurn* turn) = 0;
+		};
 		CombatInstance() {}
 
 		inline auto getOccupants() { return std::views::transform(occupants, [](uptr<OccupantObject>& item) {return item.get(); }); }
@@ -30,6 +37,8 @@ namespace fbc {
 		inline ref_view<const mset<CombatTurn>> getTurns() const { return std::views::all(turns); }
 		inline ref_view<const vec<CombatSquare>> getSquares() const { return std::views::all(squares); }
 
+		IViewSubscriber* viewSubscriber;
+
 		bool modifyTurnOrder(const TurnObject& target, int diff);
 		bool nextTurn();
 		bool update();
@@ -37,6 +46,7 @@ namespace fbc {
 		int getDistanceTo(CombatSquare* square);
 		vec<CombatSquare*> findShortestPath(CombatSquare* targ);
 		void endCombat();
+		void endCurrentTurn();
 		void fillDistances(CombatSquare* source);
 		void initialize(RunEncounter& encounter, vec<SavedCreatureEntry>& runCreatures, int playerFaction);
 		void queueAction(uptr<Action>&& action);

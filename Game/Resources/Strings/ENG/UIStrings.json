@@ -1,4 +1,7 @@
 {
+  "combat_end_turn": "End Turn",
+  "combat_pile_discard": "Discard",
+  "combat_pile_draw": "Draw",
   "options_graphics_fps": "FPS",
   "options_graphics_resolution": "Resolution",
   "options_graphics_vsync": "VSync",

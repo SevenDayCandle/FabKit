@@ -18,7 +18,7 @@ namespace fbc {
 		virtual void dispose() override;
 	};
 
-	void CallbackVFX::dispose()
+	 void CallbackVFX::dispose()
 	{
 		if (onComplete) {
 			onComplete(*this);

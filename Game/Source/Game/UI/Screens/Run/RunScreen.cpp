@@ -1,5 +1,7 @@
 module;
 
+import fbc.SavedCreatureEntry;
+
 module fbc.RunScreen;
 
 namespace fbc {
@@ -7,11 +9,15 @@ namespace fbc {
 	void RunScreen::open()
 	{
 		// TODO For testing only, remove when run starting is properly implemented
-		GameRun::startRun(5);
+		GameRun::StartData data{ 0, {
+			SavedCreatureEntry("test", "TestPlayer", "", 0)
+		} };
+		GameRun::startRun(5, data);
+
 
 		// Add buttons for each room in the current zone
 		for (const RunRoom& room : GameRun::current->getRooms()) {
-			this->addElement(makeRoomButton(const_cast<RunRoom&>(room)));
+			this->add(makeRoomButton(const_cast<RunRoom&>(room)));
 		}
 	}
 

@@ -22,12 +22,13 @@ namespace fbc {
 		inline virtual bool isHovered() { return hb->isHovered(); }
 		inline virtual void onSizeUpdated() {}
 		inline virtual UIBase& addVFX(uptr<IOverlay>&& vfx) { return *this; }
-		inline virtual UIBase& setHbExactPos(const float x, const float y) { return hb->setExactPos(x, y), *this; }
-		inline virtual UIBase& setHbExactPosX(const float x) { return hb->setExactPosX(x), * this; }
-		inline virtual UIBase& setHbExactPosY(const float y) { return hb->setExactPosY(y), * this; }
-		inline virtual UIBase& setHbOffsetPos(const float x, const float y) { return hb->setOffsetPos(x, y), * this; }
-		inline virtual UIBase& setHbOffsetPosX(const float x) { return hb->setOffsetPosX(x), * this; }
-		inline virtual UIBase& setHbOffsetPosY(const float y) { return hb->setOffsetPosY(y), * this; }
+		inline virtual UIBase& setEnabled(const bool enabled) { return this->enabled = enabled, * this; }
+		inline virtual UIBase& setHbExactPos(const float x, const float y) { return hb->setRealPos(x, y), *this; }
+		inline virtual UIBase& setHbExactPosX(const float x) { return hb->setRealPosX(x), * this; }
+		inline virtual UIBase& setHbExactPosY(const float y) { return hb->setRealPosY(y), * this; }
+		inline virtual UIBase& setHbOffsetPos(const float x, const float y) { return hb->setOffPos(x, y), * this; }
+		inline virtual UIBase& setHbOffsetPosX(const float x) { return hb->setOffPosX(x), * this; }
+		inline virtual UIBase& setHbOffsetPosY(const float y) { return hb->setOffPosY(y), * this; }
 
 		virtual UIBase& setHbExactSize(const float x, const float y);
 		virtual UIBase& setHbExactSizeX(const float x);
@@ -44,50 +45,50 @@ namespace fbc {
 		virtual void renderImpl() = 0;
 	};
 
-	// Wrapper around setExactSize that invokes any size update callbacks
+	// Wrapper around setRealSize that invokes any size update callbacks
 	UIBase& UIBase::setHbExactSize(const float x, const float y)
 	{
-		hb->setExactSize(x, y);
+		hb->setRealSize(x, y);
 		onSizeUpdated();
 		return *this;
 	}
 
-	// Wrapper around setExactSize that invokes any size update callbacks
+	// Wrapper around setRealSize that invokes any size update callbacks
 	UIBase& UIBase::setHbExactSizeX(const float x)
 	{
-		hb->setExactSizeX(x);
+		hb->setRealSizeX(x);
 		onSizeUpdated();
 		return *this;
 	}
 
-	// Wrapper around setExactSize that invokes any size update callbacks
+	// Wrapper around setRealSize that invokes any size update callbacks
 	UIBase& UIBase::setHbExactSizeY(const float y)
 	{
-		hb->setExactSizeY(y);
+		hb->setRealSizeY(y);
 		onSizeUpdated();
 		return *this;
 	}
 
-	// Wrapper around setOffsetSize that invokes any size update callbacks
+	// Wrapper around setOffSize that invokes any size update callbacks
 	UIBase& UIBase::setHbOffsetSize(const float x, const float y)
 	{
-		hb->setOffsetSize(x, y);
+		hb->setOffSize(x, y);
 		onSizeUpdated();
 		return *this;
 	}
 
-	// Wrapper around setOffsetSize that invokes any size update callbacks
+	// Wrapper around setOffSize that invokes any size update callbacks
 	UIBase& UIBase::setHbOffsetSizeX(const float x)
 	{
-		hb->setOffsetSizeX(x);
+		hb->setOffSizeX(x);
 		onSizeUpdated();
 		return *this;
 	}
 
-	// Wrapper around setOffsetSize that invokes any size update callbacks
+	// Wrapper around setOffSize that invokes any size update callbacks
 	UIBase& UIBase::setHbOffsetSizeY(const float y)
 	{
-		hb->setOffsetSizeY(y);
+		hb->setOffSizeY(y);
 		onSizeUpdated();
 		return *this;
 	}

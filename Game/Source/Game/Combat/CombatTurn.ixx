@@ -11,8 +11,9 @@ namespace fbc {
 		CombatTurn(TurnObject& source, int actionValue): source(source), actionValue(actionValue) {}
 
 		bool isDone = false;
-		TurnObject& source;
+		func<bool(CombatTurn&)> onStart;
 		int actionValue;
+		TurnObject& source;
 
 		bool operator<(const CombatTurn& other) const { return actionValue < other.actionValue; }
 		bool operator>(const CombatTurn& other) const { return actionValue > other.actionValue; }
@@ -20,18 +21,24 @@ namespace fbc {
 		inline IDrawable& getPortrait() { return source.getImagePortrait(); }
 
 		void end();
-		void start();
+		bool start();
 	};
+
+	bool CombatTurn::start()
+	{
+		if (onStart) {
+			isDone = onStart(*this);
+		}
+		else {
+			isDone = source.onTurnBegin();
+		}
+		// TODO hooks
+		return isDone;
+	}
 
 	void CombatTurn::end()
 	{
 		source.onTurnEnd();
-		// TODO hooks
-	}
-
-	void CombatTurn::start()
-	{
-		isDone = source.onTurnBegin();
 		// TODO hooks
 	}
 }

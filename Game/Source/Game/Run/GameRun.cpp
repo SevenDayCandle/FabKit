@@ -189,9 +189,9 @@ namespace fbc {
 		current = make_unique<GameRun>(save);
 	}
 
-	void GameRun::startRun(int seed)
+	void GameRun::startRun(int seed, GameRun::StartData& data)
 	{
-		current = make_unique<GameRun>(seed);
+		current = make_unique<GameRun>(seed, data);
 		RunZone* zone = current->getValidZone();
 		if (zone) {
 			current->startZone(zone);

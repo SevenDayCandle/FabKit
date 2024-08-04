@@ -9,9 +9,9 @@ import sdl;
 import std;
 
 namespace fbc {
-	export class Status : public GameObjectDerived<StatusData>, public AttributeObject {
+	export class Status : public GameObjectD<StatusData>, public AttributeObject {
 	public:
-		Status(StatusData& data): GameObjectDerived<StatusData>(data) {}
+		Status(StatusData& data): GameObjectD<StatusData>(data) {}
 
 		int stacks;
 		int turns;

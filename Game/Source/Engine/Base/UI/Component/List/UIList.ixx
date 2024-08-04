@@ -174,7 +174,7 @@ namespace fbc {
 		return addItems(items);
 	}
 
-	// Updates the menu font used by rows. This will update existing rows to use the new font and will setExactSize the menu
+	// Updates the menu font used by rows. This will update existing rows to use the new font and will setRealSize the menu
 	template <typename T>
 	UIList<T>& UIList<T>::setItemFont(const FFont& itemFont) {
 		this->itemFont = itemFont;
@@ -183,7 +183,7 @@ namespace fbc {
 		return *this;
 	}
 
-	// Updates the label function used for row titles. This will update titles on existing rows and will setExactSize the menu
+	// Updates the label function used for row titles. This will update titles on existing rows and will setRealSize the menu
 	template<typename T> UIList<T>& UIList<T>::setLabelFunc(const func<str(const T&)>& labelFunc) {
 		this->labelFunc = labelFunc;
 		for (const uptr<UIEntry<T>>& row : rows) { row->setText(this->labelFunc(row->item)); }
@@ -311,7 +311,7 @@ namespace fbc {
 		float x = hb->x + rMarg;
 		float y = hb->y + rMarg;
 		for (int i = topVisibleRowIndex; i < topVisibleRowIndex + rowCount; ++i) {
-			rows[i]->hb->setExactPos(x, y);
+			rows[i]->hb->setRealPos(x, y);
 			y += rows[i]->hb->h;
 		}
 	}

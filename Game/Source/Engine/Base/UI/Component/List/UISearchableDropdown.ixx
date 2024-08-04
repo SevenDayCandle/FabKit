@@ -187,7 +187,7 @@ namespace fbc {
 	{
 		return std::make_unique<UISearchableDropdown<T>>(
 			hb,
-			UISelectorList<T>::multiList(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), std::move(labelFunc), itemFont, background),
+			UISelectorList<T>::multiList(new ScaleHitbox(hb->getOffSizeX(), hb->getOffSizeY()), std::move(labelFunc), itemFont, background),
 			image,
 			arrow,
 			clear,
@@ -201,7 +201,7 @@ namespace fbc {
 	{
 		return std::make_unique<UISearchableDropdown<T>>(
 			hb,
-			UISelectorList<T>::singleList(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), std::move(labelFunc), itemFont, background),
+			UISelectorList<T>::singleList(new ScaleHitbox(hb->getOffSizeX(), hb->getOffSizeY()), std::move(labelFunc), itemFont, background),
 			image,
 			arrow,
 			clear,

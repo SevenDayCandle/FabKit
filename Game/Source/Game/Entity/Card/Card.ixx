@@ -10,9 +10,9 @@ import sdl;
 import std;
 
 namespace fbc {
-	export class Card : public GameObjectDerived<CardData> {
+	export class Card : public GameObjectD<CardData> {
 	public:
-		Card(CardData& data, int upgrades = 0) : GameObjectDerived<CardData>(data), upgrades(upgrades) {}
+		Card(CardData& data, int upgrades = 0) : GameObjectD<CardData>(data), upgrades(upgrades) {}
 
 		int upgrades;
 		opt<vec<uptr<Effect>>> effectOverride;

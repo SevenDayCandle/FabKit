@@ -13,7 +13,7 @@ namespace fbc {
 		UIVerticalCanvas(Hitbox* hb, float scrollSpeed = 1): UICanvas(hb),
 			scrollSpeed(scrollSpeed),
 			scrollbar{ new ScaleHitbox(hb->w * 0.93f / cfg.renderScale(), hb->y + hb->h * 0.05f / cfg.renderScale(), 48, hb->h * 0.9f / cfg.renderScale())},
-			baseOffsetY(hb->getOffsetPosY()) {
+			baseOffsetY(hb->getOffPosY()) {
 			scrollbar.setOnScroll([this](float f) {reposition(f); });
 		}
 
@@ -30,7 +30,7 @@ namespace fbc {
 	private:
 		float baseOffsetY;
 
-		inline void reposition(float percent) { hb->setOffsetPosY(baseOffsetY - percent * scrollSpeed); }
+		inline void reposition(float percent) { hb->setOffPosY(baseOffsetY - percent * scrollSpeed); }
 	};
 
 	UIVerticalCanvas& UIVerticalCanvas::setScrollSpeed(float scrollSpeed)

@@ -27,7 +27,15 @@ namespace fbc {
 			vec<SavedCreatureEntry> creatures;
 		};
 
+		struct StartData {
+			int faction;
+			vec<SavedCreatureEntry> creatures;
+		};
+
 		GameRun(int seed): seed(seed) {
+			initialize();
+		}
+		GameRun(int seed, GameRun::StartData& data) : creatures(data.creatures), faction(data.faction), seed(seed) {
 			initialize();
 		}
 		GameRun(SaveData& save): GameRun(save.seed) {
@@ -61,7 +69,7 @@ namespace fbc {
 		void startZone(RunZone* zone);
 
 		static void loadRun(SaveData& save);
-		static void startRun(int seed);
+		static void startRun(int seed, GameRun::StartData& data);
 	private:
 		int lastRngMap;
 		int posCol;

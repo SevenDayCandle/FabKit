@@ -17,14 +17,14 @@ namespace fbc {
 	protected:
 		Hitbox& parent;
 
-		inline void refreshExactPosX() override { x = parent.x + cfg.renderScale() * offsetPosX; }
-		inline void refreshExactPosY() override { y = parent.y + cfg.renderScale() * offsetPosY; }
-		inline void refreshExactSizeX() override { w = cfg.renderScale() * offsetSizeX; }
-		inline void refreshExactSizeY() override { h = cfg.renderScale() * offsetSizeY; }
-		inline void refreshOffsetPosX() override { offsetPosX = (x - parent.x) / cfg.renderScale(); }
-		inline void refreshOffsetPosY() override { offsetPosY = (y - parent.y) / cfg.renderScale(); }
-		inline void refreshOffsetSizeX() override { offsetSizeX = w / cfg.renderScale(); }
-		inline void refreshOffsetSizeY() override { offsetSizeY = h / cfg.renderScale(); }
+		inline void refreshOffPosX() override { offPosX = (x - parent.x) / cfg.renderScale(); }
+		inline void refreshOffPosY() override { offPosY = (y - parent.y) / cfg.renderScale(); }
+		inline void refreshOffSizeX() override { offSizeX = w / cfg.renderScale(); }
+		inline void refreshOffSizeY() override { offSizeY = h / cfg.renderScale(); }
+		inline void refreshRealPosX() override { x = parent.x + cfg.renderScale() * offPosX; }
+		inline void refreshRealPosY() override { y = parent.y + cfg.renderScale() * offPosY; }
+		inline void refreshRealSizeX() override { w = cfg.renderScale() * offSizeX; }
+		inline void refreshRealSizeY() override { h = cfg.renderScale() * offSizeY; }
 
 		void update() override;
 	};
@@ -33,7 +33,7 @@ namespace fbc {
 	void RelativeHitbox::update()
 	{
 		Hitbox::update();
-		refreshExactPosX();
-		refreshExactPosY();
+		refreshRealPosX();
+		refreshRealPosY();
 	}
 }

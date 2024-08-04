@@ -126,7 +126,7 @@ namespace fbc {
 	void CombatInstance::queueAction(uptr<Action>&& action)
 	{
 		actionQueue.push_back(move(action));
-		// TODO vfx & hooks
+		// TODO hooks
 	}
 
 	// Marks the current turn as being completed, so that it can be pushed out after actions are done
@@ -141,6 +141,10 @@ namespace fbc {
 	void CombatInstance::queueTurn(TurnObject& source, int actionValue)
 	{
 		const CombatTurn& turn = *turns.emplace(source, totalActionTime + actionValue);
+		if (viewSubscriber) {
+			viewSubscriber->onTurnAdded(turn);
+			viewSubscriber->onTurnChanged(getTurns());
+		}
 		// TODO vfx & hooks
 	}
 
@@ -149,6 +153,28 @@ namespace fbc {
 	{
 		// TODO hooks
 		completed = true;
+	}
+
+	// Ends the current turn
+	void CombatInstance::endCurrentTurn()
+	{
+		if (!turns.empty()) {
+			auto it = turns.begin();
+			CombatTurn& turn = const_cast<CombatTurn&>(*it);
+			CombatTurn* pt = &turn;
+			turn.end();
+			totalActionTime = turn.actionValue;
+			if (!turn.isDone && viewSubscriber) {
+				viewSubscriber->onPlayerTurnEnd(pt);
+			}
+			turns.erase(it);
+			if (viewSubscriber) {
+				viewSubscriber->onTurnRemoved(pt);
+				viewSubscriber->onTurnChanged(getTurns());
+			}
+			// TODO round end logic (whenever totalActionTime exceeds a multiple of round time)
+		}
+		currentTurn = nullptr;
 	}
 
 	// Generate a distance map from the source to all other squares
@@ -194,6 +220,9 @@ namespace fbc {
 				modifiedTurn.actionValue += diff;
 				it = turns.erase(it);
 				turns.insert(move(modifiedTurn));
+				if (viewSubscriber) {
+					viewSubscriber->onTurnChanged(getTurns());
+				}
 			}
 			else {
 				++it;
@@ -207,17 +236,10 @@ namespace fbc {
 	{
 		// TODO combat end condition check (i.e. only one faction alive)
 		if (!turns.empty()) {
-			auto it = turns.begin();
-			CombatTurn& turn = const_cast<CombatTurn&>(*it);
-			turn.end();
-			totalActionTime = turn.actionValue;
-			turns.erase(it);
-			// TODO round end logic (whenever totalActionTime exceeds a multiple of round time)
-		}
-		currentTurn = nullptr;
-		if (!turns.empty()) {
 			currentTurn = const_cast<CombatTurn*>(&*turns.begin());
-			currentTurn->start();
+			if (currentTurn->start() && viewSubscriber) {
+				viewSubscriber->onPlayerTurnBegin(currentTurn);
+			}
 			return false;
 		}
 		return true;
@@ -244,7 +266,10 @@ namespace fbc {
 			return false;
 		}
 		// Otherwise run current turn
-		else if (currentTurn && !currentTurn->isDone) {
+		else if (currentTurn) {
+			if (currentTurn->isDone) {
+				endCurrentTurn();
+			}
 			return false;
 		}
 		// Otherwise poll the next turn if it is present

@@ -166,10 +166,10 @@ namespace fbc {
 	template<typename T> void UIDropdown<T>::openPopup() {
 		int bottom = hb->y + hb->h;
 		if (bottom + menu->hb->h > cfg.getScreenYSize()) {
-			menu->hb->setExactPos(hb->x, hb->y - menu->hb->h);
+			menu->hb->setRealPos(hb->x, hb->y - menu->hb->h);
 		}
 		else {
-			menu->hb->setExactPos(hb->x, bottom);
+			menu->hb->setRealPos(hb->x, bottom);
 		}
 		if (proxy == nullptr) {
 			screenManager::openOverlay(std::make_unique<UIDropdownProxy<T>>(*this));
@@ -205,7 +205,7 @@ namespace fbc {
 	template<typename T> void UIDropdown<T>::init()
 	{
 		this->menu->setOnSelectionUpdate([this](EntryView<T>& items) { this->onSelectionUpdate(items); });
-		this->menu->hb->setExactPos(hb->x, hb->y);
+		this->menu->hb->setRealPos(hb->x, hb->y);
 		UIDropdown<T>::onSizeUpdated();
 	}
 
@@ -214,7 +214,7 @@ namespace fbc {
 	{
 		return std::make_unique<UIDropdown<T>>(
 			hb,
-			UISelectorList<T>::multiList(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), labelFunc, itemFont, background),
+			UISelectorList<T>::multiList(new ScaleHitbox(hb->getOffSizeX(), hb->getOffSizeY()), labelFunc, itemFont, background),
 			image,
 			arrow,
 			clear,
@@ -228,7 +228,7 @@ namespace fbc {
 	{
 		return std::make_unique<UIDropdown<T>>(
 			hb,
-			UISelectorList<T>::singleList(new ScaleHitbox(hb->getOffsetSizeX(), hb->getOffsetSizeY()), labelFunc, itemFont, background),
+			UISelectorList<T>::singleList(new ScaleHitbox(hb->getOffSizeX(), hb->getOffSizeY()), labelFunc, itemFont, background),
 			image,
 			arrow,
 			clear,

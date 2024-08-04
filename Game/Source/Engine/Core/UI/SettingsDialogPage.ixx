@@ -72,7 +72,7 @@ namespace fbc {
 	UISlider& SettingsDialogPage::addSlider(ConfigValue<int>& conf, strv name, int min, int max, float xOff)
 	{
 		SettingsDialogCache<int>& cache = static_cast<SettingsDialogCache<int>&>(*confs.emplace_back(std::make_unique<SettingsDialogCache<int>>(conf)));
-		UISlider& slider = stackElementYDir(std::make_unique<UISlider>(new RelativeHitbox(*hb, xOff, 0, 200, 100), min, max), 8, getOffsetFromLast());
+		UISlider& slider = stackYDir(std::make_unique<UISlider>(new RelativeHitbox(*hb, xOff, 0, 200, 100), min, max), 8, getOffsetFromLast());
 		slider
 			.setValue(conf.get())
 			.setOnComplete([&cache](int val) {cache.value = val; })
@@ -84,7 +84,7 @@ namespace fbc {
 	UIToggle& SettingsDialogPage::addToggle(ConfigValue<bool>& conf, strv name, float xOff)
 	{
 		SettingsDialogCache<bool>& cache = static_cast<SettingsDialogCache<bool>&>(*confs.emplace_back(std::make_unique<SettingsDialogCache<bool>>(conf)));
-		UIToggle& toggle = stackElementYDir(std::make_unique<UIToggle>(new RelativeHitbox(*hb, xOff, 0, 100, 100), name, cct.images.uiCheckboxEmpty, cct.images.uiCheckboxFilled, cct.fontBold(), -xOff), 8, getOffsetFromLast());
+		UIToggle& toggle = stackYDir(std::make_unique<UIToggle>(new RelativeHitbox(*hb, xOff, 0, 100, 100), name, cct.images.uiCheckboxEmpty, cct.images.uiCheckboxFilled, cct.fontBold(), -xOff), 8, getOffsetFromLast());
 		toggle.setToggleState(conf.get())
 			.setOnClick([&cache](const UIToggle& toggle) {cache.value = toggle.toggled; });
 		cache.setOnReset([&toggle, &conf]() {toggle.toggle(conf.get()); });
@@ -94,7 +94,7 @@ namespace fbc {
 	template<typename T, typename Iterable> UIDropdown<T>& SettingsDialogPage::addDropdownImpl(ConfigValue<T>& conf, strv name, const Iterable& items, func<str(const T&)> labelFunc, int min, int xOff)
 	{
 		SettingsDialogCache<T>& cache = static_cast<SettingsDialogCache<T>&>(*confs.emplace_back(std::make_unique<SettingsDialogCache<T>>(conf)));
-		UIDropdown<T>& dr = stackElementYDir(UIDropdown<T>::singleList(new RelativeHitbox(*hb, xOff, 0, hb->getScaleOffsetSizeX() * 0.8f, 100), labelFunc), 8, getOffsetFromLast());
+		UIDropdown<T>& dr = stackYDir(UIDropdown<T>::singleList(new RelativeHitbox(*hb, xOff, 0, hb->getScaleOffSizeX() * 0.8f, 100), labelFunc), 8, getOffsetFromLast());
 		dr.setItems(items)
 			.setOnChange([&cache](EntryView<T>& res) { if (res.size() > 0) cache.value = *res.begin(); })
 			.withLabel(name, cct.fontBold(), -xOff, 25);
@@ -109,7 +109,7 @@ namespace fbc {
 	template<typename T, typename U, typename Iterable> UIDropdown<U>& SettingsDialogPage::addDropdownMappedImpl(ConfigValue<T>& conf, strv name, const Iterable& items, func<T(const U*)> convFunc, func<str(const T&)> labelFunc, int min, int xOff)
 	{
 		SettingsDialogCache<T>& cache = static_cast<SettingsDialogCache<T>&>(*confs.emplace_back(std::make_unique<SettingsDialogCache<T>>(conf)));
-		UIDropdown<U>& dr = stackElementYDir(UIDropdown<U>::singleList(new RelativeHitbox(*hb, xOff, 0, hb->getScaleOffsetSizeX() * 0.8f, 100), labelFunc), 8, getOffsetFromLast());
+		UIDropdown<U>& dr = stackYDir(UIDropdown<U>::singleList(new RelativeHitbox(*hb, xOff, 0, hb->getScaleOffSizeX() * 0.8f, 100), labelFunc), 8, getOffsetFromLast());
 		dr.setItems(items)
 			.setOnChange([&cache, convFunc](EntryView<T>& res) { if (res.size() > 0) cache.value = convFunc(res.begin()); })
 			.withLabel(name, cct.fontBold(), -xOff, 25);

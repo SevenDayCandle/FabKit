@@ -16,7 +16,7 @@ namespace fbc {
 	export class TitleScreen : public UIScreen {
 	public:
 		TitleScreen(): UIScreen(new ScreenSizeHitbox()) {
-			UITextButton& b = addElement(std::make_unique<UITextButton>(
+			UITextButton& b = add(std::make_unique<UITextButton>(
 				new ScreenPosHitbox(0.5f, 0.5f, 290, 170),
 				cct.images.panel,
 				cct.fontRegular(),
@@ -25,7 +25,7 @@ namespace fbc {
 				SettingsDialog::openNew();
 				});
 
-			UITextButton& b2 = stackElementYDir(std::make_unique<UITextButton>(
+			UITextButton& b2 = stackYDir(std::make_unique<UITextButton>(
 				new ScreenPosHitbox(0.5f, 0.5f, 290, 170),
 				cct.images.panel,
 				cct.fontRegular(),

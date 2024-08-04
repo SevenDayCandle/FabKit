@@ -47,12 +47,13 @@ namespace fbc {
 		inline size_t size() const { return elements.size(); }
 		inline void clear() { elements.clear(); }
 
-		template<typename T> requires std::is_base_of_v<UIBase, T> T& addElement(uptr<T>&& element);
-		template<typename T> requires std::is_base_of_v<UIBase, T> T& stackElementXDir(uptr<T>&& element, float spacing = 8, float yOff = 0);
-		template<typename T> requires std::is_base_of_v<UIBase, T> T& stackElementYDir(uptr<T>&& element, float spacing = 8, float xOff = 0);
+		template<typename T> requires std::is_base_of_v<UIBase, T> T& add(uptr<T>&& element);
+		template<typename T> requires std::is_base_of_v<UIBase, T> T& stackXDir(uptr<T>&& element, float spacing = 8, float yOff = 0);
+		template<typename T> requires std::is_base_of_v<UIBase, T> T& stackYDir(uptr<T>&& element, float spacing = 8, float xOff = 0);
+		template<typename T> requires std::is_base_of_v<UIBase, T> uptr<T> extract(T* item);
 		UIBase* getLastItem() const;
 		virtual bool isHovered() override;
-		virtual bool removeElement(UIBase* item);
+		virtual bool remove(UIBase* item);
 		virtual void refreshDimensions() override;
 		virtual void renderImpl() override;
 		virtual void updateImpl() override;
@@ -61,7 +62,7 @@ namespace fbc {
 	};
 
 	// Add a singular element to the canvas
-	template<typename T> requires std::is_base_of_v<UIBase, T> T& UICanvas::addElement(uptr<T>&& element)
+	template<typename T> requires std::is_base_of_v<UIBase, T> T& UICanvas::add(uptr<T>&& element)
 	{
 		T& ref = *element;
 		elements.push_back(std::move(element));
@@ -92,7 +93,7 @@ namespace fbc {
 	}
 
 	// Removes a specified element from the canvas. Return true if the element was erased
-	bool UICanvas::removeElement(UIBase* item)
+	bool UICanvas::remove(UIBase* item)
 	{
 		for (auto it = elements.begin(); it != elements.end(); ++it) {
 			if (it->get() == item) {
@@ -114,7 +115,7 @@ namespace fbc {
 	 * If the element's X endpoint would exceed the width of this hb, it gets moved below the last element at the X offset defined by start
 	 * Spacing will automatically be scaled by renderScale
 	 */
-	template<typename T> requires std::is_base_of_v<UIBase, T> T& UICanvas::stackElementXDir(uptr<T>&& element, float spacing, float yOff) {
+	template<typename T> requires std::is_base_of_v<UIBase, T> T& UICanvas::stackXDir(uptr<T>&& element, float spacing, float yOff) {
 		float scaled = cfg.renderScale(spacing);
 		T& ref = *element;
 		elements.push_back(std::move(element));
@@ -129,7 +130,7 @@ namespace fbc {
 				yPos = last.getEndY() + scaled + yOff;
 			}
 
-			ref.hb->setExactPos(xPos, yPos);
+			ref.hb->setRealPos(xPos, yPos);
 		}
 		return ref;
 	}
@@ -138,7 +139,7 @@ namespace fbc {
 	 * If the element's Y endpoint would exceed the height of this hb, it gets moved to the right of the last element at the Y offset defined by start
 	 * Spacing will automatically be scaled by renderScale
 	 */
-	template<typename T> requires std::is_base_of_v<UIBase, T> T& UICanvas::stackElementYDir(uptr<T>&& element, float spacing, float xOff) {
+	template<typename T> requires std::is_base_of_v<UIBase, T> T& UICanvas::stackYDir(uptr<T>&& element, float spacing, float xOff) {
 		float scaled = cfg.renderScale(spacing);
 		T& ref = *element;
 		elements.push_back(std::move(element));
@@ -153,9 +154,22 @@ namespace fbc {
 				yPos = hb->y;
 			}
 
-			ref.hb->setExactPos(xPos, yPos);
+			ref.hb->setRealPos(xPos, yPos);
 		}
 		return ref;
+	}
+
+	// Removes a specified element from the canvas and returns it
+	template<typename T> requires std::is_base_of_v<UIBase, T> uptr<T> UICanvas::extract(T* item)
+	{
+		for (auto it = elements.begin(); it != elements.end(); ++it) {
+			if (it->get() == item) {
+				uptr<T> extracted(static_cast<T*>(it->release()));
+				elements.erase(it);
+				return extracted;
+			}
+		}
+		return nullptr;
 	}
 
 	// Update inner children

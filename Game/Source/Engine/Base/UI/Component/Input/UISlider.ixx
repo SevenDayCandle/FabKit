@@ -19,7 +19,7 @@ namespace fbc {
 		}
 		UISlider(Hitbox* hb, int limMin = 0,
 			int limMax = std::numeric_limits<int>::max(),IDrawable& imageBar = cct.images.sliderEmpty, IDrawable& imageButton = cct.images.scrollbutton, IDrawable& panelImage = cct.images.panel) :
-			UISlider(hb, new RelativeHitbox(*hb, hb->getOffsetSizeX() + 4, 0, hb->getOffsetSizeX() * 3, hb->getOffsetSizeY()), limMin, limMax, imageBar, imageButton, panelImage) {}
+			UISlider(hb, new RelativeHitbox(*hb, hb->getOffSizeX() + 4, 0, hb->getOffSizeX() * 3, hb->getOffSizeY()), limMin, limMax, imageBar, imageButton, panelImage) {}
 
 		virtual UISlider& setValue(int num) override;
 		virtual void onSizeUpdated() override;

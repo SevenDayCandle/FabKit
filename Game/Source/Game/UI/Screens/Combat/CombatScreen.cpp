@@ -1,17 +1,64 @@
 module;
 
+import fbc.Action;
 import fbc.CombatInstance;
 import fbc.CombatSquare;
 import fbc.CombatSquareRenderable;
 import fbc.CombatTurnRenderable;
 import fbc.CreatureRenderable;
 import fbc.GameRun;
+import fbc.HitboxBatchMoveSmoothVFX;
 import fbc.RelativeHitbox;
+import fbc.UIButton;
+import fbc.UIFadeAwayVFX;
 
 module fbc.CombatScreen;
 
 namespace fbc {
-	void CombatScreen::createCreatureRender(const OccupantObject* occupant)
+
+	void CombatScreen::onPlayerTurnBegin(const CombatTurn* turn)
+	{
+		endTurnButton.setEnabled(true);
+	}
+
+	void CombatScreen::onPlayerTurnEnd(const CombatTurn* turn)
+	{
+		endTurnButton.setInteractable(false).setEnabled(false);
+	}
+
+	void CombatScreen::onTurnAdded(const CombatTurn& turn)
+	{
+		createTurnRender(turn);
+	}
+
+	void CombatScreen::onTurnChanged(ref_view<const mset<CombatTurn>> turns)
+	{
+		int i = 0;
+		vec<HitboxBatchMoveSmoothVFX::Entry> entries;
+		for (const CombatTurn& turn : turns) {
+			auto res = turnUIMap.find(&turn);
+			if (res != turnUIMap.end()) {
+				CombatTurnRenderable* item = res->second;
+				entries.push_back({ item->hb.get(), 0.0, i * TILE_SIZE});
+				++i;
+			}
+		}
+		addVFX(make_unique<HitboxBatchMoveSmoothVFX>(entries));
+	}
+
+	void CombatScreen::onTurnRemoved(const CombatTurn* turn)
+	{
+		auto res = turnUIMap.find(turn);
+		if (res != turnUIMap.end()) {
+			uptr<CombatTurnRenderable> item = fieldUI.extract(res->second);
+			if (item) {
+				addVFX(make_unique<UIFadeAwayVFX>(move(item)));
+			}
+		}
+		turnUIMap.erase(turn);
+	}
+
+	void CombatScreen::createOccupantRender(const OccupantObject* occupant)
 	{
 		CombatSquare* square = occupant->currentSquare;
 		float offX = 0;
@@ -20,29 +67,49 @@ namespace fbc {
 			offX = square->col * TILE_SIZE;
 			offY = square->row * TILE_SIZE;
 		}
-		fieldUI.addElement(make_unique<CreatureRenderable>(*occupant, new RelativeHitbox(*fieldUI.hb, offX, offY, TILE_SIZE, TILE_SIZE)));
+		fieldUI.add(make_unique<CreatureRenderable>(*occupant, new RelativeHitbox(*fieldUI.hb, offX, offY, TILE_SIZE, TILE_SIZE)));
 	}
 
 	void CombatScreen::createTurnRender(const CombatTurn& turn)
 	{
-		CombatTurnRenderable* render = &turnUI.addElement(make_unique<CombatTurnRenderable>(turn, new RelativeHitbox(*turnUI.hb, 0, turnUI.size() * TILE_SIZE, TURN_W, TILE_SIZE)));
+		CombatTurnRenderable* render = &turnUI.add(make_unique<CombatTurnRenderable>(turn, new RelativeHitbox(*turnUI.hb, 0, turnUI.size() * TILE_SIZE, TURN_W, TILE_SIZE)));
+		turnUIMap.emplace(&turn, render);
 	}
 
 	void CombatScreen::open()
 	{
 		GameRun* run = GameRun::current.get();
 		instance = run->getCombatInstance();
+		instance->viewSubscriber = this;
+		endTurnButton.setInteractable(false).setEnabled(false);
+		endTurnButton.setOnClick([this](UIButton& w) {
+			instance->endCurrentTurn();
+			w.setInteractable(false);
+		});
 		// Add buttons for each square
 		for (const CombatSquare& square : instance->getSquares()) {
-			fieldUI.addElement(make_unique<CombatSquareRenderable>(square, new RelativeHitbox(*fieldUI.hb, square.col * TILE_SIZE, square.row * TILE_SIZE, TILE_SIZE, TILE_SIZE)));
+			fieldUI.add(make_unique<CombatSquareRenderable>(square, new RelativeHitbox(*fieldUI.hb, square.col * TILE_SIZE, square.row * TILE_SIZE, TILE_SIZE, TILE_SIZE)));
 		}
 		// Add images for each creature
 		for (const OccupantObject* occupant : instance->getOccupants()) {
-			createCreatureRender(occupant);
+			createOccupantRender(occupant);
 		}
 		// Add images for each turn
 		for (const CombatTurn& turn : instance->getTurns()) {
 			createTurnRender(turn);
 		}
+	}
+
+	void CombatScreen::update()
+	{
+		instance->update();
+
+		CombatTurn* currentTurn = instance->getCurrentTurn();
+		Action* currentAction = instance->getCurrentAction();
+		bool allowInteraction = currentTurn && !currentTurn->isDone;
+		endTurnButton.setInteractable(allowInteraction);
+		// TODO disallow moving/cards when actions are going on
+
+		UIScreen::update();
 	}
 }

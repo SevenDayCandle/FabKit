@@ -9,9 +9,9 @@ import sdl;
 import std;
 
 namespace fbc {
-	export class Passive : public GameObjectDerived<PassiveData>, public AttributeObject {
+	export class Passive : public GameObjectD<PassiveData>, public AttributeObject {
 	public:
-		Passive(PassiveData& data, int upgrades = 0) : GameObjectDerived<PassiveData>(data), upgrades(upgrades) {}
+		Passive(PassiveData& data, int upgrades = 0) : GameObjectD<PassiveData>(data), upgrades(upgrades) {}
 
 		int upgrades;
 

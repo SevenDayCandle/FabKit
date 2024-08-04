@@ -14,7 +14,7 @@ import sdl;
 import std;
 
 namespace fbc {
-	export class Creature : public GameObjectDerived<CreatureData>, public CombatSquare::OccupantObject {
+	export class Creature : public GameObjectD<CreatureData>, public CombatSquare::OccupantObject {
 	public:
 		class Behavior : public KeyedItem<Behavior> {
 		public:
@@ -30,7 +30,7 @@ namespace fbc {
 		};
 
 		Creature(CreatureData& data, Behavior* behavior, int faction, int upgrades, int startingHealth) :
-			GameObjectDerived(data), behavior(behavior), faction(faction), upgrades(upgrades), health(startingHealth), energyMax(data.getResultEnergyMax(upgrades)), handSize(data.getResultHandSize(upgrades)), healthMax(data.getResultHealth(upgrades)), movementMax(data.getResultMovement(upgrades)) {
+			GameObjectD(data), behavior(behavior), faction(faction), upgrades(upgrades), health(startingHealth), energyMax(data.getResultEnergyMax(upgrades)), handSize(data.getResultHandSize(upgrades)), healthMax(data.getResultHealth(upgrades)), movementMax(data.getResultMovement(upgrades)) {
 			// TODO create cards
 		}
 		Creature(CreatureData& data, Behavior* behavior, int faction, int upgrades) : Creature(data, behavior, faction, upgrades, data.getResultHealth(upgrades)) {}

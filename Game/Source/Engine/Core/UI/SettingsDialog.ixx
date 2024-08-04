@@ -32,19 +32,19 @@ namespace fbc {
 
 			navigation.addItems(&graphics, &sound, &text);
 
-			UIButton& cancel = this->addElement(std::make_unique<UITextButton>(
-				new RelativeHitbox(*hb, 20, hb->getScaleOffsetSizeY() * 0.88f, 300, 100),
+			UIButton& cancel = this->add(std::make_unique<UITextButton>(
+				new RelativeHitbox(*hb, 20, hb->getScaleOffSizeY() * 0.88f, 300, 100),
 				cct.images.panelRound,
 				cct.fontRegular(),
 				cct.strings.ui_cancel())
 			).setOnClick([this](UIButton& b) {screenManager::closeOverlay(this);});
-			UIButton& apply = this->stackElementXDir(std::make_unique<UITextButton>(
+			UIButton& apply = this->stackXDir(std::make_unique<UITextButton>(
 				new RelativeHitbox(*hb, 300, 100),
 				cct.images.panelRound,
 				cct.fontRegular(),
 				cct.strings.ui_apply())
 			).setOnClick([this](UIButton& b) { applyAll(); });
-			UIButton& save = this->stackElementXDir(std::make_unique<UITextButton>(
+			UIButton& save = this->stackXDir(std::make_unique<UITextButton>(
 				new RelativeHitbox(*hb,300, 100),
 				cct.images.panelRound,
 				cct.fontRegular(),
@@ -55,7 +55,7 @@ namespace fbc {
 				});
 		}
 
-		UINavigation<SettingsDialogPage>& navigation = this->addElement(std::make_unique<UINavigation<SettingsDialogPage>>(new RelativeHitbox(*hb, -330, 0, 300, 100)));
+		UINavigation<SettingsDialogPage>& navigation = this->add(std::make_unique<UINavigation<SettingsDialogPage>>(new RelativeHitbox(*hb, -330, 0, 300, 100)));
 		SettingsDialogPage graphics = page(cct.strings.options_section_graphics());
 		SettingsDialogPage sound = page(cct.strings.options_section_sound());
 		SettingsDialogPage text = page(cct.strings.options_section_text());

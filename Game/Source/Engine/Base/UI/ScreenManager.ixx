@@ -6,7 +6,6 @@ import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.IOverlay;
 import fbc.UIBase;
-import fbc.VFX;
 import sdl;
 import std;
 
@@ -22,7 +21,6 @@ namespace fbc::screenManager {
 	export bool hasOverlay(IOverlay* target);
 	export IOverlay* getActiveOverlay();
 	export UIBase* currentScreen();
-	export void addVFX(std::unique_ptr<IOverlay>&& vfx);
 	export void closeCurrentScreen();
 	export void closeOverlay(IOverlay* target);
 	export void dispose();
@@ -37,12 +35,6 @@ namespace fbc::screenManager {
 }
 
 namespace fbc::screenManager {
-	// Add a VFX to the current screen
-	void addVFX(uptr<IOverlay>&& vfx) {
-		if (!screens.empty()) {
-			screens.back()->addVFX(std::move(vfx));
-		}
-	}
 
 	// Close the currently opened screen and reopen the last screen opened.
 	// The screen's dispose method should save any screen state as necessary since the screen will get disposed of
@@ -106,7 +98,7 @@ namespace fbc::screenManager {
 		}
 	}
 
-	// Whenever the screen size changes, we need to setExactSize all UI elements
+	// Whenever the screen size changes, we need to setRealSize all UI elements
 	void refreshSize() {
 		for (const uptr<UIBase>& screen : screens) {
 			screen->refreshDimensions();

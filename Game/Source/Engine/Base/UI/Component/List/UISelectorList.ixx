@@ -422,7 +422,7 @@ namespace fbc {
 			                                       });
 			for (const uptr<UIEntry<T>>& row : this->rows) { row->setHbExactSizeX(maxWidth); }
 
-			scrollbar.hb->setExactPos(this->hb->x + maxWidth + rMarg, this->hb->y + rMarg);
+			scrollbar.hb->setRealPos(this->hb->x + maxWidth + rMarg, this->hb->y + rMarg);
 			scrollbar.setHbExactSizeY(sizeY);
 			this->setHbExactSize(maxWidth + scrollbar.hb->w, sizeY + rMarg * 2);
 		}
@@ -432,7 +432,7 @@ namespace fbc {
 				row->setHbExactSizeX(targetWidth);
 			}
 
-			scrollbar.hb->setExactPos(this->hb->x + targetWidth, this->hb->y + rMarg);
+			scrollbar.hb->setRealPos(this->hb->x + targetWidth, this->hb->y + rMarg);
 			scrollbar.setHbExactSizeY(sizeY);
 			this->setHbExactSizeY(sizeY + rMarg * 2);
 		}
@@ -480,7 +480,7 @@ namespace fbc {
 		float x = this->hb->x + rMarg;
 		float y = this->hb->y + rMarg;
 		for (int i = this->topVisibleRowIndex; i < this->topVisibleRowIndex + rowCount; ++i) {
-			rowsForRender[i]->hb->setExactPos(x, y);
+			rowsForRender[i]->hb->setRealPos(x, y);
 			y += rowsForRender[i]->hb->h;
 		}
 	}

@@ -114,7 +114,7 @@ namespace fbc {
 		float x = hb->x;
 		float y = hb->y;
 		for (const uptr<T>& item : items) {
-			item->hb->setExactPos(x, y);
+			item->hb->setRealPos(x, y);
 
 			x += sx;
 			if (x >= hb->x + hb->w) {
@@ -136,7 +136,7 @@ namespace fbc {
 		float x = hb->x + sx * xP;
 		float y = hb->y + sy * yP;
 		for (int i = begin; i < end; ++i) {
-			items[i]->hb->setExactPos(x, y);
+			items[i]->hb->setRealPos(x, y);
 
 			x += sx;
 			if (x >= hb->x + hb->w) {

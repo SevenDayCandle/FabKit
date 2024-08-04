@@ -14,6 +14,7 @@ namespace fbc {
 
 		void initialize() override;
 
+		inline strv combat_end_turn() const { return uiStrings.at("combat_end_turn"); };
 		inline strv options_graphics_fps() const { return uiStrings.at("options_graphics_fps"); };
 		inline strv options_graphics_resolution() const { return uiStrings.at("options_graphics_resolution"); };
 		inline strv options_graphics_vsync() const { return uiStrings.at("options_graphics_vsync"); };
