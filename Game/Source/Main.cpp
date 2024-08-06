@@ -61,7 +61,7 @@ int main()
 		
 		// Only limit frame if vsync is off
 		if (!cfg.graphicsVSync.get()) {
-			sdl::capFrame(cfg.graphicsFPS.get());
+			sdl::capFrame();
 		}
 	}
 

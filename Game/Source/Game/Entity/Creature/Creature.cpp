@@ -1,5 +1,6 @@
 module;
 
+import fbc.CallbackAction;
 import fbc.Card;
 import fbc.CardData;
 import fbc.CombatInstance;
@@ -31,7 +32,7 @@ namespace fbc {
 	// Reinsert a turn into queue based on current speed
 	void Creature::onTurnEnd()
 	{
-		queueTurn();
+		GameRun::current->getCombatInstance()->queueAction(make_unique<CallbackAction>([this]() {queueTurn(); }));
 		// TODO end turn hooks
 		// TODO status updates
 	}
@@ -172,14 +173,19 @@ namespace fbc {
 	// At the start of turn, discard hand and draw new hand
 	void Creature::drawForStartOfTurn()
 	{
-		for (PileGroup::iterator it = hand.begin(); it != hand.end(); ++it) {
+		PileGroup::iterator it = hand.begin();
+		while (it != hand.end()) {
 			// TODO check for destination pile based on card properties
 			moveBetweenPiles(it, hand, discardPile, false);
+			it = hand.begin();
 		}
 
 		int draw = getCardDraw();
-		for (PileGroup::iterator it = drawPile.begin(); it != drawPile.end() && it < drawPile.begin() + draw && hand.size() < handSize; ++it) {
+		it = drawPile.begin();
+		while (it != drawPile.end() && draw > 0 && hand.size() < handSize) {
 			moveBetweenPiles(it, drawPile, hand, false);
+			draw -= 1;
+			it = drawPile.begin();
 		}
 	}
 

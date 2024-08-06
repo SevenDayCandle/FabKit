@@ -9,9 +9,9 @@ namespace fbc {
 	void RunScreen::open()
 	{
 		// TODO For testing only, remove when run starting is properly implemented
-		GameRun::StartData data{ 0, {
-			SavedCreatureEntry("test", "TestPlayer", "", 0)
-		} };
+		vec<SavedCreatureEntry> entries = {
+			SavedCreatureEntry("test", "TestPlayer", "", 0) };
+		GameRun::StartData data{ 0, entries };
 		GameRun::startRun(5, data);
 
 

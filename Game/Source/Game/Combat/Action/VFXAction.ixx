@@ -3,7 +3,6 @@ export module fbc.VFXAction;
 import fbc.Action;
 import fbc.CallbackVFX;
 import fbc.FUtil;
-import fbc.IOverlay;
 import fbc.ScreenManager;
 import fbc.UIBase;
 import std;

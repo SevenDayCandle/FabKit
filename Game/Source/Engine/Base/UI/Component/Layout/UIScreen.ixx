@@ -15,8 +15,8 @@ namespace fbc {
 		UIScreen(uptr<Hitbox>&& hb) : UICanvas(std::move(hb)) {}
 
 		virtual UIScreen& addVFX(uptr<IOverlay>&& eff) override;
-		virtual void render() override;
-		virtual void update() override;
+		virtual void renderImpl() override;
+		virtual void updateImpl() override;
 	private:
 		vec<uptr<IOverlay>> vfx;
 	};
@@ -27,17 +27,17 @@ namespace fbc {
 		return *this;
 	}
 
-	void UIScreen::render()
+	void UIScreen::renderImpl()
 	{
-		UICanvas::render();
+		UICanvas::renderImpl();
 		for (uptr<IOverlay>& effect : vfx) {
 			effect->render();
 		}
 	}
 
-	void UIScreen::update()
+	void UIScreen::updateImpl()
 	{
-		UICanvas::update();
+		UICanvas::updateImpl();
 		std::erase_if(vfx, [](uptr<IOverlay>& effect) {return effect->tickUpdate();});
 	}
 }

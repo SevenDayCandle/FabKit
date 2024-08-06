@@ -192,6 +192,7 @@ namespace fbc::screenManager {
 
 	// Attach listeners to the core config to change the screen whenever graphics settings are changed
 	void subscribeToConfig() {
+		cfg.graphicsFPS.setOnReload([](const int& val) { sdl::setFPSLimit(val); });
 		cfg.graphicsResolution.setOnReload([](const pair<int, int>& val) {
 			cfg.resizeWindow();
 			cct.reloadFonts();

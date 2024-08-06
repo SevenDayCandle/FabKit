@@ -29,6 +29,7 @@ namespace sdl {
 	SDL_Renderer* renderer;
 	SDL_Window* window;
 	Uint64 delta;
+	Uint64 fpsLimit;
 	Uint64 timeCurrent;
 	Uint64 timeLast;
 	Uint8* keyJust;
@@ -83,6 +84,9 @@ namespace sdl {
 	export constexpr Scancode SCAN_RETURN = SDL_SCANCODE_RETURN;
 	export constexpr Scancode SCAN_RIGHT = SDL_SCANCODE_RIGHT;
 	export constexpr Scancode SCAN_UP = SDL_SCANCODE_UP;
+
+	/* Other constants */
+	export constexpr Uint64 NANOS_PER_SECOND = 1000000000ULL;
 
 	/* Directory stuff */
 	export char* dirBase() noexcept { return SDL_GetBasePath(); }
@@ -323,13 +327,13 @@ namespace sdl {
 	export bool sdlEnabled() { return enabled; }
 	export Uint64 timeDelta() { return delta; }
 	export Uint64 timeTotal() { return timeCurrent; }
+	export void setFPSLimit(int fps) { fpsLimit = fps > 0 ? NANOS_PER_SECOND / fps : 0; }
 
 
 	/* When using a fixed framerate, sleep to fill up remaining time */
-	export void capFrame(int fps) {
-		Uint64 frameDur = (1000 / fps);
-		if (frameDur > delta) {
-			SDL_Delay(frameDur - delta);
+	export void capFrame() {
+		if (fpsLimit > delta) {
+			SDL_Delay(fpsLimit - delta);
 		}
 	}
 

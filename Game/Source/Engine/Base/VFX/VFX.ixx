@@ -11,10 +11,10 @@ namespace fbc {
 
 	export class VFX : public IOverlay {
 	public:
-		VFX(float duration = DEFAULT_DURATION): duration(duration * cfg.gameEffectSpeed.get()) {}
+		VFX(float duration = DEFAULT_DURATION): duration(duration * sdl::NANOS_PER_SECOND * cfg.gameEffectSpeed.get()) {}
 		virtual ~VFX() override = default;
 
-		float duration = DEFAULT_DURATION;
+		float duration;
 		float ticks = 0;
 
 		virtual bool tickUpdate() override;

@@ -36,10 +36,9 @@ namespace fbc {
 		virtual UIBase& setHbOffsetSize(const float x, const float y);
 		virtual UIBase& setHbOffsetSizeX(const float x);
 		virtual UIBase& setHbOffsetSizeY(const float y);
-		 
 		virtual void refreshDimensions() override;
-		virtual void render() override;
-		virtual void update() override;
+		virtual void render() final override;
+		virtual void update() final override;
 		virtual void updateImpl();
 
 		virtual void renderImpl() = 0;

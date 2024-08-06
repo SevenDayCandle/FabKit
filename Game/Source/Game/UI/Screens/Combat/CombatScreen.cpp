@@ -10,7 +10,8 @@ import fbc.GameRun;
 import fbc.HitboxBatchMoveSmoothVFX;
 import fbc.RelativeHitbox;
 import fbc.UIButton;
-import fbc.UIFadeAwayVFX;
+import fbc.UIFadeOutDriftVFX;
+import fbc.VFXAction;
 
 module fbc.CombatScreen;
 
@@ -43,16 +44,16 @@ namespace fbc {
 				++i;
 			}
 		}
-		addVFX(make_unique<HitboxBatchMoveSmoothVFX>(entries));
+		instance->queueAction(make_unique<VFXAction>(make_unique<HitboxBatchMoveSmoothVFX>(entries)));
 	}
 
 	void CombatScreen::onTurnRemoved(const CombatTurn* turn)
 	{
 		auto res = turnUIMap.find(turn);
 		if (res != turnUIMap.end()) {
-			uptr<CombatTurnRenderable> item = fieldUI.extract(res->second);
+			uptr<CombatTurnRenderable> item = turnUI.extract(res->second);
 			if (item) {
-				addVFX(make_unique<UIFadeAwayVFX>(move(item)));
+				addVFX(make_unique<UIFadeOutDriftVFX>(move(item), 0, -10));
 			}
 		}
 		turnUIMap.erase(turn);
@@ -72,8 +73,8 @@ namespace fbc {
 
 	void CombatScreen::createTurnRender(const CombatTurn& turn)
 	{
-		CombatTurnRenderable* render = &turnUI.add(make_unique<CombatTurnRenderable>(turn, new RelativeHitbox(*turnUI.hb, 0, turnUI.size() * TILE_SIZE, TURN_W, TILE_SIZE)));
-		turnUIMap.emplace(&turn, render);
+		CombatTurnRenderable& render = turnUI.add(make_unique<CombatTurnRenderable>(turn, new RelativeHitbox(*turnUI.hb, 0, turnUI.size() * TILE_SIZE, TURN_W, TILE_SIZE)));
+		turnUIMap.emplace(&turn, &render);
 	}
 
 	void CombatScreen::open()
@@ -100,7 +101,7 @@ namespace fbc {
 		}
 	}
 
-	void CombatScreen::update()
+	void CombatScreen::updateImpl()
 	{
 		instance->update();
 
@@ -110,6 +111,6 @@ namespace fbc {
 		endTurnButton.setInteractable(allowInteraction);
 		// TODO disallow moving/cards when actions are going on
 
-		UIScreen::update();
+		UIScreen::updateImpl();
 	}
 }

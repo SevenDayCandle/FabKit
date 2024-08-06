@@ -19,13 +19,12 @@ namespace fbc {
 		virtual void renderImpl() override;
 
 		// TODO highlight turn owner when hovered
-	private:
-		sdl::RectF portraitRect = { hb->w / 8, hb->h * 0.15f, hb->w / 2, hb->h * 0.7f};
 	};
 
 	void CombatTurnRenderable::renderImpl()
 	{
 		UIInteractable::renderImpl();
+		sdl::RectF portraitRect = { hb->x + hb->w / 8, hb->y + hb->h * 0.15f, hb->w / 2, hb->h * 0.7f };
 		portrait.draw(&portraitRect, color, origin, rotation, flip);
 	}
 }

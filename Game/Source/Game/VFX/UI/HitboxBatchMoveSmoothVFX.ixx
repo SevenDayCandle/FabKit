@@ -16,7 +16,7 @@ namespace fbc {
 			float tOffY;
 		};
 
-		HitboxBatchMoveSmoothVFX(vec<Entry>& items, float duration = DEFAULT_DURATION): HitboxBatchMoveSmoothVFX(items, duration, 9 / duration) {}
+		HitboxBatchMoveSmoothVFX(vec<Entry>& items, float duration = DEFAULT_DURATION): HitboxBatchMoveSmoothVFX(items, duration, 15 / (sdl::NANOS_PER_SECOND * duration)) {}
 		HitboxBatchMoveSmoothVFX(vec<Entry>& items, float duration, float rate): CallbackVFX(duration), items(items), rate(rate) {}
 
 		float rate;
@@ -38,9 +38,10 @@ namespace fbc {
 
 	void HitboxBatchMoveSmoothVFX::update()
 	{
+		float lerp = rate * sdl::timeDelta();
 		for (Entry& e : items) {
-			float lx = std::lerp(e.hb->getOffPosX(), e.tOffX, rate * sdl::timeDelta());
-			float ly = std::lerp(e.hb->getOffPosY(), e.tOffY, rate * sdl::timeDelta());
+			float lx = std::lerp(e.hb->getOffPosX(), e.tOffX, lerp);
+			float ly = std::lerp(e.hb->getOffPosY(), e.tOffY, lerp);
 			e.hb->setOffPos(lx, ly);
 		}
 	}

@@ -183,6 +183,10 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Game\Combat\Action\CallbackAction.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Game\Combat\Action\VFXAction.ixx">
       <SubType>
       </SubType>
@@ -593,7 +597,15 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Game\VFX\UI\UIFadeAwayVFX.ixx">
+    <ClCompile Include="Source\Game\VFX\UI\UIFadeInVFX.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\VFX\UI\UIFadeOutDriftVFX.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Game\VFX\UI\UIFadeOutVFX.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -602,6 +614,8 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Content\test\Images\Creatures\TestPlayer.png" />
+    <Image Include="Content\test\Images\Creatures\TestPlayer_f.png" />
     <Image Include="Resources\Images\UI\ExpandArrow.png" />
     <Image Include="Resources\Images\UI\Panel_Border_B.png" />
     <Image Include="Resources\Images\UI\Panel_Border_L.png" />

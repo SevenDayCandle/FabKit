@@ -1,14 +1,18 @@
 export module fbc.CardRenderable;
 
+import fbc.Card;
+import fbc.CoreContent;
 import fbc.FUtil;
 import fbc.Hitbox;
-import fbc.UIBase;
+import fbc.UIInteractable;
 import sdl;
 import std;
 
 namespace fbc {
-	export class CardRenderable : public UIBase {
+	export class CardRenderable : public UIInteractable {
 	public:
-		CardRenderable(Hitbox* hb): UIBase(hb) {}
+		CardRenderable(const Card& card, Hitbox* hb): UIInteractable(hb, cct.images.darkPanelRound), card(card) {}
+
+		const Card& card;
 	};
 }

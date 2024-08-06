@@ -36,7 +36,7 @@ namespace fbc {
 		void createOccupantRender(const OccupantObject* occupant);
 		void createTurnRender(const CombatTurn& turn);
 		void open() override;
-		void update() override;
+		void updateImpl() override;
 	private:
 		CombatInstance* instance;
 		UITextButton& endTurnButton;
