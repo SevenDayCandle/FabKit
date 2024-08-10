@@ -132,7 +132,8 @@
       <AdditionalDependencies>winmm.lib;SDL3.lib;SDL3_image.lib;SDL3_mixer.lib;SDL3_ttf.lib;SDL3_test.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xcopy /E /I /Y /D "$(ProjectDir)Resources" "$(TargetDir)Resources"
+      <Command>xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xcopy /E /I /Y /D "$(ProjectDir)Shader" "$(TargetDir)Shader"
+xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xcopy /E /I /Y /D "$(ProjectDir)Resources" "$(TargetDir)Resources"
 xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xcopy /E /I /Y /D "$(ProjectDir)Content" "$(TargetDir)Content"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -652,6 +653,10 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
     <None Include="Content\test\Objects\Encounters.json" />
     <None Include="Resources\Strings\ENG\KeywordStrings.json" />
     <None Include="Resources\Strings\ENG\UIStrings.json" />
+    <None Include="Shader\Compiled\Normal.frag.spv" />
+    <None Include="Shader\Compiled\Normal.vert.spv" />
+    <None Include="Shader\Source\Normal.frag" />
+    <None Include="Shader\Source\Normal.vert" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Resources\Fonts\NotoSans-Bold.ttf" />

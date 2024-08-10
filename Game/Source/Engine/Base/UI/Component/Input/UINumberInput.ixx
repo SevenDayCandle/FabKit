@@ -36,7 +36,7 @@ namespace fbc {
 		virtual UINumberInput& setValue(int num);
 		virtual void onSizeUpdated() override;
 		virtual void refreshDimensions() override;
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 		virtual void start() override;
 		virtual void updateImpl() override;
 	protected:
@@ -50,7 +50,7 @@ namespace fbc {
 		void clickLeftEvent() override;
 		void onBufferUpdated() override;
 		void onKeyPress(int32 c) override;
-		void onTextInput(char* text) override;
+		void onTextInput(const char* text) override;
 		void resetBuffer() override;
 		void updateCaretPos() override;
 	private:
@@ -96,12 +96,12 @@ namespace fbc {
 		refreshCache();
 	}
 
-	void UINumberInput::renderImpl()
+	void UINumberInput::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
 	{
-		UITitledInteractable::renderImpl();
+		UITitledInteractable::renderImpl(cd, rp);
 		TextInfo::drawText(hb->x, hb->y);
-		arrow.draw(&lessRect);
-		arrow.draw(&moreRect, { 0,0 },  0, sdl::FlipMode::SDL_FLIP_VERTICAL);
+		arrow.draw(cd, rp, lessRect);
+		arrow.draw(cd, rp, moreRect, { 0,0 },  0, sdl::FlipMode::SDL_FLIP_VERTICAL);
 		if (sdl::keyboardInputActive(this)) {
 			renderCaret();
 		}
@@ -206,7 +206,7 @@ namespace fbc {
 	}
 
 	// Typing only adds numeric characters to the buffer
-	void UINumberInput::onTextInput(char* text)
+	void UINumberInput::onTextInput(const char* text)
 	{
 		if (bufferPos <= buffer.size() && futil::isNumeric(text)) {
 			buffer.insert(bufferPos, text);

@@ -81,7 +81,10 @@ namespace fbc {
 	export using path = std::filesystem::path;
 	export using str = std::string;
 	export using strv = std::string_view;
+	export using uint16 = std::uint16_t;
 	export using uint32 = std::uint32_t;
+	export using uint64 = std::uint64_t;
+	export using uint8 = std::uint8_t;
 
 	export using std::any;
 	export using std::deque;

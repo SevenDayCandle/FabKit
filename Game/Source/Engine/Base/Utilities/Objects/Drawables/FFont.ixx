@@ -32,7 +32,7 @@ namespace fbc {
         int measureH(strv text) const;
         int measureW(strv text) const;
         pair<int, int> measureDim(strv text) const;
-        sdl::FontRender makeTexture(strv text, uint32 w = 0, float x = 0, float y = 0, sdl::Color color = sdl::COLOR_WHITE, sdl::Color outlineColor = sdl::COLOR_BLACK, sdl::Color shadowColor = sdl::COLOR_BLACK_SHADOW);
+        sdl::FontRender makeTexture(strv text, uint32 w = 0, float x = 0, float y = 0, const sdl::Color& color = sdl::COLOR_WHITE, const sdl::Color& outlineColor = sdl::COLOR_BLACK, const sdl::Color& shadowColor = sdl::COLOR_BLACK_SHADOW);
         void dispose();
         void reload() const override;
     private:
@@ -100,15 +100,15 @@ namespace fbc {
     }
 
     // Create a texture snapshot of the text rendered with this font in the given colors. Text must NOT be empty
-    sdl::FontRender FFont::makeTexture(strv text, uint32 w, float x, float y, sdl::Color color, sdl::Color outlineColor, sdl::Color shadowColor)
+    sdl::FontRender FFont::makeTexture(strv text, uint32 w, float x, float y, const sdl::Color& color, const sdl::Color& outlineColor, const sdl::Color& shadowColor)
     {
         const char* texDat = text.data();
-        sdl::Surface* targetSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, color, w);
+        sdl::Surface* targetSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, { color.r, color.g, color.b, color.a }, w);
 
         if (outlineSize > 0) {
             int res = cfg.fontScale(outlineSize);
             sdl::fontOutlineSet(font, res);
-            sdl::Surface* outlineSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, outlineColor, w);
+            sdl::Surface* outlineSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, { outlineColor.r, outlineColor.g, outlineColor.b, outlineColor.a }, w);
             sdl::fontOutlineSet(font, 0);
             sdl::RectI targetRect = { res, res, targetSurf->w, targetSurf->h };
             sdl::surfaceBlitScaled(targetSurf, nullptr, outlineSurf, &targetRect, sdl::ScaleMode::SDL_SCALEMODE_BEST);
@@ -118,18 +118,25 @@ namespace fbc {
 
         if (shadowSize > 0) {
             int res = cfg.fontScale(shadowSize);
-            sdl::Surface* shadowSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, shadowColor, w);
-            sdl::Surface* newTargetSurf = sdl::surfaceCreate(targetSurf->w + res, targetSurf->h + res, targetSurf->format->format);
+            sdl::Surface* shadowSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, { shadowColor.r, shadowColor.g, shadowColor.b, shadowColor.a }, w);
+            sdl::Surface* newTargetSurf = sdl::surfaceCreate(targetSurf->w + res, targetSurf->h + res, targetSurf->format);
             sdl::RectI shadowRect = { res, res, shadowSurf->w, shadowSurf->h };
+            sdl::RectI clipRect;
+            sdl::surfaceGetClipRect(targetSurf, &clipRect);
             sdl::surfaceBlitScaled(shadowSurf, nullptr, newTargetSurf, &shadowRect, sdl::ScaleMode::SDL_SCALEMODE_BEST);
-            sdl::surfaceBlitScaled(targetSurf, nullptr, newTargetSurf, &targetSurf->clip_rect, sdl::ScaleMode::SDL_SCALEMODE_BEST);
+            sdl::surfaceBlitScaled(targetSurf, nullptr, newTargetSurf, &clipRect, sdl::ScaleMode::SDL_SCALEMODE_BEST);
             sdl::surfaceDestroy(targetSurf);
             sdl::surfaceDestroy(shadowSurf);
             targetSurf = newTargetSurf;
         }
 
-        sdl::Texture* tex = sdl::textureCreateFromSurface(targetSurf);
-        sdl::FontRender f = {  x, y, static_cast<float>(targetSurf->w), static_cast<float>(targetSurf->h), tex };
+        sdl::GpuCommandBuffer* uploadCmdBuf = sdl::gpuAcquireCommandBuffer();
+        sdl::GpuCopyPass* copyPass = sdl::gpuBeginCopyPass(uploadCmdBuf);
+        sdl::GpuTexture* fontTex = sdl::uploadTexture(copyPass, targetSurf);
+        sdl::gpuEndCopyPass(copyPass);
+        sdl::gpuSubmit(uploadCmdBuf);
+
+        sdl::FontRender f = {  x, y, static_cast<float>(targetSurf->w), static_cast<float>(targetSurf->h), fontTex };
         sdl::surfaceDestroy(targetSurf);
         return f;
     }

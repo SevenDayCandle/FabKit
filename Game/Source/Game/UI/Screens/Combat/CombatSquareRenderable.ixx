@@ -15,11 +15,11 @@ namespace fbc {
 
 		const CombatSquare& square;
 
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 	};
 
-	void CombatSquareRenderable::renderImpl()
+	void CombatSquareRenderable::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
 	{
-		UIInteractable::renderImpl();
+		UIInteractable::renderImpl(cd, rp);
 	}
 }

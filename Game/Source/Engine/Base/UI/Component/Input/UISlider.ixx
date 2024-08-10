@@ -24,7 +24,7 @@ namespace fbc {
 		virtual UISlider& setValue(int num) override;
 		virtual void onSizeUpdated() override;
 		virtual void refreshDimensions() override;
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 		virtual void updateImpl() override;
 	protected:
 		UIHorizontalScrollbar scrollbar;
@@ -46,10 +46,10 @@ namespace fbc {
 		scrollbar.refreshDimensions();
 	}
 
-	void UISlider::renderImpl()
+	void UISlider::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
 	{
-		UINumberInput::renderImpl();
-		scrollbar.renderImpl();
+		UINumberInput::renderImpl(cd, rp);
+		scrollbar.renderImpl(cd, rp);
 	}
 
 	UISlider& UISlider::setValue(int num)

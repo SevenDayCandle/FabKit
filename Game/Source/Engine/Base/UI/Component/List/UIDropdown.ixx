@@ -87,7 +87,7 @@ namespace fbc {
 		virtual void onSizeUpdated() override;
 		virtual void openPopup();
 		virtual void refreshDimensions() override;
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 		virtual void updateImpl() override;
 		virtual void unsetProxy();
 
@@ -96,7 +96,7 @@ namespace fbc {
 			func<str(EntryView<T>&)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
-			IDrawable& background = cct.images.darkPanelRound,
+			IDrawable& background = cct.images.uiDarkPanelRound,
 			IDrawable& image = cct.images.panel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall);
@@ -105,7 +105,7 @@ namespace fbc {
 			func<str(EntryView<T>&)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
-			IDrawable& background = cct.images.darkPanelRound,
+			IDrawable& background = cct.images.uiDarkPanelRound,
 			IDrawable& image = cct.images.panel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall);
@@ -135,7 +135,7 @@ namespace fbc {
 		UIDropdown<T>& dropdown;
 
 		void dispose() override;
-		void render() override;
+		void render(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 		void update() override;
 	};
 
@@ -180,8 +180,8 @@ namespace fbc {
 		}
 	}
 
-	template<typename T> void UIDropdown<T>::renderImpl() {
-		UITitledInteractable::renderImpl();
+	template<typename T> void UIDropdown<T>::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
+		UITitledInteractable::renderImpl(cd, rp);
 		if (this->selectedSize() > 0 && this->canClear()) {
 			clear.draw(&arrowRect, UIImage::color, origin, rotation);
 		}
@@ -334,8 +334,8 @@ namespace fbc {
 	// When closed, unlink this from its menu
 	template <typename T> void UIDropdownProxy<T>::dispose() { dropdown.unsetProxy(); }
 
-	template<typename T> void UIDropdownProxy<T>::render() {
-		dropdown.menu->renderImpl();
+	template<typename T> void UIDropdownProxy<T>::render(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
+		dropdown.menu->renderImpl(cd, rp);
 	}
 
 	// Close the menu if the user clicks outside the menu

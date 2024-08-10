@@ -49,7 +49,7 @@ namespace fbc {
 		virtual void onChangeItems() override;
 		virtual void onSizeUpdated() override;
 		virtual void openPopup() override;
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 		virtual void start() override;
 		virtual void unsetProxy() override;
 
@@ -58,7 +58,7 @@ namespace fbc {
 			func<str(EntryView<T>&)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
-			IDrawable& background = cct.images.darkPanelRound,
+			IDrawable& background = cct.images.uiDarkPanelRound,
 			IDrawable& image = cct.images.panel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall);
@@ -67,7 +67,7 @@ namespace fbc {
 			func<str(EntryView<T>&)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
-			IDrawable& background = cct.images.darkPanelRound,
+			IDrawable& background = cct.images.uiDarkPanelRound,
 			IDrawable& image = cct.images.panel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall);
@@ -101,10 +101,10 @@ namespace fbc {
 		this->start();
 	}
 
-	template<typename T>void UISearchableDropdown<T>::renderImpl()
+	template<typename T>void UISearchableDropdown<T>::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
 	{
 		if (sdl::keyboardInputActive(this)) {
-			UIInteractable::renderImpl();
+			UIInteractable::renderImpl(cd, rp);
 			TextInfo::drawText(this->hb->x, this->hb->y);
 			renderCaret();
 			if (this->selectedSize() > 0) {
@@ -112,7 +112,7 @@ namespace fbc {
 			}
 		}
 		else {
-			UIDropdown<T>::renderImpl();
+			UIDropdown<T>::renderImpl(cd, rp);
 		}
 	}
 

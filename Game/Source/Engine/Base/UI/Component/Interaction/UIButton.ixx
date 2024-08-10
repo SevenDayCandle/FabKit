@@ -18,7 +18,7 @@ namespace fbc {
 		inline UIButton& setOnClick(const func<void(UIButton&)>& onClick) { return this->onLeftClick = onClick, *this; }
 		inline UIButton& setOnRightClick(const func<void(UIButton&)>& onRightClick) { return this->onRightClick = onRightClick, *this; }
 
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 	private:
 		func<void(UIButton&)> onLeftClick;
 		func<void(UIButton&)> onRightClick;
@@ -27,8 +27,8 @@ namespace fbc {
 		virtual void clickRightEvent() override;
 	};
 
-	void UIButton::renderImpl() {
-		UIInteractable::renderImpl();
+	void UIButton::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
+		UIInteractable::renderImpl(cd, rp);
 		if (hb->isHovered() && interactable) {
 			image.draw(hb.get(), sdl::BlendMode::SDL_BLENDMODE_ADD, color, origin, rotation, flip);
 		}

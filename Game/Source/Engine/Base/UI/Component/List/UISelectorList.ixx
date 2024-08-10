@@ -54,7 +54,7 @@ namespace fbc {
 		void openPopup();
 		void refilterRows();
 		void refreshDimensions() override;
-		void renderImpl() override;
+		void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 		template <c_itr<int> Iterable> void selectIndices(Iterable& indices);
 		template <c_itr<T> Iterable> void selectSelection(Iterable& items);
 		template <c_itr<T*> Iterable> void selectSelection(Iterable& items);
@@ -73,8 +73,8 @@ namespace fbc {
 		void updateSingle(T item);
 		void updateSingle(T* item);
 
-		static uptr<UISelectorList> multiList(Hitbox* hb, func<str(const T&)> labelFunc = futil::toString<T>, FFont& itemFont = cct.fontSmall(), IDrawable& background = cct.images.darkPanelRound, bool canAutosize = false);
-		static uptr<UISelectorList> singleList(Hitbox* hb, func<str(const T&)> labelFunc = futil::toString<T>, FFont& itemFont = cct.fontSmall(), IDrawable& background = cct.images.darkPanelRound, bool canAutosize = false);
+		static uptr<UISelectorList> multiList(Hitbox* hb, func<str(const T&)> labelFunc = futil::toString<T>, FFont& itemFont = cct.fontSmall(), IDrawable& background = cct.images.uiDarkPanelRound, bool canAutosize = false);
+		static uptr<UISelectorList> singleList(Hitbox* hb, func<str(const T&)> labelFunc = futil::toString<T>, FFont& itemFont = cct.fontSmall(), IDrawable& background = cct.images.uiDarkPanelRound, bool canAutosize = false);
 	protected:
 		set<int> currentIndices;
 		vec<UIEntry<T>*> rowsForRender;
@@ -111,7 +111,7 @@ namespace fbc {
 		UIMenuProxy(UISelectorList<T>& menu) : menu(menu) {}
 		UISelectorList<T>& menu;
 
-		inline void render() override { menu.renderImpl(); };
+		inline void render(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override { menu.renderImpl(cd, rp); };
 
 		void dispose() override;
 		void update() override;
@@ -301,14 +301,14 @@ namespace fbc {
 	}
 
 	// Render all visible rows and the scrollbar if it is shown
-	template <typename T> void UISelectorList<T>::renderImpl() {
+	template <typename T> void UISelectorList<T>::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
 		this->background.draw(this->hb.get(), this->backgroundColor, {0, 0}, 0, sdl::FlipMode::SDL_FLIP_NONE);
 		int rowCount = getVisibleRowCount();
 		for (int i = this->topVisibleRowIndex; i < this->topVisibleRowIndex + rowCount; ++i) {
-			rowsForRender[i]->renderImpl();
+			rowsForRender[i]->renderImpl(cd, rp);
 		}
 
-		scrollbar.render();
+		scrollbar.render(cd, rp);
 	}
 
 	// Update visible rows. The scrollbar should only be shown if there are enough items to warrant it

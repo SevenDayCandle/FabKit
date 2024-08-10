@@ -55,7 +55,7 @@ namespace fbc {
 		virtual bool isHovered() override;
 		virtual bool remove(UIBase* item);
 		virtual void refreshDimensions() override;
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 		virtual void updateImpl() override;
 	protected:
 		vec<uptr<UIBase>> elements;
@@ -104,10 +104,10 @@ namespace fbc {
 		return false;
 	}
 
-	void UICanvas::renderImpl()
+	void UICanvas::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
 	{
 		for (const uptr<UIBase>& element : elements) {
-			element->render();
+			element->render(cd, rp);
 		}
 	}
 

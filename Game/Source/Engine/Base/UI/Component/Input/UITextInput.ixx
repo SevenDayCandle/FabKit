@@ -29,7 +29,7 @@ namespace fbc {
 		void commit(strv text);
 		virtual void onSizeUpdated() override;
 		virtual void refreshDimensions() override;
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 		virtual void start() override;
 		virtual void updateImpl() override;
 	protected:
@@ -66,9 +66,9 @@ namespace fbc {
 		refreshCache();
 	}
 
-	void UITextInput::renderImpl()
+	void UITextInput::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
 	{
-		UITitledInteractable::renderImpl();
+		UITitledInteractable::renderImpl(cd, rp);
 		TextInfo::drawText(hb->x, hb->y);
 		if (sdl::keyboardInputActive(this)) {
 			renderCaret();

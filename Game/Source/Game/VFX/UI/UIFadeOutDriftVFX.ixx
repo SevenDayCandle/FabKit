@@ -19,20 +19,20 @@ namespace fbc {
 		float tOffY;
 		uptr<UIImage> image;
 
-		virtual void render() override;
+		virtual void render(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 		virtual void update() override;
 	private:
 		float rate;
 	};
 
-	void UIFadeOutDriftVFX::render()
+	void UIFadeOutDriftVFX::render(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
 	{
-		image->renderImpl();
+		image->renderImpl(cd, rp);
 	}
 
 	void UIFadeOutDriftVFX::update()
 	{
-		image->color.a = 255 * (duration - ticks) / duration;
+		image->color.a = (duration - ticks) / duration;
 		image->setHbOffsetPos(image->hb->getOffPosX() + tOffX, image->hb->getOffPosY() + tOffY);
 	}
 }

@@ -77,7 +77,7 @@ namespace fbc {
 		UIList& setLabelFunc(const func<str(const T&)>& labelFunc);
 		UIList& setMaxRows(int rows);
 		void refreshDimensions() override;
-		void renderImpl() override;
+		void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 		void updateImpl() override;
 
 		virtual void selectRow(UIEntry<T>& row) = 0;
@@ -208,11 +208,11 @@ namespace fbc {
 	}
 
 	// Render all visible rows and the scrollbar if it is shown
-	template <typename T> void UIList<T>::renderImpl() {
+	template <typename T> void UIList<T>::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
 		background.draw(hb.get(), backgroundColor, { 0, 0 }, 0, sdl::FlipMode::SDL_FLIP_NONE);
 		int rowCount = getVisibleRowCount();
 		for (int i = topVisibleRowIndex; i < topVisibleRowIndex + rowCount; ++i) {
-			rows[i]->renderImpl();
+			rows[i]->renderImpl(cd, rp);
 		}
 	}
 

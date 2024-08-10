@@ -15,7 +15,7 @@ namespace fbc {
 		virtual ~ITextInputter() override = default;
 
 		virtual void onKeyPress(int32 c) override;
-		virtual void onTextInput(char* text) override;
+		virtual void onTextInput(const char* text) override;
 		void releaseBuffer();
 		virtual void start();
 
@@ -92,7 +92,7 @@ namespace fbc {
 	}
 
 	// Typing adds characters to the buffer
-	void ITextInputter::onTextInput(char* text) {
+	void ITextInputter::onTextInput(const char* text) {
 		if (bufferPos <= buffer.size()) {
 			buffer.insert(bufferPos, text);
 			bufferPos += std::strlen(text);

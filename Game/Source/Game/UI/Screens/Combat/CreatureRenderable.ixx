@@ -15,11 +15,11 @@ namespace fbc {
 
 		const OccupantObject& creature;
 
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 	};
 
-	void CreatureRenderable::renderImpl()
+	void CreatureRenderable::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
 	{
-		UIInteractable::renderImpl();
+		UIInteractable::renderImpl(cd, rp);
 	}
 }

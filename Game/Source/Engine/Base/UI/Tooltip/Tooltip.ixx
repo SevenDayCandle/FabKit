@@ -16,14 +16,14 @@ namespace fbc {
 
 	export class Tooltip : public TextInfo, public GenericTip {
 	public:
-		Tooltip(strv text, FFont& font = cct.fontSmall(), float boxSize = DEFAULT_SIZE, IDrawable& background = cct.images.darkPanelRound) : TextInfo(font, text), GenericTip(boxSize), background(background) {}
+		Tooltip(strv text, FFont& font = cct.fontSmall(), float boxSize = DEFAULT_SIZE, IDrawable& background = cct.images.uiDarkPanelRound) : TextInfo(font, text), GenericTip(boxSize), background(background) {}
 		virtual ~Tooltip() override = default;
 
 		inline virtual void update() override {}
 
 		virtual void open() override;
 		virtual void refreshDimensions() override;
-		virtual void render() override;
+		virtual void render(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 	protected:
 		IDrawable& background;
 
@@ -46,7 +46,7 @@ namespace fbc {
 		TextInfo::refreshCache();
 	}
 
-	void Tooltip::render()
+	void Tooltip::render(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
 	{
 		background.draw(&bounds);
 		TextInfo::drawText(bounds.x, bounds.y);

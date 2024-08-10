@@ -31,7 +31,7 @@ namespace fbc {
 
 		void onSizeUpdated() override;
 		void refreshDimensions() override;
-		void renderImpl() override;
+		void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 		void toggle(bool val);
 	private:
 		func<void(UIToggle&)> onClick;
@@ -52,7 +52,7 @@ namespace fbc {
 		refreshCache();
 	}
 
-	void UIToggle::renderImpl()
+	void UIToggle::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
 	{
 		if (toggled) {
 			checkImage.draw(hb.get(), UIImage::color, origin, rotation, flip);

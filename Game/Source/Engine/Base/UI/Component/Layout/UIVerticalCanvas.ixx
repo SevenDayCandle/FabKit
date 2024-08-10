@@ -22,7 +22,7 @@ namespace fbc {
 
 		UIVerticalCanvas& setScrollSpeed(float scrollSpeed);
 		void refreshDimensions() override;
-		void renderImpl() override;
+		void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 		void updateImpl() override;
 	protected:
 		float scrollSpeed;
@@ -46,10 +46,10 @@ namespace fbc {
 		scrollbar.refreshDimensions();
 	}
 
-	void UIVerticalCanvas::renderImpl()
+	void UIVerticalCanvas::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
 	{
-		UICanvas::renderImpl();
-		scrollbar.renderImpl();
+		UICanvas::renderImpl(cd, rp);
+		scrollbar.renderImpl(cd, rp);
 	}
 
 	void UIVerticalCanvas::updateImpl()

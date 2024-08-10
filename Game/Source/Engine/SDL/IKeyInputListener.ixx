@@ -9,6 +9,6 @@ export namespace sdl {
 		virtual ~IKeyInputListener() = default;
 
 		virtual void onKeyPress(std::int32_t c) = 0;
-		virtual void onTextInput(char* text) = 0;
+		virtual void onTextInput(const char* text) = 0;
 	};
 }

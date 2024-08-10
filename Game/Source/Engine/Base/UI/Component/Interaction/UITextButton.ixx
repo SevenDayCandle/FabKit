@@ -19,7 +19,7 @@ namespace fbc {
 
 		virtual void onSizeUpdated() override;
 		virtual void refreshDimensions() override;
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 	};
 
 	void UITextButton::onSizeUpdated()
@@ -34,8 +34,8 @@ namespace fbc {
 		TextInfo::setPos((this->hb->w - getTextWidth()) / 2, (this->hb->h - getTextHeight()) / 2);
 	}
 
-	void UITextButton::renderImpl() {
-		UIButton::renderImpl();
+	void UITextButton::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
+		UIButton::renderImpl(cd, rp);
 		TextInfo::drawText(hb->x, hb->y);
 	}
 }

@@ -26,11 +26,11 @@ namespace fbc {
 		inline virtual UIImage& setImage(IDrawable& image) { return this->image = image, *this;}
 		inline virtual UIImage& setOrigin(sdl::Point origin) { return this->origin = origin, *this; }
 		inline virtual UIImage& setRotation(const float rotation) { return this->rotation = rotation, *this; }
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 		virtual void updateImpl() override;
 	};
 
-	void UIImage::renderImpl() {
+	void UIImage::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
 		image.draw(hb.get(), color, origin, rotation, flip);
 	}
 

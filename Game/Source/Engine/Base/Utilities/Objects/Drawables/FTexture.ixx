@@ -13,63 +13,55 @@ namespace fbc {
         virtual ~FTexture() override {
             // Unload texture when destroyed
             if (texture && sdl::sdlEnabled()) {
-                sdl::textureDestroy(texture);
+                sdl::gpuReleaseTexture(texture);
                 texture = nullptr;
             }
         }
 
         inline bool loaded() const { return texture != nullptr; }
-        inline const sdl::RectF* getBaseRec() const override { return &dim; }
-        inline float getHeight() const override { return dim.h; }
-        inline float getWidth() const override { return dim.w; }
+        inline float getHeight() const override { return h; }
+        inline float getWidth() const override { return w; }
 
         void dispose() override;
-        void drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) override;
+        void draw(sdl::GpuCommandBuffer* cb, sdl::GpuRenderPass* rp, const sdl::RectF& destRec, sdl::GpuGraphicsPipeline* pipeline, const sdl::Color* tint, float rotation, float flipX, float flipY) override;
         void reload() const override;
-        void setDrawBlend(const sdl::BlendMode bl) override;
-        void setDrawColor(const sdl::Color& tint) override;
-    private:
-        mutable sdl::RectF dim;
-        mutable sdl::Texture* texture;
-        mutable sdl::PixelFormatEnum format;
-        mutable int access;
+        void reload(sdl::GpuCopyPass* copyPass) const;
+    protected:
+        mutable float h;
+        mutable float w;
+        mutable sdl::GpuTexture* texture;
         str path;
 	};
 
     void FTexture::dispose()
     {
-        sdl::textureDestroy(texture);
+        sdl::gpuReleaseTexture(texture);
         texture = nullptr;
     }
 
-    void FTexture::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip)
+    void FTexture::draw(sdl::GpuCommandBuffer* cb, sdl::GpuRenderPass* rp, const sdl::RectF& destRec, sdl::GpuGraphicsPipeline* pipeline, const sdl::Color* tint, float rotation, float flipX, float flipY)
     {
-        sdl::renderCopyEx(texture, sourceRec, destRec, rotation, &origin, flip);
+        sdl::queueDraw(cb, rp, texture, destRec, tint, pipeline);
     }
 
     void FTexture::reload() const
     {
+        sdl::GpuCommandBuffer* uploadCmdBuf = sdl::gpuAcquireCommandBuffer();
+        sdl::GpuCopyPass* copyPass = sdl::gpuBeginCopyPass(uploadCmdBuf);
+        reload(copyPass);
+        sdl::gpuEndCopyPass(copyPass);
+        sdl::gpuSubmit(uploadCmdBuf);
+    }
+
+    void FTexture::reload(sdl::GpuCopyPass* copyPass) const {
         if (texture) {
-            sdl::textureDestroy(texture);
+            sdl::gpuReleaseTexture(texture);
         }
-        texture = sdl::textureLoad(path.data());
-        if (texture == nullptr) {
-            sdl::logError("Failed to load texture %s: %s", path, sdl::getError());
-        }
-        int w, h;
-        sdl::textureQuery(texture, &format, &access, &w, &h);
-        dim.w = w;
-        dim.h = h;
-    }
+        sdl::Surface* surface = sdl::surfaceLoad(path.data());
+        h = surface->h;
+        w = surface->w;
+        texture = sdl::uploadTexture(copyPass, surface);
 
-    void FTexture::setDrawBlend(const sdl::BlendMode bl)
-    {
-        sdl::textureSetBlendMode(texture, bl);
-    }
-
-    void FTexture::setDrawColor(const sdl::Color& tint)
-    {
-        sdl::textureSetColorMod(texture, tint.r, tint.g, tint.b);
-        sdl::textureSetAlphaMod(texture, tint.a);
+        sdl::surfaceDestroy(surface);
     }
 }

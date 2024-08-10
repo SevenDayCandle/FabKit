@@ -18,7 +18,7 @@ namespace fbc {
 		inline UIScrollbar& setOnScroll(const func<void(float)>& onScroll) { return this->onScroll = onScroll, *this; }
 
 		virtual void onSizeUpdated() override;
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 		virtual void updateImpl() override;
 		void processMouseScroll();
 		void scroll(float percent);
@@ -52,7 +52,7 @@ namespace fbc {
 		}
 	}
 
-	void UIScrollbar::renderImpl() {
+	void UIScrollbar::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
 		imageBar.draw(hb.get());
 		imageButton.draw(&dropzone);
 	}

@@ -19,7 +19,7 @@ namespace fbc {
 		UINavigation(Hitbox* hb,
 			func<str(const T&)> labelFunc = futil::toString<T>,
 			FFont& itemFont = cct.fontRegular(),
-			IDrawable& background = cct.images.darkPanelRound,
+			IDrawable& background = cct.images.uiDarkPanelRound,
 			bool canAutosize = false) :
 			UIList<T>(hb, labelFunc, itemFont, background, canAutosize) {}
 
@@ -30,7 +30,7 @@ namespace fbc {
 
 		virtual bool isHovered() override;
 		void refreshDimensions() override;
-		void renderImpl() override;
+		void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 		void select(int ind);
 		void select(T& item);
 		void selectRow(UIEntry<T>& entry) override;
@@ -57,11 +57,11 @@ namespace fbc {
 	}
 
 	// Render the currently selected page
-	template<c_ext<UIBase> T> void UINavigation<T>::renderImpl()
+	template<c_ext<UIBase> T> void UINavigation<T>::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
 	{
-		UIList<T>::renderImpl();
+		UIList<T>::renderImpl(cd, rp);
 		if (currentItem) {
-			currentItem->renderImpl();
+			currentItem->renderImpl(cd, rp);
 		}
 	}
 

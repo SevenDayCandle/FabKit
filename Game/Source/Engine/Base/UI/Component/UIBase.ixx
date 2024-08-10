@@ -37,11 +37,11 @@ namespace fbc {
 		virtual UIBase& setHbOffsetSizeX(const float x);
 		virtual UIBase& setHbOffsetSizeY(const float y);
 		virtual void refreshDimensions() override;
-		virtual void render() final override;
+		virtual void render(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) final override;
 		virtual void update() final override;
 		virtual void updateImpl();
 
-		virtual void renderImpl() = 0;
+		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) = 0;
 	};
 
 	// Wrapper around setRealSize that invokes any size update callbacks
@@ -100,9 +100,9 @@ namespace fbc {
 	}
 
 	// If enabled, render the component for a single frame
-	void UIBase::render() {
+	void UIBase::render(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
 		if (enabled) {
-			renderImpl();
+			renderImpl(cd, rp);
 		}
 	}
 

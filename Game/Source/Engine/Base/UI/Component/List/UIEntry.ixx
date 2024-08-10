@@ -36,7 +36,7 @@ namespace fbc {
 		virtual void onHbUnhover();
 		virtual void onSizeUpdated() override;
 		virtual void refreshDimensions() override;
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 	protected:
 		sdl::Color baseColor;
 		sdl::Color hoverColor;
@@ -67,7 +67,7 @@ namespace fbc {
 		refreshCache();
 	}
 
-	template<typename T> void UIEntry<T>::renderImpl() {
+	template<typename T> void UIEntry<T>::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
 
 		sdl::RectF check = { this->hb->x, this->hb->y, this->hb->h, this->hb->h };
 

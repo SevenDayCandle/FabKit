@@ -12,11 +12,8 @@ namespace fbc {
 	public:
 		EmptyDrawable() {}
 
-		inline const sdl::RectF* getBaseRec() const override { return &EMPTY; }
 		inline float getHeight() const override { return 0; }
 		inline float getWidth() const override { return 0; }
-		inline void drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) override {}
-		inline void setDrawBlend(const sdl::BlendMode bl) override {}
-		inline void setDrawColor(const sdl::Color& tint) override {}
+		inline void draw(sdl::GpuCommandBuffer* cb, sdl::GpuRenderPass* rp, const sdl::RectF& destRec, sdl::GpuGraphicsPipeline* pipeline, const sdl::Color* tint, float rotation, float flipX, float flipY) override {}
 	};
 }

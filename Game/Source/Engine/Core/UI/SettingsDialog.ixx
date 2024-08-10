@@ -19,7 +19,7 @@ import std;
 namespace fbc {
 	export class SettingsDialog : public UIDialog {
 	public:
-		SettingsDialog(): UIDialog(new ScreenSizeHitbox(0.25, 0.25, 0.5, 0.5), cct.images.darkPanelRound) {
+		SettingsDialog(): UIDialog(new ScreenSizeHitbox(0.25, 0.25, 0.5, 0.5), cct.images.uiDarkPanelRound) {
 			graphics.addDropdown<pair<int,int>, ilist<pair<int,int>>>(cfg.graphicsResolution, cct.strings.options_graphics_resolution(), RESOLUTIONS, [](const pair<int,int>& item) { return futil::dimensionString(item); });
 			graphics.addDropdown<WindowMode, ilist<WindowMode>>(cfg.graphicsWindowMode, cct.strings.options_graphics_window_mode(), WINDOWMODE_ALL, [](const WindowMode& item) { return str(windowScreenName(item)); });
 			graphics.addSlider(cfg.graphicsFPS, cct.strings.options_graphics_fps())

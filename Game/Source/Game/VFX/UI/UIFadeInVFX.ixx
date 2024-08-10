@@ -13,19 +13,19 @@ namespace fbc {
 
 		uptr<UIImage> image;
 
-		virtual void render() override;
+		virtual void render(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 		virtual void update() override;
 	private:
 		float rate;
 	};
 
-	void UIFadeInVFX::render()
+	void UIFadeInVFX::render(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
 	{
-		image->renderImpl();
+		image->renderImpl(cd, rp);
 	}
 
 	void UIFadeInVFX::update()
 	{
-		image->color.a = 255 * ticks / duration;
+		image->color.a = ticks / duration;
 	}
 }

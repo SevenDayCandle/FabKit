@@ -15,6 +15,7 @@ namespace fbc::screenManager {
 	IOverlay* queuedCloseOverlay;
 	IOverlay* tipBatch;
 	bool queuedCloseScreen;
+	int z;
 
 	export UIBase* activeElement;
 
@@ -110,16 +111,42 @@ namespace fbc::screenManager {
 
 	// Render the last opened screen, as well as all overlays
 	void render() {
-		if (!screens.empty()) {
-			screens.back()->renderImpl();
+		sdl::GpuCommandBuffer* cmdbuf = sdl::gpuAcquireCommandBuffer();
+		if (cmdbuf) {
+			std::uint32_t w, h;
+			sdl::GpuTexture* swapchain = sdl::gpuAcquireSwapchainTexture(cmdbuf, &w, &h);
+			if (swapchain) {
+				sdl::GpuColorAttachmentInfo colorAttachmentInfo = {
+					.textureSlice = {
+						.texture = swapchain
+					},
+					.clearColor = { 0.0f, 0.0f, 0.0f, 1.0f },
+					.loadOp = sdl::GpuLoadOp::SDL_GPU_LOADOP_CLEAR,
+					.storeOp = sdl::GpuStoreOp::SDL_GPU_STOREOP_STORE
+				};
+
+				sdl::GpuRenderPass* renderPass = sdl::gpuBeginRenderPass(cmdbuf, &colorAttachmentInfo, 1, nullptr);
+				z = 0;
+
+				// Render screen elements
+				// TODO pass in: cmdbuffer, z index
+				if (!screens.empty()) {
+					screens.back()->renderImpl(cd, rp);
+				}
+				for (const uptr<IOverlay>& overlay : overlays) {
+					overlay->render(cd, rp);
+				}
+				if (tipBatch) {
+					tipBatch->render(cd, rp);
+				}
+				tipBatch = nullptr;
+
+				sdl::gpuEndRenderPass(renderPass);
+			}
+
+			sdl::gpuSubmit(cmdbuf);
 		}
-		for (const uptr<IOverlay>& overlay : overlays) {
-			overlay->render();
-		}
-		if (tipBatch) {
-			tipBatch->render();
-		}
-		tipBatch = nullptr;
+
 	}
 
 	// Close the current screen and switch the specified screen. Also dispose all overlays

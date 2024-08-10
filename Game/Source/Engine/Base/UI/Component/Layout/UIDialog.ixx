@@ -17,7 +17,7 @@ namespace fbc {
 		IDrawable& image;
 
 		virtual bool isHovered() override;
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 		virtual void updateImpl() override;
 	};
 
@@ -26,9 +26,9 @@ namespace fbc {
 		return hb->isHovered();
 	}
 
-	void UIDialog::renderImpl() {
+	void UIDialog::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
 		image.draw(hb.get());
-		UICanvas::renderImpl();
+		UICanvas::renderImpl(cd, rp);
 	}
 
 	void UIDialog::updateImpl()

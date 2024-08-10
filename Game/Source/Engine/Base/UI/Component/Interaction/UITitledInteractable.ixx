@@ -24,7 +24,7 @@ namespace fbc {
 		inline strv getLabelText() const { return label ? label->getText() : ""; }
 
 		virtual void refreshDimensions() override;
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 		UITitledInteractable& withLabel(strv text, FFont& font = cct.fontBold(), float xOff = 0, float yOff = -80, sdl::Color color = sdl::COLOR_WHITE, sdl::Color colorOutline = sdl::COLOR_BLACK);
 	private:
 		float xOff = 0;
@@ -41,9 +41,9 @@ namespace fbc {
 		}
 	}
 
-	void UITitledInteractable::renderImpl()
+	void UITitledInteractable::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
 	{
-		UIInteractable::renderImpl();
+		UIInteractable::renderImpl(cd, rp);
 		if (label) {
 			label->drawText(hb->x, hb->y);
 		}

@@ -18,7 +18,7 @@ namespace fbc {
 		UIMenu(Hitbox* hb,
 			func<str(const T&)> labelFunc = futil::toString<T>,
 			FFont& itemFont = cct.fontRegular(),
-			IDrawable& background = cct.images.darkPanelRound,
+			IDrawable& background = cct.images.uiDarkPanelRound,
 			bool canAutosize = false) :
 			UIList<T>(hb, std::move(labelFunc), itemFont, background, canAutosize) {}
 

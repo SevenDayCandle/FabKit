@@ -8,32 +8,15 @@ import sdl;
 namespace fbc {
 	export class FRegion : public IDrawable {
 	public:
-		FRegion(FTexture& base, sdl::RectF dim): base(base), dim(dim) {}
+		FRegion(FTexture& base, sdl::RectF dim) {}
 
-		inline const sdl::RectF* getBaseRec() const override { return &dim; }
-		inline float getHeight() const override { return dim.h; }
-		inline float getWidth() const override { return dim.w; }
+		inline float getHeight() const override { return 0; }
+		inline float getWidth() const override { return 0; }
 
-		void drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip) override;
-		void setDrawBlend(const sdl::BlendMode bl) override;
-		void setDrawColor(const sdl::Color& tint) override;
-	private:
-		FTexture& base;
-		sdl::RectF dim;
+		void draw(sdl::GpuCommandBuffer* cb, sdl::GpuRenderPass* rp, const sdl::RectF& destRec, sdl::GpuGraphicsPipeline* pipeline, const sdl::Color* tint, float rotation, float flipX, float flipY) override;
 	};
 
-	void FRegion::drawBase(const sdl::RectF* sourceRec, const sdl::RectF* destRec, const sdl::Point& origin, float rotation, sdl::FlipMode flip)
-	{
-		base.draw(sourceRec, origin, rotation, flip);
-	}
-
-	void FRegion::setDrawBlend(const sdl::BlendMode bl)
-	{
-		base.setDrawBlend(bl);
-	}
-
-	void FRegion::setDrawColor(const sdl::Color& tint)
-	{
-		base.setDrawColor(tint);
+	void FRegion::draw(sdl::GpuCommandBuffer* cb, sdl::GpuRenderPass* rp, const sdl::RectF& destRec, sdl::GpuGraphicsPipeline* pipeline, const sdl::Color* tint, float rotation, float flipX, float flipY) {
+		// TODO implement
 	}
 }

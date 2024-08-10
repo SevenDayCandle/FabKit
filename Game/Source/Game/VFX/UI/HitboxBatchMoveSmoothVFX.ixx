@@ -22,7 +22,7 @@ namespace fbc {
 		float rate;
 		vec<Entry> items;
 
-		inline virtual void render() override {}
+		inline virtual void render(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override {}
 
 		virtual void dispose() override;
 		virtual void update() override;

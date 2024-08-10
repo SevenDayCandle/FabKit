@@ -1,5 +1,7 @@
 export module fbc.IOverlay;
 
+import sdl;
+
 namespace fbc {
 	export struct IOverlay {
 	public:
@@ -11,7 +13,7 @@ namespace fbc {
 
 		virtual bool tickUpdate();
 
-		virtual void render() = 0;
+		virtual void render(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) = 0;
 		virtual void update() = 0;
 	protected:
 		IOverlay() {}

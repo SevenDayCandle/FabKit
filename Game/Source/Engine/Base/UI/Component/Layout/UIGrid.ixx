@@ -61,7 +61,7 @@ namespace fbc {
 		UIGrid& setSpacingY(float spacingY);
 		virtual bool isHovered() override;
 		virtual void refreshDimensions() override;
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 		virtual void updateImpl() override;
 	protected:
 		float scrollSpeed = 1;
@@ -89,12 +89,12 @@ namespace fbc {
 		scrollbar.refreshDimensions();
 	}
 
-	template<c_ext<UIBase> T> void UIGrid<T>::renderImpl()
+	template<c_ext<UIBase> T> void UIGrid<T>::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
 	{
 		for (const uptr<T>& item : items) {
-			item->render();
+			item->render(cd, rp);
 		}
-		scrollbar.render();
+		scrollbar.render(cd, rp);
 	}
 
 	template<c_ext<UIBase> T> void UIGrid<T>::updateImpl()

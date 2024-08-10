@@ -15,7 +15,7 @@ namespace fbc {
 		UIScreen(uptr<Hitbox>&& hb) : UICanvas(std::move(hb)) {}
 
 		virtual UIScreen& addVFX(uptr<IOverlay>&& eff) override;
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 		virtual void updateImpl() override;
 	private:
 		vec<uptr<IOverlay>> vfx;
@@ -27,11 +27,11 @@ namespace fbc {
 		return *this;
 	}
 
-	void UIScreen::renderImpl()
+	void UIScreen::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
 	{
-		UICanvas::renderImpl();
+		UICanvas::renderImpl(cd, rp);
 		for (uptr<IOverlay>& effect : vfx) {
-			effect->render();
+			effect->render(cd, rp);
 		}
 	}
 

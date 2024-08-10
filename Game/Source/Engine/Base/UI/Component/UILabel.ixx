@@ -15,7 +15,7 @@ namespace fbc {
 		~UILabel() override {}
 
 		virtual void refreshDimensions() override;
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
 	};
 
 	void UILabel::refreshDimensions()
@@ -24,7 +24,7 @@ namespace fbc {
 		refreshCache();
 	}
 
-	void UILabel::renderImpl() {
+	void UILabel::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
 		TextInfo::drawText(hb->x, hb->y);
 	}
 }
