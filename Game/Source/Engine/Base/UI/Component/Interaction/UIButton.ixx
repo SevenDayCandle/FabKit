@@ -12,7 +12,6 @@ namespace fbc {
 	public:
 
 		UIButton(Hitbox* hb, IDrawable& image) : UIInteractable(hb, image) {}
-		UIButton(Hitbox* hb, IDrawable& image, sdl::Point origin) : UIInteractable(hb, image, origin) {}
 		~UIButton() override {}
 
 		inline UIButton& setOnClick(const func<void(UIButton&)>& onClick) { return this->onLeftClick = onClick, *this; }
@@ -28,10 +27,7 @@ namespace fbc {
 	};
 
 	void UIButton::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
-		UIInteractable::renderImpl(cd, rp);
-		if (hb->isHovered() && interactable) {
-			image.draw(hb.get(), sdl::BlendMode::SDL_BLENDMODE_ADD, color, origin, rotation, flip);
-		}
+		image.draw(cd, rp, *hb.get(), hb->isHovered() && interactable ? &sdl::COLOR_WHITE : &color, rotation);
 	}
 
 	void UIButton::clickLeftEvent()

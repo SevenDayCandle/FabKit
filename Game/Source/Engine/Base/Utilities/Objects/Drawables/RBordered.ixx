@@ -11,10 +11,10 @@ namespace fbc {
 		RBordered(strv path) : FTexture(path) {}
 		RBordered(const RBordered&) = delete;
 
-		void draw(sdl::GpuCommandBuffer* cb, sdl::GpuRenderPass* rp, const sdl::RectF& destRec, sdl::GpuGraphicsPipeline* pipeline, const sdl::Color* tint, float rotation, float flipX, float flipY) override;
+		void draw(sdl::GpuCommandBuffer* cb, sdl::GpuRenderPass* rp, const sdl::Color* tint, float x, float y, float w, float h, float rotation, sdl::GpuGraphicsPipeline* pipeline) override;
 	};
 
-	void RBordered::draw(sdl::GpuCommandBuffer* cb, sdl::GpuRenderPass* rp, const sdl::RectF& destRec, sdl::GpuGraphicsPipeline* pipeline, const sdl::Color* tint, float rotation, float flipX, float flipY) {
-		sdl::queueDrawBordered(cb, rp, texture, destRec, tint, pipeline);
+	void RBordered::draw(sdl::GpuCommandBuffer* cb, sdl::GpuRenderPass* rp, const sdl::Color* tint, float x, float y, float w, float h, float rotation, sdl::GpuGraphicsPipeline* pipeline) {
+		sdl::queueDrawBordered(cb, rp, texture, tint, x, y, w, h, rotation, pipeline);
 	}
 }

@@ -50,7 +50,7 @@ namespace fbc {
 		UIList(Hitbox* hb,
 			func<str(const T&)> labelFunc = futil::toString<T>,
 			FFont& itemFont = cct.fontSmall(),
-			IDrawable& background = cct.images.panelRound,
+			IDrawable& background = cct.images.uiPanelRound,
 			bool canAutosize = false) :
 			UIBase(hb), background(background), itemFont(itemFont), labelFunc(std::move(labelFunc)), canAutosize(canAutosize) {
 		}
@@ -87,7 +87,7 @@ namespace fbc {
 		int activeRow = -1;
 		int maxRows = 15;
 		int topVisibleRowIndex;
-		sdl::Color backgroundColor = sdl::COLOR_WHITE;
+		sdl::Color backgroundColor = sdl::COLOR_STANDARD;
 		IDrawable& background;
 		FFont& itemFont = cct.fontSmall();
 		func<str(const T&)> labelFunc;
@@ -209,7 +209,7 @@ namespace fbc {
 
 	// Render all visible rows and the scrollbar if it is shown
 	template <typename T> void UIList<T>::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
-		background.draw(hb.get(), backgroundColor, { 0, 0 }, 0, sdl::FlipMode::SDL_FLIP_NONE);
+		background.draw(cd, rp, *hb.get(), &backgroundColor);
 		int rowCount = getVisibleRowCount();
 		for (int i = topVisibleRowIndex; i < topVisibleRowIndex + rowCount; ++i) {
 			rows[i]->renderImpl(cd, rp);

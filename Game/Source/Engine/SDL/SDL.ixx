@@ -182,14 +182,14 @@ namespace sdl {
 	export SDL_GpuGraphicsPipeline* RENDER_STANDARD;
 
 
-
-	/* Color constants */
+	/* Color constants. RGB can be higher than 1 to make the image brighter */
 	export constexpr Color COLOR_BLACK = { 0, 0, 0, 1 };
 	export constexpr Color COLOR_BLACK_SHADOW = { 0, 0, 0, 0.4f };
-	export constexpr Color COLOR_GOLD = { 0.9373f, 0.7843, 0.3176, 1 };
+	export constexpr Color COLOR_GOLD = { 0.13373f, 0.11843, 0.5176, 1 };
 	export constexpr Color COLOR_GRAY = { 0.5f, 0.5f, 0.5f, 1 };
-	export constexpr Color COLOR_LIME = { 0.298f, 1, 0.2235f, 1 };
-	export constexpr Color COLOR_WHITE = { 1, 1, 1, 1 };
+	export constexpr Color COLOR_LIME = { 0.6f, 2, 0.84f, 1 };
+	export constexpr Color COLOR_STANDARD = { 1, 1, 1, 1 };
+	export constexpr Color COLOR_WHITE = { 2, 2, 2, 1 };
 
 	/* Scan constants (used for hotkeys) */
 	export constexpr Scancode SCAN_BACKSPACE = SDL_SCANCODE_BACKSPACE;
@@ -596,6 +596,15 @@ namespace sdl {
 	 * CUSTOM FUNCTIONS
 	 */
 
+	export SDL_Color toTextColor(const Color& c) {
+		return {
+			static_cast<Uint8>(c.r),
+			static_cast<Uint8>(c.g),
+			static_cast<Uint8>(c.b),
+			static_cast<Uint8>(c.a),
+		};
+	}
+
 
 	// When using a fixed framerate, sleep to fill up remaining time
 	export void capFrame() {
@@ -605,11 +614,26 @@ namespace sdl {
 	}
 
 	// Draw a texture with the given parameters
-	export void queueDraw(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const RectF& rect, const Color* color, SDL_GpuGraphicsPipeline* pipeline, SDL_GpuBuffer* vertexBuffer) {
-		matrixUniform.m11 = rect.w / winW * 2;
-		matrixUniform.m22 = rect.h / winH * 2;
-		matrixUniform.m41 = (2 * rect.x / winW) - 1;
-		matrixUniform.m42 = 1 - (2 * rect.y / winH);
+	export void queueDraw(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const Color* color, float x, float y, float w, float h, float rotZ, SDL_GpuGraphicsPipeline* pipeline, SDL_GpuBuffer* vertexBuffer) {
+		if (rotZ != 0) {
+			float cosZ = std::cos(rotZ);
+			float sinZ = std::sin(rotZ);
+
+			matrixUniform.m11 = (w / winW * 2) * cosZ;
+			matrixUniform.m12 = -(w / winW * 2) * sinZ;
+			matrixUniform.m21 = (h / winH * 2) * sinZ;
+			matrixUniform.m22 = (h / winH * 2) * cosZ;
+			matrixUniform.m41 = (2 * x / winW) - 1;
+			matrixUniform.m42 = 1 - (2 * y / winH);
+		}
+		else {
+			matrixUniform.m11 = w / winW * 2;
+			matrixUniform.m12 = 0;
+			matrixUniform.m21 = 0;
+			matrixUniform.m22 = h / winH * 2;
+			matrixUniform.m41 = (2 * x / winW) - 1;
+			matrixUniform.m42 = 1 - (2 * y / winH);
+		}
 
 		if (lastPipeline != pipeline) {
 			SDL_GpuBindGraphicsPipeline(renderPass, pipeline);
@@ -635,10 +659,10 @@ namespace sdl {
 		SDL_GpuPushFragmentUniformData(cmdbuf, 0, color, sizeof(color));
 		SDL_GpuDrawIndexedPrimitives(renderPass, 0, 0, 2, 1);
 	}
-	export void queueDraw(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const RectF& rect, const Color* color, SDL_GpuGraphicsPipeline* pipeline = RENDER_STANDARD) { queueDraw(cmdbuf, renderPass, texture, rect, color, pipeline, bufferVertex); }
-	export void queueDrawBordered(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const RectF& rect, const Color* color, SDL_GpuGraphicsPipeline* pipeline = RENDER_STANDARD) { queueDraw(cmdbuf, renderPass, texture, rect, color, pipeline, bufferVertexBordered); }
-	export void queueDrawHorizontal(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const RectF& rect, const Color* color, SDL_GpuGraphicsPipeline* pipeline = RENDER_STANDARD) { queueDraw(cmdbuf, renderPass, texture, rect, color, pipeline, bufferVertexHorizontal); }
-	export void queueDrawVertical(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const RectF& rect, const Color* color, SDL_GpuGraphicsPipeline* pipeline = RENDER_STANDARD) { queueDraw(cmdbuf, renderPass, texture, rect, color, pipeline, bufferVertexVertical); }
+	export void queueDraw(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const Color* color, float x, float y, float w, float h, float rotZ = 0, SDL_GpuGraphicsPipeline* pipeline = RENDER_STANDARD) { queueDraw(cmdbuf, renderPass, texture, color, x, y, w, h, rotZ, pipeline, bufferVertex); }
+	export void queueDrawBordered(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const Color* color, float x, float y, float w, float h, float rotZ = 0, SDL_GpuGraphicsPipeline* pipeline = RENDER_STANDARD) { queueDraw(cmdbuf, renderPass, texture, color, x, y, w, h, rotZ, pipeline, bufferVertexBordered); }
+	export void queueDrawHorizontal(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const Color* color, float x, float y, float w, float h, float rotZ = 0, SDL_GpuGraphicsPipeline* pipeline = RENDER_STANDARD) { queueDraw(cmdbuf, renderPass, texture, color, x, y, w, h, rotZ, pipeline, bufferVertexHorizontal); }
+	export void queueDrawVertical(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const Color* color, float x, float y, float w, float h, float rotZ = 0, SDL_GpuGraphicsPipeline* pipeline = RENDER_STANDARD) { queueDraw(cmdbuf, renderPass, texture, color, x, y, w, h, rotZ, pipeline, bufferVertexVertical); }
 
 	// Reset draw parameters at the end of each frame
 	export void resetDrawCaches() {

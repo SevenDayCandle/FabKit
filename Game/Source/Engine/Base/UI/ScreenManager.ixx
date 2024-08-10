@@ -111,10 +111,10 @@ namespace fbc::screenManager {
 
 	// Render the last opened screen, as well as all overlays
 	void render() {
-		sdl::GpuCommandBuffer* cmdbuf = sdl::gpuAcquireCommandBuffer();
-		if (cmdbuf) {
+		sdl::GpuCommandBuffer* cd = sdl::gpuAcquireCommandBuffer();
+		if (cd) {
 			std::uint32_t w, h;
-			sdl::GpuTexture* swapchain = sdl::gpuAcquireSwapchainTexture(cmdbuf, &w, &h);
+			sdl::GpuTexture* swapchain = sdl::gpuAcquireSwapchainTexture(cd, &w, &h);
 			if (swapchain) {
 				sdl::GpuColorAttachmentInfo colorAttachmentInfo = {
 					.textureSlice = {
@@ -125,11 +125,10 @@ namespace fbc::screenManager {
 					.storeOp = sdl::GpuStoreOp::SDL_GPU_STOREOP_STORE
 				};
 
-				sdl::GpuRenderPass* renderPass = sdl::gpuBeginRenderPass(cmdbuf, &colorAttachmentInfo, 1, nullptr);
-				z = 0;
+				sdl::GpuRenderPass* rp = sdl::gpuBeginRenderPass(cd, &colorAttachmentInfo, 1, nullptr);
 
 				// Render screen elements
-				// TODO pass in: cmdbuffer, z index
+				// TODO pass in z index
 				if (!screens.empty()) {
 					screens.back()->renderImpl(cd, rp);
 				}
@@ -141,10 +140,11 @@ namespace fbc::screenManager {
 				}
 				tipBatch = nullptr;
 
-				sdl::gpuEndRenderPass(renderPass);
+				sdl::gpuEndRenderPass(rp);
 			}
 
-			sdl::gpuSubmit(cmdbuf);
+			sdl::gpuSubmit(cd);
+			sdl::resetDrawCaches();
 		}
 
 	}

@@ -23,7 +23,7 @@ namespace fbc {
         inline float getWidth() const override { return w; }
 
         void dispose() override;
-        void draw(sdl::GpuCommandBuffer* cb, sdl::GpuRenderPass* rp, const sdl::RectF& destRec, sdl::GpuGraphicsPipeline* pipeline, const sdl::Color* tint, float rotation, float flipX, float flipY) override;
+        void draw(sdl::GpuCommandBuffer* cb, sdl::GpuRenderPass* rp, const sdl::Color* tint, float x, float y, float w, float h, float rotation, sdl::GpuGraphicsPipeline* pipeline) override;
         void reload() const override;
         void reload(sdl::GpuCopyPass* copyPass) const;
     protected:
@@ -39,9 +39,9 @@ namespace fbc {
         texture = nullptr;
     }
 
-    void FTexture::draw(sdl::GpuCommandBuffer* cb, sdl::GpuRenderPass* rp, const sdl::RectF& destRec, sdl::GpuGraphicsPipeline* pipeline, const sdl::Color* tint, float rotation, float flipX, float flipY)
+    void FTexture::draw(sdl::GpuCommandBuffer* cb, sdl::GpuRenderPass* rp, const sdl::Color* tint, float x, float y, float w, float h, float rotation, sdl::GpuGraphicsPipeline* pipeline)
     {
-        sdl::queueDraw(cb, rp, texture, destRec, tint, pipeline);
+        sdl::queueDraw(cb, rp, texture, tint, x, y, w, h, rotation, pipeline);
     }
 
     void FTexture::reload() const

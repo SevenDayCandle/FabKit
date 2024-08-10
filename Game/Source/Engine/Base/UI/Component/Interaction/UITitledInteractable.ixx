@@ -15,7 +15,6 @@ namespace fbc {
 	export class UITitledInteractable : public UIInteractable {
 	public:
 		UITitledInteractable(Hitbox* hb, IDrawable& image) : UIInteractable(hb, image) {}
-		UITitledInteractable(Hitbox* hb, IDrawable& image, sdl::Point origin) : UIInteractable(hb, image, origin) {}
 
 		uptr<TextInfo> label;
 
@@ -25,7 +24,7 @@ namespace fbc {
 
 		virtual void refreshDimensions() override;
 		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
-		UITitledInteractable& withLabel(strv text, FFont& font = cct.fontBold(), float xOff = 0, float yOff = -80, sdl::Color color = sdl::COLOR_WHITE, sdl::Color colorOutline = sdl::COLOR_BLACK);
+		UITitledInteractable& withLabel(strv text, FFont& font = cct.fontBold(), float xOff = 0, float yOff = -80, sdl::Color color = sdl::COLOR_STANDARD, sdl::Color colorOutline = sdl::COLOR_BLACK);
 	private:
 		float xOff = 0;
 		float yOff = 0;
@@ -45,7 +44,7 @@ namespace fbc {
 	{
 		UIInteractable::renderImpl(cd, rp);
 		if (label) {
-			label->drawText(hb->x, hb->y);
+			label->drawText(cd, rp, hb->x, hb->y);
 		}
 	}
 

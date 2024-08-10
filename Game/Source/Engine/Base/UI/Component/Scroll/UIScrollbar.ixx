@@ -53,8 +53,8 @@ namespace fbc {
 	}
 
 	void UIScrollbar::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
-		imageBar.draw(hb.get());
-		imageButton.draw(&dropzone);
+		imageBar.draw(cd, rp, *hb.get());
+		imageButton.draw(cd, rp, dropzone);
 	}
 
 	// Updates the scrollbar button position and triggers the scroll event at the new position

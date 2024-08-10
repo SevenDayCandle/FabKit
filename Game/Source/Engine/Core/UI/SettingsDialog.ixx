@@ -34,19 +34,19 @@ namespace fbc {
 
 			UIButton& cancel = this->add(std::make_unique<UITextButton>(
 				new RelativeHitbox(*hb, 20, hb->getScaleOffSizeY() * 0.88f, 300, 100),
-				cct.images.panelRound,
+				cct.images.uiPanelRound,
 				cct.fontRegular(),
 				cct.strings.ui_cancel())
 			).setOnClick([this](UIButton& b) {screenManager::closeOverlay(this);});
 			UIButton& apply = this->stackXDir(std::make_unique<UITextButton>(
 				new RelativeHitbox(*hb, 300, 100),
-				cct.images.panelRound,
+				cct.images.uiPanelRound,
 				cct.fontRegular(),
 				cct.strings.ui_apply())
 			).setOnClick([this](UIButton& b) { applyAll(); });
 			UIButton& save = this->stackXDir(std::make_unique<UITextButton>(
 				new RelativeHitbox(*hb,300, 100),
-				cct.images.panelRound,
+				cct.images.uiPanelRound,
 				cct.fontRegular(),
 				cct.strings.ui_save())
 			).setOnClick([this](UIButton& b) {

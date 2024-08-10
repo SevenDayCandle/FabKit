@@ -17,7 +17,7 @@ namespace fbc {
 	export class UITextInput : public UITitledInteractable, public TextInfo, public ITextInputter {
 	public:
 		UITextInput(Hitbox* hb, 
-			IDrawable& image = cct.images.panel,
+			IDrawable& image = cct.images.uiPanel,
 			FFont& textFont = cct.fontRegular()): UITitledInteractable(hb, image), TextInfo(textFont) {
 			initCaret(this->font, this->hb->x, this->hb->y);
 			UITextInput::onSizeUpdated();
@@ -69,9 +69,9 @@ namespace fbc {
 	void UITextInput::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
 	{
 		UITitledInteractable::renderImpl(cd, rp);
-		TextInfo::drawText(hb->x, hb->y);
+		TextInfo::drawText(cd, rp, hb->x, hb->y);
 		if (sdl::keyboardInputActive(this)) {
-			renderCaret();
+			renderCaret(cd, rp);
 		}
 	}
 

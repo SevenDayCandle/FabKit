@@ -7,7 +7,7 @@ import sdl;
 namespace fbc {
 	export class TextInfo {
 	public:
-		TextInfo(FFont& font, strv text = "", sdl::Color color = sdl::COLOR_WHITE, sdl::Color colorOutline = sdl::COLOR_BLACK) : font(font), text(text), color(color), colorOutline(colorOutline) {
+		TextInfo(FFont& font, strv text = "", sdl::Color color = sdl::COLOR_STANDARD, sdl::Color colorOutline = sdl::COLOR_BLACK) : font(font), text(text), color(color), colorOutline(colorOutline) {
 			// TODO remove constructor method
 			refreshCache();
 		}
@@ -20,8 +20,7 @@ namespace fbc {
 		inline strv getText() const { return text; }
 		inline void refreshCache() { updateCache(this->text, this->color, this->colorOutline); }
 
-		void drawText() const;
-		void drawText(float offX, float offY) const;
+		void drawText(sdl::GpuCommandBuffer* cmd, sdl::GpuRenderPass* rp, float offX, float offY) const;
 		TextInfo& set(strv text, sdl::Color color);
 		TextInfo& set(strv text, sdl::Color color, sdl::Color colorOutline);
 		TextInfo& set(strv text, sdl::Color color, sdl::Color colorOutline, const FFont& font);
@@ -33,7 +32,7 @@ namespace fbc {
 	protected:
 		FFont& font;
 		str text;
-		sdl::Color color = sdl::COLOR_WHITE;
+		sdl::Color color = sdl::COLOR_STANDARD;
 		sdl::Color colorOutline = sdl::COLOR_BLACK;
 
 		inline virtual bool hasCache() { return cache.texture != nullptr; }
@@ -47,18 +46,10 @@ namespace fbc {
 		sdl::FontRender cache = { 0, 0, 0, 0, nullptr };
 	};
 
-	void TextInfo::drawText() const
+	void TextInfo::drawText(sdl::GpuCommandBuffer* cmd, sdl::GpuRenderPass* rp, float offX, float offY) const
 	{
 		if (cache.texture) {
-			sdl::renderCopy(cache.texture, nullptr, &cache);
-		}
-	}
-
-	void TextInfo::drawText(float offX, float offY) const
-	{
-		if (cache.texture) {
-			sdl::RectF textRect = { cache.x + offX, cache.y + offY, cache.w, cache.h };
-			sdl::renderCopy(cache.texture, nullptr, &textRect);
+			sdl::queueDraw(cmd, rp, cache.texture, &color, cache.x + offX, cache.y + offY, cache.w, cache.h);
 		}
 	}
 
@@ -144,7 +135,8 @@ namespace fbc {
 	void TextInfo::unloadCache()
 	{
 		if (cache.texture) {
-			sdl::textureDestroy(cache.texture);
+			sdl::gpuReleaseTexture(cache.texture);
+			cache.texture = nullptr;
 		}
 	}
 }

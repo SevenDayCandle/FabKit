@@ -9,7 +9,7 @@ import fbc.UIScrollbar;
 namespace fbc {
 	export class UIHorizontalScrollbar : public UIScrollbar {
 	public:
-		UIHorizontalScrollbar(Hitbox* hb, IDrawable& imageBar = cct.images.scrollbar, IDrawable& imageButton = cct.images.scrollbutton) : UIScrollbar(hb, imageBar, imageButton) {
+		UIHorizontalScrollbar(Hitbox* hb, IDrawable& imageBar = cct.images.uiScrollbar, IDrawable& imageButton = cct.images.uiScrollbutton) : UIScrollbar(hb, imageBar, imageButton) {
 			UIHorizontalScrollbar::updateDropzoneSize(0.05f);
 		}
 

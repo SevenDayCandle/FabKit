@@ -23,7 +23,7 @@ namespace fbc {
 	public:
 		UIDropdown(Hitbox* hb, 
 			UISelectorList<T>* menu, 
-			IDrawable& image = cct.images.panel,
+			IDrawable& image = cct.images.uiPanel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
@@ -33,7 +33,7 @@ namespace fbc {
 		}
 		UIDropdown(Hitbox* hb,
 			uptr<UISelectorList<T>> menu,
-			IDrawable& image = cct.images.panel,
+			IDrawable& image = cct.images.uiPanel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
@@ -97,7 +97,7 @@ namespace fbc {
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
 			IDrawable& background = cct.images.uiDarkPanelRound,
-			IDrawable& image = cct.images.panel,
+			IDrawable& image = cct.images.uiPanel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall);
 		static uptr<UIDropdown> singleList(Hitbox* hb, 
@@ -106,7 +106,7 @@ namespace fbc {
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
 			IDrawable& background = cct.images.uiDarkPanelRound,
-			IDrawable& image = cct.images.panel,
+			IDrawable& image = cct.images.uiPanel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall);
 	protected:
@@ -183,12 +183,12 @@ namespace fbc {
 	template<typename T> void UIDropdown<T>::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
 		UITitledInteractable::renderImpl(cd, rp);
 		if (this->selectedSize() > 0 && this->canClear()) {
-			clear.draw(&arrowRect, UIImage::color, origin, rotation);
+			clear.draw(cd, rp, arrowRect, &this->UIImage::color, rotation);
 		}
 		else {
-			arrow.draw(&arrowRect, UIImage::color, origin, rotation, menu->isOpen() ? sdl::FlipMode::SDL_FLIP_VERTICAL : flip);
+			arrow.draw(cd, rp, arrowRect, &this->UIImage::color, menu->isOpen() ? rotation + 180 : rotation);
 		}
-		TextInfo::drawText(hb->x, hb->y);
+		TextInfo::drawText(cd, rp, hb->x, hb->y);
 	}
 
 	template<typename T> void UIDropdown<T>::updateImpl() {

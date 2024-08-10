@@ -3,6 +3,7 @@ export module fbc.UIBase;
 import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.IOverlay;
+import sdl;
 import std;
 
 namespace fbc {

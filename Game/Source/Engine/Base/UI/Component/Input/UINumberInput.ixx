@@ -20,7 +20,7 @@ namespace fbc {
 		UINumberInput(Hitbox* hb,
 			int limMin = 0,
 			int limMax = std::numeric_limits<int>::max(),
-			IDrawable& image = cct.images.panel,
+			IDrawable& image = cct.images.uiPanel,
 			IDrawable& arrow = cct.images.uiArrowIncrement,
 			FFont& textFont = cct.fontRegular()) : UITitledInteractable(hb, image), TextInfo(textFont), limMin(limMin), limMax(limMax), arrow(arrow) {
 			initCaret(this->font, this->hb->x, this->hb->y);
@@ -99,11 +99,11 @@ namespace fbc {
 	void UINumberInput::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
 	{
 		UITitledInteractable::renderImpl(cd, rp);
-		TextInfo::drawText(hb->x, hb->y);
+		TextInfo::drawText(cd, rp, hb->x, hb->y);
 		arrow.draw(cd, rp, lessRect);
-		arrow.draw(cd, rp, moreRect, { 0,0 },  0, sdl::FlipMode::SDL_FLIP_VERTICAL);
+		arrow.draw(cd, rp, moreRect);
 		if (sdl::keyboardInputActive(this)) {
-			renderCaret();
+			renderCaret(cd, rp);
 		}
 	}
 

@@ -18,7 +18,7 @@ namespace fbc {
 		TitleScreen(): UIScreen(new ScreenSizeHitbox()) {
 			UITextButton& b = add(std::make_unique<UITextButton>(
 				new ScreenPosHitbox(0.5f, 0.5f, 290, 170),
-				cct.images.panel,
+				cct.images.uiPanel,
 				cct.fontRegular(),
 				cct.strings.screen_title_header()));
 			b.setOnClick([](UIButton& i) {
@@ -27,7 +27,7 @@ namespace fbc {
 
 			UITextButton& b2 = stackYDir(std::make_unique<UITextButton>(
 				new ScreenPosHitbox(0.5f, 0.5f, 290, 170),
-				cct.images.panel,
+				cct.images.uiPanel,
 				cct.fontRegular(),
 				cct.strings.screen_setup_header()));
 			b2.setOnClick([](UIButton& i) {

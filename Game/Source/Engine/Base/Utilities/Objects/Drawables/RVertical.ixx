@@ -10,10 +10,10 @@ namespace fbc {
 		RVertical(strv path) : FTexture(path) {}
 		RVertical(const RVertical&) = delete;
 
-		void draw(sdl::GpuCommandBuffer* cb, sdl::GpuRenderPass* rp, const sdl::RectF& destRec, sdl::GpuGraphicsPipeline* pipeline, const sdl::Color* tint, float rotation, float flipX, float flipY) override;
+		void draw(sdl::GpuCommandBuffer* cb, sdl::GpuRenderPass* rp, const sdl::Color* tint, float x, float y, float w, float h, float rotation, sdl::GpuGraphicsPipeline* pipeline) override;
 	};
 
-	void RVertical::draw(sdl::GpuCommandBuffer* cb, sdl::GpuRenderPass* rp, const sdl::RectF& destRec, sdl::GpuGraphicsPipeline* pipeline, const sdl::Color* tint, float rotation, float flipX, float flipY) {
-		sdl::queueDrawHorizontal(cb, rp, texture, destRec, tint, pipeline);
+	void RVertical::draw(sdl::GpuCommandBuffer* cb, sdl::GpuRenderPass* rp, const sdl::Color* tint, float x, float y, float w, float h, float rotation, sdl::GpuGraphicsPipeline* pipeline) {
+		sdl::queueDrawHorizontal(cb, rp, texture, tint, x, y, w, h, rotation, pipeline);
 	}
 }

@@ -13,12 +13,12 @@ namespace fbc {
 	export class UISlider : public UINumberInput {
 	public:
 		UISlider(Hitbox* hb, Hitbox* scrollhb, int limMin = 0,
-			int limMax = std::numeric_limits<int>::max(), IDrawable& imageBar = cct.images.sliderEmpty, IDrawable& imageButton = cct.images.scrollbutton, IDrawable& panelImage = cct.images.panel):
+			int limMax = std::numeric_limits<int>::max(), IDrawable& imageBar = cct.images.uiSliderEmpty, IDrawable& imageButton = cct.images.uiScrollbutton, IDrawable& panelImage = cct.images.uiPanel):
 			UINumberInput(hb, limMin, limMax, panelImage), scrollbar(scrollhb, imageBar, imageButton) {
 			scrollbar.setOnScroll([this](float scroll) {this->commitFromScroll(scroll); });
 		}
 		UISlider(Hitbox* hb, int limMin = 0,
-			int limMax = std::numeric_limits<int>::max(),IDrawable& imageBar = cct.images.sliderEmpty, IDrawable& imageButton = cct.images.scrollbutton, IDrawable& panelImage = cct.images.panel) :
+			int limMax = std::numeric_limits<int>::max(),IDrawable& imageBar = cct.images.uiSliderEmpty, IDrawable& imageButton = cct.images.uiScrollbutton, IDrawable& panelImage = cct.images.uiPanel) :
 			UISlider(hb, new RelativeHitbox(*hb, hb->getOffSizeX() + 4, 0, hb->getOffSizeX() * 3, hb->getOffSizeY()), limMin, limMax, imageBar, imageButton, panelImage) {}
 
 		virtual UISlider& setValue(int num) override;

@@ -14,7 +14,7 @@ namespace fbc {
 		UITextButton(Hitbox* hb, IDrawable& image, FFont& f, strv text = "") : UIButton(hb, image), TextInfo(f, text) {
 			UITextButton::onSizeUpdated();
 		}
-		UITextButton(Hitbox* hb, strv text) : UITextButton(hb, cct.images.panel, cct.fontRegular(), text) {}
+		UITextButton(Hitbox* hb, strv text) : UITextButton(hb, cct.images.uiPanel, cct.fontRegular(), text) {}
 		~UITextButton() override {}
 
 		virtual void onSizeUpdated() override;
@@ -36,6 +36,6 @@ namespace fbc {
 
 	void UITextButton::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
 		UIButton::renderImpl(cd, rp);
-		TextInfo::drawText(hb->x, hb->y);
+		TextInfo::drawText(cd, rp, hb->x, hb->y);
 	}
 }

@@ -25,7 +25,7 @@ namespace fbc {
 		UISelectorList(Hitbox* hb,
 		       func<str(const T&)> labelFunc = futil::toString<T>,
 		       FFont& itemFont = cct.fontSmall(),
-		       IDrawable& background = cct.images.panelRound,
+		       IDrawable& background = cct.images.uiPanelRound,
 		       bool canAutosize = false):
 			UIList<T>(hb, std::move(labelFunc), itemFont, background, canAutosize),
 			scrollbar(new RelativeHitbox(*hb, 0, 0, 48, 48)) { scrollbar.setOnScroll([this](float f) { onScroll(f); }); }
@@ -302,7 +302,7 @@ namespace fbc {
 
 	// Render all visible rows and the scrollbar if it is shown
 	template <typename T> void UISelectorList<T>::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
-		this->background.draw(this->hb.get(), this->backgroundColor, {0, 0}, 0, sdl::FlipMode::SDL_FLIP_NONE);
+		this->background.draw(cd, rp, *this->hb.get(), &this->backgroundColor);
 		int rowCount = getVisibleRowCount();
 		for (int i = this->topVisibleRowIndex; i < this->topVisibleRowIndex + rowCount; ++i) {
 			rowsForRender[i]->renderImpl(cd, rp);

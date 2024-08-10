@@ -15,7 +15,6 @@ namespace fbc {
 	export class UIInteractable : public UIImage {
 	public:
 		UIInteractable(Hitbox* hb, IDrawable& image) : UIImage(hb, image) {}
-		UIInteractable(Hitbox* hb, IDrawable& image, sdl::Point origin) : UIImage(hb, image, origin) {}
 
 		bool interactable = true;
 		FSound* soundClick = &cct.audio.uiClick;

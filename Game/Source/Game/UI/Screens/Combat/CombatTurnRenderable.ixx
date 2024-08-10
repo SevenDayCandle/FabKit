@@ -24,7 +24,6 @@ namespace fbc {
 	void CombatTurnRenderable::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
 	{
 		UIInteractable::renderImpl(cd, rp);
-		sdl::RectF portraitRect = { hb->x + hb->w / 8, hb->y + hb->h * 0.15f, hb->w / 2, hb->h * 0.7f };
-		portrait.draw(&portraitRect, color, origin, rotation, flip);
+		portrait.draw(cd, rp, &color, hb->x + hb->w / 8, hb->y + hb->h * 0.15f, hb->w / 2, hb->h * 0.7f, rotation);
 	}
 }

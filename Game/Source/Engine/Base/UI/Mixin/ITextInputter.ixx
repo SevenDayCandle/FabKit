@@ -22,11 +22,12 @@ namespace fbc {
 	protected:
 		int bufferPos = 0;
 		str buffer = "";
+		sdl::Color caretColor = sdl::COLOR_STANDARD;
 		sdl::FontRender caret;
 
 		void initCaret(FFont& font, float x, float y);
 		void movePosForCoords(float x, float y);
-		void renderCaret() const;
+		void renderCaret(sdl::GpuCommandBuffer* cmd, sdl::GpuRenderPass* rp);
 
 		virtual void onBufferUpdated() = 0;
 		virtual void resetBuffer() = 0;
@@ -111,8 +112,8 @@ namespace fbc {
 	}
 
 	// Renders the caret with a smooth fading "animation"
-	void ITextInputter::renderCaret() const {
-		sdl::textureSetAlphaMod(caret.texture, 127 + 127 * std::sin(sdl::timeTotal() / 100000000.0f));
-		sdl::renderCopy(caret.texture, nullptr, &caret);
+	void ITextInputter::renderCaret(sdl::GpuCommandBuffer* cmd, sdl::GpuRenderPass* rp) {
+		caretColor.a = 0.5f + 0.5f * std::sin(sdl::timeTotal() / 100000000.0f);
+		sdl::queueDraw(cmd, rp, caret.texture, &caretColor, caret.x, caret.y, caret.w, caret.h);
 	}
 }

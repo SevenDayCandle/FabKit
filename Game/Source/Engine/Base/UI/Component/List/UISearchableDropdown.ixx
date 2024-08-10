@@ -24,7 +24,7 @@ namespace fbc {
 
 		UISearchableDropdown(Hitbox* hb,
 			UISelectorList<T>* menu,
-			IDrawable& image = cct.images.panel,
+			IDrawable& image = cct.images.uiPanel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
@@ -34,7 +34,7 @@ namespace fbc {
 		}
 		UISearchableDropdown(Hitbox* hb,
 			uptr<UISelectorList<T>> menu,
-			IDrawable& image = cct.images.panel,
+			IDrawable& image = cct.images.uiPanel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
@@ -59,7 +59,7 @@ namespace fbc {
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
 			IDrawable& background = cct.images.uiDarkPanelRound,
-			IDrawable& image = cct.images.panel,
+			IDrawable& image = cct.images.uiPanel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall);
 		static uptr<UISearchableDropdown> singleSearch(Hitbox* hb,
@@ -68,7 +68,7 @@ namespace fbc {
 			FFont& itemFont = cct.fontRegular(),
 			FFont& textFont = cct.fontRegular(),
 			IDrawable& background = cct.images.uiDarkPanelRound,
-			IDrawable& image = cct.images.panel,
+			IDrawable& image = cct.images.uiPanel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall);
 	protected:
@@ -106,9 +106,9 @@ namespace fbc {
 		if (sdl::keyboardInputActive(this)) {
 			UIInteractable::renderImpl(cd, rp);
 			TextInfo::drawText(this->hb->x, this->hb->y);
-			renderCaret();
+			renderCaret(cd, rp);
 			if (this->selectedSize() > 0) {
-				this->clear.draw(&this->arrowRect, this->UIImage::color, this->origin, this->rotation);
+				this->clear.draw(cd, rp, this->arrowRect, this->UIImage::color, this->rotation);
 			}
 		}
 		else {

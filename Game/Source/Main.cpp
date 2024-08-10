@@ -16,19 +16,6 @@ void dispose() {
 	sdl::quit();
 }
 
-void draw() {
-	sdl::renderSetDrawColor(sdl::COLOR_BLACK);
-	sdl::renderClear();
-
-	screenManager::render();
-
-	sdl::renderPresent();
-}
-
-void update() {
-	screenManager::update();
-}
-
 bool initialize() {
 	if (!sdl::initSDL()) {
 		return false;
@@ -56,8 +43,8 @@ int main()
 
 	while(sdl::poll())
 	{
-		update();
-		draw();
+		screenManager::update();
+		screenManager::render();
 		
 		// Only limit frame if vsync is off
 		if (!cfg.graphicsVSync.get()) {

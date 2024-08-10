@@ -55,19 +55,13 @@ namespace fbc {
 	void UIToggle::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
 	{
 		if (toggled) {
-			checkImage.draw(hb.get(), UIImage::color, origin, rotation, flip);
-			if (hb->isHovered()) {
-				checkImage.draw(hb.get(), sdl::BlendMode::SDL_BLENDMODE_ADD, UIImage::color, origin, rotation, flip);
-			}
+			checkImage.draw(cd, rp, *hb.get(), hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color, rotation);
 		}
 		else {
-			image.draw(hb.get(), UIImage::color, origin, rotation, flip);
-			if (hb->isHovered()) {
-				image.draw(hb.get(), sdl::BlendMode::SDL_BLENDMODE_ADD, UIImage::color, origin, rotation, flip);
-			}
+			image.draw(cd, rp, *hb.get(), hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color, rotation);
 		}
 
-		TextInfo::drawText(hb->x, hb->y);
+		TextInfo::drawText(cd, rp, hb->x, hb->y);
 	}
 
 	void UIToggle::toggle(bool val)

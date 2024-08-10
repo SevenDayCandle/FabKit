@@ -25,7 +25,7 @@ namespace fbc {
 			fieldUI(add(make_unique<UICanvas>(new RelativeHitbox(*hb, TILE_OFFSET, TILE_OFFSET, hb->getScaleOffSizeX(), hb->getScaleOffSizeY())))),
 			turnUI(add(make_unique<UICanvas>(new RelativeHitbox(*hb, 0, 0, hb->getScaleOffSizeX(), hb->getScaleOffSizeY())))),
 			endTurnButton(add(make_unique<UITextButton>(new RelativeHitbox(*hb, hb->getScaleOffSizeX(0.8), hb->getScaleOffSizeY(0.8), END_TURN_SIZE, END_TURN_SIZE),
-				cct.images.panelRound, cct.fontRegular(), cct.strings.combat_end_turn()))) {
+				cct.images.uiPanelRound, cct.fontRegular(), cct.strings.combat_end_turn()))) {
 		}
 
 		virtual void onPlayerTurnBegin(const CombatTurn* turn) override;

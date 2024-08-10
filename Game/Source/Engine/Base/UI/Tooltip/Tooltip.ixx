@@ -48,8 +48,8 @@ namespace fbc {
 
 	void Tooltip::render(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
 	{
-		background.draw(&bounds);
-		TextInfo::drawText(bounds.x, bounds.y);
+		background.draw(cd, rp, bounds);
+		TextInfo::drawText(cd, rp, bounds.x, bounds.y);
 	}
 
 	// Stretch the box background to fit the words in the tooltip

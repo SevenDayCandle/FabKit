@@ -27,7 +27,7 @@ namespace fbc {
 	}
 
 	void UIDialog::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
-		image.draw(hb.get());
+		image.draw(cd, rp, *hb.get());
 		UICanvas::renderImpl(cd, rp);
 	}
 

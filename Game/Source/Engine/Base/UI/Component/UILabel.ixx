@@ -25,6 +25,6 @@ namespace fbc {
 	}
 
 	void UILabel::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
-		TextInfo::drawText(hb->x, hb->y);
+		TextInfo::drawText(cd, rp, hb->x, hb->y);
 	}
 }
