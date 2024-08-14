@@ -19,16 +19,16 @@ namespace fbc {
         }
 
         inline bool loaded() const { return texture != nullptr; }
-        inline float getHeight() const override { return h; }
-        inline float getWidth() const override { return w; }
+        inline float getHeight() const override { return texH; }
+        inline float getWidth() const override { return texW; }
 
         void dispose() override;
         void draw(sdl::GpuCommandBuffer* cb, sdl::GpuRenderPass* rp, const sdl::Color* tint, float x, float y, float w, float h, float rotation, sdl::GpuGraphicsPipeline* pipeline) override;
         void reload() const override;
         void reload(sdl::GpuCopyPass* copyPass) const;
     protected:
-        mutable float h;
-        mutable float w;
+        mutable float texH;
+        mutable float texW;
         mutable sdl::GpuTexture* texture;
         str path;
 	};
@@ -58,8 +58,8 @@ namespace fbc {
             sdl::gpuReleaseTexture(texture);
         }
         sdl::Surface* surface = sdl::surfaceLoad(path.data());
-        h = surface->h;
-        w = surface->w;
+        texH = surface->h;
+        texW = surface->w;
         texture = sdl::uploadTexture(copyPass, surface);
 
         sdl::surfaceDestroy(surface);

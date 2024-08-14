@@ -50,6 +50,7 @@ namespace sdl {
 	export struct FontRender : RectF {
 		sdl::GpuTexture* texture;
 	};
+
 	export struct Matrix4x4
 	{
 		float m11, m12, m13, m14;
@@ -65,77 +66,105 @@ namespace sdl {
 	constexpr auto SHADER_NORMAL_FRAG = "Shader/Compiled/Normal.frag.spv";
 	constexpr auto SHADER_NORMAL_VERT = "Shader/Compiled/Normal.vert.spv";
 	constexpr std::initializer_list<TexPos> VERTICES = {
-			sdl::TexPos{ -0.5f, -0.5f, 0.0f, 0.0f, 0.0f },
-			sdl::TexPos{ 0.5f, -0.5f, 0.0f, 1.0f, 0.0f },
-			sdl::TexPos{ 0.5f,  0.5f, 0.0f, 1.0f, 1.0f },
-			sdl::TexPos{ -0.5f,  0.5f, 0.0f, 0.0f, 1.0f }
+		sdl::TexPos{ -0.5f, -0.5f, 0.0f, 0.0f, 1.0f },  // Bottom Left
+		sdl::TexPos{ 0.5f, -0.5f, 0.0f, 1.0f, 1.0f },   // Bottom Right
+		sdl::TexPos{ 0.5f,  0.5f, 0.0f, 1.0f, 0.0f },   // Top Right
+		sdl::TexPos{ -0.5f,  0.5f, 0.0f, 0.0f, 0.0f }   // Top Left
 	};
 	constexpr std::initializer_list<TexPos> VERTICES_BORDERED = {
-			sdl::TexPos{ -1.0f,  1.0f, 0.0f, 0.0f, 0.0f },
-			sdl::TexPos{ -0.5f,  1.0f, 0.0f, 0.5f, 0.0f },
-			sdl::TexPos{ -0.5f,  0.5f, 0.0f, 0.5f, 0.5f },
-			sdl::TexPos{ -1.0f,  0.5f, 0.0f, 0.0f, 0.5f },
-			sdl::TexPos{ -0.5f,  1.0f, 0.0f, 0.5f, 0.0f },
-			sdl::TexPos{ 0.5f,  1.0f, 0.0f, 0.5f, 0.0f },
-			sdl::TexPos{ 0.5f,  0.5f, 0.0f, 0.5f, 0.5f },
-			sdl::TexPos{ -0.5f,  0.5f, 0.0f, 0.5f, 0.5f },
-			sdl::TexPos{ 0.5f,  1.0f, 0.0f, 0.5f, 0.0f },
-			sdl::TexPos{ 1.0f,  1.0f, 0.0f, 1.0f, 0.0f },
-			sdl::TexPos{ 1.0f,  0.5f, 0.0f, 1.0f, 0.5f },
-			sdl::TexPos{ 0.5f,  0.5f, 0.0f, 0.5f, 0.5f },
-			sdl::TexPos{ -1.0f,  0.5f, 0.0f, 0.0f, 0.5f },
-			sdl::TexPos{ -0.5f,  0.5f, 0.0f, 0.5f, 0.5f },
-			sdl::TexPos{ -0.5f, -0.5f, 0.0f, 0.5f, 0.5f },
-			sdl::TexPos{ -1.0f, -0.5f, 0.0f, 0.0f, 1.0f },
-			sdl::TexPos{ -0.5f,  0.5f, 0.0f, 0.5f, 0.5f },
-			sdl::TexPos{ 0.5f,  0.5f, 0.0f, 0.5f, 0.5f },
-			sdl::TexPos{ 0.5f, -0.5f, 0.0f, 0.5f, 1.0f },
-			sdl::TexPos{ -0.5f, -0.5f, 0.0f, 0.5f, 1.0f },
-			sdl::TexPos{ 0.5f,  0.5f, 0.0f, 0.5f, 0.5f },
-			sdl::TexPos{ 1.0f,  0.5f, 0.0f, 1.0f, 0.5f },
-			sdl::TexPos{ 1.0f, -0.5f, 0.0f, 1.0f, 1.0f },
-			sdl::TexPos{ 0.5f, -0.5f, 0.0f, 0.5f, 1.0f },
-			sdl::TexPos{ -1.0f, -0.5f, 0.0f, 0.0f, 0.5f },
-			sdl::TexPos{ -0.5f, -0.5f, 0.0f, 0.5f, 0.5f },
-			sdl::TexPos{ -0.5f, -1.0f, 0.0f, 0.5f, 1.0f },
-			sdl::TexPos{ -1.0f, -1.0f, 0.0f, 0.0f, 1.0f },
-			sdl::TexPos{ -0.5f, -0.5f, 0.0f, 0.5f, 0.5f },
-			sdl::TexPos{ 0.5f, -0.5f, 0.0f, 0.5f, 0.5f },
-			sdl::TexPos{ 0.5f, -1.0f, 0.0f, 0.5f, 1.0f },
-			sdl::TexPos{ -0.5f, -1.0f, 0.0f, 0.5f, 1.0f },
-			sdl::TexPos{ 0.5f, -0.5f, 0.0f, 0.5f, 0.5f },
-			sdl::TexPos{ 1.0f, -0.5f, 0.0f, 1.0f, 0.5f },
-			sdl::TexPos{ 1.0f, -1.0f, 0.0f, 1.0f, 1.0f },
-			sdl::TexPos{ 0.5f, -1.0f, 0.0f, 0.5f, 1.0f }
+		// Top Left
+		sdl::TexPos{ -0.5f, -0.5f, 0.0f, 0.0f, 0.5f },  // Bottom Left
+		sdl::TexPos{ 0.5f, -0.5f, 0.0f, 0.5f, 0.5f },   // Bottom Right
+		sdl::TexPos{ 0.5f,  0.5f, 0.0f, 0.5f, 0.0f },   // Top Right
+		sdl::TexPos{ -0.5f,  0.5f, 0.0f, 0.0f, 0.0f },   // Top Left
+
+		// Top Center
+		sdl::TexPos{ -0.5f, -0.5f, 0.0f, 0.5f, 0.5f },  // Bottom Left
+		sdl::TexPos{ 0.5f, -0.5f, 0.0f, 0.5f, 0.5f },   // Bottom Right
+		sdl::TexPos{ 0.5f,  0.5f, 0.0f, 0.5f, 0.0f },   // Top Right
+		sdl::TexPos{ -0.5f,  0.5f, 0.0f, 0.5f, 0.0f },   // Top Left
+
+		// Top Right
+		sdl::TexPos{ -0.5f, -0.5f, 0.0f, 0.5f, 0.5f },  // Bottom Left
+		sdl::TexPos{ 0.5f, -0.5f, 0.0f, 1.0f, 0.5f },   // Bottom Right
+		sdl::TexPos{ 0.5f,  0.5f, 0.0f, 1.0f, 0.0f },   // Top Right
+		sdl::TexPos{ -0.5f,  0.5f, 0.0f, 0.5f, 0.0f },   // Top Left
+
+		// Left
+		sdl::TexPos{ -0.5f, -0.5f, 0.0f, 0.0f, 0.5f },  // Bottom Left
+		sdl::TexPos{ 0.5f, -0.5f, 0.0f, 0.5f, 0.5f },   // Bottom Right
+		sdl::TexPos{ 0.5f,  0.5f, 0.0f, 0.5f, 0.5f },   // Top Right
+		sdl::TexPos{ -0.5f,  0.5f, 0.0f, 0.0f, 0.5f },   // Top Left
+
+		// Center
+		sdl::TexPos{ -0.5f, -0.5f, 0.0f, 0.5f, 0.5f },  // Bottom Left
+		sdl::TexPos{ 0.5f, -0.5f, 0.0f, 0.5f, 0.5f },   // Bottom Right
+		sdl::TexPos{ 0.5f,  0.5f, 0.0f, 0.5f, 0.5f },   // Top Right
+		sdl::TexPos{ -0.5f,  0.5f, 0.0f, 0.5f, 0.5f },   // Top Left
+
+		// Right
+		sdl::TexPos{ -0.5f, -0.5f, 0.0f, 0.5f, 0.5f },  // Bottom Left
+		sdl::TexPos{ 0.5f, -0.5f, 0.0f, 1.0f, 0.5f },   // Bottom Right
+		sdl::TexPos{ 0.5f,  0.5f, 0.0f, 1.0f, 0.5f },   // Top Right
+		sdl::TexPos{ -0.5f,  0.5f, 0.0f, 0.5f, 0.5f },   // Top Left
+
+		// Bottom Left
+		sdl::TexPos{ -0.5f, -0.5f, 0.0f, 0.0f, 1.0f },  // Bottom Left
+		sdl::TexPos{ 0.5f, -0.5f, 0.0f, 0.5f, 1.0f },   // Bottom Right
+		sdl::TexPos{ 0.5f,  0.5f, 0.0f, 0.5f, 0.5f },   // Top Right
+		sdl::TexPos{ -0.5f,  0.5f, 0.0f, 0.0f, 0.5f },   // Top Left
+
+		// Bottom Center
+		sdl::TexPos{ -0.5f, -0.5f, 0.0f, 0.5f, 1.0f },  // Bottom Left
+		sdl::TexPos{ 0.5f, -0.5f, 0.0f, 0.5f, 1.0f },   // Bottom Right
+		sdl::TexPos{ 0.5f,  0.5f, 0.0f, 0.5f, 0.5f },   // Top Right
+		sdl::TexPos{ -0.5f,  0.5f, 0.0f, 0.5f, 0.5f },   // Top Left
+
+		// Bottom Right
+		sdl::TexPos{ -0.5f, -0.5f, 0.0f, 0.5f, 1.0f },  // Bottom Left
+		sdl::TexPos{ 0.5f, -0.5f, 0.0f, 1.0f, 1.0f },   // Bottom Right
+		sdl::TexPos{ 0.5f,  0.5f, 0.0f, 1.0f, 0.5f },   // Top Right
+		sdl::TexPos{ -0.5f,  0.5f, 0.0f, 0.5f, 0.5f },   // Top Left
 	};
 	constexpr std::initializer_list<TexPos> VERTICES_HORIZONTAL = {
-			sdl::TexPos{ -1.0f,  1.0f, 0.0f, 0.0f, 0.0f },
-			sdl::TexPos{ -0.5f,  1.0f, 0.0f, 0.5f, 0.0f },
-			sdl::TexPos{ -0.5f,  0.0f, 0.0f, 0.5f, 1.0f },
-			sdl::TexPos{ -1.0f,  0.0f, 0.0f, 0.0f, 1.0f },
-			sdl::TexPos{ -0.5f,  1.0f, 0.0f, 0.5f, 0.0f },
-			sdl::TexPos{ 0.5f,  1.0f, 0.0f, 0.5f, 0.0f },
-			sdl::TexPos{ 0.5f,  0.0f, 0.0f, 0.5f, 1.0f },
-			sdl::TexPos{ -0.5f,  0.0f, 0.0f, 0.5f, 1.0f },
-			sdl::TexPos{ 0.5f,  1.0f, 0.0f, 0.5f, 0.0f },
-			sdl::TexPos{ 1.0f,  1.0f, 0.0f, 1.0f, 0.0f },
-			sdl::TexPos{ 1.0f,  0.0f, 0.0f, 1.0f, 1.0f },
-			sdl::TexPos{ 0.5f,  0.0f, 0.0f, 0.5f, 1.0f }
+		// Left
+		sdl::TexPos{ -0.5f, -0.5f, 0.0f, 0.0f, 1.0f },  // Bottom Left
+		sdl::TexPos{ 0.5f, -0.5f, 0.0f, 0.5f, 1.0f },   // Bottom Right
+		sdl::TexPos{ 0.5f,  0.5f, 0.0f, 0.5f, 0.0f },   // Top Right
+		sdl::TexPos{ -0.5f,  0.5f, 0.0f, 0.0f, 0.0f },   // Top Left
+
+		// Center
+		sdl::TexPos{ -0.5f, -0.5f, 0.0f, 0.5f, 1.0f },  // Bottom Left
+		sdl::TexPos{ 0.5f, -0.5f, 0.0f, 0.5f, 1.0f },   // Bottom Right
+		sdl::TexPos{ 0.5f,  0.5f, 0.0f, 0.5f, 0.0f },   // Top Right
+		sdl::TexPos{ -0.5f,  0.5f, 0.0f, 0.5f, 0.0f },   // Top Left
+
+		// Right
+		sdl::TexPos{ -0.5f, -0.5f, 0.0f, 0.5f, 1.0f },  // Bottom Left
+		sdl::TexPos{ 0.5f, -0.5f, 0.0f, 1.0f, 1.0f },   // Bottom Right
+		sdl::TexPos{ 0.5f,  0.5f, 0.0f, 1.0f, 0.0f },   // Top Right
+		sdl::TexPos{ -0.5f,  0.5f, 0.0f, 0.5f, 0.0f },   // Top Left
 	};
 	constexpr std::initializer_list<TexPos> VERTICES_VERTICAL = {
-			sdl::TexPos{ -1.0f,  1.0f, 0.0f, 0.0f, 0.0f },
-			sdl::TexPos{ 1.0f,  1.0f, 0.0f, 1.0f, 0.0f },
-			sdl::TexPos{ 1.0f,  0.5f, 0.0f, 1.0f, 0.5f },
-			sdl::TexPos{ -1.0f,  0.5f, 0.0f, 0.0f, 0.5f },
-			sdl::TexPos{ -1.0f,  0.5f, 0.0f, 0.0f, 0.5f },
-			sdl::TexPos{ 1.0f,  0.5f, 0.0f, 1.0f, 0.5f },
-			sdl::TexPos{ 1.0f, -0.5f, 0.0f, 1.0f, 0.5f },
-			sdl::TexPos{ -1.0f, -0.5f, 0.0f, 0.0f, 0.5f },
-			sdl::TexPos{ -1.0f, -0.5f, 0.0f, 0.0f, 0.5f },
-			sdl::TexPos{ 1.0f, -0.5f, 0.0f, 1.0f, 0.5f },
-			sdl::TexPos{ 1.0f, -1.0f, 0.0f, 1.0f, 1.0f },
-			sdl::TexPos{ -1.0f, -1.0f, 0.0f, 0.0f, 1.0f }
+		// Top
+		sdl::TexPos{ -0.5f, -0.5f, 0.0f, 0.0f, 0.5f },  // Bottom Left
+		sdl::TexPos{ 0.5f, -0.5f, 0.0f, 1.0f, 0.5f },   // Bottom Right
+		sdl::TexPos{ 0.5f,  0.5f, 0.0f, 1.0f, 0.0f },   // Top Right
+		sdl::TexPos{ -0.5f,  0.5f, 0.0f, 0.0f, 0.0f },   // Top Left
+
+		// Center
+		sdl::TexPos{ -0.5f, -0.5f, 0.0f, 0.0f, 0.5f },  // Bottom Left
+		sdl::TexPos{ 0.5f, -0.5f, 0.0f, 1.0f, 0.5f },   // Bottom Right
+		sdl::TexPos{ 0.5f,  0.5f, 0.0f, 1.0f, 0.5f },   // Top Right
+		sdl::TexPos{ -0.5f,  0.5f, 0.0f, 0.0f, 0.5f },   // Top Left
+
+		// Bottom
+		sdl::TexPos{ -0.5f, -0.5f, 0.0f, 0.0f, 1.0f },  // Bottom Left
+		sdl::TexPos{ 0.5f, -0.5f, 0.0f, 1.0f, 1.0f },   // Bottom Right
+		sdl::TexPos{ 0.5f,  0.5f, 0.0f, 1.0f, 0.5f },   // Top Right
+		sdl::TexPos{ -0.5f,  0.5f, 0.0f, 0.0f, 0.5f },   // Top Left
 	};
+	constexpr std::initializer_list<uint16_t> INDICES = { 0, 1, 2, 0, 2, 3 };
 
 	bool enabled;
 	const Uint8* key;
@@ -188,6 +217,7 @@ namespace sdl {
 	export constexpr Color COLOR_GOLD = { 0.13373f, 0.11843, 0.5176, 1 };
 	export constexpr Color COLOR_GRAY = { 0.5f, 0.5f, 0.5f, 1 };
 	export constexpr Color COLOR_LIME = { 0.6f, 2, 0.84f, 1 };
+	export constexpr Color COLOR_SKY = { 0.6f, 1.1, 1.5f, 1 };
 	export constexpr Color COLOR_STANDARD = { 1, 1, 1, 1 };
 	export constexpr Color COLOR_WHITE = { 2, 2, 2, 1 };
 
@@ -267,13 +297,13 @@ namespace sdl {
 	export SDL_GpuDevice* gpuCreateDevice(SDL_GpuBackend preferredBackends, SDL_bool debugMode, SDL_bool preferLowPower) { return SDL_GpuCreateDevice(preferredBackends, debugMode, preferLowPower); }
 	export SDL_GpuFence* gpuSubmitAndAcquireFence(SDL_GpuCommandBuffer* commandBuffer) { return SDL_GpuSubmitAndAcquireFence(commandBuffer); }
 	export SDL_GpuGraphicsPipeline* gpuCreateGraphicsPipeline(SDL_GpuGraphicsPipelineCreateInfo* pipelineCreateInfo) { return SDL_GpuCreateGraphicsPipeline(device, pipelineCreateInfo); }
-	export SDL_GpuGraphicsPipeline* gpuCreateGraphicsPipelineForShader(SDL_GpuShader* vertexShader, SDL_GpuShader* fragmentShader, SDL_GpuBlendFactor src = SDL_GPU_BLENDFACTOR_ONE, SDL_GpuBlendFactor dst = SDL_GPU_BLENDFACTOR_ZERO) {
-		SDL_GpuVertexBinding vertexBindings[] = {{
+	export SDL_GpuGraphicsPipeline* gpuCreateGraphicsPipelineForShader(SDL_GpuShader* vertexShader, SDL_GpuShader* fragmentShader, SDL_GpuBlendFactor srcColor = SDL_GPU_BLENDFACTOR_SRC_ALPHA, SDL_GpuBlendFactor dstColor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_GpuBlendFactor srcAlpha = SDL_GPU_BLENDFACTOR_ONE, SDL_GpuBlendFactor dstAlpha = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA) {
+		SDL_GpuVertexBinding vertexBindings[] = { {
 					.binding = 0,
 					.stride = sizeof(TexPos),
 					.inputRate = SDL_GPU_VERTEXINPUTRATE_VERTEX,
 					.stepRate = 0
-		}};
+		} };
 		SDL_GpuVertexAttribute vertexAttributes[] = { {
 					.location = 0,
 					.binding = 0,
@@ -284,16 +314,16 @@ namespace sdl {
 					.binding = 0,
 					.format = SDL_GPU_VERTEXELEMENTFORMAT_VECTOR2,
 					.offset = sizeof(float) * 3
-				}};
+				} };
 		SDL_GpuColorAttachmentDescription colorAttachmentDescriptions[] = { {
 					.format = SDL_GpuGetSwapchainTextureFormat(device, window),
 					.blendState = {
 						.blendEnable = SDL_TRUE,
-						.srcColorBlendFactor = src,
-						.dstColorBlendFactor = dst,
+						.srcColorBlendFactor = srcColor,
+						.dstColorBlendFactor = dstColor,
 						.colorBlendOp = SDL_GPU_BLENDOP_ADD,
-						.srcAlphaBlendFactor = src,
-						.dstAlphaBlendFactor = dst,
+						.srcAlphaBlendFactor = srcAlpha,
+						.dstAlphaBlendFactor = dstAlpha,
 						.alphaBlendOp = SDL_GPU_BLENDOP_ADD,
 						.colorWriteMask = 0xF
 					}
@@ -598,13 +628,12 @@ namespace sdl {
 
 	export SDL_Color toTextColor(const Color& c) {
 		return {
-			static_cast<Uint8>(c.r),
-			static_cast<Uint8>(c.g),
-			static_cast<Uint8>(c.b),
-			static_cast<Uint8>(c.a),
+			static_cast<Uint8>(255 * c.r),
+			static_cast<Uint8>(255 * c.g),
+			static_cast<Uint8>(255 * c.b),
+			static_cast<Uint8>(255 * c.a),
 		};
 	}
-
 
 	// When using a fixed framerate, sleep to fill up remaining time
 	export void capFrame() {
@@ -614,7 +643,7 @@ namespace sdl {
 	}
 
 	// Draw a texture with the given parameters
-	export void queueDraw(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const Color* color, float x, float y, float w, float h, float rotZ, SDL_GpuGraphicsPipeline* pipeline, SDL_GpuBuffer* vertexBuffer) {
+	export void queueDraw(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const Color* color, float x, float y, float w, float h, float rotZ, SDL_GpuGraphicsPipeline* pipeline, SDL_GpuBuffer* vertexBuffer, int vertexOff = 0) {
 		if (rotZ != 0) {
 			float cosZ = std::cos(rotZ);
 			float sinZ = std::sin(rotZ);
@@ -623,16 +652,16 @@ namespace sdl {
 			matrixUniform.m12 = -(w / winW * 2) * sinZ;
 			matrixUniform.m21 = (h / winH * 2) * sinZ;
 			matrixUniform.m22 = (h / winH * 2) * cosZ;
-			matrixUniform.m41 = (2 * x / winW) - 1;
-			matrixUniform.m42 = 1 - (2 * y / winH);
+			matrixUniform.m41 = (2 * x / winW) - 1 + w / winW;
+			matrixUniform.m42 = 1 - (2 * y / winH) - h / winH;
 		}
 		else {
 			matrixUniform.m11 = w / winW * 2;
 			matrixUniform.m12 = 0;
 			matrixUniform.m21 = 0;
 			matrixUniform.m22 = h / winH * 2;
-			matrixUniform.m41 = (2 * x / winW) - 1;
-			matrixUniform.m42 = 1 - (2 * y / winH);
+			matrixUniform.m41 = (2 * x / winW) - 1 + w / winW;
+			matrixUniform.m42 = 1 - (2 * y / winH) - h / winH;
 		}
 
 		if (lastPipeline != pipeline) {
@@ -656,13 +685,13 @@ namespace sdl {
 		}
 
 		SDL_GpuPushVertexUniformData(cmdbuf, 0, &matrixUniform, sizeof(matrixUniform));
-		SDL_GpuPushFragmentUniformData(cmdbuf, 0, color, sizeof(color));
-		SDL_GpuDrawIndexedPrimitives(renderPass, 0, 0, 2, 1);
+		SDL_GpuPushFragmentUniformData(cmdbuf, 0, color, sizeof(SDL_GpuColor));
+		SDL_GpuDrawIndexedPrimitives(renderPass, vertexOff, 0, 2, 1);
 	}
-	export void queueDraw(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const Color* color, float x, float y, float w, float h, float rotZ = 0, SDL_GpuGraphicsPipeline* pipeline = RENDER_STANDARD) { queueDraw(cmdbuf, renderPass, texture, color, x, y, w, h, rotZ, pipeline, bufferVertex); }
-	export void queueDrawBordered(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const Color* color, float x, float y, float w, float h, float rotZ = 0, SDL_GpuGraphicsPipeline* pipeline = RENDER_STANDARD) { queueDraw(cmdbuf, renderPass, texture, color, x, y, w, h, rotZ, pipeline, bufferVertexBordered); }
-	export void queueDrawHorizontal(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const Color* color, float x, float y, float w, float h, float rotZ = 0, SDL_GpuGraphicsPipeline* pipeline = RENDER_STANDARD) { queueDraw(cmdbuf, renderPass, texture, color, x, y, w, h, rotZ, pipeline, bufferVertexHorizontal); }
-	export void queueDrawVertical(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const Color* color, float x, float y, float w, float h, float rotZ = 0, SDL_GpuGraphicsPipeline* pipeline = RENDER_STANDARD) { queueDraw(cmdbuf, renderPass, texture, color, x, y, w, h, rotZ, pipeline, bufferVertexVertical); }
+	export void queueDraw(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const Color* color, float x, float y, float w, float h, float rotZ = 0, SDL_GpuGraphicsPipeline* pipeline = RENDER_STANDARD, int vertexOff = 0) { queueDraw(cmdbuf, renderPass, texture, color, x, y, w, h, rotZ, pipeline, bufferVertex, vertexOff); }
+	export void queueDrawBordered(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const Color* color, float x, float y, float w, float h, float rotZ = 0, SDL_GpuGraphicsPipeline* pipeline = RENDER_STANDARD, int vertexOff = 0) { queueDraw(cmdbuf, renderPass, texture, color, x, y, w, h, rotZ, pipeline, bufferVertexBordered, vertexOff); }
+	export void queueDrawHorizontal(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const Color* color, float x, float y, float w, float h, float rotZ = 0, SDL_GpuGraphicsPipeline* pipeline = RENDER_STANDARD, int vertexOff = 0) { queueDraw(cmdbuf, renderPass, texture, color, x, y, w, h, rotZ, pipeline, bufferVertexHorizontal, vertexOff); }
+	export void queueDrawVertical(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const Color* color, float x, float y, float w, float h, float rotZ = 0, SDL_GpuGraphicsPipeline* pipeline = RENDER_STANDARD, int vertexOff = 0) { queueDraw(cmdbuf, renderPass, texture, color, x, y, w, h, rotZ, pipeline, bufferVertexVertical, vertexOff); }
 
 	// Reset draw parameters at the end of each frame
 	export void resetDrawCaches() {
@@ -764,7 +793,7 @@ namespace sdl {
 
 
 	// Set up SDL. Returns true if SDL setup succeeds
-	export bool initSDL() { 
+	export bool initSDL() {
 		int val = SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_GAMEPAD);
 		if (val < 0) {
 			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "SDL_INIT failed with value %d", val);
@@ -831,7 +860,7 @@ namespace sdl {
 		constexpr Uint32 sizeVertBordered = sizeof(TexPos) * VERTICES_BORDERED.size();
 		constexpr Uint32 sizeVertHorizontal = sizeof(TexPos) * VERTICES_HORIZONTAL.size();
 		constexpr Uint32 sizeVertVertical = sizeof(TexPos) * VERTICES_VERTICAL.size();
-		constexpr Uint32 sizeIndices = sizeof(Uint16) * 6;
+		constexpr Uint32 sizeIndices = sizeof(Uint16) * INDICES.size();
 		bufferVertex = SDL_GpuCreateBuffer(device, SDL_GPU_BUFFERUSAGE_VERTEX_BIT, sizeVert);
 		bufferVertexBordered = SDL_GpuCreateBuffer(device, SDL_GPU_BUFFERUSAGE_VERTEX_BIT, sizeVertBordered);
 		bufferVertexHorizontal = SDL_GpuCreateBuffer(device, SDL_GPU_BUFFERUSAGE_VERTEX_BIT, sizeVertHorizontal);
@@ -865,14 +894,11 @@ namespace sdl {
 			vertexData[i++] = pos;
 		}
 
-		std::uint16_t* indexData = reinterpret_cast<std::uint16_t*>(&vertexData[i]);
-
-		indexData[0] = 0;
-		indexData[1] = 1;
-		indexData[2] = 2;
-		indexData[3] = 0;
-		indexData[4] = 2;
-		indexData[5] = 3;
+		Uint16* indexData = reinterpret_cast<Uint16*>(&vertexData[i]);
+		i = 0;
+		for (const Uint16& pos : INDICES) {
+			indexData[i++] = pos;
+		}
 
 		sdl::gpuUnmapTransferBuffer(bufferTransferBuffer);
 
@@ -881,7 +907,7 @@ namespace sdl {
 
 		SDL_GpuTransferBufferLocation t1 = { bufferTransferBuffer , 0 };
 		SDL_GpuBufferRegion r1 = { bufferVertex, 0, sizeVert };
-		SDL_GpuUploadToBuffer(copyPass, &t1, &r1,SDL_FALSE);
+		SDL_GpuUploadToBuffer(copyPass, &t1, &r1, SDL_FALSE);
 
 		SDL_GpuTransferBufferLocation t2 = { bufferTransferBuffer , sizeVert };
 		SDL_GpuBufferRegion r2 = { bufferVertexBordered, 0, sizeVertBordered };
@@ -905,9 +931,9 @@ namespace sdl {
 
 		// Set up standard pipeline
 		SDL_GpuSamplerCreateInfo samplerInfo = {
-			.minFilter = SDL_GPU_FILTER_NEAREST,
-				.magFilter = SDL_GPU_FILTER_NEAREST,
-				.mipmapMode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST,
+			.minFilter = SDL_GPU_FILTER_LINEAR,
+				.magFilter = SDL_GPU_FILTER_LINEAR,
+				.mipmapMode = SDL_GPU_SAMPLERMIPMAPMODE_LINEAR,
 				.addressModeU = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
 				.addressModeV = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
 				.addressModeW = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
@@ -995,10 +1021,16 @@ namespace sdl {
 		// Clean graphics stuff
 		SDL_GpuReleaseGraphicsPipeline(device, RENDER_STANDARD);
 		SDL_GpuReleaseBuffer(device, bufferVertex);
+		SDL_GpuReleaseBuffer(device, bufferVertexBordered);
+		SDL_GpuReleaseBuffer(device, bufferVertexHorizontal);
+		SDL_GpuReleaseBuffer(device, bufferVertexVertical);
 		SDL_GpuReleaseBuffer(device, bufferIndex);
 		SDL_GpuReleaseSampler(device, sampler);
 		RENDER_STANDARD = nullptr;
 		bufferVertex = nullptr;
+		bufferVertexBordered = nullptr;
+		bufferVertexHorizontal = nullptr;
+		bufferVertexVertical = nullptr;
 		bufferIndex = nullptr;
 		sampler = nullptr;
 
