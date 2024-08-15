@@ -827,7 +827,7 @@ namespace sdl {
 		winW = w;
 
 		// Setup device for this window
-		device = SDL_GpuCreateDevice(SDL_TRUE, SDL_FALSE, SDL_CreateProperties());
+		device = SDL_GpuCreateDevice(SDL_FALSE, SDL_FALSE, SDL_CreateProperties());
 		if (!device) {
 			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "Device went derp: %s", SDL_GetError());
 			SDL_Quit();
