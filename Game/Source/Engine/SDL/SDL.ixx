@@ -643,6 +643,8 @@ namespace sdl {
 
 	// Draw a texture with the given parameters
 	export void queueDraw(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const Color* color, float x, float y, float w, float h, float rotZ, SDL_GpuGraphicsPipeline* pipeline, SDL_GpuBuffer* vertexBuffer, int vertexOff = 0) {
+		matrixUniform.m41 = (2 * x / winW) - 1 + w / winW;
+		matrixUniform.m42 = 1 - (2 * y / winH) - h / winH;
 		if (rotZ != 0) {
 			float cosZ = std::cos(rotZ);
 			float sinZ = std::sin(rotZ);
@@ -651,16 +653,12 @@ namespace sdl {
 			matrixUniform.m12 = -(w / winW * 2) * sinZ;
 			matrixUniform.m21 = (h / winH * 2) * sinZ;
 			matrixUniform.m22 = (h / winH * 2) * cosZ;
-			matrixUniform.m41 = (2 * x / winW) - 1 + w / winW;
-			matrixUniform.m42 = 1 - (2 * y / winH) - h / winH;
 		}
 		else {
 			matrixUniform.m11 = w / winW * 2;
 			matrixUniform.m12 = 0;
 			matrixUniform.m21 = 0;
 			matrixUniform.m22 = h / winH * 2;
-			matrixUniform.m41 = (2 * x / winW) - 1 + w / winW;
-			matrixUniform.m42 = 1 - (2 * y / winH) - h / winH;
 		}
 
 		if (lastPipeline != pipeline) {
@@ -827,7 +825,9 @@ namespace sdl {
 		winW = w;
 
 		// Setup device for this window
-		device = SDL_GpuCreateDevice(SDL_FALSE, SDL_FALSE, SDL_CreateProperties());
+		SDL_PropertiesID id = SDL_CreateProperties();
+		SDL_SetStringProperty(id, SDL_PROP_GPU_CREATEDEVICE_NAME_STRING, "VULKAN");
+		device = SDL_GpuCreateDevice(SDL_FALSE, SDL_FALSE, id);
 		if (!device) {
 			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "Device went derp: %s", SDL_GetError());
 			SDL_Quit();
