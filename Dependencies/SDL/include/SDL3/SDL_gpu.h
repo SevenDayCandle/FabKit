@@ -195,7 +195,6 @@ typedef enum SDL_GpuShaderFormat
     SDL_GPU_SHADERFORMAT_INVALID,
     SDL_GPU_SHADERFORMAT_SECRET,   /* NDA'd platforms */
     SDL_GPU_SHADERFORMAT_SPIRV,    /* Vulkan */
-    SDL_GPU_SHADERFORMAT_HLSL,     /* D3D11, D3D12 */
     SDL_GPU_SHADERFORMAT_DXBC,     /* D3D11, D3D12 */
     SDL_GPU_SHADERFORMAT_DXIL,     /* D3D12 */
     SDL_GPU_SHADERFORMAT_MSL,      /* Metal */
@@ -364,17 +363,15 @@ typedef enum SDL_GpuSwapchainComposition
     SDL_GPU_SWAPCHAINCOMPOSITION_HDR10_ST2048
 } SDL_GpuSwapchainComposition;
 
-typedef enum SDL_GpuBackendBits
+typedef enum SDL_GpuDriver
 {
-    SDL_GPU_BACKEND_INVALID = 0,
-    SDL_GPU_BACKEND_VULKAN = 0x0000000000000001,
-    SDL_GPU_BACKEND_D3D11 = 0x0000000000000002,
-    SDL_GPU_BACKEND_METAL = 0x0000000000000004,
-    SDL_GPU_BACKEND_D3D12 = 0x0000000000000008,
-    SDL_GPU_BACKEND_ALL = (SDL_GPU_BACKEND_VULKAN | SDL_GPU_BACKEND_D3D11 | SDL_GPU_BACKEND_METAL | SDL_GPU_BACKEND_D3D12)
-} SDL_GpuBackendBits;
-
-typedef Uint64 SDL_GpuBackend;
+    SDL_GPU_DRIVER_INVALID = -1,
+    SDL_GPU_DRIVER_SECRET,
+    SDL_GPU_DRIVER_VULKAN,
+    SDL_GPU_DRIVER_D3D11,
+    SDL_GPU_DRIVER_D3D12,
+    SDL_GPU_DRIVER_METAL
+} SDL_GpuDriver;
 
 /* Structures */
 
@@ -383,22 +380,6 @@ typedef struct SDL_GpuDepthStencilValue
     float depth;
     Uint32 stencil;
 } SDL_GpuDepthStencilValue;
-
-typedef struct SDL_GpuRect
-{
-    Sint32 x;
-    Sint32 y;
-    Sint32 w;
-    Sint32 h;
-} SDL_GpuRect;
-
-typedef struct SDL_GpuColor
-{
-    float r;
-    float g;
-    float b;
-    float a;
-} SDL_GpuColor;
 
 typedef struct SDL_GpuViewport
 {
@@ -423,13 +404,6 @@ typedef struct SDL_GpuTransferBufferLocation
     SDL_GpuTransferBuffer *transferBuffer;
     Uint32 offset;
 } SDL_GpuTransferBufferLocation;
-
-typedef struct SDL_GpuTransferBufferRegion
-{
-    SDL_GpuTransferBuffer *transferBuffer;
-    Uint32 offset;
-    Uint32 size;
-} SDL_GpuTransferBufferRegion;
 
 typedef struct SDL_GpuTextureSlice
 {
@@ -598,7 +572,7 @@ typedef struct SDL_GpuRasterizerState
 
 typedef struct SDL_GpuMultisampleState
 {
-    SDL_GpuSampleCount multisampleCount;
+    SDL_GpuSampleCount sampleCount;
     Uint32 sampleMask;
 } SDL_GpuMultisampleState;
 
@@ -664,7 +638,7 @@ typedef struct SDL_GpuColorAttachmentInfo
     SDL_GpuTextureSlice textureSlice;
 
     /* Can be ignored by RenderPass if CLEAR is not used */
-    SDL_GpuColor clearColor;
+    SDL_FColor clearColor;
 
     /* Determines what is done with the texture slice at the beginning of the render pass.
      *
@@ -794,24 +768,30 @@ typedef struct SDL_GpuStorageTextureReadWriteBinding
 /**
  * Creates a GPU context.
  *
- * Backends will first be checked for availability in order of bitflags passed using preferredBackends. If none of the backends are available, the remaining backends are checked as fallback renderers.
+ * These are the supported properties:
  *
- * Think of "preferred" backends as those that have pre-built shaders readily available - for example, you would set the SDL_GPU_BACKEND_VULKAN bit if your game includes SPIR-V shaders. If you generate shaders at runtime (i.e. via SDL_shader) and the library does _not_ provide you with a preferredBackends value, you should pass SDL_GPU_BACKEND_ALL so that updated versions of SDL can be aware of which backends the application was aware of at compile time. SDL_GPU_BACKEND_INVALID is an accepted value but is not recommended.
+ * - `SDL_PROP_GPU_CREATEDEVICE_NAME_STRING`: the name of the GPU driver to use, if a specific one is desired
  *
- * \param preferredBackends a bitflag containing the renderers most recognized by the application
+ * With the D3D12 renderer:
+ * - `SDL_PROP_GPU_CREATEDEVICE_D3D12_SEMANTIC_NAME_STRING`: the prefix to use for all vertex semantics, default is "TEXCOORD"
+ *
  * \param debugMode enable debug mode properties and validations
  * \param preferLowPower set this to SDL_TRUE if your app prefers energy efficiency over maximum GPU performance
+ * \param props the properties to use.
  * \returns a GPU context on success or NULL on failure
  *
  * \since This function is available since SDL 3.x.x
  *
- * \sa SDL_GpuSelectBackend
+ * \sa SDL_GpuGetDriver
  * \sa SDL_GpuDestroyDevice
  */
 extern SDL_DECLSPEC SDL_GpuDevice *SDLCALL SDL_GpuCreateDevice(
-    SDL_GpuBackend preferredBackends,
     SDL_bool debugMode,
-    SDL_bool preferLowPower);
+    SDL_bool preferLowPower,
+    SDL_PropertiesID props);
+
+#define SDL_PROP_GPU_CREATEDEVICE_NAME_STRING                 "name"
+#define SDL_PROP_GPU_CREATEDEVICE_D3D12_SEMANTIC_NAME_STRING  "d3d12.semantic"
 
 /**
  * Destroys a GPU context previously returned by SDL_GpuCreateDevice.
@@ -828,13 +808,11 @@ extern SDL_DECLSPEC void SDLCALL SDL_GpuDestroyDevice(SDL_GpuDevice *device);
  * Returns the backend used to create this GPU context.
  *
  * \param device a GPU context to query
- * \returns an SDL_GpuBackend value, or SDL_GPU_BACKEND_INVALID on error
+ * \returns an SDL_GpuDriver value, or SDL_GPU_DRIVER_INVALID on error
  *
  * \since This function is available since SDL 3.x.x
- *
- * \sa SDL_GpuSelectBackend
  */
-extern SDL_DECLSPEC SDL_GpuBackend SDLCALL SDL_GpuGetBackend(SDL_GpuDevice *device);
+extern SDL_DECLSPEC SDL_GpuDriver SDLCALL SDL_GpuGetDriver(SDL_GpuDevice *device);
 
 /* State Creation */
 
@@ -962,6 +940,14 @@ extern SDL_DECLSPEC SDL_GpuShader *SDLCALL SDL_GpuCreateShader(
  * If you request a sample count higher than the hardware supports,
  * the implementation will automatically fall back to the highest available sample count.
  *
+ * For depth textures, the hardware support matrix looks as follows:
+ * - D16_UNORM is guaranteed to always be supported.
+ * - It's guaranteed that either D24_UNORM or D32_SFLOAT will be supported.
+ * - It's guaranteed that either D24_UNORM_S8_UINT or D32_SFLOAT_S8_UINT will be supported.
+ * Therefore, unless D16 is sufficient for your purposes, you should always call
+ * SDL_GpuSupportsTextureFormat to determine which of D24/D32 are supported by the GPU
+ * before creating a depth texture.
+ *
  * \param device a GPU Context
  * \param textureCreateInfo a struct describing the state of the texture to create
  * \returns a texture object on success, or NULL on failure
@@ -977,6 +963,7 @@ extern SDL_DECLSPEC SDL_GpuShader *SDLCALL SDL_GpuCreateShader(
  * \sa SDL_GpuBindComputeStorageTextures
  * \sa SDL_GpuBlit
  * \sa SDL_GpuReleaseTexture
+ * \sa SDL_GpuSupportsTextureFormat
  */
 extern SDL_DECLSPEC SDL_GpuTexture *SDLCALL SDL_GpuCreateTexture(
     SDL_GpuDevice *device,
@@ -1320,8 +1307,9 @@ extern SDL_DECLSPEC void SDLCALL SDL_GpuPushComputeUniformData(
  * or if none are available, a new one is created.
  * This means you don't have to worry about complex state tracking and synchronization as long as cycling is correctly employed.
  *
- * For example: you can call SetTransferData and then UploadToTexture. The next time you call SetTransferData,
- * if you set the cycle param to SDL_TRUE, you don't have to worry about overwriting any data that is not yet uploaded.
+ * For example: you can call MapTransferBuffer, write texture data, UnmapTransferBuffer, and then UploadToTexture.
+ * The next time you write texture data to the transfer buffer, if you set the cycle param to SDL_TRUE, you don't have
+ * to worry about overwriting any data that is not yet uploaded.
  *
  * Another example: If you are using a texture in a render pass every frame, this can cause a data dependency between frames.
  * If you set cycle to SDL_TRUE in the ColorAttachmentInfo struct, you can prevent this data dependency.
@@ -1401,7 +1389,7 @@ extern SDL_DECLSPEC void SDLCALL SDL_GpuSetViewport(
  */
 extern SDL_DECLSPEC void SDLCALL SDL_GpuSetScissor(
     SDL_GpuRenderPass *renderPass,
-    SDL_GpuRect *scissor);
+    SDL_Rect *scissor);
 
 /**
  * Binds vertex buffers on a command buffer for use with subsequent draw calls.
@@ -1544,7 +1532,7 @@ extern SDL_DECLSPEC void SDLCALL SDL_GpuBindFragmentStorageBuffers(
  * \param renderPass a render pass handle
  * \param baseVertex the starting offset to read from the vertex buffer
  * \param startIndex the starting offset to read from the index buffer
- * \param primitiveCount the number of primitives to draw
+ * \param vertexCount the number of vertices to draw
  * \param instanceCount the number of instances that will be drawn
  *
  * \since This function is available since SDL 3.x.x
@@ -1553,7 +1541,7 @@ extern SDL_DECLSPEC void SDLCALL SDL_GpuDrawIndexedPrimitives(
     SDL_GpuRenderPass *renderPass,
     Uint32 baseVertex,
     Uint32 startIndex,
-    Uint32 primitiveCount,
+    Uint32 vertexCount,
     Uint32 instanceCount);
 
 /**
@@ -1562,14 +1550,14 @@ extern SDL_DECLSPEC void SDLCALL SDL_GpuDrawIndexedPrimitives(
  *
  * \param renderPass a render pass handle
  * \param vertexStart The starting offset to read from the vertex buffer
- * \param primitiveCount The number of primitives to draw
+ * \param vertexCount The number of vertices to draw
  *
  * \since This function is available since SDL 3.x.x
  */
 extern SDL_DECLSPEC void SDLCALL SDL_GpuDrawPrimitives(
     SDL_GpuRenderPass *renderPass,
     Uint32 vertexStart,
-    Uint32 primitiveCount);
+    Uint32 vertexCount);
 
 /**
  * Draws data using bound graphics state and with draw parameters set from a buffer.
@@ -1789,36 +1777,6 @@ extern SDL_DECLSPEC void SDLCALL SDL_GpuMapTransferBuffer(
 extern SDL_DECLSPEC void SDLCALL SDL_GpuUnmapTransferBuffer(
     SDL_GpuDevice *device,
     SDL_GpuTransferBuffer *transferBuffer);
-
-/**
- * Immediately copies data from a pointer to a transfer buffer.
- *
- * \param device a GPU context
- * \param source a pointer to data to copy into the transfer buffer
- * \param destination a transfer buffer with offset and size
- * \param cycle if SDL_TRUE, cycles the transfer buffer if it is bound, otherwise overwrites the data.
- *
- * \since This function is available since SDL 3.x.x
- */
-extern SDL_DECLSPEC void SDLCALL SDL_GpuSetTransferData(
-    SDL_GpuDevice *device,
-    const void *source,
-    SDL_GpuTransferBufferRegion *destination,
-    SDL_bool cycle);
-
-/**
- * Immediately copies data from a transfer buffer to a pointer.
- *
- * \param device a GPU context
- * \param source a transfer buffer with offset and size
- * \param destination a data pointer
- *
- * \since This function is available since SDL 3.x.x
- */
-extern SDL_DECLSPEC void SDLCALL SDL_GpuGetTransferData(
-    SDL_GpuDevice *device,
-    SDL_GpuTransferBufferRegion *source,
-    void *destination);
 
 /* Copy Pass */
 
@@ -2248,7 +2206,6 @@ extern SDL_DECLSPEC void SDLCALL SDL_GpuReleaseFence(
  *
  * \since This function is available since SDL 3.x.x
  *
- * \sa SDL_GpuSetTransferData
  * \sa SDL_GpuUploadToTexture
  */
 extern SDL_DECLSPEC Uint32 SDLCALL SDL_GpuTextureFormatTexelBlockSize(
@@ -2265,7 +2222,7 @@ extern SDL_DECLSPEC Uint32 SDLCALL SDL_GpuTextureFormatTexelBlockSize(
  *
  * \since This function is available since SDL 3.x.x
  */
-extern SDL_DECLSPEC SDL_bool SDLCALL SDL_GpuIsTextureFormatSupported(
+extern SDL_DECLSPEC SDL_bool SDLCALL SDL_GpuSupportsTextureFormat(
     SDL_GpuDevice *device,
     SDL_GpuTextureFormat format,
     SDL_GpuTextureType type,

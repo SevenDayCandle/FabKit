@@ -1,7 +1,7 @@
 module;
 
-#define SDL_GPU_SPIRVCROSS_IMPLEMENTATION
-#include "SDL_gpu_spirvcross/SDL_gpu_spirvcross.h"
+#define SDL_GPU_SHADERCROSS_IMPLEMENTATION
+#include "SDL_gpu_shadercross/SDL_gpu_shadercross.h"
 #include "SDL3/SDL.h"
 #include "SDL3_image/SDL_image.h"
 #include "SDL3_mixer/SDL_mixer.h"
@@ -15,7 +15,7 @@ import std;
 
 namespace sdl {
 	export using BlendMode = ::SDL_BlendMode;
-	export using Color = ::SDL_GpuColor;
+	export using Color = ::SDL_FColor;
 	export using FlipMode = ::SDL_FlipMode;
 	export using Font = ::TTF_Font;
 	export using GamepadButton = ::SDL_GamepadButton;
@@ -283,18 +283,18 @@ namespace sdl {
 	export bool gamepadHasJustPressed(int pressed) { return pad[pressed] && !padLast[pressed]; }
 
 	/* GPU functions */
-	export SDL_bool gpuIsTextureFormatSupported(SDL_GpuTextureFormat format, SDL_GpuTextureType type, SDL_GpuTextureUsageFlags usage) { return SDL_GpuIsTextureFormatSupported(device, format, type, usage); }
+	export SDL_bool gpuIsTextureFormatSupported(SDL_GpuTextureFormat format, SDL_GpuTextureType type, SDL_GpuTextureUsageFlags usage) { return SDL_GpuSupportsTextureFormat(device, format, type, usage); }
 	export SDL_bool gpuQueryFence(SDL_GpuFence* fence) { return SDL_GpuQueryFence(device, fence); }
 	export SDL_bool gpuSetSwapchainParameters(SDL_GpuSwapchainComposition swapchainComposition, SDL_GpuPresentMode presentMode) { return SDL_GpuSetSwapchainParameters(device, window, swapchainComposition, presentMode); }
 	export SDL_bool gpuSupportsPresentMode(SDL_GpuPresentMode presentMode) { return SDL_GpuSupportsPresentMode(device, window, presentMode); }
 	export SDL_bool gpuSupportsSwapchainComposition(SDL_GpuSwapchainComposition swapchainComposition) { return SDL_GpuSupportsSwapchainComposition(device, window, swapchainComposition); }
-	export SDL_GpuBackend gpuGetBackend() { return SDL_GpuGetBackend(device); }
 	export SDL_GpuBuffer* gpuCreateBuffer(SDL_GpuBufferUsageFlags usageFlags, Uint32 sizeInBytes) { return SDL_GpuCreateBuffer(device, usageFlags, sizeInBytes); }
 	export SDL_GpuCommandBuffer* gpuAcquireCommandBuffer() { return SDL_GpuAcquireCommandBuffer(device); }
 	export SDL_GpuComputePass* gpuBeginComputePass(SDL_GpuCommandBuffer* commandBuffer, SDL_GpuStorageTextureReadWriteBinding* storageTextureBindings, Uint32 storageTextureBindingCount, SDL_GpuStorageBufferReadWriteBinding* storageBufferBindings, Uint32 storageBufferBindingCount) { return SDL_GpuBeginComputePass(commandBuffer, storageTextureBindings, storageTextureBindingCount, storageBufferBindings, storageBufferBindingCount); }
 	export SDL_GpuComputePipeline* gpuCreateComputePipeline(SDL_GpuComputePipelineCreateInfo* computePipelineCreateInfo) { return SDL_GpuCreateComputePipeline(device, computePipelineCreateInfo); }
 	export SDL_GpuCopyPass* gpuBeginCopyPass(SDL_GpuCommandBuffer* commandBuffer) { return SDL_GpuBeginCopyPass(commandBuffer); }
-	export SDL_GpuDevice* gpuCreateDevice(SDL_GpuBackend preferredBackends, SDL_bool debugMode, SDL_bool preferLowPower) { return SDL_GpuCreateDevice(preferredBackends, debugMode, preferLowPower); }
+	export SDL_GpuDevice* gpuCreateDevice(SDL_GpuDriver preferredBackends, SDL_bool debugMode, SDL_bool preferLowPower) { return SDL_GpuCreateDevice(preferredBackends, debugMode, preferLowPower); }
+	export SDL_GpuDriver gpuGetBackend() { return SDL_GpuGetDriver(device); }
 	export SDL_GpuFence* gpuSubmitAndAcquireFence(SDL_GpuCommandBuffer* commandBuffer) { return SDL_GpuSubmitAndAcquireFence(commandBuffer); }
 	export SDL_GpuGraphicsPipeline* gpuCreateGraphicsPipeline(SDL_GpuGraphicsPipelineCreateInfo* pipelineCreateInfo) { return SDL_GpuCreateGraphicsPipeline(device, pipelineCreateInfo); }
 	export SDL_GpuGraphicsPipeline* gpuCreateGraphicsPipelineForShader(SDL_GpuShader* vertexShader, SDL_GpuShader* fragmentShader, SDL_GpuBlendFactor srcColor = SDL_GPU_BLENDFACTOR_SRC_ALPHA, SDL_GpuBlendFactor dstColor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_GpuBlendFactor srcAlpha = SDL_GPU_BLENDFACTOR_ONE, SDL_GpuBlendFactor dstAlpha = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA) {
@@ -385,7 +385,7 @@ namespace sdl {
 			.storageBufferCount = storageBufferCount,
 			.uniformBufferCount = uniformBufferCount,
 		};
-		if (SDL_GpuGetBackend(device) == SDL_GPU_BACKEND_VULKAN)
+		if (SDL_GpuGetDriver(device) == SDL_GPU_DRIVER_VULKAN)
 		{
 			shader = SDL_GpuCreateShader(device, &shaderInfo);
 		}
@@ -430,7 +430,6 @@ namespace sdl {
 	export void gpuEndCopyPass(SDL_GpuCopyPass* copyPass) { SDL_GpuEndCopyPass(copyPass); }
 	export void gpuEndRenderPass(SDL_GpuRenderPass* renderPass) { SDL_GpuEndRenderPass(renderPass); }
 	export void gpuGenerateMipmaps(SDL_GpuCopyPass* copyPass, SDL_GpuTexture* texture) { SDL_GpuGenerateMipmaps(copyPass, texture); }
-	export void gpuGetTransferData(SDL_GpuTransferBufferRegion* source, void* destination) { SDL_GpuGetTransferData(device, source, destination); }
 	export void gpuInsertDebugLabel(SDL_GpuCommandBuffer* commandBuffer, const char* text) { SDL_GpuInsertDebugLabel(commandBuffer, text); }
 	export void gpuMapTransferBuffer(SDL_GpuTransferBuffer* transferBuffer, SDL_bool cycle, void** ppData) { SDL_GpuMapTransferBuffer(device, transferBuffer, cycle, ppData); }
 	export void gpuPopDebugGroup(SDL_GpuCommandBuffer* commandBuffer) { SDL_GpuPopDebugGroup(commandBuffer); }
@@ -447,9 +446,8 @@ namespace sdl {
 	export void gpuReleaseTexture(SDL_GpuTexture* texture) { SDL_GpuReleaseTexture(device, texture); }
 	export void gpuReleaseTransferBuffer(SDL_GpuTransferBuffer* transferBuffer) { SDL_GpuReleaseTransferBuffer(device, transferBuffer); }
 	export void gpuSetBufferName(SDL_GpuBuffer* buffer, const char* text) { SDL_GpuSetBufferName(device, buffer, text); }
-	export void gpuSetScissor(SDL_GpuRenderPass* renderPass, SDL_GpuRect* scissor) { SDL_GpuSetScissor(renderPass, scissor); }
+	export void gpuSetScissor(SDL_GpuRenderPass* renderPass, RectI* scissor) { SDL_GpuSetScissor(renderPass, scissor); }
 	export void gpuSetTextureName(SDL_GpuTexture* texture, const char* text) { SDL_GpuSetTextureName(device, texture, text); }
-	export void gpuSetTransferData(const void* source, SDL_GpuTransferBufferRegion* destination, SDL_bool cycle) { SDL_GpuSetTransferData(device, source, destination, cycle); }
 	export void gpuSetViewport(SDL_GpuRenderPass* renderPass, SDL_GpuViewport* viewport) { SDL_GpuSetViewport(renderPass, viewport); }
 	export void gpuSubmit(SDL_GpuCommandBuffer* commandBuffer) { SDL_GpuSubmit(commandBuffer); }
 	export void gpuUnmapTransferBuffer(SDL_GpuTransferBuffer* transferBuffer) { SDL_GpuUnmapTransferBuffer(device, transferBuffer); }
@@ -685,8 +683,8 @@ namespace sdl {
 		}
 
 		SDL_GpuPushVertexUniformData(cmdbuf, 0, &matrixUniform, sizeof(matrixUniform));
-		SDL_GpuPushFragmentUniformData(cmdbuf, 0, color, sizeof(SDL_GpuColor));
-		SDL_GpuDrawIndexedPrimitives(renderPass, vertexOff, 0, 2, 1);
+		SDL_GpuPushFragmentUniformData(cmdbuf, 0, color, sizeof(Color));
+		SDL_GpuDrawIndexedPrimitives(renderPass, vertexOff, 0, 6, 1);
 	}
 	export void queueDraw(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const Color* color, float x, float y, float w, float h, float rotZ = 0, SDL_GpuGraphicsPipeline* pipeline = RENDER_STANDARD, int vertexOff = 0) { queueDraw(cmdbuf, renderPass, texture, color, x, y, w, h, rotZ, pipeline, bufferVertex, vertexOff); }
 	export void queueDrawBordered(GpuCommandBuffer* cmdbuf, SDL_GpuRenderPass* renderPass, SDL_GpuTexture* texture, const Color* color, float x, float y, float w, float h, float rotZ = 0, SDL_GpuGraphicsPipeline* pipeline = RENDER_STANDARD, int vertexOff = 0) { queueDraw(cmdbuf, renderPass, texture, color, x, y, w, h, rotZ, pipeline, bufferVertexBordered, vertexOff); }
@@ -707,17 +705,10 @@ namespace sdl {
 		Uint32 h = surface->h;
 		const Uint32 imageSizeInBytes = w * h * 4;
 
-		SDL_GpuTransferBufferRegion tbr = {
-			.transferBuffer = textureTransferBuffer,
-				.offset = 0,
-				.size = w * h * 4
-		};
-		SDL_GpuSetTransferData(
-			device,
-			surface->pixels,
-			&tbr,
-			SDL_FALSE
-		);
+		Uint8* textureTransferPtr;
+		SDL_GpuMapTransferBuffer(device, textureTransferBuffer, SDL_FALSE, (void**)&textureTransferPtr);
+		std::memcpy(textureTransferPtr, surface->pixels, imageSizeInBytes);
+		SDL_GpuUnmapTransferBuffer(device, textureTransferBuffer);
 
 		SDL_GpuTextureCreateInfo info = {
 				.width = w,
@@ -764,17 +755,10 @@ namespace sdl {
 		Uint32 h = surface->h;
 		const Uint32 imageSizeInBytes = w * h * 4;
 
-		SDL_GpuTransferBufferRegion tbr = {
-			.transferBuffer = textureTransferBuffer,
-				.offset = imageSizeInBytes * layer,
-				.size = imageSizeInBytes
-		};
-		SDL_GpuSetTransferData(
-			device,
-			surface->pixels,
-			&tbr,
-			SDL_FALSE
-		);
+		Uint8* textureTransferPtr;
+		SDL_GpuMapTransferBuffer(device, textureTransferBuffer, SDL_FALSE, (void**)&textureTransferPtr);
+		SDL_memcpy(textureTransferPtr, surface->pixels, imageSizeInBytes);
+		SDL_GpuUnmapTransferBuffer(device, textureTransferBuffer);
 
 		SDL_GpuTextureTransferInfo tInfo = {
 			.transferBuffer = textureTransferBuffer,
@@ -842,7 +826,7 @@ namespace sdl {
 		winW = w;
 
 		// Setup device for this window
-		device = SDL_GpuCreateDevice(SDL_GPU_BACKEND_ALL, SDL_TRUE, SDL_FALSE);
+		device = SDL_GpuCreateDevice(SDL_TRUE, SDL_FALSE, SDL_CreateProperties());
 		if (!device) {
 			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "Device went derp: %s", SDL_GetError());
 			SDL_Quit();

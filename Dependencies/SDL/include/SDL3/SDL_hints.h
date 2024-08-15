@@ -1018,7 +1018,7 @@ extern "C" {
  *
  * \since This hint is available since SDL 3.0.0.
  */
-#define SDL_HINT_GPU_BACKEND "SDL_GPU_BACKEND"
+#define SDL_HINT_GPU_DRIVER "SDL_GPU_DRIVER"
 
 /**
  * A variable to control whether SDL_hid_enumerate() enumerates all HID
@@ -2323,8 +2323,9 @@ extern "C" {
  * A variable controlling whether warping a hidden mouse cursor will activate
  * relative mouse mode.
  *
- * When this hint is set and the mouse cursor is hidden, SDL will emulate
- * mouse warps using relative mouse mode. This can provide smoother and more
+ * When this hint is set, the mouse cursor is hidden, and multiple warps to
+ * the window center occur within a short time period, SDL will emulate mouse
+ * warps using relative mouse mode. This can provide smoother and more
  * reliable mouse motion for some older games, which continuously calculate
  * the distance travelled by the mouse pointer and warp it back to the center
  * of the window, rather than using relative mouse motion.
@@ -2332,9 +2333,8 @@ extern "C" {
  * Note that relative mouse mode may have different mouse acceleration
  * behavior than pointer warps.
  *
- * If your game or application needs to warp the mouse cursor while hidden for
- * other purposes, such as drawing a software cursor, it should disable this
- * hint.
+ * If your application needs to repeatedly warp the hidden mouse cursor at a
+ * high-frequency for other purposes, it should disable this hint.
  *
  * The variable can be set to the following values:
  *
@@ -3836,6 +3836,22 @@ extern "C" {
  * \since This hint is available since SDL 3.0.0.
  */
 #define SDL_HINT_WINDOWS_ENABLE_MESSAGELOOP "SDL_WINDOWS_ENABLE_MESSAGELOOP"
+
+/**
+ * A variable controlling whether GameInput is used for raw keyboard and mouse
+ * on Windows.
+ *
+ * The variable can be set to the following values:
+ *
+ * - "0": GameInput is not used for raw keyboard and mouse events.
+ * - "1": GameInput is used for raw keyboard and mouse events, if available.
+ *   (default)
+ *
+ * This hint should be set before SDL is initialized.
+ *
+ * \since This hint is available since SDL 3.0.0.
+ */
+#define SDL_HINT_WINDOWS_GAMEINPUT   "SDL_WINDOWS_GAMEINPUT"
 
 /**
  * A variable controlling whether raw keyboard events are used on Windows.
