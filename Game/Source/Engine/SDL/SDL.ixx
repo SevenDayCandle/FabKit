@@ -22,6 +22,7 @@ namespace sdl {
 	export using GpuColorAttachmentInfo = ::SDL_GpuColorAttachmentInfo;
 	export using GpuCommandBuffer = ::SDL_GpuCommandBuffer;
 	export using GpuCopyPass = ::SDL_GpuCopyPass;
+	export using GpuDevice = ::SDL_GpuDevice;
 	export using GpuGraphicsPipeline = ::SDL_GpuGraphicsPipeline;
 	export using GpuLoadOp = ::SDL_GpuLoadOp;
 	export using GpuRenderPass = ::SDL_GpuRenderPass;
@@ -669,7 +670,7 @@ namespace sdl {
 		if (lastBufferVertex != vertexBuffer) {
 			SDL_GpuBufferBinding b = { vertexBuffer, 0 };
 			SDL_GpuBindVertexBuffers(renderPass, 0, &b, 1);
-			lastBufferIndex = vertexBuffer;
+			lastBufferVertex = vertexBuffer;
 		}
 		if (lastBufferIndex != bufferIndex) {
 			SDL_GpuBufferBinding b = { bufferIndex, 0 };
