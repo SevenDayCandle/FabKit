@@ -197,7 +197,7 @@ namespace sdl::runner {
 
 	export bool init(const char* renderer = RENDERER_VULKAN);
 	export bool poll();
-	export GpuGraphicsPipeline* createPipeline(GpuShader* vertexShader, GpuShader* fragmentShader, GpuTextureFormat textureFormat = GpuTextureFormat::SDL_GPU_TEXTUREFORMAT_R8G8B8A8, GpuBlendFactor srcColor = GpuBlendFactor::SDL_GPU_BLENDFACTOR_SRC_ALPHA, GpuBlendFactor dstColor = GpuBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, GpuBlendFactor srcAlpha = GpuBlendFactor::SDL_GPU_BLENDFACTOR_ONE, GpuBlendFactor dstAlpha = GpuBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA);
+	export GpuGraphicsPipeline* createPipeline(GpuShader* vertexShader, GpuShader* fragmentShader, GpuTextureFormat textureFormat = GpuTextureFormat::SDL_GPU_TEXTUREFORMAT_B8G8R8A8, GpuBlendFactor srcColor = GpuBlendFactor::SDL_GPU_BLENDFACTOR_SRC_ALPHA, GpuBlendFactor dstColor = GpuBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, GpuBlendFactor srcAlpha = GpuBlendFactor::SDL_GPU_BLENDFACTOR_ONE, GpuBlendFactor dstAlpha = GpuBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA);
 	export GpuShader* loadShader(const char* shaderFilename, GpuShaderStage stage, Uint32 samplerCount = 1, Uint32 uniformBufferCount = 1, Uint32 storageBufferCount = 0, Uint32 storageTextureCount = 0);
 	export GpuTexture* uploadTexture(GpuCopyPass* copyPass, Surface* surface);
 	export GpuTexture* uploadTexture(GpuCopyPass* copyPass, Surface* surface, GpuTransferBuffer* textureTransferBuffer);
