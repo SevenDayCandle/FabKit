@@ -7,6 +7,7 @@ import fbc.CombatTurnRenderable;
 import fbc.CoreContent;
 import fbc.CreatureRenderable;
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.RelativeHitbox;
 import fbc.UICanvas;
 import fbc.UIScreen;
@@ -21,10 +22,10 @@ namespace fbc {
 
 	export class CombatScreen : public UIScreen, public CombatInstance::IViewSubscriber {
 	public:
-		CombatScreen(): UIScreen(),
-			fieldUI(add(make_unique<UICanvas>(new RelativeHitbox(*hb, TILE_OFFSET, TILE_OFFSET, hb->getScaleOffSizeX(), hb->getScaleOffSizeY())))),
-			turnUI(add(make_unique<UICanvas>(new RelativeHitbox(*hb, 0, 0, hb->getScaleOffSizeX(), hb->getScaleOffSizeY())))),
-			endTurnButton(add(make_unique<UITextButton>(new RelativeHitbox(*hb, hb->getScaleOffSizeX(0.8), hb->getScaleOffSizeY(0.8), END_TURN_SIZE, END_TURN_SIZE),
+		CombatScreen(FWindow& win): UIScreen(win),
+			fieldUI(add(make_unique<UICanvas>(win, new RelativeHitbox(*hb, TILE_OFFSET, TILE_OFFSET, hb->getScaleOffSizeX(), hb->getScaleOffSizeY())))),
+			turnUI(add(make_unique<UICanvas>(win, new RelativeHitbox(*hb, 0, 0, hb->getScaleOffSizeX(), hb->getScaleOffSizeY())))),
+			endTurnButton(add(make_unique<UITextButton>(win, new RelativeHitbox(*hb, hb->getScaleOffSizeX(0.8), hb->getScaleOffSizeY(0.8), END_TURN_SIZE, END_TURN_SIZE),
 				cct.images.uiPanelRound, cct.fontRegular(), cct.strings.combat_end_turn()))) {
 		}
 

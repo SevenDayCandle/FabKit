@@ -12,7 +12,7 @@ namespace fbc {
 		FMusic(const FMusic&) = delete;
 		~FMusic() override {
 			// Unload when destroyed
-			if (music && sdl::sdlEnabled()) {
+			if (music && sdl::runner::enabled()) {
 				sdl::musicFree(music);
 				music = nullptr;
 			}

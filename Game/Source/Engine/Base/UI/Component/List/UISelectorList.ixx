@@ -4,11 +4,11 @@ import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
-import fbc.IOverlay;
+import fbc.FWindow;
 import fbc.RelativeHitbox;
-import fbc.ScreenManager;
 import fbc.SelectView;
 import fbc.UIBase;
 import fbc.UIEntry;
@@ -22,13 +22,13 @@ namespace fbc {
 
 	export template <typename T> class UISelectorList : public UIList<T> {
 	public:
-		UISelectorList(Hitbox* hb,
+		UISelectorList(FWindow& window, Hitbox* hb,
 		       func<str(const T&)> labelFunc = futil::toString<T>,
 		       FFont& itemFont = cct.fontSmall(),
 		       IDrawable& background = cct.images.uiPanelRound,
 		       bool canAutosize = false):
-			UIList<T>(hb, std::move(labelFunc), itemFont, background, canAutosize),
-			scrollbar(new RelativeHitbox(*hb, 0, 0, 48, 48)) { scrollbar.setOnScroll([this](float f) { onScroll(f); }); }
+			UIList<T>(window, hb, std::move(labelFunc), itemFont, background, canAutosize),
+			scrollbar(window, new RelativeHitbox(*hb, 0, 0, 48, 48)) { scrollbar.setOnScroll([this](float f) { onScroll(f); }); }
 
 		~UISelectorList() override {}
 
@@ -54,7 +54,7 @@ namespace fbc {
 		void openPopup();
 		void refilterRows();
 		void refreshDimensions() override;
-		void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
+		void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		template <c_itr<int> Iterable> void selectIndices(Iterable& indices);
 		template <c_itr<T> Iterable> void selectSelection(Iterable& items);
 		template <c_itr<T*> Iterable> void selectSelection(Iterable& items);
@@ -73,8 +73,8 @@ namespace fbc {
 		void updateSingle(T item);
 		void updateSingle(T* item);
 
-		static uptr<UISelectorList> multiList(Hitbox* hb, func<str(const T&)> labelFunc = futil::toString<T>, FFont& itemFont = cct.fontSmall(), IDrawable& background = cct.images.uiDarkPanelRound, bool canAutosize = false);
-		static uptr<UISelectorList> singleList(Hitbox* hb, func<str(const T&)> labelFunc = futil::toString<T>, FFont& itemFont = cct.fontSmall(), IDrawable& background = cct.images.uiDarkPanelRound, bool canAutosize = false);
+		static uptr<UISelectorList> multiList(FWindow& window, Hitbox* hb, func<str(const T&)> labelFunc = futil::toString<T>, FFont& itemFont = cct.fontSmall(), IDrawable& background = cct.images.uiDarkPanelRound, bool canAutosize = false);
+		static uptr<UISelectorList> singleList(FWindow& window, Hitbox* hb, func<str(const T&)> labelFunc = futil::toString<T>, FFont& itemFont = cct.fontSmall(), IDrawable& background = cct.images.uiDarkPanelRound, bool canAutosize = false);
 	protected:
 		set<int> currentIndices;
 		vec<UIEntry<T>*> rowsForRender;
@@ -91,11 +91,10 @@ namespace fbc {
 		func<void(EntryView<T>&)> onChange;
 		func<void(EntryView<T>&)> onSelectionUpdate;
 		UIVerticalScrollbar scrollbar;
-		IOverlay* proxy;
+		FWindow::Element* proxy;
 
 		inline EntryView<T> selectView() { return EntryView<T>(currentIndices, this->rows); }
-
-		inline static float rMargin() { return cfg.renderScale(MARGIN); }
+		inline float rMargin() { return cfg.renderScale(MARGIN); }
 
 		void autosize() override;
 		void changeEvent();
@@ -106,12 +105,12 @@ namespace fbc {
 		void updateRowPositions();
 	};
 
-	export template <typename T> class UIMenuProxy : public IOverlay {
+	export template <typename T> class UIMenuProxy : public FWindow::Element {
 	public:
-		UIMenuProxy(UISelectorList<T>& menu) : menu(menu) {}
+		UIMenuProxy(FWindow& window, UISelectorList<T>& menu) : Element(window), menu(menu) {}
 		UISelectorList<T>& menu;
 
-		inline void render(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override { menu.renderImpl(cd, rp); };
+		inline void render(sdl::SDLBatchRenderPass& rp) override { menu.renderImpl(&rp); };
 
 		void dispose() override;
 		void update() override;
@@ -266,7 +265,7 @@ namespace fbc {
 
 	// Manually take down the overlay spawned by this menu
 	template <typename T> void UISelectorList<T>::forceClosePopup() {
-		if (proxy != nullptr) { screenManager::closeOverlay(proxy); }
+		if (proxy != nullptr) { this->win.closeOverlay(proxy); }
 	}
 
 	// Returns the entries corresponding with the currently selected indices
@@ -279,8 +278,8 @@ namespace fbc {
 	// Create a proxy overlay for this menu that closes when you click outside of it
 	template <typename T> void UISelectorList<T>::openPopup() {
 		if (proxy == nullptr) {
-			screenManager::openOverlay(std::make_unique<UIMenuProxy<T>>(*this));
-			proxy = screenManager::getActiveOverlay();
+			this->win.openOverlay(std::make_unique<UIMenuProxy<T>>(*this));
+			proxy = this->win.getActiveOverlay();
 			if (onOpen) {
 				onOpen();
 			}
@@ -301,14 +300,14 @@ namespace fbc {
 	}
 
 	// Render all visible rows and the scrollbar if it is shown
-	template <typename T> void UISelectorList<T>::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
-		this->background.draw(cd, rp, *this->hb.get(), &this->backgroundColor);
+	template <typename T> void UISelectorList<T>::renderImpl(sdl::SDLBatchRenderPass& rp) {
+		this->background.draw(rp, *this->hb.get(), this->win.getH(), this->win.getH(), 0, &this->backgroundColor);
 		int rowCount = getVisibleRowCount();
 		for (int i = this->topVisibleRowIndex; i < this->topVisibleRowIndex + rowCount; ++i) {
-			rowsForRender[i]->renderImpl(cd, rp);
+			rowsForRender[i]->renderImpl(rp);
 		}
 
-		scrollbar.render(cd, rp);
+		scrollbar.render(rp);
 	}
 
 	// Update visible rows. The scrollbar should only be shown if there are enough items to warrant it
@@ -337,7 +336,7 @@ namespace fbc {
 					updateRowPositions();
 				}
 			}
-			else if (sdl::mouseIsLeftJustClicked() && !this->isHovered()) {
+			else if (sdl::runner::mouseIsLeftJustClicked() && !this->isHovered()) {
 				this->activeRow = -1;
 			}
 		}
@@ -489,16 +488,16 @@ namespace fbc {
 	 * Statics
 	 */
 
-	template<typename T> uptr<UISelectorList<T>> UISelectorList<T>::multiList(Hitbox* hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize) {
-		return std::make_unique<UISelectorList<T>>(hb, labelFunc, itemFont, background, canAutosize);
+	template<typename T> uptr<UISelectorList<T>> UISelectorList<T>::multiList(FWindow& window, Hitbox* hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize) {
+		return std::make_unique<UISelectorList<T>>(window, hb, labelFunc, itemFont, background, canAutosize);
 	}
 
-	template<typename T> uptr<UISelectorList<T>> UISelectorList<T>::singleList(Hitbox* hb,
+	template<typename T> uptr<UISelectorList<T>> UISelectorList<T>::singleList(FWindow& window, Hitbox* hb,
 		func<str(const T&)> labelFunc,
 		FFont& itemFont,
 		IDrawable& background, 
 		bool canAutosize) {
-		uptr<UISelectorList<T>> res = std::make_unique<UISelectorList<T>>(hb, labelFunc, itemFont, background, canAutosize);
+		uptr<UISelectorList<T>> res = std::make_unique<UISelectorList<T>>(window, hb, labelFunc, itemFont, background, canAutosize);
 		res->setSelectionLimit(1);
 		return res;
 	}
@@ -520,6 +519,6 @@ namespace fbc {
 	// Close the menu if the user clicks outside the menu
 	template <typename T> void UIMenuProxy<T>::update() {
 		menu.updateImpl();
-		if ((sdl::mouseIsLeftJustClicked() && !menu.isHovered()) || sdl::keyboardJustPressedEsc()) { screenManager::closeOverlay(this); }
+		if ((sdl::runner::mouseIsLeftJustClicked() && !menu.isHovered()) || sdl::runner::keyboardJustPressedEsc()) { this->win.closeOverlay(this); }
 	}
 }

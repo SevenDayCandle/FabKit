@@ -60,7 +60,7 @@ namespace fbc {
 		ConfigNumeric soundVolumeEffects = ConfigNumeric(*this, "SoundVolumeEffects", 100, 0, 100);
 		ConfigNumeric soundVolumeMaster = ConfigNumeric(*this, "SoundVolumeMaster", 100, 0, 100);
 		ConfigNumeric soundVolumeMusic = ConfigNumeric(*this, "SoundVolumeMusic", 100, 0, 100);
-		ConfigNumeric textFontScale = ConfigNumeric(*this, "TextFontScale", 1, 1, 4);
+		ConfigNumeric textFontPercent = ConfigNumeric(*this, "TextFontPercent", 100, 50, 400);
 
 		Hotkey actDirDown = Hotkey("ActDirDown", sdl::SCAN_DOWN, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_DOWN);
 		Hotkey actDirLeft = Hotkey("ActDirLeft", sdl::SCAN_LEFT, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_LEFT);
@@ -69,8 +69,6 @@ namespace fbc {
 		Hotkey actEsc = Hotkey("ActEsc", sdl::SCAN_ESC, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_INVALID);
 		Hotkey actSelect = Hotkey("ActSelect", sdl::SCAN_RETURN, sdl::GamepadButton::SDL_GAMEPAD_BUTTON_START);
 
-		inline int getScreenXSize() const { return graphicsResolution.get().first; }
-		inline int getScreenYSize() const { return graphicsResolution.get().second; };
 		inline float fontScale() const noexcept { return fontScalePrivate; } // Gets the scale factor to setRealSize fonts by. Resolution uses the height of a 4k screen as a base
 		inline float fontScale(float mult) const noexcept { return fontScalePrivate * mult; } // Multiplies the constant by the screen scale factor. ONLY USE THIS when you need to modify offsets within methods by some constant factor or by a size variable in a class, and NOT when initializing sizes on UI components.
 		inline float renderScale() const noexcept { return renderScalePrivate; } // Gets the scale factor to setRealSize elements by. Resolution uses the height of a 4k screen as a base
@@ -79,9 +77,6 @@ namespace fbc {
 		const Language& getLanguage();
 
 		void postInitialize() override;
-		void resizeWindow();
-		void setupWindow();
-		void updateWindowMode();
 	private:
 		float fontScalePrivate = 1.0;
 		float renderScalePrivate = 1.0;
@@ -103,54 +98,30 @@ namespace fbc {
 	}
 
 	void CoreConfig::postInitialize() {
-		updateScales();
 		sdl::musicSetVolume(soundVolumeMusic.get() * soundVolumeMaster.get() * VOLUME_SCALAR);
 		sdl::soundSetAllVolume(soundVolumeEffects.get() * soundVolumeMaster.get() * VOLUME_SCALAR);
 
-		// Add sound config subscriptions. Note that graphical config subscriptions need to get set up in screenManager since they invoke refreshing on the screenManager
-		soundVolumeMaster.setOnReload([this](const int& val) {
+		// Add sound config subscriptions
+		soundVolumeMaster.addOnReload([this](const int& val) {
 			sdl::musicSetVolume(soundVolumeMusic.get() * val * VOLUME_SCALAR);
 			sdl::soundSetAllVolume(soundVolumeEffects.get() * val * VOLUME_SCALAR);
 		});
-		soundVolumeEffects.setOnReload([this](const int& val) {
+		soundVolumeEffects.addOnReload([this](const int& val) {
 			sdl::soundSetAllVolume(val * soundVolumeMaster.get() * VOLUME_SCALAR);
 		});
-		soundVolumeMusic.setOnReload([this](const int& val) {
+		soundVolumeMusic.addOnReload([this](const int& val) {
 			sdl::musicSetVolume(val * soundVolumeMaster.get() * VOLUME_SCALAR);
 		});
-	}
 
-	// When the window size parameters change, we should setRealSize the window and update renderScalePrivate
-	void CoreConfig::resizeWindow()
-	{
-		sdl::windowSetSize(getScreenXSize(), getScreenYSize());
-		updateScales();
-	}
-
-	// Create the window from the config
-	void CoreConfig::setupWindow() {
-		sdl::initWindow(getScreenXSize(), getScreenYSize(), graphicsWindowMode.get(), graphicsVSync.get());
-	}
-
-	// Update the window fullscreen mode from the config
-	void CoreConfig::updateWindowMode() {
-		switch (graphicsWindowMode.get()) {
-		case BORDERLESS_FULLSCREEN:
-			sdl::windowSetFullscreen(1);
-			break;
-		case FULLSCREEN:
-			sdl::windowSetFullscreen(1);
-			break;
-		default:
-			sdl::windowSetFullscreen(0);
-			break;
-		}
+		// Add graphic config subscriptions. Note that most config subscriptions are specific to FWindow
+		graphicsFPS.addOnReload([](const int& val) { sdl::runner::setFPSLimit(val); });
+		textFontPercent.addOnReload([this](const int& val) { updateScales(); });
 	}
 
 	// Resolution uses the height of a 4k screen as a base
 	void CoreConfig::updateScales()
 	{
-		renderScalePrivate = getScreenYSize() / BASE_DENOMINATOR;
-		fontScalePrivate = renderScalePrivate * textFontScale.get();
+		renderScalePrivate = graphicsResolution.get().second / BASE_DENOMINATOR;
+		fontScalePrivate = renderScalePrivate * textFontPercent.get() / 100;
 	}
 }

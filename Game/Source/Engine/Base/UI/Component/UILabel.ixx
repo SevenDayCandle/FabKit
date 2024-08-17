@@ -1,6 +1,7 @@
 export module fbc.UILabel;
 
 import fbc.FFont;
+import fbc.FWindow;
 import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.TextInfo;
@@ -10,12 +11,12 @@ import fbc.UITipHoverable;
 namespace fbc {
 	export class UILabel : public UITipHoverable, public TextInfo {
 	public:
-		UILabel(fbc::Hitbox* hb, FFont& f) : UITipHoverable(hb), TextInfo(f) {}
-		UILabel(fbc::Hitbox* hb, FFont& f, const str& text) : UITipHoverable(hb), TextInfo(f, text) {}
+		UILabel(FWindow& window, Hitbox* hb, FFont& f) : UITipHoverable(window, hb), TextInfo(f) {}
+		UILabel(FWindow& window, Hitbox* hb, FFont& f, const str& text) : UITipHoverable(window, hb), TextInfo(f, text) {}
 		~UILabel() override {}
 
 		virtual void refreshDimensions() override;
-		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 	};
 
 	void UILabel::refreshDimensions()
@@ -24,7 +25,7 @@ namespace fbc {
 		refreshCache();
 	}
 
-	void UILabel::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
-		TextInfo::drawText(cd, rp, hb->x, hb->y);
+	void UILabel::renderImpl(sdl::SDLBatchRenderPass& rp) {
+		TextInfo::drawText(rp, hb->x, hb->y, win.getW(), win.getH());
 	}
 }

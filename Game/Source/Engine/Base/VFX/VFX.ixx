@@ -2,16 +2,16 @@ export module fbc.VFX;
 
 import fbc.CoreConfig;
 import fbc.FUtil;
-import fbc.IOverlay;
+import fbc.FWindow;
 import sdl;
 import std;
 
 namespace fbc {
 	export constexpr float DEFAULT_DURATION = 1;
 
-	export class VFX : public IOverlay {
+	export class VFX : public FWindow::Element {
 	public:
-		VFX(float duration = DEFAULT_DURATION): duration(duration * sdl::NANOS_PER_SECOND * cfg.gameEffectSpeed.get()) {}
+		VFX(FWindow& win, float duration = DEFAULT_DURATION): Element(win), duration(duration * sdl::NANOS_PER_SECOND * cfg.gameEffectSpeed.get()) {}
 		virtual ~VFX() override = default;
 
 		float duration;
@@ -24,7 +24,7 @@ namespace fbc {
 	bool VFX::tickUpdate()
 	{
 		update();
-		ticks += sdl::timeDelta();
+		ticks += sdl::runner::timeDelta();
 		if (ticks >= duration) {
 			dispose();
 			return true;

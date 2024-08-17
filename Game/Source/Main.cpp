@@ -2,36 +2,37 @@ import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.ConfigHotkey;
 import fbc.DynamicContent;
-import fbc.ScreenManager;
+import fbc.FWindow;
 import fbc.TitleScreen;
 import sdl;
 import std;
 
 using namespace fbc;
 
+FWindow window;
+
 void dispose() {
 	// TODO save game state as necessary
-	screenManager::dispose();
+	window.dispose();
 	cct.dispose();
-	sdl::quit();
+	sdl::runner::quit();
 }
 
 bool initialize() {
-	if (!sdl::initSDL()) {
+	if (!sdl::runner::init()) {
 		return false;
 	}
 
 	cfg.load();
 	fbc::Hotkey::reload();
 	cfg.postInitialize();
-	cfg.setupWindow();
 	cct.initialize();
 	DynamicContent::loadDynamicContent();
 	cct.initializeContents();
 	cct.postInitialize();
 
-	screenManager::subscribeToConfig();
-	screenManager::openScreen(std::make_unique<fbc::TitleScreen>());
+	window.subscribeToCore(cfg);
+	window.openScreen(std::make_unique<fbc::TitleScreen>(window));
 	return true;
 }
 
@@ -41,14 +42,14 @@ int main()
 		return -1;
 	}
 
-	while(sdl::poll())
+	while(sdl::runner::poll())
 	{
-		screenManager::update();
-		screenManager::render();
+		window.update();
+		window.render();
 		
 		// Only limit frame if vsync is off
 		if (!cfg.graphicsVSync.get()) {
-			sdl::capFrame();
+			sdl::runner::capFrame();
 		}
 	}
 

@@ -11,15 +11,15 @@ import std;
 namespace fbc {
 	export class CombatSquareRenderable : public UIInteractable {
 	public:
-		CombatSquareRenderable(const CombatSquare& square, Hitbox* hb): UIInteractable(hb, cct.images.uiLightPanel), square(square) {}
+		CombatSquareRenderable(const CombatSquare& square, Hitbox* hb): UIInteractable(win, hb, cct.images.uiLightPanel), square(square) {}
 
 		const CombatSquare& square;
 
-		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 	};
 
-	void CombatSquareRenderable::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
+	void CombatSquareRenderable::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
-		UIInteractable::renderImpl(cd, rp);
+		UIInteractable::renderImpl(rp);
 	}
 }

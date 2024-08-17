@@ -44,7 +44,7 @@ namespace fbc {
 				++i;
 			}
 		}
-		instance->queueAction(make_unique<VFXAction>(make_unique<HitboxBatchMoveSmoothVFX>(entries)));
+		instance->queueAction(make_unique<VFXAction>(win, make_unique<HitboxBatchMoveSmoothVFX>(win, entries)));
 	}
 
 	void CombatScreen::onTurnRemoved(const CombatTurn* turn)
@@ -53,7 +53,7 @@ namespace fbc {
 		if (res != turnUIMap.end()) {
 			uptr<CombatTurnRenderable> item = turnUI.extract(res->second);
 			if (item) {
-				addVFX(make_unique<UIFadeOutDriftVFX>(move(item), 0, -10));
+				addVFX(make_unique<UIFadeOutDriftVFX>(win, move(item), 0, -10));
 			}
 		}
 		turnUIMap.erase(turn);

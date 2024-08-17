@@ -1,6 +1,7 @@
 export module fbc.FFont;
 
 import fbc.CoreConfig;
+import fbc.ImageDrawable;
 import fbc.FTexture;
 import fbc.FUtil;
 import fbc.ILoadable;
@@ -32,7 +33,7 @@ namespace fbc {
         int measureH(strv text) const;
         int measureW(strv text) const;
         pair<int, int> measureDim(strv text) const;
-        sdl::FontRender makeTexture(strv text, uint32 w = 0, float x = 0, float y = 0, const sdl::Color& color = sdl::COLOR_STANDARD, const sdl::Color& outlineColor = sdl::COLOR_BLACK, const sdl::Color& shadowColor = sdl::COLOR_BLACK_SHADOW);
+        ImageDrawable makeTexture(strv text, uint32 w = 0, const sdl::Color& color = sdl::COLOR_STANDARD, const sdl::Color& outlineColor = sdl::COLOR_BLACK, const sdl::Color& shadowColor = sdl::COLOR_BLACK_SHADOW);
         void dispose();
         void reload() const override;
     private:
@@ -100,7 +101,7 @@ namespace fbc {
     }
 
     // Create a texture snapshot of the text rendered with this font in the given colors. Text must NOT be empty
-    sdl::FontRender FFont::makeTexture(strv text, uint32 w, float x, float y, const sdl::Color& color, const sdl::Color& outlineColor, const sdl::Color& shadowColor)
+    ImageDrawable FFont::makeTexture(strv text, uint32 w, const sdl::Color& color, const sdl::Color& outlineColor, const sdl::Color& shadowColor)
     {
         const char* texDat = text.data();
         sdl::Surface* targetSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, sdl::toTextColor(color), w);
@@ -130,15 +131,17 @@ namespace fbc {
             targetSurf = newTargetSurf;
         }
 
-        sdl::GpuCommandBuffer* uploadCmdBuf = sdl::gpuAcquireCommandBuffer();
+        sdl::GpuCommandBuffer* uploadCmdBuf = sdl::runner::deviceAcquireCommandBuffer();
         sdl::GpuCopyPass* copyPass = sdl::gpuBeginCopyPass(uploadCmdBuf);
-        sdl::GpuTexture* fontTex = sdl::uploadTexture(copyPass, targetSurf);
+        sdl::GpuTexture* fontTex = sdl::runner::uploadTexture(copyPass, targetSurf);
         sdl::gpuEndCopyPass(copyPass);
         sdl::gpuSubmit(uploadCmdBuf);
 
-        sdl::FontRender f = {  x, y, static_cast<float>(targetSurf->w), static_cast<float>(targetSurf->h), fontTex };
+        int sw = targetSurf->w;
+        int sh = targetSurf->h;
         sdl::surfaceDestroy(targetSurf);
-        return f;
+
+        return ImageDrawable(targetSurf->w, targetSurf->h, fontTex);
     }
 
     /* Close the font */

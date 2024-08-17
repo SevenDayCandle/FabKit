@@ -1,9 +1,10 @@
 export module fbc.UIButton;
 
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
-import fbc.ScreenManager;
+
 import fbc.UIInteractable;
 import sdl;
 
@@ -11,13 +12,13 @@ namespace fbc {
 	export class UIButton : public UIInteractable {
 	public:
 
-		UIButton(Hitbox* hb, IDrawable& image) : UIInteractable(hb, image) {}
+		UIButton(FWindow& window, Hitbox* hb, IDrawable& image) : UIInteractable(window, hb, image) {}
 		~UIButton() override {}
 
 		inline UIButton& setOnClick(const func<void(UIButton&)>& onClick) { return this->onLeftClick = onClick, *this; }
 		inline UIButton& setOnRightClick(const func<void(UIButton&)>& onRightClick) { return this->onRightClick = onRightClick, *this; }
 
-		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 	private:
 		func<void(UIButton&)> onLeftClick;
 		func<void(UIButton&)> onRightClick;
@@ -26,8 +27,8 @@ namespace fbc {
 		virtual void clickRightEvent() override;
 	};
 
-	void UIButton::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
-		image.draw(cd, rp, *hb.get(), hb->isHovered() && interactable ? &sdl::COLOR_WHITE : &color, rotation);
+	void UIButton::renderImpl(sdl::SDLBatchRenderPass& rp) {
+		image.draw(rp, *hb.get(), win.getW(), win.getH(), rotation, hb->isHovered() && interactable ? &sdl::COLOR_WHITE : &color);
 	}
 
 	void UIButton::clickLeftEvent()

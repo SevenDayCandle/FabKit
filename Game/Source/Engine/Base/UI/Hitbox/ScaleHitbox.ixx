@@ -1,7 +1,7 @@
 export module fbc.ScaleHitbox;
 
-import fbc.Hitbox;
 import fbc.CoreConfig;
+import fbc.Hitbox;
 
 namespace fbc {
 	export class ScaleHitbox : public Hitbox {

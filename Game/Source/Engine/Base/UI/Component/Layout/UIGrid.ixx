@@ -1,6 +1,7 @@
 export module fbc.UIGrid;
 
 import fbc.CoreConfig;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.UIBase;
 import fbc.UIVerticalScrollbar;
@@ -39,11 +40,11 @@ namespace fbc {
 			typename vec<uptr<T>>::iterator it;
 		};
 
-		UIGrid(Hitbox* hb, float spacingX = 100, float spacingY = 100, float scrollSpeed = 1) : UIBase(hb),
+		UIGrid(FWindow& window, Hitbox* hb, float spacingX = 100, float spacingY = 100, float scrollSpeed = 1) : UIBase(window, hb),
 			spacingX(spacingX),
 			spacingY(spacingY),
 			scrollSpeed(scrollSpeed),
-			scrollbar{ new ScaleHitbox(hb->w * 0.93f / cfg.renderScale(), hb->y + hb->h * 0.05f / cfg.renderScale(), 48, hb->h * 0.9f / cfg.renderScale()) } {
+			scrollbar{window, new ScaleHitbox(hb->w * 0.93f / cfg.renderScale(), hb->y + hb->h * 0.05f / cfg.renderScale(), 48, hb->h * 0.9f / cfg.renderScale())} {
 			scrollbar.enabled = false;
 		}
 
@@ -61,7 +62,7 @@ namespace fbc {
 		UIGrid& setSpacingY(float spacingY);
 		virtual bool isHovered() override;
 		virtual void refreshDimensions() override;
-		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		virtual void updateImpl() override;
 	protected:
 		float scrollSpeed = 1;
@@ -89,12 +90,12 @@ namespace fbc {
 		scrollbar.refreshDimensions();
 	}
 
-	template<c_ext<UIBase> T> void UIGrid<T>::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
+	template<c_ext<UIBase> T> void UIGrid<T>::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
 		for (const uptr<T>& item : items) {
-			item->render(cd, rp);
+			item->render(*rp);
 		}
-		scrollbar.render(cd, rp);
+		scrollbar.render(rp);
 	}
 
 	template<c_ext<UIBase> T> void UIGrid<T>::updateImpl()

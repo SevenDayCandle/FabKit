@@ -1,24 +1,25 @@
 export module fbc.UIScrollbar;
 
-import fbc.Hitbox;
-import fbc.UIBase;
 import fbc.FUtil;
+import fbc.FWindow;
+import fbc.Hitbox;
 import fbc.IDrawable;
-import fbc.ScreenManager;
+
+import fbc.UIBase;
 import sdl;
 import std;
 
 namespace fbc {
 	export class UIScrollbar : public UIBase {
 	public:
-		UIScrollbar(Hitbox* hb, IDrawable& imageBar, IDrawable& imageButton): UIBase(hb), imageBar(imageBar), imageButton(imageButton) {
+		UIScrollbar(FWindow& window, Hitbox* hb, IDrawable& imageBar, IDrawable& imageButton): UIBase(win, hb), imageBar(imageBar), imageButton(imageButton) {
 		}
 
 		inline float getScroll() const { return scrollPercent; }
 		inline UIScrollbar& setOnScroll(const func<void(float)>& onScroll) { return this->onScroll = onScroll, *this; }
 
 		virtual void onSizeUpdated() override;
-		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		virtual void updateImpl() override;
 		void processMouseScroll();
 		void scroll(float percent);
@@ -46,15 +47,15 @@ namespace fbc {
 
 	void UIScrollbar::processMouseScroll()
 	{
-		int scrollDiff = sdl::mouseGetWheelY();
+		int scrollDiff = sdl::runner::mouseGetWheelY();
 		if (scrollDiff != 0) {
 			scroll(getScroll() + scrollDiff * -0.05f);
 		}
 	}
 
-	void UIScrollbar::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
-		imageBar.draw(cd, rp, *hb.get());
-		imageButton.draw(cd, rp, dropzone);
+	void UIScrollbar::renderImpl(sdl::SDLBatchRenderPass& rp) {
+		imageBar.draw(rp, *hb.get(), win.getW(), win.getH());
+		imageButton.draw(rp, dropzone, win.getW(), win.getH());
 	}
 
 	// Updates the scrollbar button position and triggers the scroll event at the new position
@@ -74,24 +75,24 @@ namespace fbc {
 		UIBase::updateImpl();
 		updateDropzonePos(scrollPercent);
 
-		if (hb->isHovered() && sdl::mouseIsLeftJustClicked()) {
-			screenManager::activeElement = this;
-			float per = toPercentage(sdl::mouseGetX(), sdl::mouseGetY());
+		if (hb->isHovered() && sdl::runner::mouseIsLeftJustClicked()) {
+			this->win.activeElement = this;
+			float per = toPercentage(sdl::runner::mouseGetX(), sdl::runner::mouseGetY());
 			clickPercent = per;
-			if (!sdl::mouseIsHovering(dropzone)) {
+			if (!sdl::runner::mouseIsHovering(dropzone)) {
 				scroll(per);
 			}
 		}
-		else if (screenManager::activeElement == this) {
-			if (sdl::mouseIsLeftClicked()) {
-				float per = toPercentage(sdl::mouseGetX(), sdl::mouseGetY());
+		else if (this->win.activeElement == this) {
+			if (sdl::runner::mouseIsLeftClicked()) {
+				float per = toPercentage(sdl::runner::mouseGetX(), sdl::runner::mouseGetY());
 				if (per != clickPercent) {
 					scroll(scrollPercent + per - clickPercent);
 					clickPercent = per;
 				}
 			}
 			else {
-				screenManager::activeElement = nullptr;
+				this->win.activeElement = nullptr;
 			}
 		}
 	}

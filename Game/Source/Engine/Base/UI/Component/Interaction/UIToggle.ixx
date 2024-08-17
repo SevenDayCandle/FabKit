@@ -4,6 +4,7 @@ import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.TextInfo;
@@ -14,8 +15,8 @@ import std;
 namespace fbc {
 	export class UIToggle : public UIInteractable, public TextInfo {
 	public:
-		UIToggle(Hitbox* hb, strv text, IDrawable& image = cct.images.uiCheckboxEmpty, IDrawable& checkImage = cct.images.uiCheckboxFilled, FFont& f = cct.fontRegular(), float xOff = cct.images.uiCheckboxEmpty.getWidth() * 1.15f, float yOff = cct.images.uiCheckboxEmpty.getHeight() * 0.25f):
-			UIInteractable(hb, image), checkImage(checkImage), TextInfo(f, text), xOff(xOff), yOff(yOff) {
+		UIToggle(FWindow& window, Hitbox* hb, strv text, IDrawable& image = cct.images.uiCheckboxEmpty, IDrawable& checkImage = cct.images.uiCheckboxFilled, FFont& f = cct.fontRegular(), float xOff = cct.images.uiCheckboxEmpty.getWidth() * 1.15f, float yOff = cct.images.uiCheckboxEmpty.getHeight() * 0.25f):
+			UIInteractable(window, hb, image), checkImage(checkImage), TextInfo(f, text), xOff(xOff), yOff(yOff) {
 			UIToggle::onSizeUpdated();
 		}
 
@@ -31,7 +32,7 @@ namespace fbc {
 
 		void onSizeUpdated() override;
 		void refreshDimensions() override;
-		void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
+		void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		void toggle(bool val);
 	private:
 		func<void(UIToggle&)> onClick;
@@ -52,16 +53,16 @@ namespace fbc {
 		refreshCache();
 	}
 
-	void UIToggle::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
+	void UIToggle::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
 		if (toggled) {
-			checkImage.draw(cd, rp, *hb.get(), hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color, rotation);
+			checkImage.draw(rp, *hb.get(), win.getW(), win.getH(), rotation, hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color);
 		}
 		else {
-			image.draw(cd, rp, *hb.get(), hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color, rotation);
+			image.draw(rp, *hb.get(), win.getW(), win.getH(), rotation, hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color);
 		}
 
-		TextInfo::drawText(cd, rp, hb->x, hb->y);
+		TextInfo::drawText(rp, hb->x, hb->y, win.getW(), win.getH());
 	}
 
 	void UIToggle::toggle(bool val)

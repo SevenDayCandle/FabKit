@@ -1,6 +1,7 @@
 export module fbc.UITipHoverable;
 
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.GenericTip;
 import fbc.Hitbox;
 import fbc.Tooltip;
@@ -11,13 +12,13 @@ namespace fbc {
 	public:
 		GenericTip* tooltip;
 
-		UITipHoverable(Hitbox* hb) : UIBase(hb), tooltip(nullptr) {}
+		UITipHoverable(FWindow& window, Hitbox* hb) : UIBase(window, hb), tooltip(nullptr) {}
 		~UITipHoverable() override {}
 
 		virtual void refreshDimensions() override;
 		virtual void updateImpl() override;
 
-		inline UITipHoverable& setOwnedTip(strv text) { return setOwnedTip(new Tooltip(text)); }
+		inline UITipHoverable& setOwnedTip(strv text) { return setOwnedTip(new Tooltip(win, text)); }
 		inline virtual UITipHoverable& setTooltip(GenericTip* tooltip) { return this->tooltip = tooltip, *this; } // Assigns a non-owned tooltip to this object
 
 		UITipHoverable& setOwnedTip(GenericTip* tooltip);

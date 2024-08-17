@@ -4,9 +4,10 @@ import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
-import fbc.ITextInputter;
+import fbc.TextSupplier;
 import fbc.TextInfo;
 import fbc.UIInteractable;
 import fbc.UITitledInteractable;
@@ -14,11 +15,11 @@ import sdl;
 import std;
 
 namespace fbc {
-	export class UITextInput : public UITitledInteractable, public TextInfo, public ITextInputter {
+	export class UITextInput : public UITitledInteractable, public TextInfo, public TextSupplier {
 	public:
-		UITextInput(Hitbox* hb, 
+		UITextInput(FWindow& window, Hitbox* hb, 
 			IDrawable& image = cct.images.uiPanel,
-			FFont& textFont = cct.fontRegular()): UITitledInteractable(hb, image), TextInfo(textFont) {
+			FFont& textFont = cct.fontRegular()): TextSupplier(window), UITitledInteractable(window, hb, image), TextInfo(textFont) {
 			initCaret(this->font, this->hb->x, this->hb->y);
 			UITextInput::onSizeUpdated();
 		}
@@ -29,7 +30,7 @@ namespace fbc {
 		void commit(strv text);
 		virtual void onSizeUpdated() override;
 		virtual void refreshDimensions() override;
-		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		virtual void start() override;
 		virtual void updateImpl() override;
 	protected:
@@ -66,19 +67,19 @@ namespace fbc {
 		refreshCache();
 	}
 
-	void UITextInput::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
+	void UITextInput::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
-		UITitledInteractable::renderImpl(cd, rp);
-		TextInfo::drawText(cd, rp, hb->x, hb->y);
-		if (sdl::keyboardInputActive(this)) {
-			renderCaret(cd, rp);
+		UITitledInteractable::renderImpl(rp);
+		TextInfo::drawText(rp, hb->x, hb->y, win.getW(), win.getH());
+		if (sdl::runner::keyboardInputActive(this)) {
+			renderCaret(rp);
 		}
 	}
 
 	void UITextInput::start() 
 	{
 		buffer = getText();
-		ITextInputter::start();
+		TextSupplier::start();
 		this->updateCache(buffer, sdl::COLOR_LIME);
 	}
 
@@ -86,7 +87,7 @@ namespace fbc {
 	void UITextInput::updateImpl()
 	{
 		UIInteractable::updateImpl();
-		if (sdl::keyboardInputActive(this) && sdl::mouseIsLeftJustClicked() && !isHovered()) {
+		if (sdl::runner::keyboardInputActive(this) && sdl::runner::mouseIsLeftJustClicked() && !isHovered()) {
 			commit(buffer);
 			releaseBuffer();
 		}
@@ -103,14 +104,14 @@ namespace fbc {
 
 	void UITextInput::updateCaretPos()
 	{
-		caret.x = this->hb->x + cfg.renderScale(9) + this->font.measureW(buffer.substr(0, bufferPos));
-		caret.y = this->hb->y;
+		caretPosX = this->hb->x + cfg.renderScale(9) + this->font.measureW(buffer.substr(0, bufferPos));
+		caretPosY = this->hb->y;
 	}
 
 	// When clicked while not focused, start the text input
 	void UITextInput::clickLeftEvent()
 	{
-		if (!sdl::keyboardInputActive()) {
+		if (!sdl::runner::keyboardInputActive()) {
 			start();
 		}
 	}
@@ -129,7 +130,7 @@ namespace fbc {
 			releaseBuffer();
 			return;
 		default:
-			ITextInputter::onKeyPress(c);
+			TextSupplier::onKeyPress(c);
 		}
 	}
 

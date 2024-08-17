@@ -184,7 +184,27 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\ImageDrawable.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Engine\Base\VFX\CallbackVFX.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\SDL\SDL.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\SDL\SDLBatchRenderPass.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\SDL\SDLProps.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\SDL\SDLRunner.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -262,15 +282,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\UI\Hitbox\DraggableHitbox.ixx">
-      <SubType>
-      </SubType>
-    </ClCompile>
-    <ClCompile Include="Source\Engine\Base\UI\Mixin\IOverlay.ixx">
-      <SubType>
-      </SubType>
-    </ClCompile>
-    <ClCompile Include="Source\Engine\Base\UI\Mixin\ITextInputter.ixx">
+    <ClCompile Include="Source\Engine\Base\UI\Mixin\TextSupplier.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -298,10 +310,6 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\FRegion.ixx">
-      <SubType>
-      </SubType>
-    </ClCompile>
     <ClCompile Include="Source\Game\Content\DynamicLoadables.ixx" />
     <ClCompile Include="Source\Engine\Base\VFX\VFX.ixx">
       <SubType>
@@ -315,7 +323,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\SDL\SDL.ixx" />
+    <ClCompile Include="Source\Engine\SDL\SDLBase.ixx" />
     <ClCompile Include="Source\Engine\Base\UI\Component\List\UIDropdown.ixx">
       <SubType>
       </SubType>
@@ -394,10 +402,6 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
     <ClCompile Include="Source\Engine\Base\UI\Hitbox\Hitbox.ixx">
-      <FileType>Document</FileType>
-      <DeploymentContent>false</DeploymentContent>
-    </ClCompile>
-    <ClCompile Include="Source\Engine\Base\UI\ScreenManager.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>

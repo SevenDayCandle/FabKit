@@ -14,6 +14,6 @@ namespace fbc {
 
 		inline float getHeight() const override { return 0; }
 		inline float getWidth() const override { return 0; }
-		inline void draw(sdl::GpuCommandBuffer* cb, sdl::GpuRenderPass* rp, const sdl::Color* tint, float x, float y, float w, float h, float rotation, sdl::GpuGraphicsPipeline* pipeline) override {}
+		inline void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float rotZ, const sdl::Color* tint, sdl::GpuGraphicsPipeline* pipeline) override {}
 	};
 }

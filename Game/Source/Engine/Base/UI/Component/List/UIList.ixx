@@ -5,13 +5,14 @@ import fbc.CoreContent;
 import fbc.FFont;
 import fbc.Hitbox;
 import fbc.IDrawable;
-import fbc.IOverlay;
+import fbc.FWindow;
 import fbc.RelativeHitbox;
-import fbc.ScreenManager;
+
 import fbc.UIBase;
 import fbc.UIEntry;
 import fbc.UIVerticalScrollbar;
 import fbc.FUtil;
+import fbc.FWindow;
 import sdl;
 import std;
 
@@ -47,12 +48,12 @@ namespace fbc {
 			typename vec<uptr<UIEntry<T>>>::iterator it;
 		};
 
-		UIList(Hitbox* hb,
+		UIList(FWindow& window, Hitbox* hb,
 			func<str(const T&)> labelFunc = futil::toString<T>,
 			FFont& itemFont = cct.fontSmall(),
 			IDrawable& background = cct.images.uiPanelRound,
 			bool canAutosize = false) :
-			UIBase(hb), background(background), itemFont(itemFont), labelFunc(std::move(labelFunc)), canAutosize(canAutosize) {
+			UIBase(window, hb), background(background), itemFont(itemFont), labelFunc(std::move(labelFunc)), canAutosize(canAutosize) {
 		}
 
 		~UIList() override {}
@@ -77,7 +78,7 @@ namespace fbc {
 		UIList& setLabelFunc(const func<str(const T&)>& labelFunc);
 		UIList& setMaxRows(int rows);
 		void refreshDimensions() override;
-		void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
+		void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		void updateImpl() override;
 
 		virtual void selectRow(UIEntry<T>& row) = 0;
@@ -208,11 +209,11 @@ namespace fbc {
 	}
 
 	// Render all visible rows and the scrollbar if it is shown
-	template <typename T> void UIList<T>::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
-		background.draw(cd, rp, *hb.get(), &backgroundColor);
+	template <typename T> void UIList<T>::renderImpl(sdl::SDLBatchRenderPass& rp) {
+		background.draw(rp, *hb.get(), win.getW(), win.getH(), 0, &backgroundColor);
 		int rowCount = getVisibleRowCount();
 		for (int i = topVisibleRowIndex; i < topVisibleRowIndex + rowCount; ++i) {
-			rows[i]->renderImpl(cd, rp);
+			rows[i]->renderImpl(rp);
 		}
 	}
 
@@ -242,7 +243,7 @@ namespace fbc {
 					updateRowPositions();
 				}
 			}
-			else if (sdl::mouseIsLeftJustClicked() && !isHovered()) {
+			else if (sdl::runner::mouseIsLeftJustClicked() && !isHovered()) {
 				activeRow = -1;
 			}
 		}
@@ -261,6 +262,7 @@ namespace fbc {
 		UIEntry<T>* entry = new UIEntry<T>(item,
 			i,
 			[this](UIEntry<T>& p) { this->selectRow(p); },
+			this->win,
 			new RelativeHitbox(*this->hb),
 			this->getItemFont(),
 			labelFunc(item));

@@ -1,7 +1,9 @@
-export module fbc.ITextInputter;
+export module fbc.TextSupplier;
 
 import fbc.FFont;
+import fbc.FWindow;
 import fbc.FUtil;
+import fbc.ImageDrawable;
 import sdl;
 import sdl.IKeyInputListener;
 import std;
@@ -9,10 +11,10 @@ import std;
 namespace fbc {
 	export constexpr strv INDICATOR = "|";
 
-	export struct ITextInputter : public sdl::IKeyInputListener {
+	export class TextSupplier : public sdl::IKeyInputListener {
 	public:
-		ITextInputter() {}
-		virtual ~ITextInputter() override = default;
+		TextSupplier(FWindow& window): fwindow(window) {}
+		virtual ~TextSupplier() override = default;
 
 		virtual void onKeyPress(int32 c) override;
 		virtual void onTextInput(const char* text) override;
@@ -20,34 +22,38 @@ namespace fbc {
 		virtual void start();
 
 	protected:
+		float caretPosX;
+		float caretPosY;
+		ImageDrawable caret;
 		int bufferPos = 0;
 		str buffer = "";
 		sdl::Color caretColor = sdl::COLOR_STANDARD;
-		sdl::FontRender caret;
 
 		void initCaret(FFont& font, float x, float y);
 		void movePosForCoords(float x, float y);
-		void renderCaret(sdl::GpuCommandBuffer* cmd, sdl::GpuRenderPass* rp);
+		void renderCaret(sdl::SDLBatchRenderPass& rp);
 
 		virtual void onBufferUpdated() = 0;
 		virtual void resetBuffer() = 0;
 		virtual void updateCaretPos() = 0;
+	private:
+		FWindow& fwindow;
 	};
 
 	// Resets buffer and releases text input
-	void ITextInputter::releaseBuffer()
+	void TextSupplier::releaseBuffer()
 	{
 		resetBuffer();
-		sdl::keyboardInputStopRequest(this);
+		fwindow.keyboardInputStopRequest(this);
 	}
 
-	void ITextInputter::start() {
-		sdl::keyboardInputStart(this);
+	void TextSupplier::start() {
+		fwindow.keyboardInputStart(this);
 		bufferPos = buffer.size();
 		updateCaretPos();
 	}
 
-	void ITextInputter::onKeyPress(int32 c)
+	void TextSupplier::onKeyPress(int32 c)
 	{
 		switch (c) {
 			// Moves the caret to the end
@@ -93,7 +99,7 @@ namespace fbc {
 	}
 
 	// Typing adds characters to the buffer
-	void ITextInputter::onTextInput(const char* text) {
+	void TextSupplier::onTextInput(const char* text) {
 		if (bufferPos <= buffer.size()) {
 			buffer.insert(bufferPos, text);
 			bufferPos += std::strlen(text);
@@ -102,18 +108,16 @@ namespace fbc {
 		}
 	}
 
-	void ITextInputter::initCaret(FFont& font, float x, float y)
+	void TextSupplier::initCaret(FFont& font, float x, float y)
 	{
 		caret = font.makeTexture(INDICATOR);
-		caret.x = x;
-		caret.y = y;
-		caret.w = caret.w * 1.2f;
-		caret.h = caret.h * 1.2f;
+		caretPosX = x;
+		caretPosY = y;
 	}
 
 	// Renders the caret with a smooth fading "animation"
-	void ITextInputter::renderCaret(sdl::GpuCommandBuffer* cmd, sdl::GpuRenderPass* rp) {
-		caretColor.a = 0.5f + 0.5f * std::sin(sdl::timeTotal() / 100000000.0f);
-		sdl::queueDraw(cmd, rp, caret.texture, &caretColor, caret.x, caret.y, caret.w, caret.h);
+	void TextSupplier::renderCaret(sdl::SDLBatchRenderPass& rp) {
+		caretColor.a = 0.5f + 0.5f * std::sin(sdl::runner::timeTotal() / 100000000.0f);
+		caret.draw(rp, caretPosX, caretPosY, caret.getWidth(), caret.getHeight(), fwindow.getW(), fwindow.getH(), 0, &caretColor);
 	}
 }

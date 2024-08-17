@@ -3,6 +3,7 @@ export module fbc.Tooltip;
 import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.FFont;
+import fbc.FWindow;
 import fbc.FUtil;
 import fbc.GenericTip;
 import fbc.UIBase;
@@ -16,14 +17,14 @@ namespace fbc {
 
 	export class Tooltip : public TextInfo, public GenericTip {
 	public:
-		Tooltip(strv text, FFont& font = cct.fontSmall(), float boxSize = DEFAULT_SIZE, IDrawable& background = cct.images.uiDarkPanelRound) : TextInfo(font, text), GenericTip(boxSize), background(background) {}
+		Tooltip(FWindow& window, strv text, FFont& font = cct.fontSmall(), float boxSize = DEFAULT_SIZE, IDrawable& background = cct.images.uiDarkPanelRound) : TextInfo(font, text), GenericTip(window, boxSize), background(background) {}
 		virtual ~Tooltip() override = default;
 
 		inline virtual void update() override {}
 
 		virtual void open() override;
 		virtual void refreshDimensions() override;
-		virtual void render(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
+		virtual void render(sdl::SDLBatchRenderPass& rp) override;
 	protected:
 		IDrawable& background;
 
@@ -46,10 +47,10 @@ namespace fbc {
 		TextInfo::refreshCache();
 	}
 
-	void Tooltip::render(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
+	void Tooltip::render(sdl::SDLBatchRenderPass& rp)
 	{
-		background.draw(cd, rp, bounds);
-		TextInfo::drawText(cd, rp, bounds.x, bounds.y);
+		background.draw(rp, bounds, win.getW(), win.getH());
+		TextInfo::drawText(rp, bounds.x, bounds.y, win.getW(), win.getH());
 	}
 
 	// Stretch the box background to fit the words in the tooltip

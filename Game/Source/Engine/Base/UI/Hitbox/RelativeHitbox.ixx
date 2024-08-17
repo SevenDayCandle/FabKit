@@ -2,7 +2,6 @@ export module fbc.RelativeHitbox;
 
 import fbc.CoreConfig;
 import fbc.Hitbox;
-import fbc.Hitbox;
 import fbc.FUtil;
 
 namespace fbc {

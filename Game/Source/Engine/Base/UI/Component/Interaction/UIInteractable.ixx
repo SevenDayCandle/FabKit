@@ -4,9 +4,10 @@ import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.FSound;
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
-import fbc.ScreenManager;
+
 import fbc.UIImage;
 import sdl;
 import std;
@@ -14,7 +15,7 @@ import std;
 namespace fbc {
 	export class UIInteractable : public UIImage {
 	public:
-		UIInteractable(Hitbox* hb, IDrawable& image) : UIImage(hb, image) {}
+		UIInteractable(FWindow& window, Hitbox* hb, IDrawable& image) : UIImage(window, hb, image) {}
 
 		bool interactable = true;
 		FSound* soundClick = &cct.audio.uiClick;
@@ -34,44 +35,44 @@ namespace fbc {
 	{
 		UIImage::updateImpl();
 		if (hb->isHovered()) {
-			if (screenManager::activeElement == nullptr && interactable) {
+			if (this->win.activeElement == nullptr && interactable) {
 				if (hb->isJust() && soundHover) {
 					soundHover->play();
 					justHoveredEvent();
 				}
 
-				if (sdl::mouseIsLeftJustClicked() || sdl::mouseIsRightJustClicked()) {
-					screenManager::activeElement = this;
+				if (sdl::runner::mouseIsLeftJustClicked() || sdl::runner::mouseIsRightJustClicked()) {
+					this->win.activeElement = this;
 				}
 				else if (cfg.actSelect.isKeyJustPressed()) {
 					if (soundClick) {
 						soundClick->play();
 					}
 					clickLeftEvent();
-					if (screenManager::activeElement == this) {
-						screenManager::activeElement = nullptr;
+					if (this->win.activeElement == this) {
+						this->win.activeElement = nullptr;
 					}
 				}
 			}
-			else if (screenManager::activeElement == this) {
-				if (sdl::mouseIsLeftJustReleased()) {
+			else if (this->win.activeElement == this) {
+				if (sdl::runner::mouseIsLeftJustReleased()) {
 					if (soundClick) {
 						soundClick->play();
 					}
 					clickLeftEvent();
-					screenManager::activeElement = nullptr;
+					this->win.activeElement = nullptr;
 				}
-				else if (sdl::mouseIsRightJustReleased()) {
+				else if (sdl::runner::mouseIsRightJustReleased()) {
 					if (soundClick) {
 						soundClick->play();
 					}
 					clickRightEvent();
-					screenManager::activeElement = nullptr;
+					this->win.activeElement = nullptr;
 				}
 			}
 		}
-		else if (screenManager::activeElement == this && (sdl::mouseIsLeftJustReleased() || sdl::mouseIsRightJustReleased())) {
-			screenManager::activeElement = nullptr;
+		else if (this->win.activeElement == this && (sdl::runner::mouseIsLeftJustReleased() || sdl::runner::mouseIsRightJustReleased())) {
+			this->win.activeElement = nullptr;
 		}
 	}
 }

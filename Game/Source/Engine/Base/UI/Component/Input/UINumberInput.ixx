@@ -3,10 +3,11 @@ export module fbc.UINumberInput;
 import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.FFont;
+import fbc.FWindow;
 import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.IDrawable;
-import fbc.ITextInputter;
+import fbc.TextSupplier;
 import fbc.TextInfo;
 import fbc.UIButton;
 import fbc.UIInteractable;
@@ -15,14 +16,14 @@ import sdl;
 import std;
 
 namespace fbc {
-	export class UINumberInput : public UITitledInteractable, public TextInfo, public ITextInputter {
+	export class UINumberInput : public UITitledInteractable, public TextInfo, public TextSupplier {
 	public:
-		UINumberInput(Hitbox* hb,
+		UINumberInput(FWindow& window, Hitbox* hb,
 			int limMin = 0,
 			int limMax = std::numeric_limits<int>::max(),
 			IDrawable& image = cct.images.uiPanel,
 			IDrawable& arrow = cct.images.uiArrowIncrement,
-			FFont& textFont = cct.fontRegular()) : UITitledInteractable(hb, image), TextInfo(textFont), limMin(limMin), limMax(limMax), arrow(arrow) {
+			FFont& textFont = cct.fontRegular()) : TextSupplier(window), UITitledInteractable(window, hb, image), TextInfo(textFont), limMin(limMin), limMax(limMax), arrow(arrow) {
 			initCaret(this->font, this->hb->x, this->hb->y);
 			UINumberInput::onSizeUpdated();
 		}
@@ -36,7 +37,7 @@ namespace fbc {
 		virtual UINumberInput& setValue(int num);
 		virtual void onSizeUpdated() override;
 		virtual void refreshDimensions() override;
-		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		virtual void start() override;
 		virtual void updateImpl() override;
 	protected:
@@ -96,14 +97,14 @@ namespace fbc {
 		refreshCache();
 	}
 
-	void UINumberInput::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
+	void UINumberInput::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
-		UITitledInteractable::renderImpl(cd, rp);
-		TextInfo::drawText(cd, rp, hb->x, hb->y);
-		arrow.draw(cd, rp, lessRect);
-		arrow.draw(cd, rp, moreRect);
-		if (sdl::keyboardInputActive(this)) {
-			renderCaret(cd, rp);
+		UITitledInteractable::renderImpl(rp);
+		TextInfo::drawText(rp, hb->x, hb->y, win.getW(), win.getH());
+		arrow.draw(rp, lessRect, win.getW(), win.getH());
+		arrow.draw(rp, moreRect, win.getW(), win.getH());
+		if (sdl::runner::keyboardInputActive(this)) {
+			renderCaret(rp);
 		}
 	}
 
@@ -117,7 +118,7 @@ namespace fbc {
 
 	void UINumberInput::start() {
 		buffer = getText();
-		ITextInputter::start();
+		TextSupplier::start();
 		this->updateCache(buffer, sdl::COLOR_LIME);
 	}
 
@@ -128,7 +129,7 @@ namespace fbc {
 		moreRect.x = lessRect.x = hb->x + hb->w - moreRect.w;
 		moreRect.y = hb->y;
 		lessRect.y = hb->y + moreRect.h;
-		if (sdl::keyboardInputActive(this) && sdl::mouseIsLeftJustClicked() && !isHovered()) {
+		if (sdl::runner::keyboardInputActive(this) && sdl::runner::mouseIsLeftJustClicked() && !isHovered()) {
 			commitInternal();
 			releaseBuffer();
 		}
@@ -137,21 +138,21 @@ namespace fbc {
 	// When clicked while not focused, start the text input
 	void UINumberInput::clickLeftEvent()
 	{
-		if (!sdl::keyboardInputActive()) {
-			if (sdl::mouseIsHovering(lessRect)) {
+		if (!sdl::runner::keyboardInputActive()) {
+			if (sdl::runner::mouseIsHovering(lessRect)) {
 				commit(val - interval);
 			}
-			else if (sdl::mouseIsHovering(moreRect)) {
+			else if (sdl::runner::mouseIsHovering(moreRect)) {
 				commit(val + interval);
 			}
 			else {
 				start();
 			}
 		}
-		else if (sdl::mouseIsHovering(lessRect)) {
+		else if (sdl::runner::mouseIsHovering(lessRect)) {
 			modifyDuringInput(valTemp - interval);
 		}
-		else if (sdl::mouseIsHovering(moreRect)) {
+		else if (sdl::runner::mouseIsHovering(moreRect)) {
 			modifyDuringInput(valTemp + interval);
 		}
 	}
@@ -201,7 +202,7 @@ namespace fbc {
 			modifyDuringInput(valTemp + interval);
 			return;
 		default:
-			ITextInputter::onKeyPress(c);
+			TextSupplier::onKeyPress(c);
 		}
 	}
 
@@ -224,8 +225,8 @@ namespace fbc {
 
 	void UINumberInput::updateCaretPos()
 	{
-		caret.x = this->hb->x + cfg.renderScale(9) + this->font.measureW(buffer.substr(0, bufferPos));
-		caret.y = this->hb->y;
+		caretPosX = this->hb->x + cfg.renderScale(9) + this->font.measureW(buffer.substr(0, bufferPos));
+		caretPosY = this->hb->y;
 	}
 
 	void UINumberInput::commitInternal()

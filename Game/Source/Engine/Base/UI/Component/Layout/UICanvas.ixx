@@ -2,6 +2,7 @@ export module fbc.UICanvas;
 
 import fbc.CoreConfig;
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.UIBase;
 import std;
@@ -37,8 +38,8 @@ namespace fbc {
 			typename vec<uptr<UIBase>>::iterator it;
 		};
 
-		UICanvas(Hitbox* hb) : UIBase(hb) {}
-		UICanvas(uptr<Hitbox>&& hb) : UIBase(std::move(hb)) {}
+		UICanvas(FWindow& window, Hitbox* hb) : UIBase(window, hb) {}
+		UICanvas(FWindow& window, uptr<Hitbox>&& hb) : UIBase(window, std::move(hb)) {}
 		~UICanvas() override {}
 
 		inline bool empty() { return elements.empty(); }
@@ -55,7 +56,7 @@ namespace fbc {
 		virtual bool isHovered() override;
 		virtual bool remove(UIBase* item);
 		virtual void refreshDimensions() override;
-		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		virtual void updateImpl() override;
 	protected:
 		vec<uptr<UIBase>> elements;
@@ -104,10 +105,10 @@ namespace fbc {
 		return false;
 	}
 
-	void UICanvas::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
+	void UICanvas::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
 		for (const uptr<UIBase>& element : elements) {
-			element->render(cd, rp);
+			element->render(rp);
 		}
 	}
 

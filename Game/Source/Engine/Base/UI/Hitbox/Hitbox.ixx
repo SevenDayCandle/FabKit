@@ -9,12 +9,12 @@ namespace fbc {
 		Hitbox(float offsetX, float offsetY, float offsetWidth, float offsetHeight) : sdl::RectF(0, 0, 0, 0), offPosX(offsetX), offPosY(offsetY), offSizeX(offsetWidth), offSizeY(offsetHeight) {}
 		virtual ~Hitbox() = default;
 
-		inline bool isClicked() const { return hovered && sdl::mouseIsLeftClicked(); };
-		inline bool isClickedRight() const { return hovered && sdl::mouseIsRightClicked(); };
+		inline bool isClicked() const { return hovered && sdl::runner::mouseIsLeftClicked(); };
+		inline bool isClickedRight() const { return hovered && sdl::runner::mouseIsRightClicked(); };
 		inline bool isHovered() const { return hovered; }
 		inline bool isJust() const { return just; }
-		inline bool justClicked() const { return hovered && sdl::mouseIsLeftJustClicked(); };
-		inline bool justClickedRight() const { return hovered && sdl::mouseIsRightJustClicked(); };
+		inline bool justClicked() const { return hovered && sdl::runner::mouseIsLeftJustClicked(); };
+		inline bool justClickedRight() const { return hovered && sdl::runner::mouseIsRightJustClicked(); };
 		inline bool justHovered() const { return hovered && just; }
 		inline bool justUnhovered() const { return !hovered && just; }
 		inline float cX() const { return x + (w / 2); }
@@ -72,7 +72,7 @@ namespace fbc {
 
 	// Return true if the mouse is within the rectangle. Note that the Y coordinates goes from top to bottom, with 0,0 being the top-left corner of the screen
 	bool Hitbox::isMouseHovering() {
-		return sdl::mouseIsHovering(*this);
+		return sdl::runner::mouseIsHovering(*this);
 	}
 
 	// Change the x/y position offset ratio relative to some reference, then update the position

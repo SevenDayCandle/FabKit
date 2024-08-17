@@ -1,8 +1,8 @@
 export module fbc.UIScreen;
 
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
-import fbc.IOverlay;
 import fbc.ScreenSizeHitbox;
 import fbc.UICanvas;
 import std;
@@ -10,34 +10,34 @@ import std;
 namespace fbc {
 	export class UIScreen : public UICanvas {
 	public:
-		UIScreen() : UICanvas(new ScreenSizeHitbox()) {}
-		UIScreen(Hitbox* hb) : UICanvas(hb) {}
-		UIScreen(uptr<Hitbox>&& hb) : UICanvas(std::move(hb)) {}
+		UIScreen(FWindow& window) : UICanvas(window, new ScreenSizeHitbox(window)) {}
+		UIScreen(FWindow& window, Hitbox* hb) : UICanvas(window, hb) {}
+		UIScreen(FWindow& window, uptr<Hitbox>&& hb) : UICanvas(window, std::move(hb)) {}
 
-		virtual UIScreen& addVFX(uptr<IOverlay>&& eff) override;
-		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
+		virtual UIScreen& addVFX(uptr<FWindow::Element>&& eff);
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		virtual void updateImpl() override;
 	private:
-		vec<uptr<IOverlay>> vfx;
+		vec<uptr<FWindow::Element>> vfx;
 	};
 
-	UIScreen& UIScreen::addVFX(uptr<IOverlay>&& eff)
+	UIScreen& UIScreen::addVFX(uptr<FWindow::Element>&& eff)
 	{
 		vfx.push_back(std::move(eff));
 		return *this;
 	}
 
-	void UIScreen::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
+	void UIScreen::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
-		UICanvas::renderImpl(cd, rp);
-		for (uptr<IOverlay>& effect : vfx) {
-			effect->render(cd, rp);
+		UICanvas::renderImpl(rp);
+		for (uptr<FWindow::Element>& effect : vfx) {
+			effect->render(rp);
 		}
 	}
 
 	void UIScreen::updateImpl()
 	{
 		UICanvas::updateImpl();
-		std::erase_if(vfx, [](uptr<IOverlay>& effect) {return effect->tickUpdate();});
+		std::erase_if(vfx, [](uptr<FWindow::Element>& effect) {return effect->tickUpdate();});
 	}
 }

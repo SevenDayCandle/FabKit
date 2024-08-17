@@ -2,6 +2,7 @@ export module fbc.UIHorizontalScrollbar;
 
 import fbc.CoreContent;
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.UIScrollbar;
@@ -9,7 +10,7 @@ import fbc.UIScrollbar;
 namespace fbc {
 	export class UIHorizontalScrollbar : public UIScrollbar {
 	public:
-		UIHorizontalScrollbar(Hitbox* hb, IDrawable& imageBar = cct.images.uiScrollbar, IDrawable& imageButton = cct.images.uiScrollbutton) : UIScrollbar(hb, imageBar, imageButton) {
+		UIHorizontalScrollbar(FWindow& win, Hitbox* hb, IDrawable& imageBar = cct.images.uiScrollbar, IDrawable& imageButton = cct.images.uiScrollbutton) : UIScrollbar(win, hb, imageBar, imageButton) {
 			UIHorizontalScrollbar::updateDropzoneSize(0.05f);
 		}
 

@@ -2,25 +2,26 @@ export module fbc.TextInfo;
 
 import fbc.FFont;
 import fbc.FUtil;
+import fbc.ImageDrawable;
 import sdl;
 
+// TODO directly extend imageDrawable
 namespace fbc {
 	export class TextInfo {
 	public:
 		TextInfo(FFont& font, strv text = "", sdl::Color color = sdl::COLOR_STANDARD, sdl::Color colorOutline = sdl::COLOR_BLACK) : font(font), text(text), color(color), colorOutline(colorOutline) {
-			// TODO remove constructor method
 			refreshCache();
 		}
 		virtual ~TextInfo() = default;
 
-		inline float getTextHeight() const { return cache.h; }
-		inline float getTextWidth() const { return cache.w; }
-		inline float getTextXPos() const { return cache.x; }
-		inline float getTextYPos() const { return cache.y; }
+		inline float getTextHeight() const { return cache.getHeight(); }
+		inline float getTextWidth() const { return cache.getWidth(); }
+		inline float getTextXPos() const { return texXPos; }
+		inline float getTextYPos() const { return texYPos; }
 		inline strv getText() const { return text; }
 		inline void refreshCache() { updateCache(this->text, this->color, this->colorOutline); }
 
-		void drawText(sdl::GpuCommandBuffer* cmd, sdl::GpuRenderPass* rp, float offX, float offY) const;
+		void drawText(sdl::SDLBatchRenderPass&, float winW, float winH, float offX, float offY, const sdl::Color* color = &sdl::COLOR_STANDARD);
 		TextInfo& set(strv text, sdl::Color color);
 		TextInfo& set(strv text, sdl::Color color, sdl::Color colorOutline);
 		TextInfo& set(strv text, sdl::Color color, sdl::Color colorOutline, const FFont& font);
@@ -35,7 +36,7 @@ namespace fbc {
 		sdl::Color color = sdl::COLOR_STANDARD;
 		sdl::Color colorOutline = sdl::COLOR_BLACK;
 
-		inline virtual bool hasCache() { return cache.texture != nullptr; }
+		inline virtual bool hasCache() { return cache; }
 		inline virtual int getLimitWidth() { return 0; }
 		inline void updateCache(strv text) { updateCache(text, this->color, this->colorOutline); }
 		inline void updateCache(strv text, const sdl::Color& color) { updateCache(text, color, this->colorOutline); }
@@ -43,13 +44,15 @@ namespace fbc {
 
 		void unloadCache();
 	private:
-		sdl::FontRender cache = { 0, 0, 0, 0, nullptr };
+		ImageDrawable cache;
+		int texXPos;
+		int texYPos;
 	};
 
-	void TextInfo::drawText(sdl::GpuCommandBuffer* cmd, sdl::GpuRenderPass* rp, float offX, float offY) const
+	void TextInfo::drawText(sdl::SDLBatchRenderPass& rp, float winW, float winH, float offX, float offY, const sdl::Color* color)
 	{
-		if (cache.texture) {
-			sdl::queueDraw(cmd, rp, cache.texture, &color, cache.x + offX, cache.y + offY, cache.w, cache.h);
+		if (cache) {
+			cache.draw(rp, texXPos + offX, texYPos + offY, cache.getWidth(), cache.getHeight(), winW, winH, 0, color);
 		}
 	}
 
@@ -104,8 +107,8 @@ namespace fbc {
 
 	TextInfo& TextInfo::setPos(float x, float y)
 	{
-		cache.x = x;
-		cache.y = y;
+		texXPos = x;
+		texYPos = y;
 		return *this;
 	}
 
@@ -122,21 +125,16 @@ namespace fbc {
 		unloadCache();
 
 		if (text.empty()) {
-			cache.texture = nullptr;
-			cache.w = 0;
-			cache.h = 0;
+			cache = ImageDrawable();
 		}
 		else {
-			cache = font.makeTexture(text, getLimitWidth(), cache.x, cache.y, color, colorOutline);
+			cache = font.makeTexture(text, getLimitWidth(), color, colorOutline);
 		}
 	}
 
 	// Free existing texture
 	void TextInfo::unloadCache()
 	{
-		if (cache.texture) {
-			sdl::gpuReleaseTexture(cache.texture);
-			cache.texture = nullptr;
-		}
+		cache = ImageDrawable();
 	}
 }

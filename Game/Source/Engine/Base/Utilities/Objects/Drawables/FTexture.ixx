@@ -1,52 +1,25 @@
 export module fbc.FTexture;
 
 import fbc.FUtil;
-import fbc.IDrawable;
+import fbc.ImageDrawable;
 import sdl;
+import sdl.SDLBatchRenderPass;
 import std;
 
 namespace fbc {
-	export class FTexture : public IDrawable {
+	export class FTexture : public ImageDrawable {
     public:
         FTexture(strv path) : path(path) {}
         FTexture(const FTexture&) = delete;
-        virtual ~FTexture() override {
-            // Unload texture when destroyed
-            if (texture && sdl::sdlEnabled()) {
-                sdl::gpuReleaseTexture(texture);
-                texture = nullptr;
-            }
-        }
 
-        inline bool loaded() const { return texture != nullptr; }
-        inline float getHeight() const override { return texH; }
-        inline float getWidth() const override { return texW; }
-
-        void dispose() override;
-        void draw(sdl::GpuCommandBuffer* cb, sdl::GpuRenderPass* rp, const sdl::Color* tint, float x, float y, float w, float h, float rotation, sdl::GpuGraphicsPipeline* pipeline) override;
         void reload() const override;
         void reload(sdl::GpuCopyPass* copyPass) const;
-    protected:
-        mutable float texH;
-        mutable float texW;
-        mutable sdl::GpuTexture* texture;
         str path;
 	};
 
-    void FTexture::dispose()
-    {
-        sdl::gpuReleaseTexture(texture);
-        texture = nullptr;
-    }
-
-    void FTexture::draw(sdl::GpuCommandBuffer* cb, sdl::GpuRenderPass* rp, const sdl::Color* tint, float x, float y, float w, float h, float rotation, sdl::GpuGraphicsPipeline* pipeline)
-    {
-        sdl::queueDraw(cb, rp, texture, tint, x, y, w, h, rotation, pipeline);
-    }
-
     void FTexture::reload() const
     {
-        sdl::GpuCommandBuffer* uploadCmdBuf = sdl::gpuAcquireCommandBuffer();
+        sdl::GpuCommandBuffer* uploadCmdBuf = sdl::runner::deviceAcquireCommandBuffer();
         sdl::GpuCopyPass* copyPass = sdl::gpuBeginCopyPass(uploadCmdBuf);
         reload(copyPass);
         sdl::gpuEndCopyPass(copyPass);
@@ -55,12 +28,12 @@ namespace fbc {
 
     void FTexture::reload(sdl::GpuCopyPass* copyPass) const {
         if (texture) {
-            sdl::gpuReleaseTexture(texture);
+            sdl::runner::deviceReleaseTexture(texture);
         }
         sdl::Surface* surface = sdl::surfaceLoad(path.data());
         texH = surface->h;
         texW = surface->w;
-        texture = sdl::uploadTexture(copyPass, surface);
+        texture = sdl::runner::uploadTexture(copyPass, surface);
 
         sdl::surfaceDestroy(surface);
     }

@@ -2,15 +2,15 @@ export module fbc.UIBase;
 
 import fbc.FUtil;
 import fbc.Hitbox;
-import fbc.IOverlay;
+import fbc.FWindow;
 import sdl;
 import std;
 
 namespace fbc {
-	export class UIBase : public IOverlay {
+	export class UIBase : public FWindow::Element {
 	public:
-		UIBase(Hitbox* hb) : hb(hb) {}
-		UIBase(uptr<Hitbox>&& hb) : hb(std::move(hb)) {}
+		UIBase(FWindow& window, Hitbox* hb) : Element(window), hb(hb) {}
+		UIBase(FWindow& window, uptr<Hitbox>&& hb) : Element(window), hb(std::move(hb)) {}
 		virtual ~UIBase() override = default;
 
 		uptr<Hitbox> hb;
@@ -22,7 +22,6 @@ namespace fbc {
 		inline virtual float getEndY() { return hb->y + hb->h; } // The bottom-most end Y coordinate of this object, may be larger than hb if this has subcomponents
 		inline virtual bool isHovered() { return hb->isHovered(); }
 		inline virtual void onSizeUpdated() {}
-		inline virtual UIBase& addVFX(uptr<IOverlay>&& vfx) { return *this; }
 		inline virtual UIBase& setEnabled(const bool enabled) { return this->enabled = enabled, * this; }
 		inline virtual UIBase& setHbExactPos(const float x, const float y) { return hb->setRealPos(x, y), *this; }
 		inline virtual UIBase& setHbExactPosX(const float x) { return hb->setRealPosX(x), * this; }
@@ -38,11 +37,11 @@ namespace fbc {
 		virtual UIBase& setHbOffsetSizeX(const float x);
 		virtual UIBase& setHbOffsetSizeY(const float y);
 		virtual void refreshDimensions() override;
-		virtual void render(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) final override;
+		virtual void render(sdl::SDLBatchRenderPass& rp) final override;
 		virtual void update() final override;
 		virtual void updateImpl();
 
-		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) = 0;
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) = 0;
 	};
 
 	// Wrapper around setRealSize that invokes any size update callbacks
@@ -101,9 +100,9 @@ namespace fbc {
 	}
 
 	// If enabled, render the component for a single frame
-	void UIBase::render(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) {
+	void UIBase::render(sdl::SDLBatchRenderPass& rp) {
 		if (enabled) {
-			renderImpl(cd, rp);
+			renderImpl(rp);
 		}
 	}
 

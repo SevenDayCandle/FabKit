@@ -1,18 +1,19 @@
 export module fbc.UIVerticalCanvas;
 
 import fbc.CoreConfig;
-import fbc.Hitbox;
-import fbc.UICanvas;
 import fbc.FUtil;
-import fbc.UIVerticalScrollbar;
+import fbc.FWindow;
+import fbc.Hitbox;
 import fbc.ScaleHitbox;
+import fbc.UICanvas;
+import fbc.UIVerticalScrollbar;
 
 namespace fbc {
 	export class UIVerticalCanvas : public UICanvas {
 	public:
-		UIVerticalCanvas(Hitbox* hb, float scrollSpeed = 1): UICanvas(hb),
+		UIVerticalCanvas(FWindow& window, Hitbox* hb, float scrollSpeed = 1): UICanvas(window, hb),
 			scrollSpeed(scrollSpeed),
-			scrollbar{ new ScaleHitbox(hb->w * 0.93f / cfg.renderScale(), hb->y + hb->h * 0.05f / cfg.renderScale(), 48, hb->h * 0.9f / cfg.renderScale())},
+			scrollbar{ window, new ScaleHitbox(hb->w * 0.93f / cfg.renderScale(), hb->y + hb->h * 0.05f / cfg.renderScale(), 48, hb->h * 0.9f / cfg.renderScale())},
 			baseOffsetY(hb->getOffPosY()) {
 			scrollbar.setOnScroll([this](float f) {reposition(f); });
 		}
@@ -22,7 +23,7 @@ namespace fbc {
 
 		UIVerticalCanvas& setScrollSpeed(float scrollSpeed);
 		void refreshDimensions() override;
-		void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
+		void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		void updateImpl() override;
 	protected:
 		float scrollSpeed;
@@ -46,10 +47,10 @@ namespace fbc {
 		scrollbar.refreshDimensions();
 	}
 
-	void UIVerticalCanvas::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
+	void UIVerticalCanvas::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
-		UICanvas::renderImpl(cd, rp);
-		scrollbar.renderImpl(cd, rp);
+		UICanvas::renderImpl(rp);
+		scrollbar.renderImpl(rp);
 	}
 
 	void UIVerticalCanvas::updateImpl()

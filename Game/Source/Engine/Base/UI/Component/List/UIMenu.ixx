@@ -3,6 +3,7 @@ export module fbc.UIMenu;
 import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.FFont;
+import fbc.FWindow;
 import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.IDrawable;
@@ -15,12 +16,12 @@ import std;
 namespace fbc {
 	export template <typename T> class UIMenu : public UIList<T> {
 	public:
-		UIMenu(Hitbox* hb,
+		UIMenu(FWindow& window, Hitbox* hb,
 			func<str(const T&)> labelFunc = futil::toString<T>,
 			FFont& itemFont = cct.fontRegular(),
 			IDrawable& background = cct.images.uiDarkPanelRound,
 			bool canAutosize = false) :
-			UIList<T>(hb, std::move(labelFunc), itemFont, background, canAutosize) {}
+			UIList<T>(window, hb, std::move(labelFunc), itemFont, background, canAutosize) {}
 
 		inline const T* getSelectedItem() { return &this->rows[currentIndex]->item; }
 		inline UIMenu& setItemFont(const FFont& itemFont) { return UIList<T>::setItemFont(itemFont), * this; }

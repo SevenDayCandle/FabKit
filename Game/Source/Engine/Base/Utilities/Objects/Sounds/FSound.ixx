@@ -12,7 +12,7 @@ namespace fbc {
 		FSound(const FSound&) = delete;
 		~FSound() override {
 			// Unload sound when destroyed
-			if (sound && sdl::sdlEnabled()) {
+			if (sound && sdl::runner::enabled()) {
 				sdl::soundFree(sound);
 				sound = nullptr;
 			}

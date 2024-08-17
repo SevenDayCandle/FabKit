@@ -1,7 +1,6 @@
 export module fbc.ILoadable;
 
 import fbc.FUtil;
-import fbc.Hitbox;
 import sdl;
 import std;
 

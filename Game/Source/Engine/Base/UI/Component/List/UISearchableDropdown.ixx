@@ -4,11 +4,12 @@ import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
-import fbc.ITextInputter;
+import fbc.TextSupplier;
 import fbc.ScaleHitbox;
-import fbc.ScreenManager;
+
 import fbc.SelectView;
 import fbc.TextInfo;
 import fbc.UIDropdown;
@@ -19,41 +20,41 @@ import sdl;
 import std;
 
 namespace fbc {
-	export template <typename T> class UISearchableDropdown : public UIDropdown<T>, public ITextInputter {
+	export template <typename T> class UISearchableDropdown : public UIDropdown<T>, public TextSupplier {
 	public:
 
-		UISearchableDropdown(Hitbox* hb,
+		UISearchableDropdown(FWindow& win, Hitbox* hb,
 			UISelectorList<T>* menu,
 			IDrawable& image = cct.images.uiPanel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
 			func<str(EntryView<T>&)>& buttonLabelFunc = {}
-		) : UIDropdown<T>(hb, menu, image, arrow, clear, textFont, buttonLabelFunc) {
+		) : UIDropdown<T>(win, hb, menu, image, arrow, clear, textFont, buttonLabelFunc), TextSupplier(win) {
 			initSearchable();
 		}
-		UISearchableDropdown(Hitbox* hb,
+		UISearchableDropdown(FWindow& win, Hitbox* hb,
 			uptr<UISelectorList<T>> menu,
 			IDrawable& image = cct.images.uiPanel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
 			func<str(EntryView<T>&)>& buttonLabelFunc = {}
-		) : UIDropdown<T>(hb, std::move(menu), image, arrow, clear, textFont, buttonLabelFunc) {
+		) : UIDropdown<T>(win, hb, std::move(menu), image, arrow, clear, textFont, buttonLabelFunc), TextSupplier(win) {
 			initSearchable();
 		}
 		virtual ~UISearchableDropdown() override {
-			sdl::keyboardInputStopRequest(this);
+			sdl::runner::keyboardInputStopRequest(this);
 		}
 
 		virtual void onChangeItems() override;
 		virtual void onSizeUpdated() override;
 		virtual void openPopup() override;
-		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		virtual void start() override;
 		virtual void unsetProxy() override;
 
-		static uptr<UISearchableDropdown> multiSearch(Hitbox* hb,
+		static uptr<UISearchableDropdown> multiSearch(FWindow& window, Hitbox* hb,
 			func<str(const T&)> labelFunc = futil::toString<T>,
 			func<str(EntryView<T>&)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
@@ -62,7 +63,7 @@ namespace fbc {
 			IDrawable& image = cct.images.uiPanel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall);
-		static uptr<UISearchableDropdown> singleSearch(Hitbox* hb,
+		static uptr<UISearchableDropdown> singleSearch(FWindow& window, Hitbox* hb,
 			func<str(const T&)> labelFunc = futil::toString<T>,
 			func<str(EntryView<T>&)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
@@ -101,24 +102,24 @@ namespace fbc {
 		this->start();
 	}
 
-	template<typename T>void UISearchableDropdown<T>::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
+	template<typename T>void UISearchableDropdown<T>::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
-		if (sdl::keyboardInputActive(this)) {
-			UIInteractable::renderImpl(cd, rp);
+		if (sdl::runner::keyboardInputActive(this)) {
+			UIInteractable::renderImpl(rp);
 			TextInfo::drawText(this->hb->x, this->hb->y);
-			renderCaret(cd, rp);
+			renderCaret(rp);
 			if (this->selectedSize() > 0) {
-				this->clear.draw(cd, rp, this->arrowRect, this->UIImage::color, this->rotation);
+				this->clear.draw(rp, this->arrowRect, this->win.getW(), this->win.getH(), this->UIImage::color, this->rotation);
 			}
 		}
 		else {
-			UIDropdown<T>::renderImpl(cd, rp);
+			UIDropdown<T>::renderImpl(rp);
 		}
 	}
 
 	template<typename T> void UISearchableDropdown<T>::start()
 	{
-		ITextInputter::start();
+		TextSupplier::start();
 		this->updateCache(buffer, sdl::COLOR_LIME);
 	}
 
@@ -178,14 +179,15 @@ namespace fbc {
 
 	template<typename T> void UISearchableDropdown<T>::updateCaretPos()
 	{
-		caret.x = this->hb->x + cfg.renderScale(9) + this->font.measureW(buffer.substr(0, bufferPos));
-		caret.y = this->hb->y;
+		caretPosX = this->hb->x + cfg.renderScale(9) + this->font.measureW(buffer.substr(0, bufferPos));
+		caretPosY = this->hb->y;
 	}
 
 	template<typename T> uptr<UISearchableDropdown<T>> UISearchableDropdown<T>::multiSearch(
-		Hitbox* hb, func<str(const T&)> labelFunc, func<str(EntryView<T>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
+		FWindow& win, Hitbox* hb, func<str(const T&)> labelFunc, func<str(EntryView<T>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
 	{
 		return std::make_unique<UISearchableDropdown<T>>(
+			win,
 			hb,
 			UISelectorList<T>::multiList(new ScaleHitbox(hb->getOffSizeX(), hb->getOffSizeY()), std::move(labelFunc), itemFont, background),
 			image,
@@ -197,9 +199,10 @@ namespace fbc {
 	}
 
 	template<typename T> uptr<UISearchableDropdown<T>> UISearchableDropdown<T>::singleSearch(
-		Hitbox* hb, func<str(const T&)> labelFunc, func<str(EntryView<T>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
+		FWindow& win, Hitbox* hb, func<str(const T&)> labelFunc, func<str(EntryView<T>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
 	{
 		return std::make_unique<UISearchableDropdown<T>>(
+			win,
 			hb,
 			UISelectorList<T>::singleList(new ScaleHitbox(hb->getOffSizeX(), hb->getOffSizeY()), std::move(labelFunc), itemFont, background),
 			image,

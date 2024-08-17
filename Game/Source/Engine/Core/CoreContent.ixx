@@ -130,6 +130,7 @@ namespace fbc {
 		for (uptr<BaseContent>& content : registeredContents | std::views::values) {
 			content->postInitialize();
 		}
+		cfg.textFontPercent.addOnReload([this](const int& val) {reloadFonts();});
 	}
 
 	void CoreContent::reloadFonts()

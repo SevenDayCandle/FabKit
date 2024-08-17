@@ -11,15 +11,15 @@ import std;
 namespace fbc {
 	export class CreatureRenderable : public UIInteractable {
 	public:
-		CreatureRenderable(const OccupantObject& creature, Hitbox* hb): UIInteractable(hb, creature.getImageField()), creature(creature) {}
+		CreatureRenderable(const OccupantObject& creature, Hitbox* hb): UIInteractable(win, hb, creature.getImageField()), creature(creature) {}
 
 		const OccupantObject& creature;
 
-		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 	};
 
-	void CreatureRenderable::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
+	void CreatureRenderable::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
-		UIInteractable::renderImpl(cd, rp);
+		UIInteractable::renderImpl(rp);
 	}
 }

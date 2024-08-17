@@ -4,6 +4,7 @@ import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.TextInfo;
@@ -14,7 +15,7 @@ import std;
 namespace fbc {
 	export class UITitledInteractable : public UIInteractable {
 	public:
-		UITitledInteractable(Hitbox* hb, IDrawable& image) : UIInteractable(hb, image) {}
+		UITitledInteractable(FWindow& window, Hitbox* hb, IDrawable& image) : UIInteractable(window, hb, image) {}
 
 		uptr<TextInfo> label;
 
@@ -23,7 +24,7 @@ namespace fbc {
 		inline strv getLabelText() const { return label ? label->getText() : ""; }
 
 		virtual void refreshDimensions() override;
-		virtual void renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp) override;
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		UITitledInteractable& withLabel(strv text, FFont& font = cct.fontBold(), float xOff = 0, float yOff = -80, sdl::Color color = sdl::COLOR_STANDARD, sdl::Color colorOutline = sdl::COLOR_BLACK);
 	private:
 		float xOff = 0;
@@ -40,11 +41,11 @@ namespace fbc {
 		}
 	}
 
-	void UITitledInteractable::renderImpl(sdl::GpuCommandBuffer* cd, sdl::GpuRenderPass* rp)
+	void UITitledInteractable::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
-		UIInteractable::renderImpl(cd, rp);
+		UIInteractable::renderImpl(rp);
 		if (label) {
-			label->drawText(cd, rp, hb->x, hb->y);
+			label->drawText(rp, hb->x, hb->y, win.getW(), win.getH());
 		}
 	}
 
