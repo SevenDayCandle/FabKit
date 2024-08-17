@@ -44,7 +44,7 @@ namespace fbc {
 
 		void unloadCache();
 	private:
-		ImageDrawable cache;
+		ImageDrawable cache = {0, 0, nullptr};
 		int texXPos;
 		int texYPos;
 	};
@@ -135,6 +135,8 @@ namespace fbc {
 	// Free existing texture
 	void TextInfo::unloadCache()
 	{
-		cache = ImageDrawable();
+		if (cache) {
+			cache = ImageDrawable();
+		}
 	}
 }

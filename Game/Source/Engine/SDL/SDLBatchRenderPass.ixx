@@ -8,6 +8,8 @@ namespace sdl {
 	export class SDLBatchRenderPass {
 	public:
 		SDLBatchRenderPass(GpuCommandBuffer* cmd, GpuColorAttachmentInfo* info, int colorAttachmentAmount = 1, GpuDepthStencilAttachmentInfo* depth = nullptr): cmd(cmd), renderPass(sdl::gpuBeginRenderPass(cmd, info, colorAttachmentAmount, depth)) {}
+		SDLBatchRenderPass(GpuCommandBuffer* cmd, GpuRenderPass* rp): cmd(cmd), renderPass(rp) {}
+		SDLBatchRenderPass(const SDLBatchRenderPass& other) = delete;
 		~SDLBatchRenderPass() { gpuEndRenderPass(renderPass); }
 
 		inline void drawIndexedPrimitives(fbc::uint32 baseVertex = 0, fbc::uint32 startIndex = 0, fbc::uint32 primitiveCount = 6, fbc::uint32 instanceCount = 1) { sdl::gpuDrawIndexedPrimitives(renderPass, baseVertex, startIndex, primitiveCount, instanceCount); }
@@ -22,12 +24,12 @@ namespace sdl {
 		void bindPipeline(GpuGraphicsPipeline* pipeline);
 		void bindTexture(GpuTexture* texture, GpuSampler* sampler);
 	private:
-		GpuBuffer* lastBufferIndex;
-		GpuBuffer* lastBufferVertex;
+		GpuBuffer* lastBufferIndex = nullptr;
+		GpuBuffer* lastBufferVertex = nullptr;
 		GpuCommandBuffer* cmd;
-		GpuGraphicsPipeline* lastPipeline;
+		GpuGraphicsPipeline* lastPipeline = nullptr;
 		GpuRenderPass* renderPass;
-		GpuTexture* lastTexture;
+		GpuTexture* lastTexture = nullptr;
 	};
 
 	void SDLBatchRenderPass::bindBufferIndex(GpuBuffer* buffer)

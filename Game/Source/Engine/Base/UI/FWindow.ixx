@@ -187,8 +187,8 @@ namespace fbc {
 					.storeOp = sdl::GpuStoreOp::SDL_GPU_STOREOP_STORE
 				};
 
-				sdl::SDLBatchRenderPass rp = sdl::SDLBatchRenderPass(cd, &colorAttachmentInfo, 1, nullptr);
-
+				sdl::GpuRenderPass* r = sdl::gpuBeginRenderPass(cd, &colorAttachmentInfo, 1, nullptr);
+				sdl::SDLBatchRenderPass rp = sdl::SDLBatchRenderPass(cd, r);
 				// Render screen elements
 				// TODO pass in z index
 				if (!screens.empty()) {

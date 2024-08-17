@@ -64,8 +64,8 @@ namespace fbc {
 		rp.bindBufferVertex(bufferVert);
 		rp.bindBufferIndex(sdl::runner::BUFFER_INDEX);
 		rp.bindTexture(texture, sdl::runner::SAMPLER);
-		rp.pushVertexUniformAuto(&MATRIX_UNIFORM);
-		rp.pushFragmentUniformAuto(tint);
+		rp.pushVertexUniform(&MATRIX_UNIFORM, sizeof(sdl::Matrix4x4));
+		rp.pushFragmentUniform(tint, sizeof(sdl::Color));
 		rp.drawIndexedPrimitives(vertexOff);
 	}
 }
