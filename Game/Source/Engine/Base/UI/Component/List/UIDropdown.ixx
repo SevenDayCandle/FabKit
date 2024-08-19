@@ -9,7 +9,7 @@ import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.UITitledInteractable;
 import fbc.FWindow;
-import fbc.TextInfo;
+import fbc.TextDrawable;
 import fbc.UIEntry;
 import fbc.UIInteractable;
 import fbc.UISelectorList;
@@ -19,7 +19,7 @@ import sdl;
 import std;
 
 namespace fbc {
-	export template <typename T> class UIDropdown : public UITitledInteractable, public TextInfo {
+	export template <typename T> class UIDropdown : public UITitledInteractable, public TextDrawable {
 	public:
 		UIDropdown(FWindow& window, Hitbox* hb, 
 			UISelectorList<T>* menu, 
@@ -28,7 +28,7 @@ namespace fbc {
 			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
 			func<str(EntryView<T>&)>& buttonLabelFunc = {}
-		): UITitledInteractable(window, hb, image), TextInfo(textFont), menu(menu), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
+		): UITitledInteractable(window, hb, image), TextDrawable(textFont), menu(menu), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
 			init();
 		}
 		UIDropdown(FWindow& window, Hitbox* hb,
@@ -38,7 +38,7 @@ namespace fbc {
 			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
 			func<str(EntryView<T>&)>& buttonLabelFunc = {}
-		): UITitledInteractable(window, hb, image), TextInfo(textFont), menu(std::move(menu)), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
+		): UITitledInteractable(window, hb, image), TextDrawable(textFont), menu(std::move(menu)), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
 			init();
 		}
 
@@ -158,7 +158,7 @@ namespace fbc {
 
 	template<typename T> void UIDropdown<T>::onSizeUpdated()
 	{
-		TextInfo::setPos(cfg.renderScale(24), hb->h * 0.25f);
+		TextDrawable::setPos(cfg.renderScale(24), hb->h * 0.25f);
 		arrowRect.w = arrowRect.h = hb->h * 0.5f;
 	}
 
@@ -188,7 +188,7 @@ namespace fbc {
 		else {
 			arrow.draw(rp, arrowRect, win.getW(), win.getH(), menu->isOpen() ? rotation + 180 : rotation, &this->UIImage::color);
 		}
-		TextInfo::drawText(rp, hb->x, hb->y, win.getW(), win.getH());
+		TextDrawable::drawText(rp, hb->x, hb->y, win.getW(), win.getH());
 	}
 
 	template<typename T> void UIDropdown<T>::updateImpl() {

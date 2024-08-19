@@ -17,7 +17,7 @@ namespace fbc {
 		TitleTooltip& setTitle(strv text, sdl::Color color, sdl::Color colorOutline, const FFont& font);
 		virtual void render(sdl::SDLBatchRenderPass& rp) override;
 	protected:
-		TextInfo title;
+		TextDrawable title;
 
 		virtual void updateBounds() override;
 	};

@@ -188,6 +188,10 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\RectDrawable.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Engine\Base\VFX\CallbackVFX.ixx">
       <SubType>
       </SubType>
@@ -438,7 +442,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
     <ClCompile Include="Source\Engine\Base\Utilities\Localization\Language.ixx" />
-    <ClCompile Include="Source\Engine\Base\UI\Mixin\TextInfo.ixx">
+    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\TextDrawable.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>

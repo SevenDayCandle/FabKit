@@ -8,7 +8,7 @@ import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.TextSupplier;
-import fbc.TextInfo;
+import fbc.TextDrawable;
 import fbc.UIButton;
 import fbc.UIInteractable;
 import fbc.UITitledInteractable;
@@ -16,14 +16,14 @@ import sdl;
 import std;
 
 namespace fbc {
-	export class UINumberInput : public UITitledInteractable, public TextInfo, public TextSupplier {
+	export class UINumberInput : public UITitledInteractable, public TextDrawable, public TextSupplier {
 	public:
 		UINumberInput(FWindow& window, Hitbox* hb,
 			int limMin = 0,
 			int limMax = std::numeric_limits<int>::max(),
 			IDrawable& image = cct.images.uiPanel,
 			IDrawable& arrow = cct.images.uiArrowIncrement,
-			FFont& textFont = cct.fontRegular()) : TextSupplier(window), UITitledInteractable(window, hb, image), TextInfo(textFont), limMin(limMin), limMax(limMax), arrow(arrow) {
+			FFont& textFont = cct.fontRegular()) : TextSupplier(window), UITitledInteractable(window, hb, image), TextDrawable(textFont), limMin(limMin), limMax(limMax), arrow(arrow) {
 			initCaret(this->font, this->hb->x, this->hb->y);
 			UINumberInput::onSizeUpdated();
 		}
@@ -87,7 +87,7 @@ namespace fbc {
 
 	void UINumberInput::onSizeUpdated()
 	{
-		TextInfo::setPos(cfg.renderScale(24), this->hb->h * 0.25f);
+		TextDrawable::setPos(cfg.renderScale(24), this->hb->h * 0.25f);
 		moreRect.w = moreRect.h = lessRect.w = lessRect.h = hb->h / 2;
 	}
 
@@ -100,7 +100,7 @@ namespace fbc {
 	void UINumberInput::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
 		UITitledInteractable::renderImpl(rp);
-		TextInfo::drawText(rp, hb->x, hb->y, win.getW(), win.getH());
+		TextDrawable::drawText(rp, hb->x, hb->y, win.getW(), win.getH());
 		arrow.draw(rp, lessRect, win.getW(), win.getH());
 		arrow.draw(rp, moreRect, win.getW(), win.getH());
 		if (sdl::runner::keyboardInputActive(this)) {

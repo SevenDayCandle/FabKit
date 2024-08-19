@@ -8,16 +8,16 @@ import fbc.FUtil;
 import fbc.GenericTip;
 import fbc.UIBase;
 import fbc.IDrawable;
-import fbc.TextInfo;
+import fbc.TextDrawable;
 import sdl;
 import std;
 
 namespace fbc {
 	export constexpr float PADDING = 24;
 
-	export class Tooltip : public TextInfo, public GenericTip {
+	export class Tooltip : public TextDrawable, public GenericTip {
 	public:
-		Tooltip(FWindow& window, strv text, FFont& font = cct.fontSmall(), float boxSize = DEFAULT_SIZE, IDrawable& background = cct.images.uiDarkPanelRound) : TextInfo(font, text), GenericTip(window, boxSize), background(background) {}
+		Tooltip(FWindow& window, strv text, FFont& font = cct.fontSmall(), float boxSize = DEFAULT_SIZE, IDrawable& background = cct.images.uiDarkPanelRound) : TextDrawable(font, text), GenericTip(window, boxSize), background(background) {}
 		virtual ~Tooltip() override = default;
 
 		inline virtual void update() override {}
@@ -37,33 +37,33 @@ namespace fbc {
 	// When queued for rendering, create the text and bounding box if they don't exist
 	void Tooltip::open()
 	{
-		if (!TextInfo::hasCache()) {
+		if (!TextDrawable::hasCache()) {
 			updateCache(this->text, this->color, this->colorOutline);
 		}
 	}
 
 	void Tooltip::refreshDimensions()
 	{
-		TextInfo::refreshCache();
+		TextDrawable::refreshCache();
 	}
 
 	void Tooltip::render(sdl::SDLBatchRenderPass& rp)
 	{
 		background.draw(rp, bounds, win.getW(), win.getH());
-		TextInfo::drawText(rp, bounds.x, bounds.y, win.getW(), win.getH());
+		TextDrawable::drawText(rp, bounds.x, bounds.y, win.getW(), win.getH());
 	}
 
 	// Stretch the box background to fit the words in the tooltip
 	void Tooltip::updateBounds()
 	{
 		float off = cfg.renderScale(PADDING);
-		TextInfo::setPos(off, off);
-		bounds.h = TextInfo::getTextHeight() + off * 2;
+		TextDrawable::setPos(off, off);
+		bounds.h = TextDrawable::getTextHeight() + off * 2;
 	}
 
 	void Tooltip::updateCache(strv text, const sdl::Color& color, const sdl::Color& colorOutline)
 	{
-		TextInfo::updateCache(text, color, colorOutline);
+		TextDrawable::updateCache(text, color, colorOutline);
 		updateBounds();
 	}
 }

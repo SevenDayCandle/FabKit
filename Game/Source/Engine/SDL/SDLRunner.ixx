@@ -133,6 +133,8 @@ namespace sdl {
 	Event e;
 	Gamepad* gamepad;
 	GpuDevice* device;
+	SDL_GpuGraphicsPipeline* RENDER_FILL;
+	SDL_GpuGraphicsPipeline* RENDER_STANDARD;
 	std::uint64_t delta;
 	std::uint64_t fpsLimit;
 	std::uint64_t timeCurrent;
@@ -147,7 +149,6 @@ namespace sdl::runner {
 	export SDL_GpuBuffer* BUFFER_VERTEX_BORDERED;
 	export SDL_GpuBuffer* BUFFER_VERTEX_HORIZONTAL;
 	export SDL_GpuBuffer* BUFFER_VERTEX_VERTICAL;
-	export SDL_GpuGraphicsPipeline* RENDER_STANDARD;
 	export SDL_GpuSampler* SAMPLER;
 
 	export inline bool gamepadHasJustPressed(int pressed) { return pad[pressed] && !padLast[pressed]; }
@@ -172,37 +173,26 @@ namespace sdl::runner {
 	export inline bool mouseIsRightJustReleased() noexcept { return mouse != SDL_BUTTON_RIGHT && mouseLast == SDL_BUTTON_RIGHT; }
 	export inline bool mouseIsRightReleased() noexcept { return mouse != SDL_BUTTON_RIGHT; }
 	export inline bool enabled() { return enabledInternal; }
-	export SDL_bool deviceClaimWindow(SDL_Window* window, SDL_GpuSwapchainComposition swapchainComposition, SDL_GpuPresentMode presentMode) { return SDL_GpuClaimWindow(device, window, swapchainComposition, presentMode); }
-	export SDL_bool deviceIsTextureFormatSupported(SDL_GpuTextureFormat format, SDL_GpuTextureType type, SDL_GpuTextureUsageFlags usage) { return SDL_GpuSupportsTextureFormat(device, format, type, usage); }
-	export SDL_bool deviceQueryFence(SDL_GpuFence* fence) { return SDL_GpuQueryFence(device, fence); }
-	export SDL_bool deviceSetSwapchainParameters(SDL_Window* window, SDL_GpuSwapchainComposition swapchainComposition, SDL_GpuPresentMode presentMode) { return SDL_GpuSetSwapchainParameters(device, window, swapchainComposition, presentMode); }
-	export SDL_bool deviceSupportsPresentMode(SDL_Window* window, SDL_GpuPresentMode presentMode) { return SDL_GpuSupportsPresentMode(device, window, presentMode); }
-	export SDL_bool deviceSupportsSwapchainComposition(SDL_Window* window, SDL_GpuSwapchainComposition swapchainComposition) { return SDL_GpuSupportsSwapchainComposition(device, window, swapchainComposition); }
-	export SDL_GpuBuffer* deviceCreateBuffer(SDL_GpuBufferUsageFlags usageFlags, Uint32 sizeInBytes) { return SDL_GpuCreateBuffer(device, usageFlags, sizeInBytes); }
-	export SDL_GpuCommandBuffer* deviceAcquireCommandBuffer() { return SDL_GpuAcquireCommandBuffer(device); }
-	export SDL_GpuComputePipeline* deviceCreateComputePipeline(SDL_GpuComputePipelineCreateInfo* computePipelineCreateInfo) { return SDL_GpuCreateComputePipeline(device, computePipelineCreateInfo); }
-	export SDL_GpuCopyPass* deviceBeginCopyPass(SDL_GpuCommandBuffer* commandBuffer) { return SDL_GpuBeginCopyPass(commandBuffer); }
-	export SDL_GpuDriver deviceGetDriver() { return SDL_GpuGetDriver(device); }
-	export SDL_GpuGraphicsPipeline* deviceCreateGraphicsPipeline(SDL_GpuGraphicsPipelineCreateInfo* pipelineCreateInfo) { return SDL_GpuCreateGraphicsPipeline(device, pipelineCreateInfo); }
-	export SDL_GpuSampleCount deviceGetBestSampleCount(SDL_GpuTextureFormat format, SDL_GpuSampleCount desiredSampleCount) { return SDL_GpuGetBestSampleCount(device, format, desiredSampleCount); }
-	export SDL_GpuSampler* deviceCreateSampler(SDL_GpuSamplerCreateInfo* samplerCreateInfo) { return SDL_GpuCreateSampler(device, samplerCreateInfo); }
-	export SDL_GpuShader* deviceCreateShader(SDL_GpuShaderCreateInfo* shaderCreateInfo) { return SDL_GpuCreateShader(device, shaderCreateInfo); }
-	export SDL_GpuTexture* deviceCreateTexture(SDL_GpuTextureCreateInfo* textureCreateInfo) { return SDL_GpuCreateTexture(device, textureCreateInfo); }
-	export SDL_GpuTextureFormat deviceGetSwapchainTextureFormat(SDL_Window* window) { return SDL_GpuGetSwapchainTextureFormat(device, window); }
-	export SDL_GpuTransferBuffer* deviceCreateTransferBuffer(SDL_GpuTransferBufferUsage usage, Uint32 sizeInBytes) { return SDL_GpuCreateTransferBuffer(device, usage, sizeInBytes); }
+	export inline SDL_bool deviceClaimWindow(SDL_Window* window, SDL_GpuSwapchainComposition swapchainComposition, SDL_GpuPresentMode presentMode) { return SDL_GpuClaimWindow(device, window, swapchainComposition, presentMode); }
+	export inline SDL_bool deviceIsTextureFormatSupported(SDL_GpuTextureFormat format, SDL_GpuTextureType type, SDL_GpuTextureUsageFlags usage) { return SDL_GpuSupportsTextureFormat(device, format, type, usage); }
+	export inline SDL_bool deviceQueryFence(SDL_GpuFence* fence) { return SDL_GpuQueryFence(device, fence); }
+	export inline SDL_bool deviceSetSwapchainParameters(SDL_Window* window, SDL_GpuSwapchainComposition swapchainComposition, SDL_GpuPresentMode presentMode) { return SDL_GpuSetSwapchainParameters(device, window, swapchainComposition, presentMode); }
+	export inline SDL_bool deviceSupportsPresentMode(SDL_Window* window, SDL_GpuPresentMode presentMode) { return SDL_GpuSupportsPresentMode(device, window, presentMode); }
+	export inline SDL_bool deviceSupportsSwapchainComposition(SDL_Window* window, SDL_GpuSwapchainComposition swapchainComposition) { return SDL_GpuSupportsSwapchainComposition(device, window, swapchainComposition); }
+	export inline SDL_GpuBuffer* deviceCreateBuffer(SDL_GpuBufferUsageFlags usageFlags, Uint32 sizeInBytes) { return SDL_GpuCreateBuffer(device, usageFlags, sizeInBytes); }
+	export inline SDL_GpuCommandBuffer* deviceAcquireCommandBuffer() { return SDL_GpuAcquireCommandBuffer(device); }
+	export inline SDL_GpuComputePipeline* deviceCreateComputePipeline(SDL_GpuComputePipelineCreateInfo* computePipelineCreateInfo) { return SDL_GpuCreateComputePipeline(device, computePipelineCreateInfo); }
+	export inline SDL_GpuCopyPass* deviceBeginCopyPass(SDL_GpuCommandBuffer* commandBuffer) { return SDL_GpuBeginCopyPass(commandBuffer); }
+	export inline SDL_GpuDriver deviceGetDriver() { return SDL_GpuGetDriver(device); }
+	export inline SDL_GpuGraphicsPipeline* deviceCreateGraphicsPipeline(SDL_GpuGraphicsPipelineCreateInfo* pipelineCreateInfo) { return SDL_GpuCreateGraphicsPipeline(device, pipelineCreateInfo); }
+	export inline SDL_GpuSampleCount deviceGetBestSampleCount(SDL_GpuTextureFormat format, SDL_GpuSampleCount desiredSampleCount) { return SDL_GpuGetBestSampleCount(device, format, desiredSampleCount); }
+	export inline SDL_GpuSampler* deviceCreateSampler(SDL_GpuSamplerCreateInfo* samplerCreateInfo) { return SDL_GpuCreateSampler(device, samplerCreateInfo); }
+	export inline SDL_GpuShader* deviceCreateShader(SDL_GpuShaderCreateInfo* shaderCreateInfo) { return SDL_GpuCreateShader(device, shaderCreateInfo); }
+	export inline SDL_GpuTexture* deviceCreateTexture(SDL_GpuTextureCreateInfo* textureCreateInfo) { return SDL_GpuCreateTexture(device, textureCreateInfo); }
+	export inline SDL_GpuTextureFormat deviceGetSwapchainTextureFormat(SDL_Window* window) { return SDL_GpuGetSwapchainTextureFormat(device, window); }
+	export inline SDL_GpuTransferBuffer* deviceCreateTransferBuffer(SDL_GpuTransferBufferUsage usage, Uint32 sizeInBytes) { return SDL_GpuCreateTransferBuffer(device, usage, sizeInBytes); }
 	export inline Uint64 timeDelta() { return delta; }
 	export inline Uint64 timeTotal() { return timeCurrent; }
-	export inline void setFPSLimit(int fps) { fpsLimit = fps > 0 ? NANOS_PER_SECOND / fps : 0; }
-
-
-	export bool init(const char* renderer = RENDERER_VULKAN);
-	export bool poll();
-	export GpuGraphicsPipeline* createPipeline(GpuShader* vertexShader, GpuShader* fragmentShader, GpuTextureFormat textureFormat = GpuTextureFormat::SDL_GPU_TEXTUREFORMAT_B8G8R8A8, GpuBlendFactor srcColor = GpuBlendFactor::SDL_GPU_BLENDFACTOR_SRC_ALPHA, GpuBlendFactor dstColor = GpuBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, GpuBlendFactor srcAlpha = GpuBlendFactor::SDL_GPU_BLENDFACTOR_ONE, GpuBlendFactor dstAlpha = GpuBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA);
-	export GpuShader* loadShader(const char* shaderFilename, GpuShaderStage stage, Uint32 samplerCount = 1, Uint32 uniformBufferCount = 1, Uint32 storageBufferCount = 0, Uint32 storageTextureCount = 0);
-	export GpuTexture* uploadTexture(GpuCopyPass* copyPass, Surface* surface);
-	export GpuTexture* uploadTexture(GpuCopyPass* copyPass, Surface* surface, GpuTransferBuffer* textureTransferBuffer);
-	export GpuTexture* uploadTextureForArray(GpuCopyPass* copyPass, Surface* surface, GpuTexture* texture, GpuTransferBuffer* textureTransferBuffer, Uint32 layer);
-	export void capFrame();
 	export inline void deviceMapTransferBuffer(SDL_GpuTransferBuffer* transferBuffer, SDL_bool cycle, void** ppData) { SDL_GpuMapTransferBuffer(device, transferBuffer, cycle, ppData); }
 	export inline void deviceReleaseBuffer(SDL_GpuBuffer* buffer) { SDL_GpuReleaseBuffer(device, buffer); }
 	export inline void deviceReleaseComputePipeline(SDL_GpuComputePipeline* computePipeline) { SDL_GpuReleaseComputePipeline(device, computePipeline); }
@@ -218,6 +208,19 @@ namespace sdl::runner {
 	export inline void deviceUnmapTransferBuffer(SDL_GpuTransferBuffer* transferBuffer) { SDL_GpuUnmapTransferBuffer(device, transferBuffer); }
 	export inline void deviceWait() { SDL_GpuWait(device); }
 	export inline void deviceWaitForFences(SDL_bool waitAll, SDL_GpuFence** pFences, Uint32 fenceCount) { SDL_GpuWaitForFences(device, waitAll, pFences, fenceCount); }
+	export inline void setFPSLimit(int fps) { fpsLimit = fps > 0 ? NANOS_PER_SECOND / fps : 0; }
+
+	export bool init(const char* renderer = RENDERER_VULKAN);
+	export bool poll();
+	export GpuGraphicsPipeline* createPipeline(GpuShader* vertexShader, GpuShader* fragmentShader, GpuTextureFormat textureFormat = GpuTextureFormat::SDL_GPU_TEXTUREFORMAT_B8G8R8A8, GpuBlendFactor srcColor = GpuBlendFactor::SDL_GPU_BLENDFACTOR_SRC_ALPHA, GpuBlendFactor dstColor = GpuBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, GpuBlendFactor srcAlpha = GpuBlendFactor::SDL_GPU_BLENDFACTOR_ONE, GpuBlendFactor dstAlpha = GpuBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA);
+	export GpuGraphicsPipeline* createShapePipeline(GpuShader* vertexShader, GpuShader* fragmentShader, GpuTextureFormat textureFormat = GpuTextureFormat::SDL_GPU_TEXTUREFORMAT_B8G8R8A8, GpuBlendFactor srcColor = GpuBlendFactor::SDL_GPU_BLENDFACTOR_SRC_ALPHA, GpuBlendFactor dstColor = GpuBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, GpuBlendFactor srcAlpha = GpuBlendFactor::SDL_GPU_BLENDFACTOR_ONE, GpuBlendFactor dstAlpha = GpuBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA);
+	export GpuGraphicsPipeline* pipelineForMode(RenderMode mode);
+	export GpuGraphicsPipeline* shapePipelineForMode(RenderMode mode);
+	export GpuShader* loadShader(const char* shaderFilename, GpuShaderStage stage, Uint32 samplerCount = 1, Uint32 uniformBufferCount = 1, Uint32 storageBufferCount = 0, Uint32 storageTextureCount = 0);
+	export GpuTexture* uploadTexture(GpuCopyPass* copyPass, Surface* surface);
+	export GpuTexture* uploadTexture(GpuCopyPass* copyPass, Surface* surface, GpuTransferBuffer* textureTransferBuffer);
+	export GpuTexture* uploadTextureForArray(GpuCopyPass* copyPass, Surface* surface, GpuTexture* texture, GpuTransferBuffer* textureTransferBuffer, Uint32 layer);
+	export void capFrame();
 	export void keyboardInputStart(Window* window, IKeyInputListener* listener);
 	export void keyboardInputStop(Window* window);
 	export void keyboardInputStopRequest(Window* window, IKeyInputListener* listener);
@@ -354,7 +357,8 @@ namespace sdl::runner {
 		};
 		SAMPLER = gpuCreateSampler(device, &samplerInfo);
 
-		// Set up standard pipeline
+		// Set up pipelines
+
 		GpuShader* shaderFragment = loadShader(SHADER_NORMAL_FRAG, SDL_GPU_SHADERSTAGE_FRAGMENT);
 		GpuShader* shaderVertex = loadShader(SHADER_NORMAL_VERT, SDL_GPU_SHADERSTAGE_VERTEX);
 		RENDER_STANDARD = createPipeline(shaderVertex, shaderFragment);
@@ -463,7 +467,6 @@ namespace sdl::runner {
 						.colorWriteMask = 0xF
 					}
 				} };
-
 		GpuGraphicsPipelineCreateInfo pipelineCreateInfo = {
 			.vertexShader = vertexShader,
 			.fragmentShader = fragmentShader,
@@ -487,6 +490,54 @@ namespace sdl::runner {
 		};
 
 		return gpuCreateGraphicsPipeline(device, &pipelineCreateInfo);
+	}
+
+	GpuGraphicsPipeline* createShapePipeline(GpuShader* vertexShader, GpuShader* fragmentShader, GpuTextureFormat textureFormat, GpuBlendFactor srcColor, GpuBlendFactor dstColor, GpuBlendFactor srcAlpha, GpuBlendFactor dstAlpha)
+	{
+		GpuColorAttachmentDescription colorAttachmentDescriptions[] = { {
+					.format = textureFormat,
+					.blendState = {
+						.blendEnable = true,
+						.srcColorBlendFactor = srcColor,
+						.dstColorBlendFactor = dstColor,
+						.colorBlendOp = GpuBlendOp::SDL_GPU_BLENDOP_ADD,
+						.srcAlphaBlendFactor = srcAlpha,
+						.dstAlphaBlendFactor = dstAlpha,
+						.alphaBlendOp = GpuBlendOp::SDL_GPU_BLENDOP_ADD,
+						.colorWriteMask = 0xF
+					}
+				} };
+		GpuGraphicsPipelineCreateInfo pipelineCreateInfo = {
+			.vertexShader = nullptr,
+			.fragmentShader = nullptr,
+			.vertexInputState = {
+			},
+			.primitiveType = GpuPrimitiveType::SDL_GPU_PRIMITIVETYPE_TRIANGLELIST,
+			.rasterizerState = {
+				.fillMode = SDL_GpuFillMode::SDL_GPU_FILLMODE_FILL
+			},
+			.multisampleState = {
+				.sampleMask = 0xFFFF
+			},
+			.depthStencilState = {},
+			.attachmentInfo = {
+				.colorAttachmentDescriptions = colorAttachmentDescriptions,
+				.colorAttachmentCount = 1
+			},
+			.blendConstants = {0.0f, 0.0f, 0.0f, 0.0f}
+		};
+
+		return gpuCreateGraphicsPipeline(device, &pipelineCreateInfo);
+	}
+
+	GpuGraphicsPipeline* pipelineForMode(RenderMode mode)
+	{
+		switch (mode) {
+		case OVERLAY:
+			return nullptr;
+		default:
+			return RENDER_STANDARD;
+		}
 	}
 
 	// Generates a shader to be used for this window

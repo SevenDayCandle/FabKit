@@ -3,7 +3,6 @@ export module fbc.FTexture;
 import fbc.FUtil;
 import fbc.ImageDrawable;
 import sdl;
-import sdl.SDLBatchRenderPass;
 import std;
 
 namespace fbc {

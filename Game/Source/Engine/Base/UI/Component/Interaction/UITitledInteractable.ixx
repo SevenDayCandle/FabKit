@@ -7,7 +7,7 @@ import fbc.FUtil;
 import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
-import fbc.TextInfo;
+import fbc.TextDrawable;
 import fbc.UIInteractable;
 import sdl;
 import std;
@@ -17,7 +17,7 @@ namespace fbc {
 	public:
 		UITitledInteractable(FWindow& window, Hitbox* hb, IDrawable& image) : UIInteractable(window, hb, image) {}
 
-		uptr<TextInfo> label;
+		uptr<TextDrawable> label;
 
 		inline virtual float getBeginX() override { return label ? std::min(hb->x, hb->x + label->getTextXPos()) : hb->x; }
 		inline virtual float getBeginY() override { return label ? std::min(hb->y, hb->y + label->getTextYPos()) : hb->y; }
@@ -53,7 +53,7 @@ namespace fbc {
 	{
 		this->xOff = xOff;
 		this->yOff = yOff;
-		label = std::make_unique<TextInfo>(font, text, color, colorOutline);
+		label = std::make_unique<TextDrawable>(font, text, color, colorOutline);
 		label->setPos(cfg.renderScale(xOff), cfg.renderScale(yOff));
 		return *this;
 	}

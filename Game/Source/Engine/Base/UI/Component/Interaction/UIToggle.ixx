@@ -7,16 +7,16 @@ import fbc.FUtil;
 import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
-import fbc.TextInfo;
+import fbc.TextDrawable;
 import fbc.UIInteractable;
 import sdl;
 import std;
 
 namespace fbc {
-	export class UIToggle : public UIInteractable, public TextInfo {
+	export class UIToggle : public UIInteractable, public TextDrawable {
 	public:
 		UIToggle(FWindow& window, Hitbox* hb, strv text, IDrawable& image = cct.images.uiCheckboxEmpty, IDrawable& checkImage = cct.images.uiCheckboxFilled, FFont& f = cct.fontRegular(), float xOff = cct.images.uiCheckboxEmpty.getWidth() * 1.15f, float yOff = cct.images.uiCheckboxEmpty.getHeight() * 0.25f):
-			UIInteractable(window, hb, image), checkImage(checkImage), TextInfo(f, text), xOff(xOff), yOff(yOff) {
+			UIInteractable(window, hb, image), checkImage(checkImage), TextDrawable(f, text), xOff(xOff), yOff(yOff) {
 			UIToggle::onSizeUpdated();
 		}
 
@@ -44,7 +44,7 @@ namespace fbc {
 
 	void UIToggle::onSizeUpdated()
 	{
-		TextInfo::setPos(cfg.renderScale(xOff), cfg.renderScale(yOff));
+		TextDrawable::setPos(cfg.renderScale(xOff), cfg.renderScale(yOff));
 	}
 
 	void UIToggle::refreshDimensions()
@@ -62,7 +62,7 @@ namespace fbc {
 			image.draw(rp, *hb.get(), win.getW(), win.getH(), rotation, hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color);
 		}
 
-		TextInfo::drawText(rp, hb->x, hb->y, win.getW(), win.getH());
+		TextDrawable::drawText(rp, hb->x, hb->y, win.getW(), win.getH());
 	}
 
 	void UIToggle::toggle(bool val)

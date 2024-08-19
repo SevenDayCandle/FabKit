@@ -4,15 +4,15 @@ import fbc.FFont;
 import fbc.FWindow;
 import fbc.FUtil;
 import fbc.Hitbox;
-import fbc.TextInfo;
+import fbc.TextDrawable;
 import fbc.Tooltip;
 import fbc.UITipHoverable;
 
 namespace fbc {
-	export class UILabel : public UITipHoverable, public TextInfo {
+	export class UILabel : public UITipHoverable, public TextDrawable {
 	public:
-		UILabel(FWindow& window, Hitbox* hb, FFont& f) : UITipHoverable(window, hb), TextInfo(f) {}
-		UILabel(FWindow& window, Hitbox* hb, FFont& f, const str& text) : UITipHoverable(window, hb), TextInfo(f, text) {}
+		UILabel(FWindow& window, Hitbox* hb, FFont& f) : UITipHoverable(window, hb), TextDrawable(f) {}
+		UILabel(FWindow& window, Hitbox* hb, FFont& f, const str& text) : UITipHoverable(window, hb), TextDrawable(f, text) {}
 		~UILabel() override {}
 
 		virtual void refreshDimensions() override;
@@ -26,6 +26,6 @@ namespace fbc {
 	}
 
 	void UILabel::renderImpl(sdl::SDLBatchRenderPass& rp) {
-		TextInfo::drawText(rp, hb->x, hb->y, win.getW(), win.getH());
+		TextDrawable::drawText(rp, hb->x, hb->y, win.getW(), win.getH());
 	}
 }

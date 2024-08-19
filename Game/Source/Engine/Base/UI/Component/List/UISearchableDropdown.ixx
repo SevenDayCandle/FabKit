@@ -11,7 +11,7 @@ import fbc.TextSupplier;
 import fbc.ScaleHitbox;
 
 import fbc.SelectView;
-import fbc.TextInfo;
+import fbc.TextDrawable;
 import fbc.UIDropdown;
 import fbc.UIEntry;
 import fbc.UIInteractable;
@@ -106,7 +106,7 @@ namespace fbc {
 	{
 		if (sdl::runner::keyboardInputActive(this)) {
 			UIInteractable::renderImpl(rp);
-			TextInfo::drawText(this->hb->x, this->hb->y);
+			TextDrawable::drawText(this->hb->x, this->hb->y);
 			renderCaret(rp);
 			if (this->selectedSize() > 0) {
 				this->clear.draw(rp, this->arrowRect, this->win.getW(), this->win.getH(), this->UIImage::color, this->rotation);
@@ -132,7 +132,7 @@ namespace fbc {
 	// Directly set the textInfo text to avoid updating the display textureCache and hiding your text input
 	template<typename T> void UISearchableDropdown<T>::onSelectionUpdate(EntryView<T>& items) {
 		if (this->isOpen()) {
-			TextInfo::text = this->getButtonText(items);
+			TextDrawable::text = this->getButtonText(items);
 		}
 		else {
 			UIDropdown<T>::onSelectionUpdate(items);

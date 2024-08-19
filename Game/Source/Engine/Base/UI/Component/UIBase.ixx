@@ -1,8 +1,9 @@
 export module fbc.UIBase;
 
 import fbc.FUtil;
-import fbc.Hitbox;
 import fbc.FWindow;
+import fbc.Hitbox;
+import fbc.RelativeHitbox;
 import sdl;
 import std;
 
@@ -29,6 +30,8 @@ namespace fbc {
 		inline virtual UIBase& setHbOffsetPos(const float x, const float y) { return hb->setOffPos(x, y), * this; }
 		inline virtual UIBase& setHbOffsetPosX(const float x) { return hb->setOffPosX(x), * this; }
 		inline virtual UIBase& setHbOffsetPosY(const float y) { return hb->setOffPosY(y), * this; }
+		template <typename... Args> requires std::constructible_from<RelativeHitbox, Hitbox&, Args...> inline uptr<RelativeHitbox> relhb(Args... args) { return make_unique<RelativeHitbox>(&hb, std::forward<Args>(args)...); }
+		template <typename T, typename... Args> requires std::constructible_from<T, FWindow&, Args...> uptr<T> inline create(Args... args) { return make_unique<T>(win, std::forward<Args>(args)...); }
 
 		virtual UIBase& setHbExactSize(const float x, const float y);
 		virtual UIBase& setHbExactSizeX(const float x);

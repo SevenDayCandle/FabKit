@@ -3,7 +3,6 @@ export module fbc.ImageDrawable;
 import fbc.FUtil;
 import fbc.IDrawable;
 import sdl;
-import sdl.SDLBatchRenderPass;
 import std;
 
 namespace fbc {
@@ -42,24 +41,7 @@ namespace fbc {
 
 	void ImageDrawable::draw(sdl::SDLBatchRenderPass& rp, sdl::GpuBuffer* bufferVert, float x, float y, float w, float h, float winW, float winH, float rotZ, const sdl::Color* tint, sdl::GpuGraphicsPipeline* pipeline, int vertexOff)
 	{
-		MATRIX_UNIFORM.m41 = (2 * x / winW) - 1 + w / winW;
-		MATRIX_UNIFORM.m42 = 1 - (2 * y / winH) - h / winH;
-		if (rotZ != 0) {
-			float cosZ = std::cos(rotZ);
-			float sinZ = std::sin(rotZ);
-
-			MATRIX_UNIFORM.m11 = (w / winW * 2) * cosZ;
-			MATRIX_UNIFORM.m12 = -(w / winW * 2) * sinZ;
-			MATRIX_UNIFORM.m21 = (h / winH * 2) * sinZ;
-			MATRIX_UNIFORM.m22 = (h / winH * 2) * cosZ;
-		}
-		else {
-			MATRIX_UNIFORM.m11 = w / winW * 2;
-			MATRIX_UNIFORM.m12 = 0;
-			MATRIX_UNIFORM.m21 = 0;
-			MATRIX_UNIFORM.m22 = h / winH * 2;
-		}
-
+		setupMatrix(x, y, w, h, winW, winH, rotZ);
 		rp.bindPipeline(pipeline);
 		rp.bindBufferVertex(bufferVert);
 		rp.bindBufferIndex(sdl::runner::BUFFER_INDEX);

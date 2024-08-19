@@ -111,6 +111,12 @@ namespace sdl {
 	export using Surface = ::SDL_Surface;
 	export using Window = ::SDL_Window;
 
+	export enum RenderMode {
+		NORMAL,
+		OVERLAY,
+		GRAYSCALE
+	};
+
 	export struct Matrix4x4
 	{
 		float m11, m12, m13, m14;

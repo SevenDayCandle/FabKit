@@ -1,7 +1,6 @@
 export module fbc.FFont;
 
 import fbc.CoreConfig;
-import fbc.ImageDrawable;
 import fbc.FTexture;
 import fbc.FUtil;
 import fbc.ILoadable;
@@ -33,7 +32,7 @@ namespace fbc {
         int measureH(strv text) const;
         int measureW(strv text) const;
         pair<int, int> measureDim(strv text) const;
-        ImageDrawable makeTexture(strv text, uint32 w = 0, const sdl::Color& color = sdl::COLOR_STANDARD, const sdl::Color& outlineColor = sdl::COLOR_BLACK, const sdl::Color& shadowColor = sdl::COLOR_BLACK_SHADOW);
+        sdl::Surface* makeSurface(strv text, uint32 w = 0, const sdl::Color& color = sdl::COLOR_STANDARD, const sdl::Color& outlineColor = sdl::COLOR_BLACK, const sdl::Color& shadowColor = sdl::COLOR_BLACK_SHADOW);
         void dispose();
         void reload() const override;
     private:
@@ -101,7 +100,7 @@ namespace fbc {
     }
 
     // Create a texture snapshot of the text rendered with this font in the given colors. Text must NOT be empty
-    ImageDrawable FFont::makeTexture(strv text, uint32 w, const sdl::Color& color, const sdl::Color& outlineColor, const sdl::Color& shadowColor)
+    sdl::Surface* FFont::makeSurface(strv text, uint32 w, const sdl::Color& color, const sdl::Color& outlineColor, const sdl::Color& shadowColor)
     {
         const char* texDat = text.data();
         sdl::Surface* targetSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, sdl::toTextColor(color), w);
@@ -137,11 +136,7 @@ namespace fbc {
         sdl::gpuEndCopyPass(copyPass);
         sdl::gpuSubmit(uploadCmdBuf);
 
-        int sw = targetSurf->w;
-        int sh = targetSurf->h;
-        sdl::surfaceDestroy(targetSurf);
-
-        return ImageDrawable(targetSurf->w, targetSurf->h, fontTex);
+        return targetSurf;
     }
 
     /* Close the font */

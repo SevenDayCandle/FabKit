@@ -8,18 +8,18 @@ import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.TextSupplier;
-import fbc.TextInfo;
+import fbc.TextDrawable;
 import fbc.UIInteractable;
 import fbc.UITitledInteractable;
 import sdl;
 import std;
 
 namespace fbc {
-	export class UITextInput : public UITitledInteractable, public TextInfo, public TextSupplier {
+	export class UITextInput : public UITitledInteractable, public TextDrawable, public TextSupplier {
 	public:
 		UITextInput(FWindow& window, Hitbox* hb, 
 			IDrawable& image = cct.images.uiPanel,
-			FFont& textFont = cct.fontRegular()): TextSupplier(window), UITitledInteractable(window, hb, image), TextInfo(textFont) {
+			FFont& textFont = cct.fontRegular()): TextSupplier(window), UITitledInteractable(window, hb, image), TextDrawable(textFont) {
 			initCaret(this->font, this->hb->x, this->hb->y);
 			UITextInput::onSizeUpdated();
 		}
@@ -57,7 +57,7 @@ namespace fbc {
 
 	void UITextInput::onSizeUpdated()
 	{
-		TextInfo::setPos(cfg.renderScale(24), this->hb->h * 0.25f);
+		TextDrawable::setPos(cfg.renderScale(24), this->hb->h * 0.25f);
 		initCaret(this->font, this->hb->x, this->hb->y);
 	}
 
@@ -70,7 +70,7 @@ namespace fbc {
 	void UITextInput::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
 		UITitledInteractable::renderImpl(rp);
-		TextInfo::drawText(rp, hb->x, hb->y, win.getW(), win.getH());
+		TextDrawable::drawText(rp, hb->x, hb->y, win.getW(), win.getH());
 		if (sdl::runner::keyboardInputActive(this)) {
 			renderCaret(rp);
 		}
