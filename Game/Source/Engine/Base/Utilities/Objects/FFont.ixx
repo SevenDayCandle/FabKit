@@ -24,6 +24,7 @@ namespace fbc {
         inline int getOutlineSize() const { return outlineSize; }
         inline int getShadowSize() const { return outlineSize; }
         inline int getSize() const { return size; }
+        inline sdl::Surface* makeSurfaceScaled(strv text, uint32 w = 0, const sdl::Color& color = sdl::COLOR_STANDARD, const sdl::Color& outlineColor = sdl::COLOR_BLACK, const sdl::Color& shadowColor = sdl::COLOR_BLACK_SHADOW) { return makeSurfaceScaled(text, cfg.renderScale(w), color, outlineColor, shadowColor); }
 
         FFont& setAllSizes(int size, int outlineSize, int shadowSize);
         FFont& setOutlineSize(int size);

@@ -11,10 +11,10 @@ namespace fbc {
 		RBordered(strv path) : FTexture(path) {}
 		RBordered(const RBordered&) = delete;
 
-		void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float rotZ, const sdl::Color* tint, sdl::GpuGraphicsPipeline* pipeline) override;
+		void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) override;
 	};
 
-	void RBordered::draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float rotZ, const sdl::Color* tint, sdl::GpuGraphicsPipeline* pipeline) {
+	void RBordered::draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline) {
 		const float cornerW = texW / 2;
 		const float edgeW = w - texW;
 		const float edgeH = h - texW;

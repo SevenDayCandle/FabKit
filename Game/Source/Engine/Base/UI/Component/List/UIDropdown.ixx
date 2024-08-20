@@ -5,21 +5,21 @@ import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FUtil;
 import fbc.FWindow;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
-import fbc.UITitledInteractable;
-import fbc.FWindow;
+import fbc.ScaleHitbox;
+import fbc.SelectView;
 import fbc.TextDrawable;
 import fbc.UIEntry;
 import fbc.UIInteractable;
 import fbc.UISelectorList;
-import fbc.ScaleHitbox;
-import fbc.SelectView;
+import fbc.UITitledInteractable;
 import sdl;
 import std;
 
 namespace fbc {
-	export template <typename T> class UIDropdown : public UITitledInteractable, public TextDrawable {
+	export template <typename T> class UIDropdown : public UITitledInteractable {
 	public:
 		UIDropdown(FWindow& window, Hitbox* hb, 
 			UISelectorList<T>* menu, 
@@ -28,7 +28,7 @@ namespace fbc {
 			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
 			func<str(EntryView<T>&)>& buttonLabelFunc = {}
-		): UITitledInteractable(window, hb, image), TextDrawable(textFont), menu(menu), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
+		): UITitledInteractable(window, hb, image), text(textFont), menu(menu), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
 			init();
 		}
 		UIDropdown(FWindow& window, Hitbox* hb,
@@ -38,7 +38,7 @@ namespace fbc {
 			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
 			func<str(EntryView<T>&)>& buttonLabelFunc = {}
-		): UITitledInteractable(window, hb, image), TextDrawable(textFont), menu(std::move(menu)), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
+		): UITitledInteractable(window, hb, image), text(textFont), menu(std::move(menu)), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
 			init();
 		}
 
@@ -113,6 +113,7 @@ namespace fbc {
 		IDrawable& arrow;
 		IDrawable& clear;
 		sdl::RectF arrowRect;
+		TextDrawable text;
 
 		str getButtonText(EntryView<T>& items);
 		virtual void clickLeftEvent() override;
@@ -145,7 +146,7 @@ namespace fbc {
 
 	template<typename T> void UIDropdown<T>::refreshDimensions() {
 		UITitledInteractable::refreshDimensions();
-		refreshCache();
+		text.reload();
 		this->menu->refreshDimensions();
 	}
 
@@ -158,7 +159,7 @@ namespace fbc {
 
 	template<typename T> void UIDropdown<T>::onSizeUpdated()
 	{
-		TextDrawable::setPos(cfg.renderScale(24), hb->h * 0.25f);
+		text.setPos(cfg.renderScale(24), hb->h * 0.25f);
 		arrowRect.w = arrowRect.h = hb->h * 0.5f;
 	}
 
@@ -188,7 +189,7 @@ namespace fbc {
 		else {
 			arrow.draw(rp, arrowRect, win.getW(), win.getH(), menu->isOpen() ? rotation + 180 : rotation, &this->UIImage::color);
 		}
-		TextDrawable::drawText(rp, hb->x, hb->y, win.getW(), win.getH());
+		text.draw(rp, hb->x, hb->y, win.getW(), win.getH());
 	}
 
 	template<typename T> void UIDropdown<T>::updateImpl() {
@@ -199,7 +200,7 @@ namespace fbc {
 
 	// Updates the text shown on the button by default, this may be overriden in derivative types
 	template<typename T> void UIDropdown<T>::onSelectionUpdate(EntryView<T>& items) {
-		setText(getButtonText(items));
+		this->text.setText(getButtonText(items));
 	}
 
 	template<typename T> void UIDropdown<T>::init()
@@ -248,7 +249,7 @@ namespace fbc {
 		}
 		else {
 			str displayText = (futil::joinStrMap(", ", items, [](UIEntry<T>& entry) {return entry.getText(); }));
-			if (this->font.measureW(displayText) > hb->w) {
+			if (text.getFont().measureW(displayText) > hb->w) {
 				return str(cct.strings.ui_items(this->selectedSize()));
 			}
 			else {

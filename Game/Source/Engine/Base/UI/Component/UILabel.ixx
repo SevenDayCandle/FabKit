@@ -9,23 +9,29 @@ import fbc.Tooltip;
 import fbc.UITipHoverable;
 
 namespace fbc {
-	export class UILabel : public UITipHoverable, public TextDrawable {
+	export class UILabel : public UITipHoverable {
 	public:
-		UILabel(FWindow& window, Hitbox* hb, FFont& f) : UITipHoverable(window, hb), TextDrawable(f) {}
-		UILabel(FWindow& window, Hitbox* hb, FFont& f, const str& text) : UITipHoverable(window, hb), TextDrawable(f, text) {}
+		UILabel(FWindow& window, Hitbox* hb, FFont& f, strv text = "") : UITipHoverable(window, hb), text(f, text, hb->w) {}
 		~UILabel() override {}
+
+		inline UILabel& setColor(sdl::Color color) { return text.setColor(color), * this; }
+		inline UILabel& setColorOutline(sdl::Color colorOutline) { return text.setColorOutline(colorOutline), * this; }
+		inline UILabel& setFont(const FFont& font) { return text.setFont(font), * this; }
+		inline UILabel& setText(strv t) { return text.setText(t), * this; }
 
 		virtual void refreshDimensions() override;
 		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
+	protected:
+		TextDrawable text;
 	};
 
 	void UILabel::refreshDimensions()
 	{
 		UITipHoverable::refreshDimensions();
-		refreshCache();
+		text.setWidth(hb->w);
 	}
 
 	void UILabel::renderImpl(sdl::SDLBatchRenderPass& rp) {
-		TextDrawable::drawText(rp, hb->x, hb->y, win.getW(), win.getH());
+		text.draw(rp, hb->x, hb->y, win.getW(), win.getH());
 	}
 }

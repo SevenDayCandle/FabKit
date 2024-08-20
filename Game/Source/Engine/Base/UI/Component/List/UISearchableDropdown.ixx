@@ -92,7 +92,7 @@ namespace fbc {
 	template<typename T> void UISearchableDropdown<T>::onSizeUpdated()
 	{
 		UIDropdown<T>::onSizeUpdated();
-		this->initCaret(this->font, this->hb->x, this->hb->y);
+		initCaret(this->hb->x, this->hb->y);
 	}
 
 	// Whenever this dropdown is open, the text input buffer should be active
@@ -106,7 +106,7 @@ namespace fbc {
 	{
 		if (sdl::runner::keyboardInputActive(this)) {
 			UIInteractable::renderImpl(rp);
-			TextDrawable::drawText(this->hb->x, this->hb->y);
+			this->buffer.draw(rp, this->hb->x, this->hb->y, this->win.getW(), this->win.getH());
 			renderCaret(rp);
 			if (this->selectedSize() > 0) {
 				this->clear.draw(rp, this->arrowRect, this->win.getW(), this->win.getH(), this->UIImage::color, this->rotation);
@@ -132,7 +132,7 @@ namespace fbc {
 	// Directly set the textInfo text to avoid updating the display textureCache and hiding your text input
 	template<typename T> void UISearchableDropdown<T>::onSelectionUpdate(EntryView<T>& items) {
 		if (this->isOpen()) {
-			TextDrawable::text = this->getButtonText(items);
+			this->text.setText(this->getButtonText(items));
 		}
 		else {
 			UIDropdown<T>::onSelectionUpdate(items);
@@ -166,7 +166,7 @@ namespace fbc {
 	{
 		this->menu->setFilterFunc([this](const UIEntry<T>* item) {return this->checkEntry(item); });
 		this->menu->setOnClose([this]() {this->releaseBuffer(); });
-		this->initCaret(this->font, this->hb->x, this->hb->y);
+		initCaret(this->hb->x, this->hb->y);
 	}
 
 	template<typename T> void UISearchableDropdown<T>::resetBuffer()
@@ -212,6 +212,4 @@ namespace fbc {
 			buttonLabelFunc
 		);
 	}
-
-
 }

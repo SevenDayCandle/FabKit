@@ -11,16 +11,15 @@ namespace fbc {
 		RectDrawable() {}
 		virtual ~RectDrawable() = default;
 
-		void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::GpuGraphicsPipeline* pipeline = sdl::runner::RENDER_STANDARD) override;
+		void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) override;
 	};
 
-	void RectDrawable::draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float rotZ, const sdl::Color* tint, sdl::GpuGraphicsPipeline* pipeline)
+	void RectDrawable::draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline)
 	{
 		setupMatrix(x, y, w, h, winW, winH, rotZ);
-		rp.bindPipeline(pipeline);
+		rp.bindPipeline(sdl::runner::shapePipelineForMode(pipeline));
 		rp.bindBufferVertex(sdl::runner::BUFFER_VERTEX);
 		rp.bindBufferIndex(sdl::runner::BUFFER_INDEX);
-		rp.bindTexture(nullptr, sdl::runner::SAMPLER);
 		rp.pushVertexUniform(&MATRIX_UNIFORM, sizeof(sdl::Matrix4x4));
 		rp.pushFragmentUniform(tint, sizeof(sdl::Color));
 		rp.drawIndexedPrimitives(0);

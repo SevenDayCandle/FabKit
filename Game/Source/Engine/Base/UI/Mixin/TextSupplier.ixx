@@ -1,41 +1,46 @@
 export module fbc.TextSupplier;
 
+import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FWindow;
 import fbc.FUtil;
-import fbc.ImageDrawable;
+import fbc.RectDrawable;
+import fbc.TextDrawable;
 import sdl;
 import sdl.IKeyInputListener;
 import std;
 
 namespace fbc {
-	export constexpr strv INDICATOR = "|";
-
 	export class TextSupplier : public sdl::IKeyInputListener {
 	public:
-		TextSupplier(FWindow& window): fwindow(window) {}
+		TextSupplier(FWindow& window, FFont& textFont = cct.fontRegular()): fwindow(window), buffer(textFont, "", getLimitWidth()) {}
 		virtual ~TextSupplier() override = default;
 
 		virtual void onKeyPress(int32 c) override;
 		virtual void onTextInput(const char* text) override;
-		void releaseBuffer();
 		virtual void start();
+		void releaseBuffer();
 
 	protected:
 		float caretPosX;
 		float caretPosY;
-		ImageDrawable caret;
+		float caretSizeX;
+		float caretSizeY;
 		int bufferPos = 0;
-		str buffer = "";
+		RectDrawable caret;
+		TextDrawable buffer;
 		sdl::Color caretColor = sdl::COLOR_STANDARD;
 
-		void initCaret(FFont& font, float x, float y);
-		void movePosForCoords(float x, float y);
-		void renderCaret(sdl::SDLBatchRenderPass& rp);
+		inline virtual int getLimitWidth() { return 0; }
 
+		void initCaret(float x, float y, float w = 3, float h = 12);
+		void renderCaret(sdl::SDLBatchRenderPass& rp);
+		void updateCaretPos();
+
+		virtual float getBasePosX() = 0;
+		virtual float getBasePosY() = 0;
+		virtual strv getSourceText() = 0;
 		virtual void onBufferUpdated() = 0;
-		virtual void resetBuffer() = 0;
-		virtual void updateCaretPos() = 0;
 	private:
 		FWindow& fwindow;
 	};
@@ -43,13 +48,14 @@ namespace fbc {
 	// Resets buffer and releases text input
 	void TextSupplier::releaseBuffer()
 	{
-		resetBuffer();
+		buffer.set(getSourceText(), sdl::COLOR_WHITE);
 		fwindow.keyboardInputStopRequest(this);
 	}
 
 	void TextSupplier::start() {
 		fwindow.keyboardInputStart(this);
-		bufferPos = buffer.size();
+		buffer.set(getSourceText(), sdl::COLOR_LIME);
+		bufferPos = buffer.getTextLen();
 		updateCaretPos();
 	}
 
@@ -58,7 +64,7 @@ namespace fbc {
 		switch (c) {
 			// Moves the caret to the end
 		case sdl::KEY_DOWN:
-			bufferPos = buffer.size();
+			bufferPos = buffer.getTextLen();
 			updateCaretPos();
 			return;
 			// clears the buffer and releases text input
@@ -76,7 +82,7 @@ namespace fbc {
 			return;
 			// Moves the buffer forward one position
 		case sdl::KEY_RIGHT:
-			if (bufferPos < buffer.size()) {
+			if (bufferPos < buffer.getTextLen()) {
 				bufferPos += 1;
 				updateCaretPos();
 			}
@@ -88,8 +94,8 @@ namespace fbc {
 			return;
 			// Backspace removes the last element from the buffer
 		case sdl::KEY_BACKSPACE:
-			if (bufferPos <= buffer.size() && bufferPos > 0) {
-				buffer.erase(bufferPos - 1, 1);
+			if (bufferPos <= buffer.getTextLen() && bufferPos > 0) {
+				buffer.textErase(bufferPos - 1, 1);
 				bufferPos -= 1;
 				updateCaretPos();
 				onBufferUpdated();
@@ -100,24 +106,30 @@ namespace fbc {
 
 	// Typing adds characters to the buffer
 	void TextSupplier::onTextInput(const char* text) {
-		if (bufferPos <= buffer.size()) {
-			buffer.insert(bufferPos, text);
+		if (bufferPos <= buffer.getTextLen()) {
+			buffer.textInsert(bufferPos, text);
 			bufferPos += std::strlen(text);
 			updateCaretPos();
 			onBufferUpdated();
 		}
 	}
 
-	void TextSupplier::initCaret(FFont& font, float x, float y)
+	void TextSupplier::initCaret(float x, float y, float w, float h)
 	{
-		caret = font.makeTexture(INDICATOR);
 		caretPosX = x;
 		caretPosY = y;
+		caretSizeX = w;
+		caretSizeY = h;
 	}
 
 	// Renders the caret with a smooth fading "animation"
 	void TextSupplier::renderCaret(sdl::SDLBatchRenderPass& rp) {
 		caretColor.a = 0.5f + 0.5f * std::sin(sdl::runner::timeTotal() / 100000000.0f);
-		caret.draw(rp, caretPosX, caretPosY, caret.getWidth(), caret.getHeight(), fwindow.getW(), fwindow.getH(), 0, &caretColor);
+		caret.draw(rp, caretPosX, caretPosY, caretSizeX, caretSizeY, fwindow.getW(), fwindow.getH(), 0, &caretColor);
+	}
+
+	void TextSupplier::updateCaretPos() {
+		caretPosX = getBasePosX() + cfg.renderScale(9) + buffer.getFont().measureW(buffer.getText().substr(0, bufferPos));
+		caretPosY = getBasePosY();
 	}
 }

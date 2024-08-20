@@ -13,18 +13,18 @@ import sdl;
 import std;
 
 namespace fbc {
-	export class UIToggle : public UIInteractable, public TextDrawable {
+	export class UIToggle : public UIInteractable {
 	public:
 		UIToggle(FWindow& window, Hitbox* hb, strv text, IDrawable& image = cct.images.uiCheckboxEmpty, IDrawable& checkImage = cct.images.uiCheckboxFilled, FFont& f = cct.fontRegular(), float xOff = cct.images.uiCheckboxEmpty.getWidth() * 1.15f, float yOff = cct.images.uiCheckboxEmpty.getHeight() * 0.25f):
-			UIInteractable(window, hb, image), checkImage(checkImage), TextDrawable(f, text), xOff(xOff), yOff(yOff) {
+			UIInteractable(window, hb, image), checkImage(checkImage), text(f, text), xOff(xOff), yOff(yOff) {
 			UIToggle::onSizeUpdated();
 		}
 
 		bool toggled = false;
 		IDrawable& checkImage;
 
-		inline float getBeginX() override { return std::min(hb->x, hb->x + getTextXPos()); }
-		inline float getBeginY() override { return std::min(hb->y, hb->y + getTextYPos()); }
+		inline float getBeginX() override { return std::min(hb->x, hb->x + text.getPosX()); }
+		inline float getBeginY() override { return std::min(hb->y, hb->y + text.getPosY()); }
 		inline UIToggle& setOnClick(const func<void(UIToggle&)>& onClick) { return this->onClick = onClick, *this; }
 		inline UIToggle& setTextOffsetX(float xOff) { return this->xOff = xOff, *this; }
 		inline UIToggle& setTextOffsetY(float yOff) { return this->yOff = yOff, *this; }
@@ -34,6 +34,8 @@ namespace fbc {
 		void refreshDimensions() override;
 		void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		void toggle(bool val);
+	protected:
+		TextDrawable text;
 	private:
 		func<void(UIToggle&)> onClick;
 		float xOff = 0;
@@ -44,13 +46,13 @@ namespace fbc {
 
 	void UIToggle::onSizeUpdated()
 	{
-		TextDrawable::setPos(cfg.renderScale(xOff), cfg.renderScale(yOff));
+		text.setPos(cfg.renderScale(xOff), cfg.renderScale(yOff));
 	}
 
 	void UIToggle::refreshDimensions()
 	{
 		UIInteractable::refreshDimensions();
-		refreshCache();
+		text.reload();
 	}
 
 	void UIToggle::renderImpl(sdl::SDLBatchRenderPass& rp)
@@ -62,7 +64,7 @@ namespace fbc {
 			image.draw(rp, *hb.get(), win.getW(), win.getH(), rotation, hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color);
 		}
 
-		TextDrawable::drawText(rp, hb->x, hb->y, win.getW(), win.getH());
+		text.draw(rp, hb->x, hb->y, win.getW(), win.getH());
 	}
 
 	void UIToggle::toggle(bool val)

@@ -16,15 +16,15 @@ import sdl;
 import std;
 
 namespace fbc {
-	export class UINumberInput : public UITitledInteractable, public TextDrawable, public TextSupplier {
+	export class UINumberInput : public UITitledInteractable, public TextSupplier {
 	public:
 		UINumberInput(FWindow& window, Hitbox* hb,
 			int limMin = 0,
 			int limMax = std::numeric_limits<int>::max(),
 			IDrawable& image = cct.images.uiPanel,
 			IDrawable& arrow = cct.images.uiArrowIncrement,
-			FFont& textFont = cct.fontRegular()) : TextSupplier(window), UITitledInteractable(window, hb, image), TextDrawable(textFont), limMin(limMin), limMax(limMax), arrow(arrow) {
-			initCaret(this->font, this->hb->x, this->hb->y);
+			FFont& textFont = cct.fontRegular()) : TextSupplier(window, textFont), UITitledInteractable(window, hb, image), limMin(limMin), limMax(limMax), arrow(arrow) {
+			initCaret(this->hb->x, this->hb->y);
 			UINumberInput::onSizeUpdated();
 		}
 
@@ -38,22 +38,21 @@ namespace fbc {
 		virtual void onSizeUpdated() override;
 		virtual void refreshDimensions() override;
 		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
-		virtual void start() override;
 		virtual void updateImpl() override;
 	protected:
 		int limMax = std::numeric_limits<int>::max();
 		int limMin = 0;
 
+		inline virtual float getBasePosX() override { return this->hb->x; }
+		inline virtual float getBasePosY() override { return this->hb->y; }
+		inline virtual strv getSourceText() override { return futil::toString(val); }
 		inline void doOnComplete(int val) { if (onComplete) onComplete(val); }
-		inline virtual int getLimitWidth() override { return this->hb->w; }
 
 		virtual void commitInternal();
 		void clickLeftEvent() override;
 		void onBufferUpdated() override;
 		void onKeyPress(int32 c) override;
 		void onTextInput(const char* text) override;
-		void resetBuffer() override;
-		void updateCaretPos() override;
 	private:
 		func<void(int)> onBufferUpdateCallback;
 		func<void(int)> onComplete;
@@ -87,20 +86,20 @@ namespace fbc {
 
 	void UINumberInput::onSizeUpdated()
 	{
-		TextDrawable::setPos(cfg.renderScale(24), this->hb->h * 0.25f);
+		buffer.setPos(cfg.renderScale(24), this->hb->h * 0.25f);
 		moreRect.w = moreRect.h = lessRect.w = lessRect.h = hb->h / 2;
 	}
 
 	void UINumberInput::refreshDimensions()
 	{
 		UITitledInteractable::refreshDimensions();
-		refreshCache();
+		buffer.reload();
 	}
 
 	void UINumberInput::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
 		UITitledInteractable::renderImpl(rp);
-		TextDrawable::drawText(rp, hb->x, hb->y, win.getW(), win.getH());
+		buffer.draw(rp, hb->x, hb->y, win.getW(), win.getH());
 		arrow.draw(rp, lessRect, win.getW(), win.getH());
 		arrow.draw(rp, moreRect, win.getW(), win.getH());
 		if (sdl::runner::keyboardInputActive(this)) {
@@ -112,14 +111,8 @@ namespace fbc {
 	UINumberInput& UINumberInput::setValue(int num)
 	{
 		valTemp = val = std::clamp(num, limMin, limMax);
-		setText(std::to_string(num));
+		buffer.setText(std::to_string(num));
 		return *this;
-	}
-
-	void UINumberInput::start() {
-		buffer = getText();
-		TextSupplier::start();
-		this->updateCache(buffer, sdl::COLOR_LIME);
 	}
 
 	// When clicking outside of the text input, commit whatever is in the input
@@ -165,10 +158,9 @@ namespace fbc {
 				valTemp = std::max(0, limMin);
 			}
 			else {
-				valTemp = std::stoi(buffer);
+				valTemp = std::stoi(str(buffer.getText()));
 				valTemp = std::clamp(valTemp, limMin, limMax);
 			}
-			this->updateCache(buffer, sdl::COLOR_LIME);
 			if (onBufferUpdateCallback) {
 				onBufferUpdateCallback(valTemp);
 			}
@@ -191,10 +183,6 @@ namespace fbc {
 			commitInternal();
 			releaseBuffer();
 			return;
-		case sdl::KEY_ESC:
-			this->refreshCache();
-			releaseBuffer();
-			return;
 		case sdl::KEY_DOWN:
 			modifyDuringInput(valTemp - interval);
 			return;
@@ -209,30 +197,17 @@ namespace fbc {
 	// Typing only adds numeric characters to the buffer
 	void UINumberInput::onTextInput(const char* text)
 	{
-		if (bufferPos <= buffer.size() && futil::isNumeric(text)) {
-			buffer.insert(bufferPos, text);
+		if (bufferPos <= buffer.getTextLen() && futil::isNumeric(text)) {
+			buffer.textInsert(bufferPos, text);
 			bufferPos += std::strlen(text);
 			updateCaretPos();
 			onBufferUpdated();
 		}
 	}
 
-	void UINumberInput::resetBuffer()
-	{
-		this->refreshCache();
-		buffer = getText();
-	}
-
-	void UINumberInput::updateCaretPos()
-	{
-		caretPosX = this->hb->x + cfg.renderScale(9) + this->font.measureW(buffer.substr(0, bufferPos));
-		caretPosY = this->hb->y;
-	}
-
 	void UINumberInput::commitInternal()
 	{
 		val = valTemp;
-		setText(buffer);
 		if (onComplete) {
 			onComplete(val);
 		}
@@ -241,8 +216,7 @@ namespace fbc {
 	void UINumberInput::modifyDuringInput(int val)
 	{
 		valTemp = std::clamp(val, limMin, limMax);
-		buffer = std::to_string(valTemp);
-		this->updateCache(buffer, sdl::COLOR_LIME);
+		buffer.set(std::to_string(valTemp), sdl::COLOR_LIME);
 		if (onBufferUpdateCallback) {
 			onBufferUpdateCallback(valTemp);
 		}

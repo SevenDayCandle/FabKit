@@ -11,6 +11,8 @@ namespace fbc {
 		IDrawable() {}
 		virtual ~IDrawable() override = default;
 
+		inline virtual float getHeight() const { return 0; }
+		inline virtual float getWidth() const { return 0; }
 		inline virtual void dispose() override {}
 		inline virtual void reload() const override {}
 		inline void draw(sdl::SDLBatchRenderPass& rp, const sdl::RectF& rect, float winW, float winH, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) {
@@ -18,7 +20,6 @@ namespace fbc {
 		};
 
 		virtual void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) = 0;
-		virtual float getWidth() const = 0;
 	protected:
 		inline static sdl::Matrix4x4 MATRIX_UNIFORM = {
 		1, 0, 0, 0,

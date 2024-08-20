@@ -362,6 +362,7 @@ namespace sdl::runner {
 		GpuShader* shaderFragment = loadShader(SHADER_NORMAL_FRAG, SDL_GPU_SHADERSTAGE_FRAGMENT);
 		GpuShader* shaderVertex = loadShader(SHADER_NORMAL_VERT, SDL_GPU_SHADERSTAGE_VERTEX);
 		RENDER_STANDARD = createPipeline(shaderVertex, shaderFragment);
+		RENDER_FILL = createShapePipeline(shaderVertex, shaderFragment);
 		// TODO more shaders/blending modes
 
 		gpuReleaseShader(device, shaderFragment);
@@ -530,14 +531,15 @@ namespace sdl::runner {
 		return gpuCreateGraphicsPipeline(device, &pipelineCreateInfo);
 	}
 
+	// TODO more pipelines
 	GpuGraphicsPipeline* pipelineForMode(RenderMode mode)
 	{
-		switch (mode) {
-		case OVERLAY:
-			return nullptr;
-		default:
-			return RENDER_STANDARD;
-		}
+		return RENDER_STANDARD;
+	}
+
+	GpuGraphicsPipeline* shapePipelineForMode(RenderMode mode)
+	{
+		return RENDER_FILL;
 	}
 
 	// Generates a shader to be used for this window

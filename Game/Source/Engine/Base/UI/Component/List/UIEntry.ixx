@@ -10,15 +10,14 @@ import fbc.UIInteractable;
 import fbc.UILabel;
 import fbc.FUtil;
 import fbc.RelativeHitbox;
-
 import sdl;
 import std;
 
 namespace fbc {
-	export template <typename T> class UIEntry : public UIInteractable, public TextDrawable {
+	export template <typename T> class UIEntry : public UIInteractable {
 	public:
 		UIEntry(const T& item, int index, const func<void(UIEntry<T>&)>& onClick, FWindow& window, RelativeHitbox* hb, FFont& f, const str& text, IDrawable& image = cct.images.uiCheckboxEmpty, IDrawable& checkImage = cct.images.uiCheckboxFilled, sdl::Color baseColor = sdl::COLOR_STANDARD, sdl::Color hoverColor = sdl::COLOR_STANDARD) :
-			item(item), index(index), onClick(onClick), baseColor(baseColor), hoverColor(hoverColor), UIInteractable(window, hb, image), TextDrawable(f, text), checkImage(checkImage) {
+			UIInteractable(window, hb, image), item(item), index(index), onClick(onClick), baseColor(baseColor), hoverColor(hoverColor), text(f, text), checkImage(checkImage) {
 		}
 
 		operator const T*() const { return &item; }
@@ -29,7 +28,8 @@ namespace fbc {
 		const T& item;
 		int index;
 
-		inline virtual float getProjectedWidth() { return image.getWidth() + cfg.renderScale(8) + TextDrawable::getTextWidth(); };
+		inline strv getText() { return text.getText(); }
+		inline virtual float getProjectedWidth() { return image.getWidth() + cfg.renderScale(8) + text.getWidth(); };
 		inline virtual void updateActiveStatus(bool val) { active = val; };
 		inline virtual void updateSelectStatus(bool selected) { toggled = selected; };
 
@@ -43,53 +43,50 @@ namespace fbc {
 		sdl::Color hoverColor;
 		IDrawable& checkImage;
 		func<void(UIEntry<T>&)> onClick;
+		TextDrawable text;
 
 		inline virtual void clickLeftEvent() override { onClick(*this); }
 	};
 
 	template<typename T> void UIEntry<T>::onHbHover()
 	{
-		TextDrawable::setColor(hoverColor);
+		text.setColor(hoverColor);
 	}
 
 	template<typename T> void UIEntry<T>::onHbUnhover()
 	{
-		TextDrawable::setColor(baseColor);
+		text.setColor(baseColor);
 	}
 
 	template<typename T> void UIEntry<T>::onSizeUpdated()
 	{
-		TextDrawable::setPos(this->hb->h * 1.25f, 0);
+		text.setPos(this->hb->h * 1.25f, 0);
 	}
 
 	template<typename T> void UIEntry<T>::refreshDimensions()
 	{
 		UIInteractable::refreshDimensions();
-		refreshCache();
+		text.reload();
 	}
 
 	template<typename T> void UIEntry<T>::renderImpl(sdl::SDLBatchRenderPass& rp) {
-
-		sdl::RectF check = { this->hb->x, this->hb->y, this->hb->h, this->hb->h };
-
-
 		if (active) {
 			if (toggled) {
-				checkImage.draw(rp, check, win.getW(), win.getH(), 0, &sdl::COLOR_WHITE);
+				checkImage.draw(rp, this->hb->x, this->hb->y, this->hb->h, this->hb->h, win.getW(), win.getH(), 0, &sdl::COLOR_WHITE);
 			}
 			else {
-				image.draw(rp, check, win.getW(), win.getH(), 0, &sdl::COLOR_WHITE);
+				image.draw(rp, this->hb->x, this->hb->y, this->hb->h, this->hb->h, win.getW(), win.getH(), 0, &sdl::COLOR_WHITE);
 			}
 		}
 		else {
 			if (toggled) {
-				checkImage.draw(rp, check, win.getW(), win.getH());
+				checkImage.draw(rp, this->hb->x, this->hb->y, this->hb->h, this->hb->h, win.getW(), win.getH());
 			}
 			else {
-				image.draw(rp, check, win.getW(), win.getH());
+				image.draw(rp, this->hb->x, this->hb->y, this->hb->h, this->hb->h, win.getW(), win.getH());
 			}
 		}
 
-		TextDrawable::drawText(rp, check.x, check.y, win.getW(), win.getH());
+		text.draw(rp, this->hb->x, this->hb->y, win.getW(), win.getH());
 	}
 }

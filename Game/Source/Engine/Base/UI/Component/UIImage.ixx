@@ -4,7 +4,6 @@ import fbc.FUtil;
 import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
-import fbc.TextDrawable;
 import fbc.Tooltip;
 import fbc.UITipHoverable;
 import sdl;

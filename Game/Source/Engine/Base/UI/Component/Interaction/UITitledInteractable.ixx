@@ -19,8 +19,8 @@ namespace fbc {
 
 		uptr<TextDrawable> label;
 
-		inline virtual float getBeginX() override { return label ? std::min(hb->x, hb->x + label->getTextXPos()) : hb->x; }
-		inline virtual float getBeginY() override { return label ? std::min(hb->y, hb->y + label->getTextYPos()) : hb->y; }
+		inline virtual float getBeginX() override { return label ? std::min(hb->x, hb->x + label->getPosX()) : hb->x; }
+		inline virtual float getBeginY() override { return label ? std::min(hb->y, hb->y + label->getPosY()) : hb->y; }
 		inline strv getLabelText() const { return label ? label->getText() : ""; }
 
 		virtual void refreshDimensions() override;
@@ -36,7 +36,7 @@ namespace fbc {
 	{
 		UIInteractable::refreshDimensions();
 		if (label) {
-			label->refreshCache();
+			label->reload();
 			label->setPos(cfg.renderScale(xOff), cfg.renderScale(yOff));
 		}
 	}
@@ -45,7 +45,7 @@ namespace fbc {
 	{
 		UIInteractable::renderImpl(rp);
 		if (label) {
-			label->drawText(rp, hb->x, hb->y, win.getW(), win.getH());
+			label->draw(rp, hb->x, hb->y, win.getW(), win.getH());
 		}
 	}
 
@@ -53,7 +53,7 @@ namespace fbc {
 	{
 		this->xOff = xOff;
 		this->yOff = yOff;
-		label = std::make_unique<TextDrawable>(font, text, color, colorOutline);
+		label = std::make_unique<TextDrawable>(font, text, 0, color, colorOutline);
 		label->setPos(cfg.renderScale(xOff), cfg.renderScale(yOff));
 		return *this;
 	}
