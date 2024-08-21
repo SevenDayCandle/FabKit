@@ -7,6 +7,7 @@ import fbc.UIBase;
 import fbc.UIVerticalScrollbar;
 import fbc.FUtil;
 import fbc.ScaleHitbox;
+import sdl.SDLBatchRenderPass;
 import std;
 
 namespace fbc {

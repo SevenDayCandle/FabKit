@@ -10,7 +10,10 @@ import fbc.IDrawable;
 import fbc.RelativeHitbox;
 import fbc.UIEntry;
 import fbc.UIList;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {

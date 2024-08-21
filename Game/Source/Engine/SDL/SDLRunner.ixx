@@ -14,6 +14,8 @@ import std;
 
 namespace sdl {
 	constexpr auto RENDERER_VULKAN = "VULKAN";
+	constexpr auto SHADER_FILL_FRAG = "Shader/Compiled/Fill.frag.spv";
+	constexpr auto SHADER_FILL_VERT = "Shader/Compiled/Fill.vert.spv";
 	constexpr auto SHADER_NORMAL_FRAG = "Shader/Compiled/Normal.frag.spv";
 	constexpr auto SHADER_NORMAL_VERT = "Shader/Compiled/Normal.vert.spv";
 
@@ -216,7 +218,7 @@ namespace sdl::runner {
 	export GpuGraphicsPipeline* createShapePipeline(GpuShader* vertexShader, GpuShader* fragmentShader, GpuTextureFormat textureFormat = GpuTextureFormat::SDL_GPU_TEXTUREFORMAT_B8G8R8A8, GpuBlendFactor srcColor = GpuBlendFactor::SDL_GPU_BLENDFACTOR_SRC_ALPHA, GpuBlendFactor dstColor = GpuBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, GpuBlendFactor srcAlpha = GpuBlendFactor::SDL_GPU_BLENDFACTOR_ONE, GpuBlendFactor dstAlpha = GpuBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA);
 	export GpuGraphicsPipeline* pipelineForMode(RenderMode mode);
 	export GpuGraphicsPipeline* shapePipelineForMode(RenderMode mode);
-	export GpuShader* loadShader(const char* shaderFilename, GpuShaderStage stage, Uint32 samplerCount = 1, Uint32 uniformBufferCount = 1, Uint32 storageBufferCount = 0, Uint32 storageTextureCount = 0);
+	export GpuShader* loadShader(const char* shaderFilename, GpuShaderStage stage, Uint32 samplerCount, Uint32 uniformBufferCount, Uint32 storageBufferCount = 0, Uint32 storageTextureCount = 0);
 	export GpuTexture* uploadTexture(GpuCopyPass* copyPass, Surface* surface);
 	export GpuTexture* uploadTexture(GpuCopyPass* copyPass, Surface* surface, GpuTransferBuffer* textureTransferBuffer);
 	export GpuTexture* uploadTextureForArray(GpuCopyPass* copyPass, Surface* surface, GpuTexture* texture, GpuTransferBuffer* textureTransferBuffer, Uint32 layer);
@@ -358,11 +360,13 @@ namespace sdl::runner {
 		SAMPLER = gpuCreateSampler(device, &samplerInfo);
 
 		// Set up pipelines
-
-		GpuShader* shaderFragment = loadShader(SHADER_NORMAL_FRAG, SDL_GPU_SHADERSTAGE_FRAGMENT);
-		GpuShader* shaderVertex = loadShader(SHADER_NORMAL_VERT, SDL_GPU_SHADERSTAGE_VERTEX);
+		GpuShader* shaderFragment = loadShader(SHADER_NORMAL_FRAG, SDL_GPU_SHADERSTAGE_FRAGMENT, 1, 1);
+		GpuShader* shaderVertex = loadShader(SHADER_NORMAL_VERT, SDL_GPU_SHADERSTAGE_VERTEX, 0, 1);
 		RENDER_STANDARD = createPipeline(shaderVertex, shaderFragment);
-		RENDER_FILL = createShapePipeline(shaderVertex, shaderFragment);
+
+		GpuShader* shaderFillFragment = loadShader(SHADER_FILL_FRAG, SDL_GPU_SHADERSTAGE_FRAGMENT, 1, 1);
+		GpuShader* shaderFillVertex = loadShader(SHADER_FILL_VERT, SDL_GPU_SHADERSTAGE_VERTEX, 0, 1);
+		RENDER_FILL = createPipeline(shaderFillVertex, shaderFillFragment);
 		// TODO more shaders/blending modes
 
 		gpuReleaseShader(device, shaderFragment);
@@ -493,12 +497,13 @@ namespace sdl::runner {
 		return gpuCreateGraphicsPipeline(device, &pipelineCreateInfo);
 	}
 
+	// Generates a non-texture graphics pipeline to be used for this window
 	GpuGraphicsPipeline* createShapePipeline(GpuShader* vertexShader, GpuShader* fragmentShader, GpuTextureFormat textureFormat, GpuBlendFactor srcColor, GpuBlendFactor dstColor, GpuBlendFactor srcAlpha, GpuBlendFactor dstAlpha)
 	{
 		GpuColorAttachmentDescription colorAttachmentDescriptions[] = { {
 					.format = textureFormat,
 					.blendState = {
-						.blendEnable = true,
+						.blendEnable = SDL_TRUE,
 						.srcColorBlendFactor = srcColor,
 						.dstColorBlendFactor = dstColor,
 						.colorBlendOp = GpuBlendOp::SDL_GPU_BLENDOP_ADD,
@@ -577,6 +582,7 @@ namespace sdl::runner {
 		return shader;
 	}
 
+	// Convert a surface into a texture to be used for rendering
 	GpuTexture* uploadTexture(GpuCopyPass* copyPass, Surface* surface)
 	{
 		GpuTransferBuffer* textureTransferBuffer = runner::deviceCreateTransferBuffer(
@@ -588,6 +594,7 @@ namespace sdl::runner {
 		return tex;
 	}
 
+	// Convert a surface into a texture to be used for rendering
 	GpuTexture* uploadTexture(GpuCopyPass* copyPass, Surface* surface, GpuTransferBuffer* textureTransferBuffer)
 	{
 		Uint32 w = surface->w;
@@ -627,6 +634,7 @@ namespace sdl::runner {
 		return texture;
 	}
 
+	// Add a surface into a texture array to be used for rendering
 	GpuTexture* uploadTextureForArray(GpuCopyPass* copyPass, Surface* surface, GpuTexture* texture, GpuTransferBuffer* textureTransferBuffer, Uint32 layer)
 	{
 		Uint32 w = surface->w;

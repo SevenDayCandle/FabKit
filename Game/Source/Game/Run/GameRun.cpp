@@ -6,7 +6,10 @@ import fbc.FUtil;
 import fbc.RunEncounter;
 import fbc.RunRoom;
 import fbc.RunZone;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 module fbc.GameRun;

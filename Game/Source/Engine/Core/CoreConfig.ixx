@@ -7,7 +7,10 @@ import fbc.ConfigNumeric;
 import fbc.FUtil;
 import fbc.Language;
 import fbc.WindowMode;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {

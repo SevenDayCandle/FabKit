@@ -16,7 +16,10 @@ import fbc.UIDropdown;
 import fbc.UIEntry;
 import fbc.UIInteractable;
 import fbc.UISelectorList;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {
@@ -51,7 +54,6 @@ namespace fbc {
 		virtual void onSizeUpdated() override;
 		virtual void openPopup() override;
 		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
-		virtual void start() override;
 		virtual void unsetProxy() override;
 
 		static uptr<UISearchableDropdown> multiSearch(FWindow& window, Hitbox* hb,
@@ -73,16 +75,15 @@ namespace fbc {
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall);
 	protected:
-		void updateCaretPos() override;
 
 		virtual void onSelectionUpdate(EntryView<T>& items) override;
 	private:
-		str lowerBuffer;
+		str lowercaseText;
 
 		bool checkEntry(const UIEntry<T>* entry);
 		void initSearchable();
 		void onBufferUpdated() override;
-		void resetBuffer() override;
+		void releaseBuffer() override;
 	};
 
 	template<typename T> void UISearchableDropdown<T>::onChangeItems() {
@@ -117,12 +118,6 @@ namespace fbc {
 		}
 	}
 
-	template<typename T> void UISearchableDropdown<T>::start()
-	{
-		TextSupplier::start();
-		this->updateCache(buffer, sdl::COLOR_LIME);
-	}
-
 	template<typename T> void UISearchableDropdown<T>::unsetProxy()
 	{
 		UIDropdown<T>::unsetProxy();
@@ -142,11 +137,11 @@ namespace fbc {
 	// An entry matches if the buffer is a prefix of the entry's text
 	template<typename T> bool UISearchableDropdown<T>::checkEntry(const UIEntry<T>* entry) {
 		strv text = entry->getText();
-		if (lowerBuffer.size() > text.size()) {
+		if (lowercaseText.size() > text.size()) {
 			return false;
 		}
-		for (int i = 0; i < lowerBuffer.size(); ++i) {
-			if (std::tolower(text[i]) != lowerBuffer[i]) {
+		for (int i = 0; i < lowercaseText.size(); ++i) {
+			if (std::tolower(text[i]) != lowercaseText[i]) {
 				return false;
 			}
 		}
@@ -156,10 +151,9 @@ namespace fbc {
 	// The entries displayed in the menu should be filtered by the current buffer text
 	template<typename T> void UISearchableDropdown<T>::onBufferUpdated()
 	{
-		lowerBuffer.resize(buffer.size()); // Cache lowercase version of buffer to reuse for prefix matching
-		std::transform(buffer.begin(), buffer.end(), lowerBuffer.begin(), [](unsigned char c) {return std::tolower(c); });
+		lowercaseText.resize(buffer.getTextLen()); // Cache lowercase version of buffer to reuse for prefix matching
+		std::transform(buffer.getTextBegin(), buffer.getTextEnd(), lowercaseText.begin(), [](unsigned char c) {return std::tolower(c); });
 		this->menu->refilterRows();
-		this->updateCache(buffer, sdl::COLOR_LIME);
 	}
 
 	template<typename T> void UISearchableDropdown<T>::initSearchable()
@@ -169,18 +163,11 @@ namespace fbc {
 		initCaret(this->hb->x, this->hb->y);
 	}
 
-	template<typename T> void UISearchableDropdown<T>::resetBuffer()
+	template<typename T> void UISearchableDropdown<T>::releaseBuffer()
 	{
-		buffer.clear();
-		lowerBuffer.clear();
+		TextSupplier::releaseBuffer();
+		lowercaseText.clear();
 		this->menu->refilterRows();
-		this->updateCache();
-	}
-
-	template<typename T> void UISearchableDropdown<T>::updateCaretPos()
-	{
-		caretPosX = this->hb->x + cfg.renderScale(9) + this->font.measureW(buffer.substr(0, bufferPos));
-		caretPosY = this->hb->y;
 	}
 
 	template<typename T> uptr<UISearchableDropdown<T>> UISearchableDropdown<T>::multiSearch(

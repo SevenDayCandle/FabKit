@@ -4,7 +4,10 @@ import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.FUtil;
 import fbc.IDrawable;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import sdl.IKeyInputListener;
 import std;
 

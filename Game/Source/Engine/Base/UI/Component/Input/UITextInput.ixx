@@ -11,7 +11,10 @@ import fbc.TextSupplier;
 import fbc.TextDrawable;
 import fbc.UIInteractable;
 import fbc.UITitledInteractable;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {

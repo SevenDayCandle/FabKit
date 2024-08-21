@@ -6,7 +6,10 @@ import fbc.Hitbox;
 import fbc.IDrawable;
 
 import fbc.UIInteractable;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 
 namespace fbc {
 	export class UIButton : public UIInteractable {

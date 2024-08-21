@@ -2,7 +2,10 @@ export module fbc.ContentRegisterable;
 
 import fbc.BaseContent;
 import fbc.FUtil;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 /*

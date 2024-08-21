@@ -3,14 +3,17 @@ export module fbc.TextDrawable;
 import fbc.FFont;
 import fbc.FUtil;
 import fbc.ImageDrawable;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 
 // TODO directly extend imageDrawable
 namespace fbc {
 	export class TextDrawable : public ImageDrawable {
 	public:
 		TextDrawable(FFont& font, strv text = "", float w = 0, sdl::Color color = sdl::COLOR_STANDARD, sdl::Color colorOutline = sdl::COLOR_BLACK) : font(font), textW(w), text(text), color(color), colorOutline(colorOutline) {
-			reload();
+			TextDrawable::reload();
 		}
 		virtual ~TextDrawable() = default;
 
@@ -18,6 +21,8 @@ namespace fbc {
 		inline FFont& getFont() const { return font; }
 		inline float getPosX() const { return posX; }
 		inline float getPosY() const { return posY; }
+		inline str::const_iterator getTextBegin() const { return text.begin(); }
+		inline str::const_iterator getTextEnd() const { return text.end(); }
 		inline size_t getTextLen() const { return text.size(); }
 		inline strv getText() const { return text; }
 		inline void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float winW, float winH, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) { draw(rp, x, y, texW, texH, winW, winH, rotZ, tint, pipeline); }
@@ -64,9 +69,14 @@ namespace fbc {
 
 	void TextDrawable::reload(sdl::GpuCopyPass* copyPass) const
 	{
+		if (texture) {
+			sdl::runner::deviceReleaseTexture(texture);
+		}
 		sdl::Surface* surface = font.makeSurface(text, textW, color, colorOutline);
-		sdl::GpuTexture* fontTex = sdl::runner::uploadTexture(copyPass, surface);
-		sdl::surfaceDestroy(surface);
+		if (surface) {
+			texture = sdl::runner::uploadTexture(copyPass, surface);
+			sdl::surfaceDestroy(surface);
+		}
 	}
 
 	TextDrawable& TextDrawable::set(strv text, sdl::Color color)

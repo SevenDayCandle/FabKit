@@ -7,7 +7,10 @@ import fbc.IDrawable;
 import fbc.RelativeHitbox;
 import fbc.UIHorizontalScrollbar;
 import fbc.UINumberInput;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {

@@ -2,7 +2,10 @@ export module fbc.RectDrawable;
 
 import fbc.FUtil;
 import fbc.IDrawable;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {

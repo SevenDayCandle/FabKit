@@ -9,7 +9,10 @@ import fbc.Hitbox;
 import fbc.IDrawable;
 
 import fbc.UIImage;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {

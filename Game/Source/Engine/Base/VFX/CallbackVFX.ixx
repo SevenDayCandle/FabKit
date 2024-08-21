@@ -3,7 +3,10 @@ export module fbc.CallbackVFX;
 import fbc.FUtil;
 import fbc.FWindow;
 import fbc.VFX;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {

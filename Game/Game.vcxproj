@@ -196,10 +196,6 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\SDL\SDL.ixx">
-      <SubType>
-      </SubType>
-    </ClCompile>
     <ClCompile Include="Source\Engine\SDL\SDLBatchRenderPass.ixx">
       <SubType>
       </SubType>
@@ -665,6 +661,10 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
     <None Include="Content\test\Objects\Encounters.json" />
     <None Include="Resources\Strings\ENG\KeywordStrings.json" />
     <None Include="Resources\Strings\ENG\UIStrings.json" />
+    <None Include="Shader\Compiled\Fill.frag.spv" />
+    <None Include="Shader\Compiled\Fill.vert.spv" />
+    <None Include="Shader\Source\Fill.vert" />
+    <None Include="Shader\Source\Fill.frag" />
     <None Include="Shader\Compiled\Normal.frag.spv" />
     <None Include="Shader\Compiled\Normal.vert.spv" />
     <None Include="Shader\Source\Normal.frag" />

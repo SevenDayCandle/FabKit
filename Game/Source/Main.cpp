@@ -4,7 +4,10 @@ import fbc.ConfigHotkey;
 import fbc.DynamicContent;
 import fbc.FWindow;
 import fbc.TitleScreen;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 using namespace fbc;

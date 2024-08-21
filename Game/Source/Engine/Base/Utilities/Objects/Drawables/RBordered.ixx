@@ -2,7 +2,10 @@ export module fbc.RBordered;
 
 import fbc.FUtil;
 import fbc.FTexture;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {

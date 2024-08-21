@@ -1,12 +1,16 @@
 export module fbc.TextSupplier;
 
+import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FWindow;
 import fbc.FUtil;
 import fbc.RectDrawable;
 import fbc.TextDrawable;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import sdl.IKeyInputListener;
 import std;
 
@@ -18,8 +22,8 @@ namespace fbc {
 
 		virtual void onKeyPress(int32 c) override;
 		virtual void onTextInput(const char* text) override;
+		virtual void releaseBuffer();
 		virtual void start();
-		void releaseBuffer();
 
 	protected:
 		float caretPosX;

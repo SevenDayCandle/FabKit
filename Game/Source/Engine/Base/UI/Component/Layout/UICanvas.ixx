@@ -5,6 +5,7 @@ import fbc.FUtil;
 import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.UIBase;
+import sdl.SDLBatchRenderPass;
 import std;
 
 namespace fbc {

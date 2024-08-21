@@ -6,7 +6,10 @@ import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.Tooltip;
 import fbc.UITipHoverable;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 
 namespace fbc {
 	export class UIImage : public UITipHoverable {

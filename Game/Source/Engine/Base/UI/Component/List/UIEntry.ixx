@@ -10,7 +10,9 @@ import fbc.UIInteractable;
 import fbc.UILabel;
 import fbc.FUtil;
 import fbc.RelativeHitbox;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {

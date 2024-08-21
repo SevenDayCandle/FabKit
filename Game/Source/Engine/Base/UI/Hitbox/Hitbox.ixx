@@ -1,7 +1,10 @@
 export module fbc.Hitbox;
 
 import fbc.FUtil;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 
 namespace fbc {
 	export class Hitbox : public sdl::RectF {

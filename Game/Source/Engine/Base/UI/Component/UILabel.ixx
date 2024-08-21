@@ -7,6 +7,7 @@ import fbc.Hitbox;
 import fbc.TextDrawable;
 import fbc.Tooltip;
 import fbc.UITipHoverable;
+import sdl.SDLBatchRenderPass;
 
 namespace fbc {
 	export class UILabel : public UITipHoverable {

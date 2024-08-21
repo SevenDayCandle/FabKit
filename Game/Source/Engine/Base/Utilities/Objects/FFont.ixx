@@ -4,7 +4,10 @@ import fbc.CoreConfig;
 import fbc.FTexture;
 import fbc.FUtil;
 import fbc.ILoadable;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 
 namespace fbc {
 	export class FFont : public ILoadable {
@@ -100,42 +103,38 @@ namespace fbc {
         return *this;
     }
 
-    // Create a texture snapshot of the text rendered with this font in the given colors. Text must NOT be empty
+    // Create a texture snapshot of the text rendered with this font in the given colors. Returns nullptr if the text was empty
     sdl::Surface* FFont::makeSurface(strv text, uint32 w, const sdl::Color& color, const sdl::Color& outlineColor, const sdl::Color& shadowColor)
     {
         const char* texDat = text.data();
         sdl::Surface* targetSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, sdl::toTextColor(color), w);
 
-        if (outlineSize > 0) {
-            int res = cfg.fontScale(outlineSize);
-            sdl::fontOutlineSet(font, res);
-            sdl::Surface* outlineSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, sdl::toTextColor(outlineColor), w);
-            sdl::fontOutlineSet(font, 0);
-            sdl::RectI targetRect = { res, res, targetSurf->w, targetSurf->h };
-            sdl::surfaceBlitScaled(targetSurf, nullptr, outlineSurf, &targetRect, sdl::ScaleMode::SDL_SCALEMODE_BEST);
-            sdl::surfaceDestroy(targetSurf);
-            targetSurf = outlineSurf;
-        }
+        if (targetSurf) {
+            if (outlineSize > 0) {
+                int res = cfg.fontScale(outlineSize);
+                sdl::fontOutlineSet(font, res);
+                sdl::Surface* outlineSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, sdl::toTextColor(outlineColor), w);
+                sdl::fontOutlineSet(font, 0);
+                sdl::RectI targetRect = { res, res, targetSurf->w, targetSurf->h };
+                sdl::surfaceBlitScaled(targetSurf, nullptr, outlineSurf, &targetRect, sdl::ScaleMode::SDL_SCALEMODE_BEST);
+                sdl::surfaceDestroy(targetSurf);
+                targetSurf = outlineSurf;
+            }
 
-        if (shadowSize > 0) {
-            int res = cfg.fontScale(shadowSize);
-            sdl::Surface* shadowSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, sdl::toTextColor(shadowColor), w);
-            sdl::Surface* newTargetSurf = sdl::surfaceCreate(targetSurf->w + res, targetSurf->h + res, targetSurf->format);
-            sdl::RectI shadowRect = { res, res, shadowSurf->w, shadowSurf->h };
-            sdl::RectI clipRect;
-            sdl::surfaceGetClipRect(targetSurf, &clipRect);
-            sdl::surfaceBlitScaled(shadowSurf, nullptr, newTargetSurf, &shadowRect, sdl::ScaleMode::SDL_SCALEMODE_BEST);
-            sdl::surfaceBlitScaled(targetSurf, nullptr, newTargetSurf, &clipRect, sdl::ScaleMode::SDL_SCALEMODE_BEST);
-            sdl::surfaceDestroy(targetSurf);
-            sdl::surfaceDestroy(shadowSurf);
-            targetSurf = newTargetSurf;
+            if (shadowSize > 0) {
+                int res = cfg.fontScale(shadowSize);
+                sdl::Surface* shadowSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, sdl::toTextColor(shadowColor), w);
+                sdl::Surface* newTargetSurf = sdl::surfaceCreate(targetSurf->w + res, targetSurf->h + res, targetSurf->format);
+                sdl::RectI shadowRect = { res, res, shadowSurf->w, shadowSurf->h };
+                sdl::RectI clipRect;
+                sdl::surfaceGetClipRect(targetSurf, &clipRect);
+                sdl::surfaceBlitScaled(shadowSurf, nullptr, newTargetSurf, &shadowRect, sdl::ScaleMode::SDL_SCALEMODE_BEST);
+                sdl::surfaceBlitScaled(targetSurf, nullptr, newTargetSurf, &clipRect, sdl::ScaleMode::SDL_SCALEMODE_BEST);
+                sdl::surfaceDestroy(targetSurf);
+                sdl::surfaceDestroy(shadowSurf);
+                targetSurf = newTargetSurf;
+            }
         }
-
-        sdl::GpuCommandBuffer* uploadCmdBuf = sdl::runner::deviceAcquireCommandBuffer();
-        sdl::GpuCopyPass* copyPass = sdl::gpuBeginCopyPass(uploadCmdBuf);
-        sdl::GpuTexture* fontTex = sdl::runner::uploadTexture(copyPass, targetSurf);
-        sdl::gpuEndCopyPass(copyPass);
-        sdl::gpuSubmit(uploadCmdBuf);
 
         return targetSurf;
     }

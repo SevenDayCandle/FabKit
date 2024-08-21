@@ -2,7 +2,10 @@ export module fbc.RVertical;
 
 import fbc.FTexture;
 import fbc.FUtil;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 
 namespace fbc {
 	export class RVertical : public FTexture {

@@ -15,7 +15,9 @@ import fbc.UIEntry;
 import fbc.UIInteractable;
 import fbc.UISelectorList;
 import fbc.UITitledInteractable;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {

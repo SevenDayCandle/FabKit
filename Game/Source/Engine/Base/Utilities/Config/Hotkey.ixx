@@ -7,7 +7,10 @@ export module fbc.ConfigHotkey;
 import fbc.Config;
 import fbc.FUtil;
 import fbc.KeyedItem;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {

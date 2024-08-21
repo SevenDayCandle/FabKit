@@ -7,6 +7,7 @@ import fbc.Hitbox;
 import fbc.ScaleHitbox;
 import fbc.UICanvas;
 import fbc.UIVerticalScrollbar;
+import sdl.SDLBatchRenderPass;
 
 namespace fbc {
 	export class UIVerticalCanvas : public UICanvas {

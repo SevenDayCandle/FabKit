@@ -3,7 +3,10 @@ export module fbc.ConfigNumeric;
 import fbc.Config;
 import fbc.ConfigValue;
 import fbc.FUtil;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {

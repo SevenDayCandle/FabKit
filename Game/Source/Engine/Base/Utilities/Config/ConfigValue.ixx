@@ -2,7 +2,10 @@ export module fbc.ConfigValue;
 
 import fbc.Config;
 import fbc.FUtil;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 
 namespace fbc {
     export template<typename T> class ConfigValue : public Config::ConfigEntry {
