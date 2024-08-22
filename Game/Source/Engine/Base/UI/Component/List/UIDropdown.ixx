@@ -23,16 +23,6 @@ import std;
 namespace fbc {
 	export template <typename T> class UIDropdown : public UIInteractable {
 	public:
-		UIDropdown(FWindow& window, uptr<Hitbox>&& hb, 
-			UISelectorList<T>* menu, 
-			IDrawable& image = cct.images.uiPanel,
-			IDrawable& arrow = cct.images.uiArrowSmall,
-			IDrawable& clear = cct.images.uiClearSmall,
-			FFont& textFont = cct.fontRegular(),
-			func<str(EntryView<T>&)>& buttonLabelFunc = {}
-		): UIInteractable(window, move(hb), image), text(textFont), menu(menu), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
-			init();
-		}
 		UIDropdown(FWindow& window, uptr<Hitbox>&& hb,
 			uptr<UISelectorList<T>> menu,
 			IDrawable& image = cct.images.uiPanel,

@@ -47,8 +47,19 @@ namespace fbc {
 			virtual Hitbox* getHb() = 0;
 		};
 
-		FWindow() {}
+		FWindow(CoreConfig& cfg, CoreContent& cct, const char* title) : cfg(cfg), cct(cct) {
+			const pair<int, int>& resolution = cfg.graphicsResolution.get();
+			initialize(resolution.first, resolution.second, title, cfg.graphicsWindowMode.get());
+			cfg.graphicsResolution.addOnReload([this](const pair<int, int>& val) {refreshSize(val.first, val.second); });
+			cfg.graphicsWindowMode.addOnReload([this](const int& val) {sdl::windowSetFullscreen(window, val); });
 
+		}
+		FWindow(FWindow& parent, int w, int h, const char* title, uint32 windowFlags = 0): cfg(parent.cfg), cct(parent.cct) {
+			initialize(w, h, title, windowFlags);
+		}
+
+		CoreConfig& cfg;
+		CoreContent& cct;
 		Element* activeElement;
 
 		inline int getH() const noexcept { return winH; }
@@ -57,7 +68,6 @@ namespace fbc {
 		inline void keyboardInputStart(sdl::IKeyInputListener* listener) { sdl::runner::keyboardInputStart(window, listener); }
 
 		bool hasOverlay(Element* target);
-		bool initialize(int w, int h, uint32 windowFlags = 0, bool vsync = false, const char* title = "Fabricate");
 		Element* getActiveOverlay();
 		Element* currentScreen();
 		void closeCurrentScreen();
@@ -68,7 +78,6 @@ namespace fbc {
 		void queueTip(Element* tip);
 		void refreshSize(int winW, int winH);
 		void render();
-		void subscribeToCore(CoreConfig& cfg);
 		void swapScreen(uptr<Element>&& screen);
 		void update();
 	private:
@@ -78,6 +87,7 @@ namespace fbc {
 		deque<uptr<Element>> overlays;
 		Element* queuedCloseOverlay;
 		Element* tipBatch;
+		FWindow* parent;
 		sdl::Matrix4x4 matrixUniform = {
 		1, 0, 0, 0,
 			0, 1, 0, 0,
@@ -87,10 +97,12 @@ namespace fbc {
 		sdl::Window* window;
 		int winH;
 		int winW;
+
+		bool initialize(int w, int h, const char* title, uint32 windowFlags = 0);
 	};
 
 	// Set up window and its rendering device. Returns true if set up successfully
-	bool FWindow::initialize(int w, int h, uint32 windowFlags, bool vsync, const char* title)
+	bool FWindow::initialize(int w, int h, const char* title, uint32 windowFlags)
 	{
 		this->winH = h;
 		this->winW = w;
@@ -101,11 +113,13 @@ namespace fbc {
 		}
 
 		// Setup device for this window
-		if (!sdl::runner::deviceClaimWindow(window, sdl::GpuSwapchainComposition::SDL_GPU_SWAPCHAINCOMPOSITION_SDR, vsync ? sdl::GpuPresentMode::SDL_GPU_PRESENTMODE_VSYNC : sdl::GpuPresentMode::SDL_GPU_PRESENTMODE_IMMEDIATE))
+		if (!sdl::runner::deviceClaimWindow(window, sdl::GpuSwapchainComposition::SDL_GPU_SWAPCHAINCOMPOSITION_SDR, cfg.graphicsVSync.get() ? sdl::GpuPresentMode::SDL_GPU_PRESENTMODE_VSYNC : sdl::GpuPresentMode::SDL_GPU_PRESENTMODE_IMMEDIATE))
 		{
 			sdl::logCritical("GpuClaimWindow went derp: %s", sdl::getError());
 			return false;
 		}
+
+		cfg.graphicsVSync.addOnReload([this](const bool& val) { sdl::runner::deviceSetSwapchainParameters(window, sdl::GpuSwapchainComposition::SDL_GPU_SWAPCHAINCOMPOSITION_SDR, val ? sdl::GpuPresentMode::SDL_GPU_PRESENTMODE_VSYNC : sdl::GpuPresentMode::SDL_GPU_PRESENTMODE_IMMEDIATE); });
 
 		return true;
 	}
@@ -292,16 +306,6 @@ namespace fbc {
 			}
 			queuedCloseOverlay = nullptr;
 		}
-	}
-
-	// Attach listeners to the core config to change the screen whenever graphics settings are changed
-	void FWindow::subscribeToCore(CoreConfig& cfg) {
-		const pair<int, int>& resolution = cfg.graphicsResolution.get();
-		initialize(resolution.first, resolution.second, cfg.graphicsWindowMode.get(), cfg.graphicsVSync.get());
-
-		cfg.graphicsResolution.addOnReload([this](const pair<int, int>& val) {refreshSize(val.first, val.second);});
-		cfg.graphicsWindowMode.addOnReload([this](const int& val) {sdl::windowSetFullscreen(window, val); });
-		cfg.graphicsVSync.addOnReload([this](const bool& val) { sdl::runner::deviceSetSwapchainParameters(window, sdl::GpuSwapchainComposition::SDL_GPU_SWAPCHAINCOMPOSITION_SDR, val ? sdl::GpuPresentMode::SDL_GPU_PRESENTMODE_VSYNC : sdl::GpuPresentMode::SDL_GPU_PRESENTMODE_IMMEDIATE); });
 	}
 
 	bool FWindow::Element::tickUpdate()

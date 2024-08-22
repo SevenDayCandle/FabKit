@@ -26,16 +26,6 @@ namespace fbc {
 	export template <typename T> class UISearchableDropdown : public UIDropdown<T>, public TextSupplier {
 	public:
 		UISearchableDropdown(FWindow& window, uptr<Hitbox>&& hb,
-			UISelectorList<T>* menu,
-			IDrawable& image = cct.images.uiPanel,
-			IDrawable& arrow = cct.images.uiArrowSmall,
-			IDrawable& clear = cct.images.uiClearSmall,
-			FFont& textFont = cct.fontRegular(),
-			func<str(EntryView<T>&)>& buttonLabelFunc = {}
-		) : UIDropdown<T>(window, move(hb), menu, image, arrow, clear, textFont, buttonLabelFunc), TextSupplier(window) {
-			initSearchable();
-		}
-		UISearchableDropdown(FWindow& window, uptr<Hitbox>&& hb,
 			uptr<UISelectorList<T>> menu,
 			IDrawable& image = cct.images.uiPanel,
 			IDrawable& arrow = cct.images.uiArrowSmall,

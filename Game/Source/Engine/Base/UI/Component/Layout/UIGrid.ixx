@@ -48,6 +48,7 @@ namespace fbc {
 			scrollbar{window, make_unique<ScaleHitbox>(hb->w * 0.93f / cfg.renderScale(), hb->y + hb->h * 0.05f / cfg.renderScale(), 48, hb->h * 0.9f / cfg.renderScale())} {
 			scrollbar.enabled = false;
 		}
+		UIGrid(UIGrid&& other) noexcept : UIBase(other.win, move(other.hb)), spacingX(other.spacingX), spacingY(other.spacingY), scrollSpeed(other.scrollSpeed), scrollbar(move(other.scrollbar)), items(move(other.items)) {}
 
 		inline float getSpacingX() const { return spacingX; }
 		inline float getSpacingY() const { return spacingY; }

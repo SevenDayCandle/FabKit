@@ -12,18 +12,10 @@ import std;
 
 using namespace fbc;
 
-FWindow window;
-
-void dispose() {
-	// TODO save game state as necessary
-	window.dispose();
-	cct.dispose();
-	sdl::runner::quit();
-}
-
-bool initialize() {
+int main()
+{
 	if (!sdl::runner::init()) {
-		return false;
+		return -1;
 	}
 
 	cfg.load();
@@ -34,16 +26,8 @@ bool initialize() {
 	cct.initializeContents();
 	cct.postInitialize();
 
-	window.subscribeToCore(cfg);
+	FWindow window(cfg, cct, "Fabricate");
 	window.openScreen(std::make_unique<fbc::TitleScreen>(window));
-	return true;
-}
-
-int main()
-{
-	if (!initialize()) {
-		return -1;
-	}
 
 	while(sdl::runner::poll())
 	{
@@ -56,6 +40,8 @@ int main()
 		}
 	}
 
-	dispose();
+	window.dispose();
+	cct.dispose();
+	sdl::runner::quit();
 	return 0;
 }
