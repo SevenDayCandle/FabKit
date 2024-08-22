@@ -214,7 +214,7 @@ namespace fbc {
 
 	// Render all visible rows and the scrollbar if it is shown
 	template <typename T> void UIList<T>::renderImpl(sdl::SDLBatchRenderPass& rp) {
-		background.draw(rp, *hb.get(), win.getW(), win.getH(), 0, &backgroundColor);
+		background.draw(rp, *hb.get(), win.getW(), win.getH(), 1, 1, 0, &backgroundColor);
 		int rowCount = getVisibleRowCount();
 		for (int i = topVisibleRowIndex; i < topVisibleRowIndex + rowCount; ++i) {
 			rows[i]->renderImpl(rp);

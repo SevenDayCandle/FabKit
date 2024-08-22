@@ -28,6 +28,6 @@ namespace fbc {
 	void CombatTurnRenderable::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
 		UIInteractable::renderImpl(rp);
-		portrait.draw(rp, hb->x + hb->w / 8, hb->y + hb->h * 0.15f, hb->w / 2, hb->h * 0.7f, win.getW(), win.getH(), rotation, &color);
+		portrait.draw(rp, hb->x + hb->w / 8, hb->y + hb->h * 0.15f, hb->w / 2, hb->h * 0.7f, win.getW(), win.getH(), 1, 1, rotation, &color);
 	}
 }

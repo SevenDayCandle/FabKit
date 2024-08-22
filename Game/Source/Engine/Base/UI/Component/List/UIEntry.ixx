@@ -74,10 +74,10 @@ namespace fbc {
 	template<typename T> void UIEntry<T>::renderImpl(sdl::SDLBatchRenderPass& rp) {
 		if (active) {
 			if (toggled) {
-				checkImage.draw(rp, this->hb->x, this->hb->y, this->hb->h, this->hb->h, win.getW(), win.getH(), 0, &sdl::COLOR_WHITE);
+				checkImage.draw(rp, this->hb->x, this->hb->y, this->hb->h, this->hb->h, win.getW(), win.getH(), 1, 1, 0, &sdl::COLOR_WHITE);
 			}
 			else {
-				image.draw(rp, this->hb->x, this->hb->y, this->hb->h, this->hb->h, win.getW(), win.getH(), 0, &sdl::COLOR_WHITE);
+				image.draw(rp, this->hb->x, this->hb->y, this->hb->h, this->hb->h, win.getW(), win.getH(), 1, 1, 0, &sdl::COLOR_WHITE);
 			}
 		}
 		else {

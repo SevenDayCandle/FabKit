@@ -29,6 +29,6 @@ namespace fbc {
 	};
 
 	void UIImage::renderImpl(sdl::SDLBatchRenderPass& rp) {
-		image.draw(rp, *hb.get(), win.getW(), win.getH(), rotation, &color);
+		image.draw(rp, *hb.get(), win.getW(), win.getH(), 1, 1, rotation, &color);
 	}
 }

@@ -103,7 +103,7 @@ namespace fbc {
 		UIInteractable::renderImpl(rp);
 		buffer.draw(rp, hb->x, hb->y, win.getW(), win.getH());
 		arrow.draw(rp, lessRect, win.getW(), win.getH());
-		arrow.draw(rp, moreRect, win.getW(), win.getH(), sdl::rads(180));
+		arrow.draw(rp, moreRect, win.getW(), win.getH(), 1, -1);
 		if (sdl::runner::keyboardInputActive(this)) {
 			renderCaret(rp);
 		}

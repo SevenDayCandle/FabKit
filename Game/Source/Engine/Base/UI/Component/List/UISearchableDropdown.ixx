@@ -115,7 +115,7 @@ namespace fbc {
 			this->buffer.draw(rp, this->hb->x, this->hb->y, this->win.getW(), this->win.getH());
 			renderCaret(rp);
 			if (this->selectedSize() > 0) {
-				this->clear.draw(rp, this->arrowRect, this->win.getW(), this->win.getH(), this->UIImage::color, this->rotation);
+				this->clear.draw(rp, this->arrowRect, this->win.getW(), this->win.getH(), 1, 1, this->rotation, this->UIImage::color);
 			}
 		}
 		else {

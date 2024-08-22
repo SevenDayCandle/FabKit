@@ -30,9 +30,9 @@ namespace fbc {
 		inline str::const_iterator getTextEnd() const { return text.end(); }
 		inline size_t getTextLen() const { return text.size(); }
 		inline strv getText() const { return text; }
-		inline void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float winW, float winH, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) { draw(rp, x, y, texW, texH, winW, winH, rotZ, tint, pipeline); }
+		inline void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float winW, float winH, float scX = 1, float scY = 1, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) { draw(rp, x, y, texW, texH, winW, winH, scX, scY, rotZ, tint, pipeline); }
 
-		void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) override;
+		void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) override;
 		void reload() const override;
 		void reload(sdl::GpuCopyPass* copyPass) const;
 		TextDrawable& set(strv text, sdl::Color color);
@@ -56,10 +56,10 @@ namespace fbc {
 		sdl::Color colorOutline = sdl::COLOR_BLACK;
 	};
 
-	void TextDrawable::draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline)
+	void TextDrawable::draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline)
 	{
 		if (texture) {
-			ImageDrawable::draw(rp, x + posX, y + posY, w, h, winW, winH, rotZ, tint, pipeline);
+			ImageDrawable::draw(rp, x + posX, y + posY, w, h, winW, winH, scX, scY, rotZ, tint, pipeline);
 		}
 	}
 

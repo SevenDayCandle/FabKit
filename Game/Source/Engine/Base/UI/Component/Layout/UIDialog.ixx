@@ -31,7 +31,7 @@ namespace fbc {
 	}
 
 	void UIDialog::renderImpl(sdl::SDLBatchRenderPass& rp) {
-		image.draw(rp, *hb.get(), win.getW(), win.getH());
+		image.draw(rp, *hb.get(), win.getW(), win.getH(), 1, 1);
 		UICanvas::renderImpl(rp);
 	}
 

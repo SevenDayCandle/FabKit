@@ -177,6 +177,7 @@ namespace fbc {
 		else {
 			menu->hb->setRealPos(hb->x, bottom);
 		}
+		menu->updateImpl(); // Update to update menu sub-hitboxes
 		if (proxy == nullptr) {
 			this->win.openOverlay(std::make_unique<UIDropdownProxy<T>>(this->win, *this));
 			proxy = this->win.getActiveOverlay();
@@ -189,10 +190,10 @@ namespace fbc {
 	template<typename T> void UIDropdown<T>::renderImpl(sdl::SDLBatchRenderPass& rp) {
 		UIInteractable::renderImpl(rp);
 		if (this->selectedSize() > 0 && this->canClear()) {
-			clear.draw(rp, arrowRect, win.getW(), win.getH(), rotation, &this->UIImage::color);
+			clear.draw(rp, arrowRect, win.getW(), win.getH(), 1, 1, rotation, &this->UIImage::color);
 		}
 		else {
-			arrow.draw(rp, arrowRect, win.getW(), win.getH(), menu->isOpen() ? rotation + sdl::rads(180) : rotation, &this->UIImage::color);
+			arrow.draw(rp, arrowRect, win.getW(), win.getH(), 1, menu->isOpen() ? -1 : 1, rotation, &this->UIImage::color);
 		}
 		text.draw(rp, hb->x, hb->y, win.getW(), win.getH());
 	}

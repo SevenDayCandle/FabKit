@@ -129,7 +129,7 @@ namespace fbc {
 	// Renders the caret with a smooth fading "animation"
 	void TextSupplier::renderCaret(sdl::SDLBatchRenderPass& rp) {
 		caretColor.a = 0.5f + 0.5f * std::sin(sdl::runner::timeTotal() / 100000000.0f);
-		caret.draw(rp, caretPosX, caretPosY, caretSizeX, caretSizeY, fwindow.getW(), fwindow.getH(), 0, &caretColor);
+		caret.draw(rp, caretPosX, caretPosY, caretSizeX, caretSizeY, fwindow.getW(), fwindow.getH(), 1, 1, 0, &caretColor);
 	}
 
 	void TextSupplier::updateCaretPos() {

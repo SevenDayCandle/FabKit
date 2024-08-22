@@ -133,6 +133,7 @@ namespace fbc {
 		for (uptr<BaseContent>& content : registeredContents | std::views::values) {
 			content->postInitialize();
 		}
+		cfg.graphicsResolution.addOnReload([this](auto& val) {reloadFonts(); });
 		cfg.textFontPercent.addOnReload([this](const int& val) {reloadFonts();});
 	}
 

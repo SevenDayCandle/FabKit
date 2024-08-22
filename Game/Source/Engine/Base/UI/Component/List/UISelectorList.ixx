@@ -306,7 +306,7 @@ namespace fbc {
 
 	// Render all visible rows and the scrollbar if it is shown
 	template <typename T> void UISelectorList<T>::renderImpl(sdl::SDLBatchRenderPass& rp) {
-		this->background.draw(rp, *this->hb.get(), this->win.getW(), this->win.getH(), 0, &this->backgroundColor);
+		this->background.draw(rp, *this->hb.get(), this->win.getW(), this->win.getH(), 1, 1, 0, &this->backgroundColor);
 		int rowCount = getVisibleRowCount();
 		for (int i = this->topVisibleRowIndex; i < this->topVisibleRowIndex + rowCount; ++i) {
 			rowsForRender[i]->renderImpl(rp);

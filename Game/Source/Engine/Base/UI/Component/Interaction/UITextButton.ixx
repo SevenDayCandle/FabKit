@@ -40,6 +40,7 @@ namespace fbc {
 	{
 		UIButton::refreshDimensions();
 		text.setWidth(hb->w);
+		text.setPos((this->hb->w - text.getWidth()) / 2, (this->hb->h - text.getHeight()) / 2);
 	}
 
 	void UITextButton::renderImpl(sdl::SDLBatchRenderPass& rp) {
