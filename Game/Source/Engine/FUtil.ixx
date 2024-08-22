@@ -98,6 +98,7 @@ namespace fbc {
 	export using std::span;
 	export using std::type_info;
 
+	export using std::forward;
 	export using std::make_shared;
 	export using std::make_unique;
 	export using std::move;

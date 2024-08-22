@@ -18,7 +18,7 @@ namespace fbc {
 
 	export class RunScreen : public UIScreen {
 	public:
-		RunScreen(FWindow& win): UIScreen(win) {}
+		RunScreen(FWindow& window): UIScreen(window) {}
 
 		void open() override;
 	private:

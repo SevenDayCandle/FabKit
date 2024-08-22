@@ -51,13 +51,14 @@ namespace fbc {
 			typename vec<uptr<UIEntry<T>>>::iterator it;
 		};
 
-		UIList(FWindow& window, Hitbox* hb,
+		UIList(FWindow& window, uptr<Hitbox>&& hb,
 			func<str(const T&)> labelFunc = futil::toString<T>,
 			FFont& itemFont = cct.fontSmall(),
 			IDrawable& background = cct.images.uiPanelRound,
 			bool canAutosize = false) :
-			UIBase(window, hb), background(background), itemFont(itemFont), labelFunc(std::move(labelFunc)), canAutosize(canAutosize) {
+			UIBase(window, move(hb)), background(background), itemFont(itemFont), labelFunc(std::move(labelFunc)), canAutosize(canAutosize) {
 		}
+		UIList(UIList&& other) noexcept = default;
 
 		~UIList() override {}
 
@@ -266,7 +267,7 @@ namespace fbc {
 			i,
 			[this](UIEntry<T>& p) { this->selectRow(p); },
 			this->win,
-			new RelativeHitbox(*this->hb),
+			make_unique<RelativeHitbox>(*this->hb),
 			this->getItemFont(),
 			labelFunc(item));
 		entry->setHbExactSizeY(cfg.renderScale(64));

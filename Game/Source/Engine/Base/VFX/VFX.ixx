@@ -13,7 +13,7 @@ namespace fbc {
 
 	export class VFX : public FWindow::Element {
 	public:
-		VFX(FWindow& win, float duration = DEFAULT_DURATION): Element(win), duration(duration * sdl::NANOS_PER_SECOND * cfg.gameEffectSpeed.get()) {}
+		VFX(FWindow& window, float duration = DEFAULT_DURATION): Element(window), duration(duration * sdl::NANOS_PER_SECOND * cfg.gameEffectSpeed.get()) {}
 		virtual ~VFX() override = default;
 
 		float duration;

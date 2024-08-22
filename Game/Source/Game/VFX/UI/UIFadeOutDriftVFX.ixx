@@ -13,7 +13,7 @@ import std;
 namespace fbc {
 	export class UIFadeOutDriftVFX : public VFX {
 	public:
-		UIFadeOutDriftVFX(FWindow& win, uptr<UIImage>&& image, float tOffX = 0, float tOffY = 0, float duration = DEFAULT_DURATION * 0.5f): VFX(win, duration), image(move(image)), tOffX(tOffX), tOffY(tOffY) {}
+		UIFadeOutDriftVFX(FWindow& window, uptr<UIImage>&& image, float tOffX = 0, float tOffY = 0, float duration = DEFAULT_DURATION * 0.5f): VFX(window, duration), image(move(image)), tOffX(tOffX), tOffY(tOffY) {}
 
 		inline UIFadeOutDriftVFX& setTOff(float tOffX, float tOffY) { return this->tOffX = tOffX, this->tOffY = tOffY, *this; }
 		inline UIFadeOutDriftVFX& setTOffX(float tOffX) { return this->tOffX = tOffX, *this; }

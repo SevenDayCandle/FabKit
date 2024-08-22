@@ -11,15 +11,16 @@ import sdl.SDLRunner;
 import std;
 
 namespace fbc {
-	export class UIBase : public FWindow::Element {
+	export class UIBase : public FWindow::Hoverable {
 	public:
-		UIBase(FWindow& window, Hitbox* hb) : Element(window), hb(hb) {}
-		UIBase(FWindow& window, uptr<Hitbox>&& hb) : Element(window), hb(std::move(hb)) {}
+		UIBase(FWindow& window, uptr<Hitbox>&& hb) : Hoverable(window), hb(move(hb)) {}
+		UIBase(UIBase&& other) noexcept = default;
 		virtual ~UIBase() override = default;
 
 		uptr<Hitbox> hb;
 		bool enabled = true;
 
+		inline Hitbox* getHb() final override { return hb.get(); }
 		inline virtual float getBeginX() { return hb->x; } // The left-most end X coordinate of this object, may be smaller than hb if this has labels
 		inline virtual float getBeginY() { return hb->y; } // The left-most end X coordinate of this object, may be smaller than hb if this has labels
 		inline virtual float getEndX() { return hb->x + hb->w; } // The right-most end X coordinate of this object, may be larger than hb if this has subcomponents
@@ -33,8 +34,7 @@ namespace fbc {
 		inline virtual UIBase& setHbOffsetPos(const float x, const float y) { return hb->setOffPos(x, y), * this; }
 		inline virtual UIBase& setHbOffsetPosX(const float x) { return hb->setOffPosX(x), * this; }
 		inline virtual UIBase& setHbOffsetPosY(const float y) { return hb->setOffPosY(y), * this; }
-		template <typename... Args> requires std::constructible_from<RelativeHitbox, Hitbox&, Args...> inline uptr<RelativeHitbox> relhb(Args... args) { return make_unique<RelativeHitbox>(&hb, std::forward<Args>(args)...); }
-		template <typename T, typename... Args> requires std::constructible_from<T, FWindow&, Args...> uptr<T> inline create(Args... args) { return make_unique<T>(win, std::forward<Args>(args)...); }
+		template <typename... Args> requires std::constructible_from<RelativeHitbox, Hitbox&, Args&&...> inline uptr<RelativeHitbox> relhb(Args&&... args) { return make_unique<RelativeHitbox>(*hb, forward<Args>(args)...); } // Generate a relative hitbox based on this component's hitbox
 
 		virtual UIBase& setHbExactSize(const float x, const float y);
 		virtual UIBase& setHbExactSizeX(const float x);
@@ -45,9 +45,7 @@ namespace fbc {
 		virtual void refreshDimensions() override;
 		virtual void render(sdl::SDLBatchRenderPass& rp) final override;
 		virtual void update() final override;
-		virtual void updateImpl();
-
-		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) = 0;
+		virtual void updateImpl() override;
 	};
 
 	// Wrapper around setRealSize that invokes any size update callbacks

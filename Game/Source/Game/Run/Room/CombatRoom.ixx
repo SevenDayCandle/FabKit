@@ -22,10 +22,10 @@ namespace fbc {
 
 	const CombatRoom CombatRoom::instance = CombatRoom();
 
-	void CombatRoom::onAfterClick(FWindow& win)
+	void CombatRoom::onAfterClick(FWindow& window)
 	{
 		if (GameRun::current->getCombatInstance() != nullptr) {
-			win.openScreen(make_unique<CombatScreen>(win));
+			window.openScreen(make_unique<CombatScreen>(window));
 		}
 	}
 

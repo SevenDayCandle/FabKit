@@ -101,6 +101,7 @@ namespace fbc {
 	}
 
 	void CoreConfig::postInitialize() {
+		updateScales();
 		sdl::musicSetVolume(soundVolumeMusic.get() * soundVolumeMaster.get() * VOLUME_SCALAR);
 		sdl::soundSetAllVolume(soundVolumeEffects.get() * soundVolumeMaster.get() * VOLUME_SCALAR);
 
@@ -118,6 +119,7 @@ namespace fbc {
 
 		// Add graphic config subscriptions. Note that most config subscriptions are specific to FWindow
 		graphicsFPS.addOnReload([](const int& val) { sdl::runner::setFPSLimit(val); });
+		graphicsResolution.addOnReload([this](const pair<int, int>& val) { updateScales(); });
 		textFontPercent.addOnReload([this](const int& val) { updateScales(); });
 	}
 

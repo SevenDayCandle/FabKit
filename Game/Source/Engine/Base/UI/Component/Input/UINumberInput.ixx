@@ -11,7 +11,6 @@ import fbc.TextSupplier;
 import fbc.TextDrawable;
 import fbc.UIButton;
 import fbc.UIInteractable;
-import fbc.UITitledInteractable;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
 import sdl.SDLProps; 
@@ -19,14 +18,14 @@ import sdl.SDLRunner;
 import std;
 
 namespace fbc {
-	export class UINumberInput : public UITitledInteractable, public TextSupplier {
+	export class UINumberInput : public UIInteractable, public TextSupplier {
 	public:
-		UINumberInput(FWindow& window, Hitbox* hb,
+		UINumberInput(FWindow& window, uptr<Hitbox>&& hb,
 			int limMin = 0,
 			int limMax = std::numeric_limits<int>::max(),
 			IDrawable& image = cct.images.uiPanel,
 			IDrawable& arrow = cct.images.uiArrowIncrement,
-			FFont& textFont = cct.fontRegular()) : TextSupplier(window, textFont), UITitledInteractable(window, hb, image), limMin(limMin), limMax(limMax), arrow(arrow) {
+			FFont& textFont = cct.fontRegular()) : TextSupplier(window, textFont), UIInteractable(window, move(hb), image), limMin(limMin), limMax(limMax), arrow(arrow) {
 			initCaret(this->hb->x, this->hb->y);
 			UINumberInput::onSizeUpdated();
 		}
@@ -46,9 +45,9 @@ namespace fbc {
 		int limMax = std::numeric_limits<int>::max();
 		int limMin = 0;
 
-		inline virtual float getBasePosX() override { return this->hb->x; }
-		inline virtual float getBasePosY() override { return this->hb->y; }
-		inline virtual strv getSourceText() override { return futil::toString(val); }
+		inline float getBasePosX() final override { return this->hb->x; }
+		inline float getBasePosY() final override { return this->hb->y; }
+		inline strv getSourceText() final override { return futil::toString(val); }
 		inline void doOnComplete(int val) { if (onComplete) onComplete(val); }
 
 		virtual void commitInternal();
@@ -95,16 +94,16 @@ namespace fbc {
 
 	void UINumberInput::refreshDimensions()
 	{
-		UITitledInteractable::refreshDimensions();
+		UIInteractable::refreshDimensions();
 		buffer.reload();
 	}
 
 	void UINumberInput::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
-		UITitledInteractable::renderImpl(rp);
+		UIInteractable::renderImpl(rp);
 		buffer.draw(rp, hb->x, hb->y, win.getW(), win.getH());
 		arrow.draw(rp, lessRect, win.getW(), win.getH());
-		arrow.draw(rp, moreRect, win.getW(), win.getH());
+		arrow.draw(rp, moreRect, win.getW(), win.getH(), sdl::rads(180));
 		if (sdl::runner::keyboardInputActive(this)) {
 			renderCaret(rp);
 		}

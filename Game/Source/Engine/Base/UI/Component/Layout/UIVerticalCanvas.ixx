@@ -12,9 +12,9 @@ import sdl.SDLBatchRenderPass;
 namespace fbc {
 	export class UIVerticalCanvas : public UICanvas {
 	public:
-		UIVerticalCanvas(FWindow& window, Hitbox* hb, float scrollSpeed = 1): UICanvas(window, hb),
+		UIVerticalCanvas(FWindow& window, uptr<Hitbox>&& hb, float scrollSpeed = 1): UICanvas(window, move(hb)),
 			scrollSpeed(scrollSpeed),
-			scrollbar{ window, new ScaleHitbox(hb->w * 0.93f / cfg.renderScale(), hb->y + hb->h * 0.05f / cfg.renderScale(), 48, hb->h * 0.9f / cfg.renderScale())},
+			scrollbar{ window, make_unique<ScaleHitbox>(hb->w * 0.93f / cfg.renderScale(), hb->y + hb->h * 0.05f / cfg.renderScale(), 48, hb->h * 0.9f / cfg.renderScale())},
 			baseOffsetY(hb->getOffPosY()) {
 			scrollbar.setOnScroll([this](float f) {reposition(f); });
 		}

@@ -8,9 +8,9 @@ namespace fbc {
 	/* Hitbox whose position AND size scale with screen dimensions */
 	export class ScreenSizeHitbox : public Hitbox {
 	public:
-		ScreenSizeHitbox(FWindow& win) : ScreenSizeHitbox(win, 0, 0, 1, 1) {}
-		ScreenSizeHitbox(FWindow& win, float offsetWidth, float offsetHeight) : ScreenSizeHitbox(win, 0, 0, offsetWidth, offsetHeight) {}
-		ScreenSizeHitbox(FWindow& win, float screenXPercentPos, float screenYPercentPos, float screenXPercentSize, float screenYPercentSize) : Hitbox(screenXPercentPos, screenYPercentPos, screenXPercentSize, screenYPercentSize), win(win) {
+		ScreenSizeHitbox(FWindow& window) : ScreenSizeHitbox(window, 0, 0, 1, 1) {}
+		ScreenSizeHitbox(FWindow& window, float offsetWidth, float offsetHeight) : ScreenSizeHitbox(window, 0, 0, offsetWidth, offsetHeight) {}
+		ScreenSizeHitbox(FWindow& window, float screenXPercentPos, float screenYPercentPos, float screenXPercentSize, float screenYPercentSize) : Hitbox(screenXPercentPos, screenYPercentPos, screenXPercentSize, screenYPercentSize), win(window) {
 			refresh();
 		}
 		~ScreenSizeHitbox() override {}

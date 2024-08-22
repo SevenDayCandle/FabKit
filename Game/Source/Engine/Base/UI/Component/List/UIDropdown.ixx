@@ -14,35 +14,38 @@ import fbc.TextDrawable;
 import fbc.UIEntry;
 import fbc.UIInteractable;
 import fbc.UISelectorList;
-import fbc.UITitledInteractable;
+import fbc.UIInteractable;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
 import sdl.SDLRunner;
 import std;
 
 namespace fbc {
-	export template <typename T> class UIDropdown : public UITitledInteractable {
+	export template <typename T> class UIDropdown : public UIInteractable {
 	public:
-		UIDropdown(FWindow& window, Hitbox* hb, 
+		UIDropdown(FWindow& window, uptr<Hitbox>&& hb, 
 			UISelectorList<T>* menu, 
 			IDrawable& image = cct.images.uiPanel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
 			func<str(EntryView<T>&)>& buttonLabelFunc = {}
-		): UITitledInteractable(window, hb, image), text(textFont), menu(menu), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
+		): UIInteractable(window, move(hb), image), text(textFont), menu(menu), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
 			init();
 		}
-		UIDropdown(FWindow& window, Hitbox* hb,
+		UIDropdown(FWindow& window, uptr<Hitbox>&& hb,
 			uptr<UISelectorList<T>> menu,
 			IDrawable& image = cct.images.uiPanel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall,
 			FFont& textFont = cct.fontRegular(),
 			func<str(EntryView<T>&)>& buttonLabelFunc = {}
-		): UITitledInteractable(window, hb, image), text(textFont), menu(std::move(menu)), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
+		): UIInteractable(window, move(hb), image), text(textFont), menu(std::move(menu)), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
 			init();
 		}
+		UIDropdown(UIDropdown&& other) noexcept : UIInteractable(other.win, move(other.hb), other.image), text(move(other.text)), menu(move(other.menu)), buttonLabelFunc(move(other.buttonLabelFunc)), arrow(other.arrow), clear(other.clear) {
+			init();
+		};
 
 		uptr<UISelectorList<T>> menu;
 
@@ -93,7 +96,7 @@ namespace fbc {
 		virtual void updateImpl() override;
 		virtual void unsetProxy();
 
-		static uptr<UIDropdown> multiList(FWindow& window, Hitbox* hb, 
+		static UIDropdown multiList(FWindow& window, uptr<Hitbox>&& hb,
 			func<str(const T&)> labelFunc = futil::toString<T>,
 			func<str(EntryView<T>&)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
@@ -102,7 +105,7 @@ namespace fbc {
 			IDrawable& image = cct.images.uiPanel,
 			IDrawable& arrow = cct.images.uiArrowSmall,
 			IDrawable& clear = cct.images.uiClearSmall);
-		static uptr<UIDropdown> singleList(FWindow& window, Hitbox* hb, 
+		static UIDropdown singleList(FWindow& window, uptr<Hitbox>&& hb,
 			func<str(const T&)> labelFunc = futil::toString<T>,
 			func<str(EntryView<T>&)> buttonLabelFunc = {},
 			FFont& itemFont = cct.fontRegular(),
@@ -134,7 +137,7 @@ namespace fbc {
 
 	export template <typename T> class UIDropdownProxy : public FWindow::Element {
 	public:
-		UIDropdownProxy(FWindow& win, UIDropdown<T>& menu) : Element(win), dropdown(menu) {}
+		UIDropdownProxy(FWindow& window, UIDropdown<T>& menu) : Element(window), dropdown(menu) {}
 		UIDropdown<T>& dropdown;
 
 		void dispose() override;
@@ -147,7 +150,7 @@ namespace fbc {
 	}
 
 	template<typename T> void UIDropdown<T>::refreshDimensions() {
-		UITitledInteractable::refreshDimensions();
+		UIInteractable::refreshDimensions();
 		text.reload();
 		this->menu->refreshDimensions();
 	}
@@ -184,12 +187,12 @@ namespace fbc {
 	}
 
 	template<typename T> void UIDropdown<T>::renderImpl(sdl::SDLBatchRenderPass& rp) {
-		UITitledInteractable::renderImpl(rp);
+		UIInteractable::renderImpl(rp);
 		if (this->selectedSize() > 0 && this->canClear()) {
 			clear.draw(rp, arrowRect, win.getW(), win.getH(), rotation, &this->UIImage::color);
 		}
 		else {
-			arrow.draw(rp, arrowRect, win.getW(), win.getH(), menu->isOpen() ? rotation + 180 : rotation, &this->UIImage::color);
+			arrow.draw(rp, arrowRect, win.getW(), win.getH(), menu->isOpen() ? rotation + sdl::rads(180) : rotation, &this->UIImage::color);
 		}
 		text.draw(rp, hb->x, hb->y, win.getW(), win.getH());
 	}
@@ -212,13 +215,14 @@ namespace fbc {
 		UIDropdown<T>::onSizeUpdated();
 	}
 
-	template<typename T> uptr<UIDropdown<T>> UIDropdown<T>::multiList(
-		FWindow& win, Hitbox* hb, func<str(const T&)> labelFunc, func<str(EntryView<T>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
+	template<typename T> UIDropdown<T> UIDropdown<T>::multiList(
+		FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, func<str(EntryView<T>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
 	{
-		return std::make_unique<UIDropdown<T>>(
-			win,
-			hb,
-			UISelectorList<T>::multiList(win, new ScaleHitbox(hb->getOffSizeX(), hb->getOffSizeY()), labelFunc, itemFont, background),
+		Hitbox& ref = *hb;
+		return UIDropdown<T>(
+			window,
+			move(hb),
+			UISelectorList<T>::multiList(window, make_unique<ScaleHitbox>(ref.getOffSizeX(), ref.getOffSizeY()), labelFunc, itemFont, background),
 			image,
 			arrow,
 			clear,
@@ -227,13 +231,14 @@ namespace fbc {
 		);
 	}
 
-	template<typename T> uptr<UIDropdown<T>> UIDropdown<T>::singleList(
-		FWindow& win, Hitbox* hb, func<str(const T&)> labelFunc, func<str(EntryView<T>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
+	template<typename T> UIDropdown<T> UIDropdown<T>::singleList(
+		FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, func<str(EntryView<T>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear)
 	{
-		return std::make_unique<UIDropdown<T>>(
-			win,
-			hb,
-			UISelectorList<T>::singleList(win, new ScaleHitbox(hb->getOffSizeX(), hb->getOffSizeY()), labelFunc, itemFont, background),
+		Hitbox& ref = *hb;
+		return UIDropdown<T>(
+			window,
+			move(hb),
+			UISelectorList<T>::singleList(window, make_unique<ScaleHitbox>(ref.getOffSizeX(), ref.getOffSizeY()), labelFunc, itemFont, background),
 			image,
 			arrow,
 			clear,

@@ -13,7 +13,7 @@ import std;
 namespace fbc {
 	export class UIFadeOutVFX : public VFX {
 	public:
-		UIFadeOutVFX(FWindow& win, uptr<UIImage>&& image, float duration = DEFAULT_DURATION * 0.5f) : VFX(win, duration), image(move(image)) {}
+		UIFadeOutVFX(FWindow& window, uptr<UIImage>&& image, float duration = DEFAULT_DURATION * 0.5f) : VFX(window, duration), image(move(image)) {}
 
 		uptr<UIImage> image;
 

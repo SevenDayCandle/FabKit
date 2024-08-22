@@ -15,7 +15,7 @@ namespace fbc {
 	export class UIButton : public UIInteractable {
 	public:
 
-		UIButton(FWindow& window, Hitbox* hb, IDrawable& image) : UIInteractable(window, hb, image) {}
+		UIButton(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image) : UIInteractable(window, move(hb), image) {}
 		~UIButton() override {}
 
 		inline UIButton& setOnClick(const func<void(UIButton&)>& onClick) { return this->onLeftClick = onClick, *this; }

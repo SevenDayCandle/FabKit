@@ -20,12 +20,12 @@ import std;
 namespace fbc {
 	export template <c_ext<UIBase> T> class UINavigation : public UIList<T> {
 	public:
-		UINavigation(FWindow& win, Hitbox* hb,
+		UINavigation(FWindow& window, uptr<Hitbox>&& hb,
 			func<str(const T&)> labelFunc = futil::toString<T>,
 			FFont& itemFont = cct.fontRegular(),
 			IDrawable& background = cct.images.uiDarkPanelRound,
 			bool canAutosize = false) :
-			UIList<T>(win, hb, labelFunc, itemFont, background, canAutosize) {}
+			UIList<T>(window, move(hb), labelFunc, itemFont, background, canAutosize) {}
 
 		inline T* getSelectedItem() { return currentItem; }
 		inline UINavigation& setItemFont(FFont& itemFont) { return UIList<T>::setItemFont(itemFont), * this; }
@@ -119,7 +119,7 @@ namespace fbc {
 			i,
 			[this](UIEntry<T>& p) { this->selectRow(p); },
 			this->win,
-			new RelativeHitbox(*this->hb),
+			make_unique<RelativeHitbox>(*this->hb),
 			this->getItemFont(),
 			this->labelFunc(item),
 			cct.images.none,

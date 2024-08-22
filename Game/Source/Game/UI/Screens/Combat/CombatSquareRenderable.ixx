@@ -3,6 +3,7 @@ export module fbc.CombatSquareRenderable;
 import fbc.CombatSquare;
 import fbc.CoreContent;
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.UIInteractable;
 import sdl.SDLBase; 
@@ -14,7 +15,7 @@ import std;
 namespace fbc {
 	export class CombatSquareRenderable : public UIInteractable {
 	public:
-		CombatSquareRenderable(const CombatSquare& square, Hitbox* hb): UIInteractable(win, hb, cct.images.uiLightPanel), square(square) {}
+		CombatSquareRenderable(FWindow& window, uptr<Hitbox>&& hb, const CombatSquare& square): UIInteractable(window, move(hb), cct.images.uiLightPanel), square(square) {}
 
 		const CombatSquare& square;
 

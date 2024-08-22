@@ -12,7 +12,7 @@ import std;
 namespace fbc {
 	export class CallbackVFX : public VFX {
 	public:
-		CallbackVFX(FWindow& win, float duration = DEFAULT_DURATION): VFX(win, duration) {}
+		CallbackVFX(FWindow& window, float duration = DEFAULT_DURATION): VFX(window, duration) {}
 		virtual ~CallbackVFX() = default;
 
 		func<void(CallbackVFX&)> onComplete;

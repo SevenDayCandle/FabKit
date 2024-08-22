@@ -9,7 +9,6 @@ import fbc.RectDrawable;
 import fbc.TextDrawable;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
 import sdl.SDLRunner;
 import sdl.IKeyInputListener;
 import std;
@@ -18,6 +17,7 @@ namespace fbc {
 	export class TextSupplier : public sdl::IKeyInputListener {
 	public:
 		TextSupplier(FWindow& window, FFont& textFont = cct.fontRegular()): fwindow(window), buffer(textFont, "", getLimitWidth()) {}
+		TextSupplier(TextSupplier&& other) noexcept = default;
 		virtual ~TextSupplier() override = default;
 
 		virtual void onKeyPress(int32 c) override;

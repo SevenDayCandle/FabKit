@@ -380,6 +380,7 @@ namespace sdl {
 
 	/* Misc functions */
 	export inline const char* __cdecl getError() { return TTF_GetError(); }
+	export inline constexpr float rads(float deg) { return deg * std::numbers::pi_v<float> / 180; }
 	export inline SDL_Color toTextColor(const Color& c) {
 		return {
 			static_cast<Uint8>(255 * c.r),

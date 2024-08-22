@@ -13,6 +13,7 @@ namespace fbc {
     public:
         FTexture(strv path) : path(path) {}
         FTexture(const FTexture&) = delete;
+        FTexture(FTexture&& other) noexcept = default;
 
         void reload() const override;
         void reload(sdl::GpuCopyPass* copyPass) const;

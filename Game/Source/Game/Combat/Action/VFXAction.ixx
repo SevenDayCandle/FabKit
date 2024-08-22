@@ -10,7 +10,7 @@ import std;
 namespace fbc {
 	export class VFXAction : public Action {
 	public:
-		VFXAction(FWindow& win, uptr<CallbackVFX>&& vfx): Action(), vfx(move(vfx)), win(win) {}
+		VFXAction(FWindow& window, uptr<CallbackVFX>&& vfx): Action(), vfx(move(vfx)), win(window) {}
 
 		bool isDone;
 		FWindow& win;

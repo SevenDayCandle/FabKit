@@ -13,10 +13,10 @@ import sdl.SDLBatchRenderPass;
 namespace fbc {
 	export class UITextButton : public UIButton {
 	public:
-		UITextButton(FWindow& window, Hitbox* hb, IDrawable& image, FFont& f, strv text = "") : UIButton(window, hb, image), text(f, text) {
+		UITextButton(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image, FFont& f, strv text = "") : UIButton(window, move(hb), image), text(f, text) {
 			UITextButton::onSizeUpdated();
 		}
-		UITextButton(FWindow& window, Hitbox* hb, strv text) : UITextButton(window, hb, cct.images.uiPanel, cct.fontRegular(), text) {}
+		UITextButton(FWindow& window, uptr<Hitbox>&& hb, strv text) : UITextButton(window, move(hb), cct.images.uiPanel, cct.fontRegular(), text) {}
 		~UITextButton() override {}
 
 		inline UITextButton& setColor(sdl::Color color) { return text.setColor(color), * this; }

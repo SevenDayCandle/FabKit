@@ -22,11 +22,10 @@ namespace fbc {
 
 	export class CombatScreen : public UIScreen, public CombatInstance::IViewSubscriber {
 	public:
-		CombatScreen(FWindow& win): UIScreen(win),
-			fieldUI(add(make_unique<UICanvas>(win, new RelativeHitbox(*hb, TILE_OFFSET, TILE_OFFSET, hb->getScaleOffSizeX(), hb->getScaleOffSizeY())))),
-			turnUI(add(make_unique<UICanvas>(win, new RelativeHitbox(*hb, 0, 0, hb->getScaleOffSizeX(), hb->getScaleOffSizeY())))),
-			endTurnButton(add(make_unique<UITextButton>(win, new RelativeHitbox(*hb, hb->getScaleOffSizeX(0.8), hb->getScaleOffSizeY(0.8), END_TURN_SIZE, END_TURN_SIZE),
-				cct.images.uiPanelRound, cct.fontRegular(), cct.strings.combat_end_turn()))) {
+		CombatScreen(FWindow& window): UIScreen(window),
+			fieldUI(addNew<UICanvas>(relhb(TILE_OFFSET, TILE_OFFSET, hb->getScaleOffSizeX(), hb->getScaleOffSizeY()))),
+			turnUI(addNew<UICanvas>(relhb(0, 0, hb->getScaleOffSizeX(), hb->getScaleOffSizeY()))),
+			endTurnButton(add(make_unique<UITextButton>(win, relhb(hb->getScaleOffSizeX(0.8), hb->getScaleOffSizeY(0.8), END_TURN_SIZE, END_TURN_SIZE), cct.images.uiPanelRound, cct.fontRegular(), cct.strings.combat_end_turn()))) {
 		}
 
 		virtual void onPlayerTurnBegin(const CombatTurn* turn) override;

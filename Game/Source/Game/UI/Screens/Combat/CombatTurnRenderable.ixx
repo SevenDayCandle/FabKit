@@ -3,6 +3,7 @@ export module fbc.CombatTurnRenderable;
 import fbc.CombatTurn;
 import fbc.CoreContent;
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.UIInteractable;
@@ -15,7 +16,7 @@ import std;
 namespace fbc {
 	export class CombatTurnRenderable : public UIInteractable {
 	public:
-		CombatTurnRenderable(const CombatTurn& turn, Hitbox* hb) : UIInteractable(win, hb, cct.images.uiDarkPanelRound), portrait(turn.source.getImagePortrait()) {}
+		CombatTurnRenderable(FWindow& window, uptr<Hitbox> hb, const CombatTurn& turn) : UIInteractable(window, move(hb), cct.images.uiDarkPanelRound), portrait(turn.source.getImagePortrait()) {}
 
 		IDrawable& portrait;
 

@@ -21,8 +21,8 @@ namespace fbc {
 		const float edgeW = w - texW;
 		const float centerX = x + cornerW;
 
-		ImageDrawable::draw(rp, sdl::runner::BUFFER_VERTEX_BORDERED, x, y, cornerW, h, winW, winH, rotZ, tint, pipeline, 0); // Left
-		ImageDrawable::draw(rp, sdl::runner::BUFFER_VERTEX_BORDERED, centerX, y, edgeW, h, winW, winH, rotZ, tint, pipeline, 4); // Center
-		ImageDrawable::draw(rp, sdl::runner::BUFFER_VERTEX_BORDERED, centerX + edgeW, y, cornerW, h, winW, winH, rotZ, tint, pipeline, 8); // Right
+		ImageDrawable::draw(rp, sdl::runner::BUFFER_VERTEX_HORIZONTAL, x, y, cornerW, h, winW, winH, rotZ, tint, pipeline, 0); // Left
+		ImageDrawable::draw(rp, sdl::runner::BUFFER_VERTEX_HORIZONTAL, centerX, y, edgeW, h, winW, winH, rotZ, tint, pipeline, 4); // Center
+		ImageDrawable::draw(rp, sdl::runner::BUFFER_VERTEX_HORIZONTAL, centerX + edgeW, y, cornerW, h, winW, winH, rotZ, tint, pipeline, 8); // Right
 	}
 }

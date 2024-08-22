@@ -13,6 +13,10 @@ namespace fbc {
 			refresh();
 		}
 		~RelativeHitbox() override {}
+
+		inline static uptr<RelativeHitbox> make(Hitbox& parent) { return make_unique<RelativeHitbox>(parent); }
+		inline static uptr<RelativeHitbox> make(Hitbox& parent, float offsetWidth, float offsetHeight) { return make_unique<RelativeHitbox>(parent, offsetWidth, offsetHeight); }
+		inline static uptr<RelativeHitbox> make(Hitbox& parent, float parentOffsetX, float parentOffsetY, float offsetWidth, float offsetHeight) { return make_unique<RelativeHitbox>(parent, parentOffsetX, parentOffsetY, offsetWidth, offsetHeight); }
 	protected:
 		Hitbox& parent;
 

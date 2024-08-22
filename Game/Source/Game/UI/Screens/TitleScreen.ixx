@@ -15,9 +15,9 @@ import std;
 namespace fbc {
 	export class TitleScreen : public UIScreen {
 	public:
-		TitleScreen(FWindow& win): UIScreen(win, new ScreenSizeHitbox(win)) {
-			UITextButton& b = add(std::make_unique<UITextButton>(win,
-				new ScreenPosHitbox(win, 0.5f, 0.5f, 290, 170),
+		TitleScreen(FWindow& window): UIScreen(window, make_unique<ScreenSizeHitbox>(window)) {
+			UITextButton& b = add(make_unique<UITextButton>(window,
+				make_unique<ScreenPosHitbox>(window, 0.5f, 0.5f, 290, 170),
 				cct.images.uiPanel,
 				cct.fontRegular(),
 				cct.strings.screen_title_header()));
@@ -25,8 +25,8 @@ namespace fbc {
 				SettingsDialog::openNew(this->win);
 				});
 
-			UITextButton& b2 = stackYDir(std::make_unique<UITextButton>(win,
-				new ScreenPosHitbox(win, 0.5f, 0.5f, 290, 170),
+			UITextButton& b2 = stackYDir(std::make_unique<UITextButton>(window,
+				make_unique<ScreenPosHitbox>(window, 0.5f, 0.5f, 290, 170),
 				cct.images.uiPanel,
 				cct.fontRegular(),
 				cct.strings.screen_setup_header()));

@@ -180,15 +180,19 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Base\UI\Mixin\UITitle.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Engine\Base\UI\Tooltip\GenericTip.ixx">
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\ImageDrawable.ixx">
+    <ClCompile Include="Source\Engine\Base\Objects\Drawables\ImageDrawable.ixx">
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\RectDrawable.ixx">
+    <ClCompile Include="Source\Engine\Base\Objects\Drawables\RectDrawable.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -278,10 +282,6 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\UI\Component\Interaction\UITitledInteractable.ixx">
-      <SubType>
-      </SubType>
-    </ClCompile>
     <ClCompile Include="Source\Engine\Base\UI\Mixin\TextSupplier.ixx">
       <SubType>
       </SubType>
@@ -306,7 +306,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\EmptyDrawable.ixx">
+    <ClCompile Include="Source\Engine\Base\Objects\Drawables\EmptyDrawable.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -350,7 +350,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\UI\Component\UITipHoverable.ixx" />
+    <ClCompile Include="Source\Engine\Base\UI\Mixin\UITipHost.ixx" />
     <ClCompile Include="Source\Engine\Base\UI\Component\Scroll\UIVerticalScrollbar.ixx">
       <SubType>
       </SubType>
@@ -364,17 +364,17 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\RBordered.ixx">
+    <ClCompile Include="Source\Engine\Base\Objects\Drawables\RBordered.ixx">
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Sounds\FMusic.ixx" />
-    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Sounds\FSound.ixx" />
-    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\RHorizontal.ixx">
+    <ClCompile Include="Source\Engine\Base\Objects\Sounds\FMusic.ixx" />
+    <ClCompile Include="Source\Engine\Base\Objects\Sounds\FSound.ixx" />
+    <ClCompile Include="Source\Engine\Base\Objects\Drawables\RHorizontal.ixx">
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\IDrawable.ixx">
+    <ClCompile Include="Source\Engine\Base\Objects\Drawables\IDrawable.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -382,7 +382,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\RVertical.ixx">
+    <ClCompile Include="Source\Engine\Base\Objects\Drawables\RVertical.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -429,16 +429,16 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Utilities\Objects\FFont.ixx">
+    <ClCompile Include="Source\Engine\Base\Objects\FFont.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\FTexture.ixx">
+    <ClCompile Include="Source\Engine\Base\Objects\Drawables\FTexture.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
     <ClCompile Include="Source\Engine\Base\Utilities\Localization\Language.ixx" />
-    <ClCompile Include="Source\Engine\Base\Utilities\Objects\Drawables\TextDrawable.ixx">
+    <ClCompile Include="Source\Engine\Base\Objects\Drawables\TextDrawable.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>

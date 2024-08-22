@@ -3,10 +3,9 @@ export module fbc.FWindow;
 import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.FUtil;
-import fbc.IDrawable;
+import fbc.Hitbox;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
 import sdl.SDLRunner;
 import sdl.IKeyInputListener;
 import std;
@@ -26,11 +25,26 @@ namespace fbc {
 			inline virtual void renderImpl(sdl::SDLBatchRenderPass& rp) { render(rp); } // 
 			inline virtual void refreshDimensions() {}  // Force resizing of hitboxes when the screen size changes
 			inline virtual void updateImpl() { update(); }
+			template <typename T, typename... Args> requires std::constructible_from<T, FWindow&, Args&&...> uptr<T> inline create(Args&&... args) { return make_unique<T>(win, forward<Args>(args)...); }  // Generate a component using this element's window
 
 			virtual bool tickUpdate();
 
 			virtual void render(sdl::SDLBatchRenderPass& rp) = 0;
 			virtual void update() = 0;
+		};
+
+		class Hoverable : public Element {
+		public:
+			Hoverable(FWindow& window) : Element(window) {}
+			virtual ~Hoverable() = default;
+
+			inline virtual float getBeginX() { return getHb()->x; } // The left-most end X coordinate of this object, may be smaller than hb if this has labels
+			inline virtual float getBeginY() { return getHb()->y; } // The left-most end X coordinate of this object, may be smaller than hb if this has labels
+			inline virtual float getEndX() { return getHb()->x + getHb()->w; } // The right-most end X coordinate of this object, may be larger than hb if this has subcomponents
+			inline virtual float getEndY() { return getHb()->y + getHb()->h; } // The bottom-most end Y coordinate of this object, may be larger than hb if this has subcomponents
+			inline virtual bool isHovered() { return getHb()->isHovered(); }
+
+			virtual Hitbox* getHb() = 0;
 		};
 
 		FWindow() {}
@@ -73,7 +87,6 @@ namespace fbc {
 		sdl::Window* window;
 		int winH;
 		int winW;
-		int z;
 	};
 
 	// Set up window and its rendering device. Returns true if set up successfully
@@ -165,6 +178,8 @@ namespace fbc {
 
 	// Whenever the screen size changes, we need to setRealSize all UI elements
 	void FWindow::refreshSize(int winW, int winH) {
+		this->winH = winH;
+		this->winW = winW;
 		sdl::windowSetSize(window, winW, winH);
 		for (const uptr<FWindow::Element>& screen : screens) {
 			screen->refreshDimensions();

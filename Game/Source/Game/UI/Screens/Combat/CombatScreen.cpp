@@ -61,19 +61,22 @@ namespace fbc {
 
 	void CombatScreen::createOccupantRender(const OccupantObject* occupant)
 	{
-		CombatSquare* square = occupant->currentSquare;
-		float offX = 0;
-		float offY = 0;
-		if (square) {
-			offX = square->col * TILE_SIZE;
-			offY = square->row * TILE_SIZE;
+		if (occupant) {
+			const OccupantObject& occRef = *occupant;
+			CombatSquare* square = occupant->currentSquare;
+			float offX = 0;
+			float offY = 0;
+			if (square) {
+				offX = square->col * TILE_SIZE;
+				offY = square->row * TILE_SIZE;
+			}
+			fieldUI.addNew<CreatureRenderable>(RelativeHitbox::make(*fieldUI.hb, offX, offY, TILE_SIZE, TILE_SIZE), occRef);
 		}
-		fieldUI.add(make_unique<CreatureRenderable>(*occupant, new RelativeHitbox(*fieldUI.hb, offX, offY, TILE_SIZE, TILE_SIZE)));
 	}
 
 	void CombatScreen::createTurnRender(const CombatTurn& turn)
 	{
-		CombatTurnRenderable& render = turnUI.add(make_unique<CombatTurnRenderable>(turn, new RelativeHitbox(*turnUI.hb, 0, turnUI.size() * TILE_SIZE, TURN_W, TILE_SIZE)));
+		CombatTurnRenderable& render = turnUI.addNew<CombatTurnRenderable>(RelativeHitbox::make(*turnUI.hb, 0, turnUI.size() * TILE_SIZE, TURN_W, TILE_SIZE), turn);
 		turnUIMap.emplace(&turn, &render);
 	}
 
@@ -89,7 +92,7 @@ namespace fbc {
 		});
 		// Add buttons for each square
 		for (const CombatSquare& square : instance->getSquares()) {
-			fieldUI.add(make_unique<CombatSquareRenderable>(square, new RelativeHitbox(*fieldUI.hb, square.col * TILE_SIZE, square.row * TILE_SIZE, TILE_SIZE, TILE_SIZE)));
+			fieldUI.addNew<CombatSquareRenderable>(RelativeHitbox::make(*fieldUI.hb, square.col * TILE_SIZE, square.row * TILE_SIZE, TILE_SIZE, TILE_SIZE), square);
 		}
 		// Add images for each creature
 		for (const OccupantObject* occupant : instance->getOccupants()) {

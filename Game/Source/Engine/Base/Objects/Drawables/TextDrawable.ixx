@@ -15,6 +15,11 @@ namespace fbc {
 		TextDrawable(FFont& font, strv text = "", float w = 0, sdl::Color color = sdl::COLOR_STANDARD, sdl::Color colorOutline = sdl::COLOR_BLACK) : font(font), textW(w), text(text), color(color), colorOutline(colorOutline) {
 			TextDrawable::reload();
 		}
+		TextDrawable(FFont& font, strv text, float posX, float posY, float w = 0, sdl::Color color = sdl::COLOR_STANDARD, sdl::Color colorOutline = sdl::COLOR_BLACK) : font(font), posX(posX), posY(posY), textW(w), text(text), color(color), colorOutline(colorOutline) {
+			TextDrawable::reload();
+		}
+		TextDrawable(const TextDrawable&) = delete;
+		TextDrawable(TextDrawable&& other) noexcept : ImageDrawable(move(other)), font(other.font), posX(other.posX), posY(other.posY), textW(other.textW), text(other.text), color(other.color), colorOutline(other.colorOutline) {}
 		virtual ~TextDrawable() = default;
 
 		inline bool empty() const { return text.empty(); }
@@ -54,7 +59,7 @@ namespace fbc {
 	void TextDrawable::draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline)
 	{
 		if (texture) {
-			ImageDrawable::draw(rp, x, y, w, h, winW, winH, rotZ, tint, pipeline);
+			ImageDrawable::draw(rp, x + posX, y + posY, w, h, winW, winH, rotZ, tint, pipeline);
 		}
 	}
 
@@ -71,9 +76,12 @@ namespace fbc {
 	{
 		if (texture) {
 			sdl::runner::deviceReleaseTexture(texture);
+			texture = nullptr;
 		}
 		sdl::Surface* surface = font.makeSurface(text, textW, color, colorOutline);
 		if (surface) {
+			texH = surface->h;
+			texW = surface->w;
 			texture = sdl::runner::uploadTexture(copyPass, surface);
 			sdl::surfaceDestroy(surface);
 		}

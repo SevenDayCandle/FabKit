@@ -14,7 +14,7 @@ import std;
 namespace fbc {
 	export class UIScrollbar : public UIBase {
 	public:
-		UIScrollbar(FWindow& win, Hitbox* hb, IDrawable& imageBar, IDrawable& imageButton): UIBase(win, hb), imageBar(imageBar), imageButton(imageButton) {}
+		UIScrollbar(FWindow& window, uptr<Hitbox>&& hb, IDrawable& imageBar, IDrawable& imageButton): UIBase(window, move(hb)), imageBar(imageBar), imageButton(imageButton) {}
 
 		inline float getScroll() const { return scrollPercent; }
 		inline UIScrollbar& setOnScroll(const func<void(float)>& onScroll) { return this->onScroll = onScroll, *this; }

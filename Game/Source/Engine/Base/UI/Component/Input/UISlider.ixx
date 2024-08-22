@@ -16,14 +16,15 @@ import std;
 namespace fbc {
 	export class UISlider : public UINumberInput {
 	public:
-		UISlider(FWindow& window, Hitbox* hb, Hitbox* scrollhb, int limMin = 0,
+		UISlider(FWindow& window, uptr<Hitbox>&& hb, uptr<Hitbox>&& scrollhb, int limMin = 0,
 			int limMax = std::numeric_limits<int>::max(), IDrawable& imageBar = cct.images.uiSliderEmpty, IDrawable& imageButton = cct.images.uiScrollbutton, IDrawable& panelImage = cct.images.uiPanel):
-			UINumberInput(window, hb, limMin, limMax, panelImage), scrollbar(window, scrollhb, imageBar, imageButton) {
+			UINumberInput(window, move(hb), limMin, limMax, panelImage), scrollbar(window, move(scrollhb), imageBar, imageButton) {
 			scrollbar.setOnScroll([this](float scroll) {this->commitFromScroll(scroll); });
 		}
-		UISlider(FWindow& window, Hitbox* hb, int limMin = 0,
+		UISlider(FWindow& window, uptr<Hitbox>&& hb, int limMin = 0,
 			int limMax = std::numeric_limits<int>::max(),IDrawable& imageBar = cct.images.uiSliderEmpty, IDrawable& imageButton = cct.images.uiScrollbutton, IDrawable& panelImage = cct.images.uiPanel) :
-			UISlider(window, hb, new RelativeHitbox(*hb, hb->getOffSizeX() + 4, 0, hb->getOffSizeX() * 3, hb->getOffSizeY()), limMin, limMax, imageBar, imageButton, panelImage) {}
+			UISlider(window, move(hb), std::make_unique<RelativeHitbox>(*hb, hb->getOffSizeX() + 4, 0, hb->getOffSizeX() * 3, hb->getOffSizeY()), limMin, limMax, imageBar, imageButton, panelImage) {}
+		UISlider(UISlider&& other) noexcept: UINumberInput(other.win, move(other.hb), other.limMin, other.limMax, other.image), scrollbar(std::move(other.scrollbar)) {}
 
 		virtual UISlider& setValue(int num) override;
 		virtual void onSizeUpdated() override;

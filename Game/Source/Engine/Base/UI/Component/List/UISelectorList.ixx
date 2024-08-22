@@ -25,13 +25,15 @@ namespace fbc {
 
 	export template <typename T> class UISelectorList : public UIList<T> {
 	public:
-		UISelectorList(FWindow& window, Hitbox* hb,
+		UISelectorList(FWindow& window, uptr<Hitbox>&& hb,
 		       func<str(const T&)> labelFunc = futil::toString<T>,
 		       FFont& itemFont = cct.fontSmall(),
 		       IDrawable& background = cct.images.uiPanelRound,
 		       bool canAutosize = false):
-			UIList<T>(window, hb, std::move(labelFunc), itemFont, background, canAutosize),
-			scrollbar(window, new RelativeHitbox(*hb, 0, 0, 48, 48)) { scrollbar.setOnScroll([this](float f) { onScroll(f); }); }
+			UIList<T>(window, move(hb), std::move(labelFunc), itemFont, background, canAutosize),
+			scrollbar(window, make_unique<RelativeHitbox>(*this->hb, 0, 0, 48, 48))
+		{ scrollbar.setOnScroll([this](float f) { onScroll(f); }); }
+		UISelectorList(UISelectorList&& other) noexcept = default;
 
 		~UISelectorList() override {}
 
@@ -76,8 +78,8 @@ namespace fbc {
 		void updateSingle(T item);
 		void updateSingle(T* item);
 
-		static uptr<UISelectorList> multiList(FWindow& window, Hitbox* hb, func<str(const T&)> labelFunc = futil::toString<T>, FFont& itemFont = cct.fontSmall(), IDrawable& background = cct.images.uiDarkPanelRound, bool canAutosize = false);
-		static uptr<UISelectorList> singleList(FWindow& window, Hitbox* hb, func<str(const T&)> labelFunc = futil::toString<T>, FFont& itemFont = cct.fontSmall(), IDrawable& background = cct.images.uiDarkPanelRound, bool canAutosize = false);
+		static uptr<UISelectorList> multiList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>, FFont& itemFont = cct.fontSmall(), IDrawable& background = cct.images.uiDarkPanelRound, bool canAutosize = false);
+		static uptr<UISelectorList> singleList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>, FFont& itemFont = cct.fontSmall(), IDrawable& background = cct.images.uiDarkPanelRound, bool canAutosize = false);
 	protected:
 		set<int> currentIndices;
 		vec<UIEntry<T>*> rowsForRender;
@@ -304,7 +306,7 @@ namespace fbc {
 
 	// Render all visible rows and the scrollbar if it is shown
 	template <typename T> void UISelectorList<T>::renderImpl(sdl::SDLBatchRenderPass& rp) {
-		this->background.draw(rp, *this->hb.get(), this->win.getH(), this->win.getH(), 0, &this->backgroundColor);
+		this->background.draw(rp, *this->hb.get(), this->win.getW(), this->win.getH(), 0, &this->backgroundColor);
 		int rowCount = getVisibleRowCount();
 		for (int i = this->topVisibleRowIndex; i < this->topVisibleRowIndex + rowCount; ++i) {
 			rowsForRender[i]->renderImpl(rp);
@@ -491,16 +493,16 @@ namespace fbc {
 	 * Statics
 	 */
 
-	template<typename T> uptr<UISelectorList<T>> UISelectorList<T>::multiList(FWindow& window, Hitbox* hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize) {
-		return std::make_unique<UISelectorList<T>>(window, hb, labelFunc, itemFont, background, canAutosize);
+	template<typename T> uptr<UISelectorList<T>> UISelectorList<T>::multiList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize) {
+		return std::make_unique<UISelectorList<T>>(window, move(hb), labelFunc, itemFont, background, canAutosize);
 	}
 
-	template<typename T> uptr<UISelectorList<T>> UISelectorList<T>::singleList(FWindow& window, Hitbox* hb,
+	template<typename T> uptr<UISelectorList<T>> UISelectorList<T>::singleList(FWindow& window, uptr<Hitbox>&& hb,
 		func<str(const T&)> labelFunc,
 		FFont& itemFont,
 		IDrawable& background, 
 		bool canAutosize) {
-		uptr<UISelectorList<T>> res = std::make_unique<UISelectorList<T>>(window, hb, labelFunc, itemFont, background, canAutosize);
+		uptr<UISelectorList<T>> res = std::make_unique<UISelectorList<T>>(window, move(hb), labelFunc, itemFont, background, canAutosize);
 		res->setSelectionLimit(1);
 		return res;
 	}

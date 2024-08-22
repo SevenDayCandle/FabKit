@@ -10,7 +10,6 @@ import fbc.IDrawable;
 import fbc.TextSupplier;
 import fbc.TextDrawable;
 import fbc.UIInteractable;
-import fbc.UITitledInteractable;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
 import sdl.SDLProps; 
@@ -18,11 +17,11 @@ import sdl.SDLRunner;
 import std;
 
 namespace fbc {
-	export class UITextInput : public UITitledInteractable, public TextSupplier {
+	export class UITextInput : public UIInteractable, public TextSupplier {
 	public:
-		UITextInput(FWindow& window, Hitbox* hb, 
+		UITextInput(FWindow& window, uptr<Hitbox>&& hb, 
 			IDrawable& image = cct.images.uiPanel,
-			FFont& textFont = cct.fontRegular()): UITitledInteractable(window, hb, image), TextSupplier(window, textFont) {
+			FFont& textFont = cct.fontRegular()): UIInteractable(window, move(hb), image), TextSupplier(window, textFont) {
 			initCaret(this->hb->x, this->hb->y);
 			UITextInput::onSizeUpdated();
 		}
@@ -36,10 +35,10 @@ namespace fbc {
 		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		virtual void updateImpl() override;
 	protected:
-		inline virtual float getBasePosX() override { return this->hb->x; }
-		inline virtual float getBasePosY() override { return this->hb->y; }
-		inline virtual int getLimitWidth() override { return this->hb->w; }
-		inline virtual strv getSourceText() override { return resText;  }
+		inline float getBasePosX() final override { return this->hb->x; }
+		inline float getBasePosY() final override { return this->hb->y; }
+		inline int getLimitWidth() override { return this->hb->w; }
+		inline strv getSourceText() final override { return resText;  }
 
 		void clickLeftEvent() override;
 		void onBufferUpdated() override;
@@ -67,13 +66,13 @@ namespace fbc {
 
 	void UITextInput::refreshDimensions()
 	{
-		UITitledInteractable::refreshDimensions();
+		UIInteractable::refreshDimensions();
 		buffer.reload();
 	}
 
 	void UITextInput::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
-		UITitledInteractable::renderImpl(rp);
+		UIInteractable::renderImpl(rp);
 		buffer.draw(rp, hb->x, hb->y, win.getW(), win.getH());
 		if (sdl::runner::keyboardInputActive(this)) {
 			renderCaret(rp);

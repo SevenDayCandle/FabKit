@@ -19,12 +19,13 @@ import std;
 namespace fbc {
 	export template <typename T> class UIMenu : public UIList<T> {
 	public:
-		UIMenu(FWindow& window, Hitbox* hb,
+		UIMenu(FWindow& window, uptr<Hitbox>&& hb,
 			func<str(const T&)> labelFunc = futil::toString<T>,
 			FFont& itemFont = cct.fontRegular(),
 			IDrawable& background = cct.images.uiDarkPanelRound,
 			bool canAutosize = false) :
-			UIList<T>(window, hb, std::move(labelFunc), itemFont, background, canAutosize) {}
+			UIList<T>(window, move(hb), std::move(labelFunc), itemFont, background, canAutosize) {}
+		UIMenu(UIMenu&& other) noexcept = default;
 
 		inline const T* getSelectedItem() { return &this->rows[currentIndex]->item; }
 		inline UIMenu& setItemFont(const FFont& itemFont) { return UIList<T>::setItemFont(itemFont), * this; }
@@ -79,7 +80,7 @@ namespace fbc {
 		UIEntry<T>* entry = new UIEntry<T>(item,
 			i,
 			[this](UIEntry<T>& p) { this->selectRow(p); },
-			new RelativeHitbox(*this->hb),
+			make_unique<RelativeHitbox>(*this->hb),
 			this->getItemFont(),
 			this->labelFunc(item),
 			cct.images.none,

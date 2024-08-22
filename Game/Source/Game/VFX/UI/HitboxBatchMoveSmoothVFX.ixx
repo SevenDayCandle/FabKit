@@ -20,8 +20,8 @@ namespace fbc {
 			float tOffY;
 		};
 
-		HitboxBatchMoveSmoothVFX(FWindow& win, vec<Entry>& items, float duration = DEFAULT_DURATION): HitboxBatchMoveSmoothVFX(win, items, duration, 15 / (sdl::NANOS_PER_SECOND * duration)) {}
-		HitboxBatchMoveSmoothVFX(FWindow& win, vec<Entry>& items, float duration, float rate): CallbackVFX(win, duration), items(items), rate(rate) {}
+		HitboxBatchMoveSmoothVFX(FWindow& window, vec<Entry>& items, float duration = DEFAULT_DURATION): HitboxBatchMoveSmoothVFX(window, items, duration, 15 / (sdl::NANOS_PER_SECOND * duration)) {}
+		HitboxBatchMoveSmoothVFX(FWindow& window, vec<Entry>& items, float duration, float rate): CallbackVFX(window, duration), items(items), rate(rate) {}
 
 		float rate;
 		vec<Entry> items;

@@ -8,9 +8,9 @@ namespace fbc {
 	/* Hitbox whose position scale with screen dimensions, and whose size scale with render scale */
 	export class ScreenPosHitbox : public Hitbox {
 	public:
-		ScreenPosHitbox(FWindow& win) : Hitbox(0, 0, 0, 0), win(win) {}
-		ScreenPosHitbox(FWindow& win, float offsetWidth, float offsetHeight) : ScreenPosHitbox(win, 0, 0, offsetWidth, offsetHeight) {}
-		ScreenPosHitbox(FWindow& win, float screenXPercent, float screenYPercent, float offsetWidth, float offsetHeight): Hitbox(screenXPercent, screenYPercent, offsetWidth, offsetHeight), win(win) {
+		ScreenPosHitbox(FWindow& window) : Hitbox(0, 0, 0, 0), win(window) {}
+		ScreenPosHitbox(FWindow& window, float offsetWidth, float offsetHeight) : ScreenPosHitbox(window, 0, 0, offsetWidth, offsetHeight) {}
+		ScreenPosHitbox(FWindow& window, float screenXPercent, float screenYPercent, float offsetWidth, float offsetHeight): Hitbox(screenXPercent, screenYPercent, offsetWidth, offsetHeight), win(window) {
 			refresh();
 		}
 		~ScreenPosHitbox() override {}

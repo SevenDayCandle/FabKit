@@ -3,6 +3,7 @@ export module fbc.CreatureRenderable;
 import fbc.CombatSquare;
 import fbc.CoreContent;
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.UIInteractable;
 import sdl.SDLBase; 
@@ -14,7 +15,7 @@ import std;
 namespace fbc {
 	export class CreatureRenderable : public UIInteractable {
 	public:
-		CreatureRenderable(const OccupantObject& creature, Hitbox* hb): UIInteractable(win, hb, creature.getImageField()), creature(creature) {}
+		CreatureRenderable(FWindow& window, uptr<Hitbox> hb, const OccupantObject& creature): UIInteractable(window, move(hb), creature.getImageField()), creature(creature) {}
 
 		const OccupantObject& creature;
 

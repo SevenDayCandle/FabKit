@@ -6,13 +6,14 @@ import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.TextDrawable;
 import fbc.Tooltip;
-import fbc.UITipHoverable;
+import fbc.UIBase;
+import sdl.SDLBase;
 import sdl.SDLBatchRenderPass;
 
 namespace fbc {
-	export class UILabel : public UITipHoverable {
+	export class UILabel : public UIBase {
 	public:
-		UILabel(FWindow& window, Hitbox* hb, FFont& f, strv text = "") : UITipHoverable(window, hb), text(f, text, hb->w) {}
+		UILabel(FWindow& window, uptr<Hitbox>&& hb, FFont& f, strv text = "") : UIBase(window, move(hb)), text(f, text, hb->w) {}
 		~UILabel() override {}
 
 		inline UILabel& setColor(sdl::Color color) { return text.setColor(color), * this; }
@@ -28,7 +29,7 @@ namespace fbc {
 
 	void UILabel::refreshDimensions()
 	{
-		UITipHoverable::refreshDimensions();
+		UIBase::refreshDimensions();
 		text.setWidth(hb->w);
 	}
 

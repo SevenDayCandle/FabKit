@@ -11,9 +11,8 @@ import std;
 namespace fbc {
 	export class UIScreen : public UICanvas {
 	public:
-		UIScreen(FWindow& window) : UICanvas(window, new ScreenSizeHitbox(window)) {}
-		UIScreen(FWindow& window, Hitbox* hb) : UICanvas(window, hb) {}
-		UIScreen(FWindow& window, uptr<Hitbox>&& hb) : UICanvas(window, std::move(hb)) {}
+		UIScreen(FWindow& window) : UICanvas(window, make_unique<ScreenSizeHitbox>(window)) {}
+		UIScreen(FWindow& window, uptr<Hitbox>&& hb) : UICanvas(window, move(hb)) {}
 
 		virtual UIScreen& addVFX(uptr<FWindow::Element>&& eff);
 		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;

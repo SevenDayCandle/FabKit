@@ -4,12 +4,12 @@ import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FWindow;
+import fbc.Hitbox;
 import fbc.TextDrawable;
 import fbc.IDrawable;
 import fbc.UIInteractable;
 import fbc.UILabel;
 import fbc.FUtil;
-import fbc.RelativeHitbox;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
 import sdl.SDLRunner;
@@ -18,8 +18,8 @@ import std;
 namespace fbc {
 	export template <typename T> class UIEntry : public UIInteractable {
 	public:
-		UIEntry(const T& item, int index, const func<void(UIEntry<T>&)>& onClick, FWindow& window, RelativeHitbox* hb, FFont& f, const str& text, IDrawable& image = cct.images.uiCheckboxEmpty, IDrawable& checkImage = cct.images.uiCheckboxFilled, sdl::Color baseColor = sdl::COLOR_STANDARD, sdl::Color hoverColor = sdl::COLOR_STANDARD) :
-			UIInteractable(window, hb, image), item(item), index(index), onClick(onClick), baseColor(baseColor), hoverColor(hoverColor), text(f, text), checkImage(checkImage) {
+		UIEntry(const T& item, int index, const func<void(UIEntry<T>&)>& onClick, FWindow& window, uptr<Hitbox> hb, FFont& f, const str& text, IDrawable& image = cct.images.uiCheckboxEmpty, IDrawable& checkImage = cct.images.uiCheckboxFilled, sdl::Color baseColor = sdl::COLOR_STANDARD, sdl::Color hoverColor = sdl::COLOR_STANDARD) :
+			UIInteractable(window, move(hb), image), item(item), index(index), onClick(onClick), baseColor(baseColor), hoverColor(hoverColor), text(f, text), checkImage(checkImage) {
 		}
 
 		operator const T*() const { return &item; }

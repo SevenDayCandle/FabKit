@@ -13,6 +13,9 @@ namespace fbc {
 	public:
 		ImageDrawable() {}
 		ImageDrawable(const ImageDrawable&) = delete;
+		ImageDrawable(ImageDrawable&& other) noexcept : texH(other.texH), texW(other.texW), texture(other.texture) {
+			other.texture = nullptr;
+		}
 		ImageDrawable(float w, float h, sdl::GpuTexture* texture): texH(h), texW(w), texture(texture) {}
 		virtual ~ImageDrawable() override {
 			if (texture && sdl::runner::enabled()) {
@@ -31,9 +34,9 @@ namespace fbc {
 		void dispose() override;
 		void draw(sdl::SDLBatchRenderPass& rp, sdl::GpuBuffer* bufferVert, float x, float y, float w, float h, float winW, float winH, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL, int vertexOff = 0);
 	protected:
-		mutable float texH;
-		mutable float texW;
-		mutable sdl::GpuTexture* texture;
+		mutable float texH = 0;
+		mutable float texW = 0;
+		mutable sdl::GpuTexture* texture = nullptr;
 	};
 
 	void ImageDrawable::dispose()

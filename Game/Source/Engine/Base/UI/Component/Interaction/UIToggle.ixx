@@ -18,8 +18,8 @@ import std;
 namespace fbc {
 	export class UIToggle : public UIInteractable {
 	public:
-		UIToggle(FWindow& window, Hitbox* hb, strv text, IDrawable& image = cct.images.uiCheckboxEmpty, IDrawable& checkImage = cct.images.uiCheckboxFilled, FFont& f = cct.fontRegular(), float xOff = cct.images.uiCheckboxEmpty.getWidth() * 1.15f, float yOff = cct.images.uiCheckboxEmpty.getHeight() * 0.25f):
-			UIInteractable(window, hb, image), checkImage(checkImage), text(f, text), xOff(xOff), yOff(yOff) {
+		UIToggle(FWindow& window, uptr<Hitbox>&& hb, strv text, IDrawable& image = cct.images.uiCheckboxEmpty, IDrawable& checkImage = cct.images.uiCheckboxFilled, FFont& f = cct.fontRegular(), float xOff = cct.images.uiCheckboxEmpty.getWidth() * 1.15f, float yOff = cct.images.uiCheckboxEmpty.getHeight() * 0.25f):
+			UIInteractable(window, move(hb), image), checkImage(checkImage), text(f, text), xOff(xOff), yOff(yOff) {
 			UIToggle::onSizeUpdated();
 		}
 
