@@ -1,10 +1,8 @@
 export module fbc.VFX;
 
-import fbc.CoreConfig;
 import fbc.FUtil;
 import fbc.FWindow;
-import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
+import sdl.SDLBase;
 import sdl.SDLRunner;
 import std;
 
@@ -19,7 +17,7 @@ namespace fbc {
 		float duration;
 		float ticks = 0;
 
-		virtual bool tickUpdate() override;
+		virtual bool tickUpdate();
 	};
 
 	// Update the VFX and dispose when the duration is completed

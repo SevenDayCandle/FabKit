@@ -26,7 +26,7 @@ namespace fbc {
 		UIScreen* screen = dynamic_cast<UIScreen*>(win.currentScreen());
 		if (screen) {
 			vfx->setOnComplete([this](CallbackVFX& v) {isDone = true; });
-			screen->addVFX(move(vfx));
+			screen->addVfx(move(vfx));
 		}
 		else {
 			isDone = true;

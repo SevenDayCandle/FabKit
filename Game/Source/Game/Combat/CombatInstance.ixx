@@ -27,6 +27,8 @@ namespace fbc {
 		};
 		CombatInstance() {}
 
+		IViewSubscriber* viewSubscriber;
+
 		inline auto getOccupants() { return std::views::transform(occupants, [](uptr<OccupantObject>& item) {return item.get(); }); }
 		inline bool hasAction() const { return currentAction != nullptr; }
 		inline bool isCompleted() const { return completed; }
@@ -36,8 +38,12 @@ namespace fbc {
 		inline int getTotalActionTime() const { return totalActionTime; }
 		inline ref_view<const mset<CombatTurn>> getTurns() const { return std::views::all(turns); }
 		inline ref_view<const vec<CombatSquare>> getSquares() const { return std::views::all(squares); }
-
-		IViewSubscriber* viewSubscriber;
+		template <c_ext<Action> T> inline T& queueActionGet(uptr<T>&& action) {
+			T& ref = *action;
+			queueAction(move(action));
+			return ref;
+		}
+		template <c_ext<Action> T, typename... Args> requires std::constructible_from<T, Args&&...> inline T& queueActionNew(Args&&... args) { return queueActionGet(make_unique<T>(forward<Args>(args)...)); };
 
 		bool modifyTurnOrder(const TurnObject& target, int diff);
 		bool nextTurn();
@@ -66,7 +72,7 @@ namespace fbc {
 		vec<CombatSquare> squares;
 		vec<uptr<OccupantObject>> occupants;
 
-		inline int getSquareIndex(int col, int row) const {return col + fieldColumns * row;}
+		inline int getSquareIndex(int col, int row) const { return col + fieldColumns * row; }
 
 		int getSquareIndexAllowRandom(int col, int row);
 	};

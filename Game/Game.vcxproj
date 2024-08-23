@@ -606,7 +606,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       </SubType>
     </ClCompile>
     <ClCompile Include="Source\Game\UI\Screens\TitleScreen.ixx" />
-    <ClCompile Include="Source\Game\VFX\UI\HitboxBatchMoveSmoothVFX.ixx">
+    <ClCompile Include="Source\Game\VFX\UI\UIBatchMoveVFX.ixx">
       <SubType>
       </SubType>
     </ClCompile>

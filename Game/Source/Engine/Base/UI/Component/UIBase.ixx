@@ -22,12 +22,11 @@ namespace fbc {
 		bool enabled = true;
 
 		inline Hitbox* getHb() final override { return hb.get(); }
+		inline virtual bool isHovered() { return hb->isHovered(); }
 		inline virtual float getBeginX() { return hb->x; } // The left-most end X coordinate of this object, may be smaller than hb if this has labels
 		inline virtual float getBeginY() { return hb->y; } // The left-most end X coordinate of this object, may be smaller than hb if this has labels
 		inline virtual float getEndX() { return hb->x + hb->w; } // The right-most end X coordinate of this object, may be larger than hb if this has subcomponents
 		inline virtual float getEndY() { return hb->y + hb->h; } // The bottom-most end Y coordinate of this object, may be larger than hb if this has subcomponents
-		inline virtual bool isHovered() { return hb->isHovered(); }
-		inline virtual void onSizeUpdated() {}
 		inline virtual UIBase& setEnabled(const bool enabled) { return this->enabled = enabled, * this; }
 		inline virtual UIBase& setHbExactPos(const float x, const float y) { return hb->setRealPos(x, y), *this; }
 		inline virtual UIBase& setHbExactPosX(const float x) { return hb->setRealPosX(x), * this; }
@@ -35,6 +34,7 @@ namespace fbc {
 		inline virtual UIBase& setHbOffsetPos(const float x, const float y) { return hb->setOffPos(x, y), * this; }
 		inline virtual UIBase& setHbOffsetPosX(const float x) { return hb->setOffPosX(x), * this; }
 		inline virtual UIBase& setHbOffsetPosY(const float y) { return hb->setOffPosY(y), * this; }
+		inline virtual void onSizeUpdated() {}
 		template <typename... Args> requires std::constructible_from<RelativeHitbox, FWindow&, Hitbox&, Args&&...> inline uptr<RelativeHitbox> relhb(Args&&... args) { return make_unique<RelativeHitbox>(win, *hb, forward<Args>(args)...); } // Generate a relative hitbox based on this component's hitbox
 
 		virtual UIBase& setHbExactSize(const float x, const float y);

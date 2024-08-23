@@ -23,6 +23,7 @@ namespace fbc {
 	export class CombatScreen : public UIScreen, public CombatInstance::IViewSubscriber {
 	public:
 		CombatScreen(FWindow& window): UIScreen(window),
+			cardUI(addNew<UICanvas>(relhb(0, 0, hb->getScaleOffSizeX(), hb->getScaleOffSizeY()))),
 			fieldUI(addNew<UICanvas>(relhb(TILE_OFFSET, TILE_OFFSET, hb->getScaleOffSizeX(), hb->getScaleOffSizeY()))),
 			turnUI(addNew<UICanvas>(relhb(0, 0, hb->getScaleOffSizeX(), hb->getScaleOffSizeY()))),
 			endTurnButton(add(make_unique<UITextButton>(win, relhb(hb->getScaleOffSizeX(0.8), hb->getScaleOffSizeY(0.8), END_TURN_SIZE, END_TURN_SIZE), window.cct.images.uiPanelRound, window.cct.fontRegular(), window.cct.strings.combat_end_turn()))) {
@@ -40,6 +41,7 @@ namespace fbc {
 	private:
 		CombatInstance* instance;
 		UITextButton& endTurnButton;
+		UICanvas& cardUI;
 		UICanvas& fieldUI;
 		UICanvas& turnUI;
 		umap<const CombatTurn*, CombatTurnRenderable*> turnUIMap;

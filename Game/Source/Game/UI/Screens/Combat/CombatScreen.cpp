@@ -7,7 +7,7 @@ import fbc.CombatSquareRenderable;
 import fbc.CombatTurnRenderable;
 import fbc.CreatureRenderable;
 import fbc.GameRun;
-import fbc.HitboxBatchMoveSmoothVFX;
+import fbc.UIBatchMoveVFX;
 import fbc.RelativeHitbox;
 import fbc.UIButton;
 import fbc.UIFadeOutDriftVFX;
@@ -35,16 +35,16 @@ namespace fbc {
 	void CombatScreen::onTurnChanged(ref_view<const mset<CombatTurn>> turns)
 	{
 		int i = 0;
-		vec<HitboxBatchMoveSmoothVFX::Entry> entries;
+		UIBatchMoveVFX& ref = addVfxNew<UIBatchMoveVFX>();
 		for (const CombatTurn& turn : turns) {
 			auto res = turnUIMap.find(&turn);
 			if (res != turnUIMap.end()) {
 				CombatTurnRenderable* item = res->second;
-				entries.push_back({ item->hb.get(), 0.0, i * TILE_SIZE});
+				ref.items.emplace_back(*item, 0.0, i * TILE_SIZE);
 				++i;
 			}
 		}
-		instance->queueAction(make_unique<VFXAction>(win, make_unique<HitboxBatchMoveSmoothVFX>(win, entries)));
+
 	}
 
 	void CombatScreen::onTurnRemoved(const CombatTurn* turn)
@@ -53,7 +53,7 @@ namespace fbc {
 		if (res != turnUIMap.end()) {
 			uptr<CombatTurnRenderable> item = turnUI.extract(res->second);
 			if (item) {
-				addVFX(make_unique<UIFadeOutDriftVFX>(win, move(item), 0, -10));
+				addVfxNew<UIFadeOutDriftVFX>(move(item), 0, -10);
 			}
 		}
 		turnUIMap.erase(turn);

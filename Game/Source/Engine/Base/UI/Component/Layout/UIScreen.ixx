@@ -5,6 +5,7 @@ import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.ScreenSizeHitbox;
 import fbc.UICanvas;
+import fbc.VFX;
 import sdl.SDLBatchRenderPass;
 import std;
 
@@ -14,23 +15,25 @@ namespace fbc {
 		UIScreen(FWindow& window) : UICanvas(window, make_unique<ScreenSizeHitbox>(window)) {}
 		UIScreen(FWindow& window, uptr<Hitbox>&& hb) : UICanvas(window, move(hb)) {}
 
-		virtual UIScreen& addVFX(uptr<FWindow::Element>&& eff);
+		template<c_ext<VFX> T, typename... Args> requires std::constructible_from<T, FWindow&, Args&&...> inline T& addVfxNew(Args&&... args) { return addVfx(create<T>(forward<Args>(args)...)); };
+		template<c_ext<VFX> T> T& addVfx(uptr<T>&& eff);
 		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		virtual void updateImpl() override;
 	private:
-		vec<uptr<FWindow::Element>> vfx;
+		vec<uptr<VFX>> vfx;
 	};
 
-	UIScreen& UIScreen::addVFX(uptr<FWindow::Element>&& eff)
+	template<c_ext<VFX> T> T& UIScreen::addVfx(uptr<T>&& eff)
 	{
+		T& ref = *eff;
 		vfx.push_back(std::move(eff));
-		return *this;
+		return ref;
 	}
 
 	void UIScreen::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
 		UICanvas::renderImpl(rp);
-		for (uptr<FWindow::Element>& effect : vfx) {
+		for (uptr<VFX>& effect : vfx) {
 			effect->render(rp);
 		}
 	}
@@ -38,6 +41,6 @@ namespace fbc {
 	void UIScreen::updateImpl()
 	{
 		UICanvas::updateImpl();
-		std::erase_if(vfx, [](uptr<FWindow::Element>& effect) {return effect->tickUpdate();});
+		std::erase_if(vfx, [](uptr<VFX>& effect) {return effect->tickUpdate();});
 	}
 }

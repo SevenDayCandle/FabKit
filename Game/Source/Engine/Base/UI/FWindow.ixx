@@ -26,8 +26,6 @@ namespace fbc {
 			inline virtual void updateImpl() { update(); }
 			template <typename T, typename... Args> requires std::constructible_from<T, FWindow&, Args&&...> uptr<T> inline create(Args&&... args) { return make_unique<T>(win, forward<Args>(args)...); }  // Generate a component using this element's window
 
-			virtual bool tickUpdate();
-
 			virtual void render(sdl::SDLBatchRenderPass& rp) = 0;
 			virtual void update() = 0;
 		};
@@ -291,11 +289,5 @@ namespace fbc {
 			}
 			queuedCloseOverlay = nullptr;
 		}
-	}
-
-	bool FWindow::Element::tickUpdate()
-	{
-		update();
-		return true;
 	}
 }
