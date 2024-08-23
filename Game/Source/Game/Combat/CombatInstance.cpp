@@ -12,7 +12,10 @@ import fbc.GameRun;
 import fbc.RunEncounter;
 import fbc.SavedCreatureEntry;
 import fbc.TurnObject;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 module fbc.CombatInstance;

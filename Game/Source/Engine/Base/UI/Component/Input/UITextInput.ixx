@@ -4,24 +4,28 @@ import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
-import fbc.ITextInputter;
-import fbc.TextInfo;
+import fbc.TextSupplier;
+import fbc.TextDrawable;
 import fbc.UIInteractable;
-import fbc.UITitledInteractable;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {
-	export class UITextInput : public UITitledInteractable, public TextInfo, public ITextInputter {
+	export class UITextInput : public UIInteractable, public TextSupplier {
 	public:
-		UITextInput(Hitbox* hb, 
-			IDrawable& image = cct.images.panel,
-			FFont& textFont = cct.fontRegular()): UITitledInteractable(hb, image), TextInfo(textFont) {
-			initCaret(this->font, this->hb->x, this->hb->y);
+		UITextInput(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image, FFont& textFont) :
+			UIInteractable(window, move(hb), image), TextSupplier(window, textFont) {
+			initCaret(this->hb->x, this->hb->y);
 			UITextInput::onSizeUpdated();
 		}
+		UITextInput(FWindow& window, uptr<Hitbox>&& hb) :
+			UITextInput(window, std::move(hb), window.cct.images.uiPanel, window.cct.fontRegular()) {}
 
 		inline UITextInput& setOnBufferUpdate(const func<void(strv)>& onBufferUpdateCallback) { return this->onBufferUpdateCallback = onBufferUpdateCallback, * this; }
 		inline UITextInput& setOnComplete(const func<void(strv)>& onComplete) { return this->onComplete = onComplete, *this; }
@@ -29,65 +33,59 @@ namespace fbc {
 		void commit(strv text);
 		virtual void onSizeUpdated() override;
 		virtual void refreshDimensions() override;
-		virtual void renderImpl() override;
-		virtual void start() override;
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		virtual void updateImpl() override;
 	protected:
-		inline virtual int getLimitWidth() override { return this->hb->w; }
+		inline float getBasePosX() final override { return this->hb->x; }
+		inline float getBasePosY() final override { return this->hb->y; }
+		inline int getLimitWidth() override { return this->hb->w; }
+		inline strv getSourceText() final override { return resText;  }
 
 		void clickLeftEvent() override;
 		void onBufferUpdated() override;
 		void onKeyPress(int32 c) override;
-		void resetBuffer() override;
-		void updateCaretPos() override;
 	private:
 		func<void(strv)> onBufferUpdateCallback;
 		func<void(strv)> onComplete;
+		str resText;
 	};
 
 	// Commits the text and invokes the completion callback
 	void UITextInput::commit(strv text)
 	{
-		setText(str(text));
+		resText = text;
 		if (onComplete) {
-			onComplete(this->getText());
+			onComplete(resText);
 		}
 	}
 
 	void UITextInput::onSizeUpdated()
 	{
-		TextInfo::setPos(cfg.renderScale(24), this->hb->h * 0.25f);
-		initCaret(this->font, this->hb->x, this->hb->y);
+		buffer.setPos(win.cfg.renderScale(24), this->hb->h * 0.25f);
+		initCaret(this->hb->x, this->hb->y);
 	}
 
 	void UITextInput::refreshDimensions()
 	{
-		UITitledInteractable::refreshDimensions();
-		refreshCache();
+		UIInteractable::refreshDimensions();
+		buffer.reload();
 	}
 
-	void UITextInput::renderImpl()
+	void UITextInput::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
-		UITitledInteractable::renderImpl();
-		TextInfo::drawText(hb->x, hb->y);
-		if (sdl::keyboardInputActive(this)) {
-			renderCaret();
+		UIInteractable::renderImpl(rp);
+		buffer.draw(rp, hb->x, hb->y, win.getW(), win.getH());
+		if (sdl::runner::keyboardInputActive(this)) {
+			renderCaret(rp);
 		}
-	}
-
-	void UITextInput::start() 
-	{
-		buffer = getText();
-		ITextInputter::start();
-		this->updateCache(buffer, sdl::COLOR_LIME);
 	}
 
 	// When clicking outside of the text input, commit whatever is in the input
 	void UITextInput::updateImpl()
 	{
 		UIInteractable::updateImpl();
-		if (sdl::keyboardInputActive(this) && sdl::mouseIsLeftJustClicked() && !isHovered()) {
-			commit(buffer);
+		if (sdl::runner::keyboardInputActive(this) && sdl::runner::mouseIsLeftJustClicked() && !isHovered()) {
+			commit(buffer.getText());
 			releaseBuffer();
 		}
 	}
@@ -95,22 +93,15 @@ namespace fbc {
 	// Updates the display text and invokes the buffer change callback
 	void UITextInput::onBufferUpdated()
 	{
-		this->updateCache(buffer, sdl::COLOR_LIME);
 		if (onBufferUpdateCallback) {
-			onBufferUpdateCallback(buffer);
+			onBufferUpdateCallback(buffer.getText());
 		}
-	}
-
-	void UITextInput::updateCaretPos()
-	{
-		caret.x = this->hb->x + cfg.renderScale(9) + this->font.measureW(buffer.substr(0, bufferPos));
-		caret.y = this->hb->y;
 	}
 
 	// When clicked while not focused, start the text input
 	void UITextInput::clickLeftEvent()
 	{
-		if (!sdl::keyboardInputActive()) {
+		if (!sdl::runner::keyboardInputActive()) {
 			start();
 		}
 	}
@@ -121,20 +112,11 @@ namespace fbc {
 		switch (c) {
 		case sdl::KEY_ENTER:
 		case sdl::KEY_RETURN:
-			commit(buffer);
-			releaseBuffer();
-			return;
-		case sdl::KEY_ESC:
-			this->refreshCache();
+			commit(buffer.getText());
 			releaseBuffer();
 			return;
 		default:
-			ITextInputter::onKeyPress(c);
+			TextSupplier::onKeyPress(c);
 		}
-	}
-
-	void UITextInput::resetBuffer() {
-		this->refreshCache();
-		buffer = getText();
 	}
 }

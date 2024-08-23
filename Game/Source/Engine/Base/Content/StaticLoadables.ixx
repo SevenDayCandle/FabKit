@@ -17,6 +17,7 @@ namespace fbc {
 	export class StaticLoadables : public ContentLoadables {
 	public:
 		StaticLoadables(const BaseContent& content) : ContentLoadables(content) {}
+		StaticLoadables(StaticLoadables&& other) noexcept : ContentLoadables(move(other)), items(move(other.items)) {}
 
 		virtual void dispose() override;
 		virtual void initialize() override;
@@ -24,12 +25,13 @@ namespace fbc {
 		inline FMusic& cacheMusic(const strv& key) { return static_cast<FMusic&>(*items.emplace_back(std::make_unique<FMusic>(getPath(key, AUDIO_PATH)))); }
 		inline FSound& cacheSound(const strv& key) { return static_cast<FSound&>(*items.emplace_back(std::make_unique<FSound>(getPath(key, AUDIO_PATH)))); }
 		inline FTexture& cacheTexture(const strv& key) { return static_cast<FTexture&>(*items.emplace_back(std::make_unique<FTexture>(getPath(key, IMAGE_PATH)))); }
-		inline RBordered& cacheBordered(FTexture& texture) { return static_cast<RBordered&>(*items.emplace_back(std::make_unique<RBordered>(texture))); }
-		inline RHorizontal& cacheHorizontal(FTexture& texture) { return static_cast<RHorizontal&>(*items.emplace_back(std::make_unique<RHorizontal>(texture))); }
-		inline RVertical& cacheVertical(FTexture& texture) { return static_cast<RVertical&>(*items.emplace_back(std::make_unique<RVertical>(texture))); }
+		inline RBordered& cacheBordered(const strv& key) { return static_cast<RBordered&>(*items.emplace_back(std::make_unique<RBordered>(getPath(key, IMAGE_PATH)))); }
+		inline RHorizontal& cacheHorizontal(const strv& key) { return static_cast<RHorizontal&>(*items.emplace_back(std::make_unique<RHorizontal>(getPath(key, IMAGE_PATH)))); }
+		inline RVertical& cacheVertical(const strv& key) { return static_cast<RVertical&>(*items.emplace_back(std::make_unique<RVertical>(getPath(key, IMAGE_PATH)))); }
 	private:
-		str getPath(const strv& key, const strv& folder) const;
 		vec<uptr<ILoadable>> items;
+
+		str getPath(const strv& key, const strv& folder) const;
 	};
 
 	// Clear out all caches

@@ -1,30 +1,34 @@
 export module fbc.RelativeHitbox;
 
 import fbc.CoreConfig;
-import fbc.Hitbox;
-import fbc.Hitbox;
 import fbc.FUtil;
+import fbc.FWindow;
+import fbc.Hitbox;
 
 namespace fbc {
 	export class RelativeHitbox : public Hitbox {
 	public:
-		RelativeHitbox(Hitbox& parent) : RelativeHitbox(parent, 0, 0, 0, 0) {}
-		RelativeHitbox(Hitbox& parent, float offsetWidth, float offsetHeight) : RelativeHitbox(parent, 0, 0, offsetWidth, offsetHeight) {}
-		RelativeHitbox(Hitbox& parent, float parentOffsetX, float parentOffsetY, float offsetWidth, float offsetHeight) : parent(parent), Hitbox(parentOffsetX, parentOffsetY, offsetWidth, offsetHeight) {
+		RelativeHitbox(FWindow& win, Hitbox& parent) : RelativeHitbox(win, parent, 0, 0, 0, 0) {}
+		RelativeHitbox(FWindow& win, Hitbox& parent, float offsetWidth, float offsetHeight) : RelativeHitbox(win, parent, 0, 0, offsetWidth, offsetHeight) {}
+		RelativeHitbox(FWindow& win, Hitbox& parent, float parentOffsetX, float parentOffsetY, float offsetWidth, float offsetHeight) : parent(parent), Hitbox(win, parentOffsetX, parentOffsetY, offsetWidth, offsetHeight) {
 			refresh();
 		}
 		~RelativeHitbox() override {}
+
+		inline static uptr<RelativeHitbox> make(FWindow& win, Hitbox& parent) { return make_unique<RelativeHitbox>(win, parent); }
+		inline static uptr<RelativeHitbox> make(FWindow& win, Hitbox& parent, float offsetWidth, float offsetHeight) { return make_unique<RelativeHitbox>(win, parent, offsetWidth, offsetHeight); }
+		inline static uptr<RelativeHitbox> make(FWindow& win, Hitbox& parent, float parentOffsetX, float parentOffsetY, float offsetWidth, float offsetHeight) { return make_unique<RelativeHitbox>(win, parent, parentOffsetX, parentOffsetY, offsetWidth, offsetHeight); }
 	protected:
 		Hitbox& parent;
 
-		inline void refreshOffPosX() override { offPosX = (x - parent.x) / cfg.renderScale(); }
-		inline void refreshOffPosY() override { offPosY = (y - parent.y) / cfg.renderScale(); }
-		inline void refreshOffSizeX() override { offSizeX = w / cfg.renderScale(); }
-		inline void refreshOffSizeY() override { offSizeY = h / cfg.renderScale(); }
-		inline void refreshRealPosX() override { x = parent.x + cfg.renderScale() * offPosX; }
-		inline void refreshRealPosY() override { y = parent.y + cfg.renderScale() * offPosY; }
-		inline void refreshRealSizeX() override { w = cfg.renderScale() * offSizeX; }
-		inline void refreshRealSizeY() override { h = cfg.renderScale() * offSizeY; }
+		inline void refreshOffPosX() override { offPosX = (x - parent.x) / win.cfg.renderScale(); }
+		inline void refreshOffPosY() override { offPosY = (y - parent.y) / win.cfg.renderScale(); }
+		inline void refreshOffSizeX() override { offSizeX = w / win.cfg.renderScale(); }
+		inline void refreshOffSizeY() override { offSizeY = h / win.cfg.renderScale(); }
+		inline void refreshRealPosX() override { x = parent.x + win.cfg.renderScale() * offPosX; }
+		inline void refreshRealPosY() override { y = parent.y + win.cfg.renderScale() * offPosY; }
+		inline void refreshRealSizeX() override { w = win.cfg.renderScale() * offSizeX; }
+		inline void refreshRealSizeY() override { h = win.cfg.renderScale() * offSizeY; }
 
 		void update() override;
 	};

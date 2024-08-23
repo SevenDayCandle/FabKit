@@ -1,14 +1,18 @@
 export module fbc.CallbackVFX;
 
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.VFX;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {
 	export class CallbackVFX : public VFX {
 	public:
-		CallbackVFX(float duration = DEFAULT_DURATION): VFX(duration) {}
+		CallbackVFX(FWindow& window, float duration = DEFAULT_DURATION): VFX(window, duration) {}
 		virtual ~CallbackVFX() = default;
 
 		func<void(CallbackVFX&)> onComplete;

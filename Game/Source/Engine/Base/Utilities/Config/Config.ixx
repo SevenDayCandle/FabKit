@@ -5,7 +5,10 @@ module;
 export module fbc.Config;
 
 import fbc.FUtil;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {
@@ -24,6 +27,7 @@ namespace fbc {
         };
 
         Config(strv id) : id(id) {}
+        Config(Config&& other) noexcept : id(other.id), values_map(move(other.values_map)), items(move(other.items)) {}
         virtual ~Config() {}
 
         const str id;

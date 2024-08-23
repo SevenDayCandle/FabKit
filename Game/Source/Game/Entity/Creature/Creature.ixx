@@ -10,7 +10,10 @@ import fbc.KeyedItem;
 import fbc.IDrawable;
 import fbc.ItemListing;
 import fbc.PileType;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {

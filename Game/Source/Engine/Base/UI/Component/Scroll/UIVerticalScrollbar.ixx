@@ -2,18 +2,25 @@ export module fbc.UIVerticalScrollbar;
 
 import fbc.CoreContent;
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.UIScrollbar;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLRunner;
 
 namespace fbc {
 
 	export class UIVerticalScrollbar : public UIScrollbar {
 	public:
-		UIVerticalScrollbar(Hitbox* hb, IDrawable& imageBar = cct.images.scrollbar, IDrawable& imageButton = cct.images.scrollbutton): UIScrollbar(hb, imageBar, imageButton) {
+		UIVerticalScrollbar(FWindow& window, uptr<Hitbox>&& hb, IDrawable& imageBar, IDrawable& imageButton) :
+			UIScrollbar(window, move(hb), imageBar, imageButton) {
 			UIVerticalScrollbar::updateDropzoneSize(0.05f);
 		}
+		UIVerticalScrollbar(FWindow& window, uptr<Hitbox>&& hb) :
+			UIVerticalScrollbar(window, move(hb), window.cct.images.uiScrollbar, window.cct.images.uiScrollbutton) {}
+
 
 		float toPercentage(float x, float y) override;
 		void updateDropzonePos(float percent) override;

@@ -1,10 +1,10 @@
 export module fbc.RunScreen;
 
 import fbc.CoreContent;
+import fbc.FWindow;
 import fbc.GameRun;
 import fbc.RelativeHitbox;
 import fbc.RunRoom;
-import fbc.ScreenManager;
 import fbc.SettingsDialog;
 import fbc.UIButton;
 import fbc.UIScreen;
@@ -18,7 +18,7 @@ namespace fbc {
 
 	export class RunScreen : public UIScreen {
 	public:
-		RunScreen(): UIScreen() {}
+		RunScreen(FWindow& window): UIScreen(window) {}
 
 		void open() override;
 	private:

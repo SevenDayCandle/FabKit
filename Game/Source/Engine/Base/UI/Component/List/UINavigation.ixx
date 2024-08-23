@@ -1,27 +1,26 @@
 export module fbc.UINavigation;
 
-import fbc.CoreConfig;
-import fbc.CoreContent;
+import fbc.EmptyDrawable;
 import fbc.FFont;
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
-import fbc.IDrawable;
 import fbc.RelativeHitbox;
 import fbc.UIEntry;
 import fbc.UIBase;
 import fbc.UIList;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {
 	export template <c_ext<UIBase> T> class UINavigation : public UIList<T> {
 	public:
-		UINavigation(Hitbox* hb,
-			func<str(const T&)> labelFunc = futil::toString<T>,
-			FFont& itemFont = cct.fontRegular(),
-			IDrawable& background = cct.images.darkPanelRound,
-			bool canAutosize = false) :
-			UIList<T>(hb, labelFunc, itemFont, background, canAutosize) {}
+		UINavigation(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize) :
+			UIList<T>(window, move(hb), std::move(labelFunc), itemFont, background, canAutosize) {}
+		UINavigation(FWindow& window, uptr<Hitbox>&& hb) :
+			UINavigation(window, std::move(hb), futil::toString<T>, window.cct.fontRegular(), window.cct.images.uiDarkPanelRound, false) {}
 
 		inline T* getSelectedItem() { return currentItem; }
 		inline UINavigation& setItemFont(FFont& itemFont) { return UIList<T>::setItemFont(itemFont), * this; }
@@ -30,7 +29,7 @@ namespace fbc {
 
 		virtual bool isHovered() override;
 		void refreshDimensions() override;
-		void renderImpl() override;
+		void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		void select(int ind);
 		void select(T& item);
 		void selectRow(UIEntry<T>& entry) override;
@@ -57,11 +56,11 @@ namespace fbc {
 	}
 
 	// Render the currently selected page
-	template<c_ext<UIBase> T> void UINavigation<T>::renderImpl()
+	template<c_ext<UIBase> T> void UINavigation<T>::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
-		UIList<T>::renderImpl();
+		UIList<T>::renderImpl(rp);
 		if (currentItem) {
-			currentItem->renderImpl();
+			currentItem->renderImpl(rp);
 		}
 	}
 
@@ -114,12 +113,13 @@ namespace fbc {
 		UIEntry<T>* entry = new UIEntry<T>(item,
 			i,
 			[this](UIEntry<T>& p) { this->selectRow(p); },
-			new RelativeHitbox(*this->hb),
+			this->win,
+			this->relhb(),
 			this->getItemFont(),
 			this->labelFunc(item),
-			cct.images.none,
-			cct.images.uiArrowLarge);
-		entry->setHbExactSizeY(cfg.renderScale(64));
+			EMPTY,
+			this->win.cct.images.uiArrowLarge);
+		entry->setHbExactSizeY(this->win.cfg.renderScale(64));
 		return entry;
 	}
 

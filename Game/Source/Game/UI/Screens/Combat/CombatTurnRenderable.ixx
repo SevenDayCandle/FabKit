@@ -3,28 +3,31 @@ export module fbc.CombatTurnRenderable;
 import fbc.CombatTurn;
 import fbc.CoreContent;
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.UIInteractable;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {
 	export class CombatTurnRenderable : public UIInteractable {
 	public:
-		CombatTurnRenderable(const CombatTurn& turn, Hitbox* hb) : UIInteractable(hb, cct.images.darkPanelRound), portrait(turn.source.getImagePortrait()) {}
+		CombatTurnRenderable(FWindow& window, uptr<Hitbox> hb, const CombatTurn& turn) : UIInteractable(window, move(hb), window.cct.images.uiDarkPanelRound), portrait(turn.source.getImagePortrait()) {}
 
 		IDrawable& portrait;
 
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 
 		// TODO highlight turn owner when hovered
 	};
 
-	void CombatTurnRenderable::renderImpl()
+	void CombatTurnRenderable::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
-		UIInteractable::renderImpl();
-		sdl::RectF portraitRect = { hb->x + hb->w / 8, hb->y + hb->h * 0.15f, hb->w / 2, hb->h * 0.7f };
-		portrait.draw(&portraitRect, color, origin, rotation, flip);
+		UIInteractable::renderImpl(rp);
+		portrait.draw(rp, hb->x + hb->w / 8, hb->y + hb->h * 0.15f, hb->w / 2, hb->h * 0.7f, win.getW(), win.getH(), 1, 1, rotation, &color);
 	}
 }

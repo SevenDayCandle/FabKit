@@ -1,26 +1,27 @@
 export module fbc.UIMenu;
 
-import fbc.CoreConfig;
-import fbc.CoreContent;
+import fbc.EmptyDrawable;
 import fbc.FFont;
+import fbc.FWindow;
 import fbc.FUtil;
 import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.RelativeHitbox;
 import fbc.UIEntry;
 import fbc.UIList;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {
 	export template <typename T> class UIMenu : public UIList<T> {
 	public:
-		UIMenu(Hitbox* hb,
-			func<str(const T&)> labelFunc = futil::toString<T>,
-			FFont& itemFont = cct.fontRegular(),
-			IDrawable& background = cct.images.darkPanelRound,
-			bool canAutosize = false) :
-			UIList<T>(hb, std::move(labelFunc), itemFont, background, canAutosize) {}
+		UIMenu(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize) :
+			UIList<T>(window, move(hb), std::move(labelFunc), itemFont, background, canAutosize) {}
+		UIMenu(FWindow& window, uptr<Hitbox>&& hb) :
+			UIMenu(window, std::move(hb), futil::toString<T>, window.cct.fontRegular(), window.cct.images.uiDarkPanelRound, false) {}
+		UIMenu(UIMenu&& other) noexcept = default;
 
 		inline const T* getSelectedItem() { return &this->rows[currentIndex]->item; }
 		inline UIMenu& setItemFont(const FFont& itemFont) { return UIList<T>::setItemFont(itemFont), * this; }
@@ -75,12 +76,12 @@ namespace fbc {
 		UIEntry<T>* entry = new UIEntry<T>(item,
 			i,
 			[this](UIEntry<T>& p) { this->selectRow(p); },
-			new RelativeHitbox(*this->hb),
+			make_unique<RelativeHitbox>(*this->hb),
 			this->getItemFont(),
 			this->labelFunc(item),
-			cct.images.none,
-			cct.images.none);
-		entry->setHbExactSizeY(cfg.renderScale(64));
+			EMPTY,
+			EMPTY);
+		entry->setHbExactSizeY(this->win.cfg.renderScale(64));
 		return entry;
 	}
 

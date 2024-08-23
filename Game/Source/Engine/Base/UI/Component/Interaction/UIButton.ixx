@@ -1,24 +1,27 @@
 export module fbc.UIButton;
 
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
-import fbc.ScreenManager;
+
 import fbc.UIInteractable;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 
 namespace fbc {
 	export class UIButton : public UIInteractable {
 	public:
 
-		UIButton(Hitbox* hb, IDrawable& image) : UIInteractable(hb, image) {}
-		UIButton(Hitbox* hb, IDrawable& image, sdl::Point origin) : UIInteractable(hb, image, origin) {}
+		UIButton(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image) : UIInteractable(window, move(hb), image) {}
 		~UIButton() override {}
 
 		inline UIButton& setOnClick(const func<void(UIButton&)>& onClick) { return this->onLeftClick = onClick, *this; }
 		inline UIButton& setOnRightClick(const func<void(UIButton&)>& onRightClick) { return this->onRightClick = onRightClick, *this; }
 
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 	private:
 		func<void(UIButton&)> onLeftClick;
 		func<void(UIButton&)> onRightClick;
@@ -27,11 +30,8 @@ namespace fbc {
 		virtual void clickRightEvent() override;
 	};
 
-	void UIButton::renderImpl() {
-		UIInteractable::renderImpl();
-		if (hb->isHovered() && interactable) {
-			image.draw(hb.get(), sdl::BlendMode::SDL_BLENDMODE_ADD, color, origin, rotation, flip);
-		}
+	void UIButton::renderImpl(sdl::SDLBatchRenderPass& rp) {
+		image.draw(rp, *hb.get(), win.getW(), win.getH(), 1, 1, rotation, hb->isHovered() && interactable ? &sdl::COLOR_WHITE : &color);
 	}
 
 	void UIButton::clickLeftEvent()

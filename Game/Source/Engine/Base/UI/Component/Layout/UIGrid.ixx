@@ -1,11 +1,13 @@
 export module fbc.UIGrid;
 
 import fbc.CoreConfig;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.UIBase;
 import fbc.UIVerticalScrollbar;
 import fbc.FUtil;
 import fbc.ScaleHitbox;
+import sdl.SDLBatchRenderPass;
 import std;
 
 namespace fbc {
@@ -39,13 +41,14 @@ namespace fbc {
 			typename vec<uptr<T>>::iterator it;
 		};
 
-		UIGrid(Hitbox* hb, float spacingX = 100, float spacingY = 100, float scrollSpeed = 1) : UIBase(hb),
+		UIGrid(FWindow& window, uptr<Hitbox>&& hb, float spacingX = 100, float spacingY = 100, float scrollSpeed = 1) : UIBase(window, move(hb)),
 			spacingX(spacingX),
 			spacingY(spacingY),
 			scrollSpeed(scrollSpeed),
-			scrollbar{ new ScaleHitbox(hb->w * 0.93f / cfg.renderScale(), hb->y + hb->h * 0.05f / cfg.renderScale(), 48, hb->h * 0.9f / cfg.renderScale()) } {
+			scrollbar{window, make_unique<ScaleHitbox>(window, hb->w * 0.93f / window.cfg.renderScale(), hb->y + hb->h * 0.05f / window.cfg.renderScale(), 48, hb->h * 0.9f / window.cfg.renderScale())} {
 			scrollbar.enabled = false;
 		}
+		UIGrid(UIGrid&& other) noexcept : UIBase(other.win, move(other.hb)), spacingX(other.spacingX), spacingY(other.spacingY), scrollSpeed(other.scrollSpeed), scrollbar(move(other.scrollbar)), items(move(other.items)) {}
 
 		inline float getSpacingX() const { return spacingX; }
 		inline float getSpacingY() const { return spacingY; }
@@ -61,7 +64,7 @@ namespace fbc {
 		UIGrid& setSpacingY(float spacingY);
 		virtual bool isHovered() override;
 		virtual void refreshDimensions() override;
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		virtual void updateImpl() override;
 	protected:
 		float scrollSpeed = 1;
@@ -89,12 +92,12 @@ namespace fbc {
 		scrollbar.refreshDimensions();
 	}
 
-	template<c_ext<UIBase> T> void UIGrid<T>::renderImpl()
+	template<c_ext<UIBase> T> void UIGrid<T>::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
 		for (const uptr<T>& item : items) {
-			item->render();
+			item->render(*rp);
 		}
-		scrollbar.render();
+		scrollbar.render(rp);
 	}
 
 	template<c_ext<UIBase> T> void UIGrid<T>::updateImpl()
@@ -109,8 +112,8 @@ namespace fbc {
 	// Updates the positions of ALL items in the grid, and shows the scrollbar if any of them would extend outside of the grid
 	template<c_ext<UIBase> T> void UIGrid<T>::updateItemOffsets()
 	{
-		float sx = cfg.renderScale(spacingX);
-		float sy = cfg.renderScale(spacingY);
+		float sx = win.cfg.renderScale(spacingX);
+		float sy = win.cfg.renderScale(spacingY);
 		float x = hb->x;
 		float y = hb->y;
 		for (const uptr<T>& item : items) {
@@ -128,8 +131,8 @@ namespace fbc {
 
 	// Updates the positions of items from index begin (inclusive) to index end (exclusive), and shows the scrollbar if any of them would extend outside of the grid
 	template<c_ext<UIBase> T> void UIGrid<T>::updateItemOffsets(int begin, int end) {
-		float sx = cfg.renderScale(spacingX);
-		float sy = cfg.renderScale(spacingY);
+		float sx = win.cfg.renderScale(spacingX);
+		float sy = win.cfg.renderScale(spacingY);
 		int rowsize = hb->w / sx;
 		int xP = begin % rowsize;
 		int yP = begin / rowsize; // Intentional integer division in parentheses to ensure that this multiplier rounds down

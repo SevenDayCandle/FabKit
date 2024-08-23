@@ -3,23 +3,27 @@ export module fbc.CombatSquareRenderable;
 import fbc.CombatSquare;
 import fbc.CoreContent;
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.UIInteractable;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {
 	export class CombatSquareRenderable : public UIInteractable {
 	public:
-		CombatSquareRenderable(const CombatSquare& square, Hitbox* hb): UIInteractable(hb, cct.images.lightPanel), square(square) {}
+		CombatSquareRenderable(FWindow& window, uptr<Hitbox>&& hb, const CombatSquare& square): UIInteractable(window, move(hb), window.cct.images.uiLightPanel), square(square) {}
 
 		const CombatSquare& square;
 
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 	};
 
-	void CombatSquareRenderable::renderImpl()
+	void CombatSquareRenderable::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
-		UIInteractable::renderImpl();
+		UIInteractable::renderImpl(rp);
 	}
 }

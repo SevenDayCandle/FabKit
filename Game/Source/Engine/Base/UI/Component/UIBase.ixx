@@ -1,27 +1,33 @@
 export module fbc.UIBase;
 
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
-import fbc.IOverlay;
+import fbc.Hoverable;
+import fbc.RelativeHitbox;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {
-	export class UIBase : public IOverlay {
+	export class UIBase : public Hoverable {
 	public:
-		UIBase(Hitbox* hb) : hb(hb) {}
-		UIBase(uptr<Hitbox>&& hb) : hb(std::move(hb)) {}
+		UIBase(FWindow& window, uptr<Hitbox>&& hb) : Hoverable(window), hb(move(hb)) {}
+		UIBase(UIBase&& other) noexcept = default;
 		virtual ~UIBase() override = default;
 
 		uptr<Hitbox> hb;
 		bool enabled = true;
 
+		inline Hitbox* getHb() final override { return hb.get(); }
 		inline virtual float getBeginX() { return hb->x; } // The left-most end X coordinate of this object, may be smaller than hb if this has labels
 		inline virtual float getBeginY() { return hb->y; } // The left-most end X coordinate of this object, may be smaller than hb if this has labels
 		inline virtual float getEndX() { return hb->x + hb->w; } // The right-most end X coordinate of this object, may be larger than hb if this has subcomponents
 		inline virtual float getEndY() { return hb->y + hb->h; } // The bottom-most end Y coordinate of this object, may be larger than hb if this has subcomponents
 		inline virtual bool isHovered() { return hb->isHovered(); }
 		inline virtual void onSizeUpdated() {}
-		inline virtual UIBase& addVFX(uptr<IOverlay>&& vfx) { return *this; }
 		inline virtual UIBase& setEnabled(const bool enabled) { return this->enabled = enabled, * this; }
 		inline virtual UIBase& setHbExactPos(const float x, const float y) { return hb->setRealPos(x, y), *this; }
 		inline virtual UIBase& setHbExactPosX(const float x) { return hb->setRealPosX(x), * this; }
@@ -29,6 +35,7 @@ namespace fbc {
 		inline virtual UIBase& setHbOffsetPos(const float x, const float y) { return hb->setOffPos(x, y), * this; }
 		inline virtual UIBase& setHbOffsetPosX(const float x) { return hb->setOffPosX(x), * this; }
 		inline virtual UIBase& setHbOffsetPosY(const float y) { return hb->setOffPosY(y), * this; }
+		template <typename... Args> requires std::constructible_from<RelativeHitbox, FWindow&, Hitbox&, Args&&...> inline uptr<RelativeHitbox> relhb(Args&&... args) { return make_unique<RelativeHitbox>(win, *hb, forward<Args>(args)...); } // Generate a relative hitbox based on this component's hitbox
 
 		virtual UIBase& setHbExactSize(const float x, const float y);
 		virtual UIBase& setHbExactSizeX(const float x);
@@ -37,11 +44,9 @@ namespace fbc {
 		virtual UIBase& setHbOffsetSizeX(const float x);
 		virtual UIBase& setHbOffsetSizeY(const float y);
 		virtual void refreshDimensions() override;
-		virtual void render() final override;
+		virtual void render(sdl::SDLBatchRenderPass& rp) final override;
 		virtual void update() final override;
-		virtual void updateImpl();
-
-		virtual void renderImpl() = 0;
+		virtual void updateImpl() override;
 	};
 
 	// Wrapper around setRealSize that invokes any size update callbacks
@@ -100,9 +105,9 @@ namespace fbc {
 	}
 
 	// If enabled, render the component for a single frame
-	void UIBase::render() {
+	void UIBase::render(sdl::SDLBatchRenderPass& rp) {
 		if (enabled) {
-			renderImpl();
+			renderImpl(rp);
 		}
 	}
 

@@ -5,6 +5,7 @@ import fbc.CoreConfig;
 import fbc.ConfigValue;
 import fbc.ConfigNumeric;
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.RelativeHitbox;
 import fbc.SelectView;
@@ -12,9 +13,10 @@ import fbc.UICanvas;
 import fbc.UIDropdown;
 import fbc.UIEntry;
 import fbc.UINumberInput;
-import fbc.UITextInput;
 import fbc.UISlider;
+import fbc.UITitle;
 import fbc.UIToggle;
+import fbc.UITextInput;
 import std;
 
 namespace fbc {
@@ -42,13 +44,14 @@ namespace fbc {
 		};
 
 	public:
-		SettingsDialogPage(Hitbox* hb, strv name): UICanvas(hb), name(name) {}
+		SettingsDialogPage(FWindow& window, uptr<Hitbox>&& hb, strv name): UICanvas(window, move(hb)), name(name) {}
 
 		const str name;
 
 		friend std::ostream& operator<<(std::ostream& os, const SettingsDialogPage& obj) { return os << obj.name; }
 
 		inline UISlider& addSlider(ConfigNumeric& conf, strv name, float xOff = 400) { return addSlider(conf, name, conf.getMin(), conf.getMax(), xOff); }
+		template <typename T> inline SettingsDialogCache<T>& makeCache(ConfigValue<T>& conf) {return static_cast<SettingsDialogCache<T>&>(*confs.emplace_back(std::make_unique<SettingsDialogCache<T>>(conf)));}
 		template <typename T, c_itr<T> Iterable> inline UIDropdown<T>& addDropdown(ConfigValue<T>& conf, strv name, const Iterable& items, func<str(const T&)> labelFunc = futil::toString<T>, int min = 1, int xOff = 400) { return addDropdownImpl<T, Iterable>(conf, name, items, labelFunc, min, xOff); }
 		template <typename T, c_itr<T*> Iterable> inline UIDropdown<T>& addDropdown(ConfigValue<T>& conf, strv name, const Iterable& items, func<str(const T&)> labelFunc = futil::toString<T>, int min = 1, int xOff = 400) { return addDropdownImpl<T, Iterable>(conf, name, items, labelFunc, min, xOff); }
 		template <typename T, typename U, c_itr<U> Iterable> inline UIDropdown<U>& addDropdownMapped(ConfigValue<T>& conf, strv name, Iterable& items, func<T(const U*)> convFunc, func<str(const T&)> labelFunc = futil::toString<T>, int min = 1, int xOff = 400) { return addDropdownMappedImpl<T, U, Iterable>(conf, name, items, convFunc, labelFunc, min, xOff); }
@@ -71,20 +74,25 @@ namespace fbc {
 
 	UISlider& SettingsDialogPage::addSlider(ConfigValue<int>& conf, strv name, int min, int max, float xOff)
 	{
-		SettingsDialogCache<int>& cache = static_cast<SettingsDialogCache<int>&>(*confs.emplace_back(std::make_unique<SettingsDialogCache<int>>(conf)));
-		UISlider& slider = stackYDir(std::make_unique<UISlider>(new RelativeHitbox(*hb, xOff, 0, 200, 100), min, max), 8, getOffsetFromLast());
-		slider
-			.setValue(conf.get())
-			.setOnComplete([&cache](int val) {cache.value = val; })
-			.withLabel(name, cct.fontBold(), -xOff, 25);
+		SettingsDialogCache<int>& cache = makeCache(conf);
+		UISlider& slider = stackYDir(
+			UITitle<UISlider>::make(UISlider(win, relhb(xOff, 0, 200, 100), min, max), win.cct.fontBold(), name, -xOff, 25),
+			8,
+			getOffsetFromLast());
+
+		slider.setValue(conf.get())
+			.setOnComplete([&cache](int val) {cache.value = val; });
 		cache.setOnReset([&slider, &conf]() {slider.setValue(conf.get()); });
 		return slider;
 	}
 
 	UIToggle& SettingsDialogPage::addToggle(ConfigValue<bool>& conf, strv name, float xOff)
 	{
-		SettingsDialogCache<bool>& cache = static_cast<SettingsDialogCache<bool>&>(*confs.emplace_back(std::make_unique<SettingsDialogCache<bool>>(conf)));
-		UIToggle& toggle = stackYDir(std::make_unique<UIToggle>(new RelativeHitbox(*hb, xOff, 0, 100, 100), name, cct.images.uiCheckboxEmpty, cct.images.uiCheckboxFilled, cct.fontBold(), -xOff), 8, getOffsetFromLast());
+		SettingsDialogCache<bool>& cache = makeCache(conf);
+		UIToggle& toggle = stackYDir(
+			create<UIToggle>(relhb(xOff, 0, 100, 100), name, win.cct.images.uiCheckboxEmpty, win.cct.images.uiCheckboxFilled, win.cct.fontBold(), -xOff),
+			8,
+			getOffsetFromLast());
 		toggle.setToggleState(conf.get())
 			.setOnClick([&cache](const UIToggle& toggle) {cache.value = toggle.toggled; });
 		cache.setOnReset([&toggle, &conf]() {toggle.toggle(conf.get()); });
@@ -93,11 +101,13 @@ namespace fbc {
 
 	template<typename T, typename Iterable> UIDropdown<T>& SettingsDialogPage::addDropdownImpl(ConfigValue<T>& conf, strv name, const Iterable& items, func<str(const T&)> labelFunc, int min, int xOff)
 	{
-		SettingsDialogCache<T>& cache = static_cast<SettingsDialogCache<T>&>(*confs.emplace_back(std::make_unique<SettingsDialogCache<T>>(conf)));
-		UIDropdown<T>& dr = stackYDir(UIDropdown<T>::singleList(new RelativeHitbox(*hb, xOff, 0, hb->getScaleOffSizeX() * 0.8f, 100), labelFunc), 8, getOffsetFromLast());
+		SettingsDialogCache<T>& cache = makeCache(conf);
+		UIDropdown<T>& dr = stackYDir(
+			UITitle<UIDropdown<T>>::make(UIDropdown<T>::singleList(win, relhb(xOff, 0, hb->getScaleOffSizeX() * 0.8f, 100), labelFunc), win.cct.fontBold(), name, -xOff, 25),
+			8,
+			getOffsetFromLast());
 		dr.setItems(items)
-			.setOnChange([&cache](EntryView<T>& res) { if (res.size() > 0) cache.value = *res.begin(); })
-			.withLabel(name, cct.fontBold(), -xOff, 25);
+			.setOnChange([&cache](EntryView<T>& res) { if (res.size() > 0) cache.value = *res.begin(); });
 		dr.updateSingle(conf.get());
 		if (min > 0) {
 			dr.setSelectionMin(min);
@@ -108,11 +118,13 @@ namespace fbc {
 
 	template<typename T, typename U, typename Iterable> UIDropdown<U>& SettingsDialogPage::addDropdownMappedImpl(ConfigValue<T>& conf, strv name, const Iterable& items, func<T(const U*)> convFunc, func<str(const T&)> labelFunc, int min, int xOff)
 	{
-		SettingsDialogCache<T>& cache = static_cast<SettingsDialogCache<T>&>(*confs.emplace_back(std::make_unique<SettingsDialogCache<T>>(conf)));
-		UIDropdown<U>& dr = stackYDir(UIDropdown<U>::singleList(new RelativeHitbox(*hb, xOff, 0, hb->getScaleOffSizeX() * 0.8f, 100), labelFunc), 8, getOffsetFromLast());
+		SettingsDialogCache<T>& cache = makeCache(conf);
+		UIDropdown<U>& dr = stackYDir(
+			UITitle<UIDropdown<U>>::make(UIDropdown<U>::singleList(win, relhb(xOff, 0, hb->getScaleOffSizeX() * 0.8f, 100), labelFunc), win.cct.fontBold(), name, -xOff, 25),
+			8,
+			getOffsetFromLast());
 		dr.setItems(items)
-			.setOnChange([&cache, convFunc](EntryView<T>& res) { if (res.size() > 0) cache.value = convFunc(res.begin()); })
-			.withLabel(name, cct.fontBold(), -xOff, 25);
+			.setOnChange([&cache, convFunc](EntryView<T>& res) { if (res.size() > 0) cache.value = convFunc(res.begin()); });
 		dr.updateSingle(conf.get());
 		if (min > 0) {
 			dr.setSelectionMin(min);
@@ -137,7 +149,7 @@ namespace fbc {
 
 	float SettingsDialogPage::getOffsetFromLast()
 	{
-		UIBase* last = getLastItem();
-		return last ? std::max(last->hb->x - last->getBeginX(), 0.0f) : 0;
+		Hoverable* last = getLastItem();
+		return last ? std::max(last->getHb()->x - last->getBeginX(), 0.0f) : 0;
 	}
 }

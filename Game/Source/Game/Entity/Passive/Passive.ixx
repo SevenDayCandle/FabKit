@@ -5,7 +5,10 @@ import fbc.Effect;
 import fbc.FUtil;
 import fbc.GameObject;
 import fbc.PassiveData;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {

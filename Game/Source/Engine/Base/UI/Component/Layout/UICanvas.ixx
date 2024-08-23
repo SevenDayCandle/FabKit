@@ -2,8 +2,11 @@ export module fbc.UICanvas;
 
 import fbc.CoreConfig;
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
+import fbc.Hoverable;
 import fbc.UIBase;
+import sdl.SDLBatchRenderPass;
 import std;
 
 namespace fbc {
@@ -13,12 +16,12 @@ namespace fbc {
 		class Iterator {
 		public:
 			using iterator_category = std::forward_iterator_tag;
-			using value_type = UIBase;
+			using value_type = Hoverable;
 			using difference_type = std::ptrdiff_t;
-			using pointer = UIBase*;
-			using reference = UIBase&;
+			using pointer = Hoverable*;
+			using reference = Hoverable&;
 
-			Iterator(typename vec<uptr<UIBase>>::iterator it) : it(it) {}
+			Iterator(typename vec<uptr<Hoverable>>::iterator it) : it(it) {}
 
 			reference operator*() const { return *(*it); }
 			pointer operator->() const { return it->get(); }
@@ -34,11 +37,10 @@ namespace fbc {
 			friend bool operator!=(const Iterator& a, const Iterator& b) { return a.it != b.it; }
 
 		private:
-			typename vec<uptr<UIBase>>::iterator it;
+			typename vec<uptr<Hoverable>>::iterator it;
 		};
 
-		UICanvas(Hitbox* hb) : UIBase(hb) {}
-		UICanvas(uptr<Hitbox>&& hb) : UIBase(std::move(hb)) {}
+		UICanvas(FWindow& window, uptr<Hitbox>&& hb) : UIBase(window, move(hb)) {}
 		~UICanvas() override {}
 
 		inline bool empty() { return elements.empty(); }
@@ -46,23 +48,24 @@ namespace fbc {
 		inline Iterator end() { return Iterator(elements.end()); }
 		inline size_t size() const { return elements.size(); }
 		inline void clear() { elements.clear(); }
+		template<c_ext<Hoverable> T, typename... Args> requires std::constructible_from<T, FWindow&, Args&&...> inline T& addNew(Args&&... args) { return add(create<T>(forward<Args>(args)...)); };
 
-		template<typename T> requires std::is_base_of_v<UIBase, T> T& add(uptr<T>&& element);
-		template<typename T> requires std::is_base_of_v<UIBase, T> T& stackXDir(uptr<T>&& element, float spacing = 8, float yOff = 0);
-		template<typename T> requires std::is_base_of_v<UIBase, T> T& stackYDir(uptr<T>&& element, float spacing = 8, float xOff = 0);
-		template<typename T> requires std::is_base_of_v<UIBase, T> uptr<T> extract(T* item);
-		UIBase* getLastItem() const;
+		template<c_ext<Hoverable> T> T& add(uptr<T>&& element);
+		template<c_ext<Hoverable> T> T& stackXDir(uptr<T>&& element, float spacing = 8, float yOff = 0);
+		template<c_ext<Hoverable> T> T& stackYDir(uptr<T>&& element, float spacing = 8, float xOff = 0);
+		template<c_ext<Hoverable> T> uptr<T> extract(T* item);
+		Hoverable* getLastItem() const;
 		virtual bool isHovered() override;
-		virtual bool remove(UIBase* item);
+		virtual bool remove(Hoverable* item);
 		virtual void refreshDimensions() override;
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		virtual void updateImpl() override;
 	protected:
-		vec<uptr<UIBase>> elements;
+		vec<uptr<Hoverable>> elements;
 	};
 
 	// Add a singular element to the canvas
-	template<typename T> requires std::is_base_of_v<UIBase, T> T& UICanvas::add(uptr<T>&& element)
+	template<c_ext<Hoverable> T> T& UICanvas::add(uptr<T>&& element)
 	{
 		T& ref = *element;
 		elements.push_back(std::move(element));
@@ -70,7 +73,7 @@ namespace fbc {
 	}
 
 	// Get the hb for the last item added into the list
-	UIBase* UICanvas::getLastItem() const
+	Hoverable* UICanvas::getLastItem() const
 	{
 		if (elements.size() > 0) {
 			return elements[elements.size() - 1].get();
@@ -80,20 +83,20 @@ namespace fbc {
 
 	// Is considered hovered if any child element is hovered; own hitbox is ignored
 	bool UICanvas::isHovered() {
-		return std::ranges::any_of(elements, [](const uptr<UIBase>& i) { return i->isHovered(); });
+		return std::ranges::any_of(elements, [](const uptr<Hoverable>& i) { return i->isHovered(); });
 	}
 
 	// Updates the dimensions of all children too
 	void UICanvas::refreshDimensions()
 	{
 		UIBase::refreshDimensions();
-		for (const uptr<UIBase>& element : elements) {
+		for (const uptr<Hoverable>& element : elements) {
 			element->refreshDimensions();
 		}
 	}
 
 	// Removes a specified element from the canvas. Return true if the element was erased
-	bool UICanvas::remove(UIBase* item)
+	bool UICanvas::remove(Hoverable* item)
 	{
 		for (auto it = elements.begin(); it != elements.end(); ++it) {
 			if (it->get() == item) {
@@ -104,10 +107,10 @@ namespace fbc {
 		return false;
 	}
 
-	void UICanvas::renderImpl()
+	void UICanvas::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
-		for (const uptr<UIBase>& element : elements) {
-			element->render();
+		for (const uptr<Hoverable>& element : elements) {
+			element->render(rp);
 		}
 	}
 
@@ -115,13 +118,13 @@ namespace fbc {
 	 * If the element's X endpoint would exceed the width of this hb, it gets moved below the last element at the X offset defined by start
 	 * Spacing will automatically be scaled by renderScale
 	 */
-	template<typename T> requires std::is_base_of_v<UIBase, T> T& UICanvas::stackXDir(uptr<T>&& element, float spacing, float yOff) {
-		float scaled = cfg.renderScale(spacing);
+	template<c_ext<Hoverable> T> T& UICanvas::stackXDir(uptr<T>&& element, float spacing, float yOff) {
+		float scaled = win.cfg.renderScale(spacing);
 		T& ref = *element;
 		elements.push_back(std::move(element));
 		// Only actually do positioning if there is a previous element to reference
 		if (elements.size() > 1) {
-			UIBase& last = *elements[elements.size() - 2];
+			Hoverable& last = *elements[elements.size() - 2];
 			float xPos = last.getEndX() + scaled;
 			float yPos = last.getBeginY() + yOff;
 
@@ -130,7 +133,7 @@ namespace fbc {
 				yPos = last.getEndY() + scaled + yOff;
 			}
 
-			ref.hb->setRealPos(xPos, yPos);
+			ref.getHb()->setRealPos(xPos, yPos);
 		}
 		return ref;
 	}
@@ -139,13 +142,13 @@ namespace fbc {
 	 * If the element's Y endpoint would exceed the height of this hb, it gets moved to the right of the last element at the Y offset defined by start
 	 * Spacing will automatically be scaled by renderScale
 	 */
-	template<typename T> requires std::is_base_of_v<UIBase, T> T& UICanvas::stackYDir(uptr<T>&& element, float spacing, float xOff) {
-		float scaled = cfg.renderScale(spacing);
+	template<c_ext<Hoverable> T> T& UICanvas::stackYDir(uptr<T>&& element, float spacing, float xOff) {
+		float scaled = win.cfg.renderScale(spacing);
 		T& ref = *element;
 		elements.push_back(std::move(element));
 		// Only actually do positioning if there is a previous element to reference
 		if (elements.size() > 1) {
-			UIBase& last = *elements[elements.size() - 2];
+			Hoverable& last = *elements[elements.size() - 2];
 			float xPos = last.getBeginX() + xOff;
 			float yPos = last.getEndY() + scaled;
 
@@ -154,13 +157,13 @@ namespace fbc {
 				yPos = hb->y;
 			}
 
-			ref.hb->setRealPos(xPos, yPos);
+			ref.getHb()->setRealPos(xPos, yPos);
 		}
 		return ref;
 	}
 
 	// Removes a specified element from the canvas and returns it
-	template<typename T> requires std::is_base_of_v<UIBase, T> uptr<T> UICanvas::extract(T* item)
+	template<c_ext<Hoverable> T> uptr<T> UICanvas::extract(T* item)
 	{
 		for (auto it = elements.begin(); it != elements.end(); ++it) {
 			if (it->get() == item) {
@@ -176,7 +179,7 @@ namespace fbc {
 	void UICanvas::updateImpl()
 	{
 		UIBase::updateImpl();
-		for (const uptr<UIBase>& element : elements) {
+		for (const uptr<Hoverable>& element : elements) {
 			element->update();
 		}
 	}

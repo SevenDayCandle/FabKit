@@ -2,7 +2,10 @@ export module fbc.ConfigValue;
 
 import fbc.Config;
 import fbc.FUtil;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 
 namespace fbc {
     export template<typename T> class ConfigValue : public Config::ConfigEntry {
@@ -13,9 +16,9 @@ namespace fbc {
 
         operator T() { return value; }
 
-        inline void setOnReload(const func<void(const T&)>& onChange) {this->onChange = onChange;}
         inline const T& get() const {return value;}
 
+        void addOnReload(const func<void(const T&)>& onChangeNew);
         void reload() override;
         void set(const T& newValue);
     protected:
@@ -40,6 +43,21 @@ namespace fbc {
         catch (const exception& e) {
             sdl::logError("Config item with id %s failed to parse input %s: %s", id.data(), input.data(), e.what());
             return defaultValue;
+        }
+    }
+
+    // Chain a new callback onto the existing onChange
+    template<typename T> void ConfigValue<T>::addOnReload(const func<void(const T&)>& onChangeNew)
+    {
+        auto previousOnChange = this->onChange;
+        if (previousOnChange) {
+            this->onChange = [previousOnChange, onChangeNew](const T& val) {
+                previousOnChange(val);
+                onChangeNew(val);
+            };
+        }
+        else {
+            this->onChange = onChangeNew;
         }
     }
 

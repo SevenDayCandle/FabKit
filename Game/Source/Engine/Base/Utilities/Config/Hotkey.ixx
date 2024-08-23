@@ -7,7 +7,10 @@ export module fbc.ConfigHotkey;
 import fbc.Config;
 import fbc.FUtil;
 import fbc.KeyedItem;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {
@@ -18,7 +21,7 @@ namespace fbc {
 		Hotkey(strv id, sdl::Scancode key, sdl::GamepadButton gamepad): KeyedItem(id), key(key), keyDefault(key), pad(gamepad), padDefault(gamepad) {}
 		virtual ~Hotkey() = default;
 
-		inline bool isKeyJustPressed() const { return key > 0 && sdl::keyboardJustPressed(key); }
+		inline bool isKeyJustPressed() const { return key > 0 && sdl::runner::keyboardJustPressed(key); }
 		inline int getKey() const { return key; }
 		inline int getPad() const { return pad; }
 		inline void setKey(sdl::Scancode key) { this->key = key; }

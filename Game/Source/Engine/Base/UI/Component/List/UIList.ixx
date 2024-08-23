@@ -5,14 +5,18 @@ import fbc.CoreContent;
 import fbc.FFont;
 import fbc.Hitbox;
 import fbc.IDrawable;
-import fbc.IOverlay;
+import fbc.FWindow;
 import fbc.RelativeHitbox;
-import fbc.ScreenManager;
+
 import fbc.UIBase;
 import fbc.UIEntry;
 import fbc.UIVerticalScrollbar;
 import fbc.FUtil;
-import sdl;
+import fbc.FWindow;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {
@@ -47,13 +51,11 @@ namespace fbc {
 			typename vec<uptr<UIEntry<T>>>::iterator it;
 		};
 
-		UIList(Hitbox* hb,
-			func<str(const T&)> labelFunc = futil::toString<T>,
-			FFont& itemFont = cct.fontSmall(),
-			IDrawable& background = cct.images.panelRound,
-			bool canAutosize = false) :
-			UIBase(hb), background(background), itemFont(itemFont), labelFunc(std::move(labelFunc)), canAutosize(canAutosize) {
-		}
+		UIList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize = false) :
+			UIBase(window, move(hb)), background(background), itemFont(itemFont), labelFunc(move(labelFunc)), canAutosize(canAutosize) {}
+		UIList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>, bool canAutosize = false) :
+			UIList(window, move(hb), move(labelFunc), window.cct.fontSmall(), window.cct.images.uiPanelRound, canAutosize) {}
+		UIList(UIList&& other) noexcept = default;
 
 		~UIList() override {}
 
@@ -77,7 +79,7 @@ namespace fbc {
 		UIList& setLabelFunc(const func<str(const T&)>& labelFunc);
 		UIList& setMaxRows(int rows);
 		void refreshDimensions() override;
-		void renderImpl() override;
+		void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		void updateImpl() override;
 
 		virtual void selectRow(UIEntry<T>& row) = 0;
@@ -87,15 +89,15 @@ namespace fbc {
 		int activeRow = -1;
 		int maxRows = 15;
 		int topVisibleRowIndex;
-		sdl::Color backgroundColor = sdl::COLOR_WHITE;
+		sdl::Color backgroundColor = sdl::COLOR_STANDARD;
 		IDrawable& background;
-		FFont& itemFont = cct.fontSmall();
+		FFont& itemFont;
 		func<str(const T&)> labelFunc;
 		vec<uptr<UIEntry<T>>> rows;
 
+		inline virtual float rMargin() { return win.cfg.renderScale(MARGIN); }
 		inline virtual int getVisibleRowCount() const { return std::min(static_cast<int>(rows.size()), this->maxRows); }
 		inline virtual void updateTopVisibleRowIndex(int value) { topVisibleRowIndex = value; }
-		inline static float rMargin() { return cfg.renderScale(MARGIN); }
 
 		virtual UIEntry<T>* makeRow(const T& item, int i);
 		virtual void refreshRows();
@@ -208,11 +210,11 @@ namespace fbc {
 	}
 
 	// Render all visible rows and the scrollbar if it is shown
-	template <typename T> void UIList<T>::renderImpl() {
-		background.draw(hb.get(), backgroundColor, { 0, 0 }, 0, sdl::FlipMode::SDL_FLIP_NONE);
+	template <typename T> void UIList<T>::renderImpl(sdl::SDLBatchRenderPass& rp) {
+		background.draw(rp, *hb.get(), win.getW(), win.getH(), 1, 1, 0, &backgroundColor);
 		int rowCount = getVisibleRowCount();
 		for (int i = topVisibleRowIndex; i < topVisibleRowIndex + rowCount; ++i) {
-			rows[i]->renderImpl();
+			rows[i]->renderImpl(rp);
 		}
 	}
 
@@ -228,21 +230,21 @@ namespace fbc {
 		}
 
 		if (activeRow >= 0) {
-			if (cfg.actDirUp.isKeyJustPressed()) {
+			if (win.cfg.actDirUp.isKeyJustPressed()) {
 				activeRow = std::max(0, activeRow - 1);
 				if (activeRow < topVisibleRowIndex) {
 					updateTopVisibleRowIndex(topVisibleRowIndex - 1);
 					updateRowPositions();
 				}
 			}
-			else if (cfg.actDirDown.isKeyJustPressed()) {
+			else if (win.cfg.actDirDown.isKeyJustPressed()) {
 				activeRow = std::min(static_cast<int>(rows.size()) - 1, activeRow + 1);
 				if (activeRow > topVisibleRowIndex + maxRows) {
 					updateTopVisibleRowIndex(topVisibleRowIndex + 1);
 					updateRowPositions();
 				}
 			}
-			else if (sdl::mouseIsLeftJustClicked() && !isHovered()) {
+			else if (sdl::runner::mouseIsLeftJustClicked() && !isHovered()) {
 				activeRow = -1;
 			}
 		}
@@ -251,7 +253,7 @@ namespace fbc {
 			rows[i]->updateActiveStatus(this->activeRow == i);
 		}
 
-		if (this->activeRow >= 0 && cfg.actSelect.isKeyJustPressed()) {
+		if (this->activeRow >= 0 && win.cfg.actSelect.isKeyJustPressed()) {
 			this->selectRow(*rows[this->activeRow]);
 		}
 	}
@@ -261,10 +263,11 @@ namespace fbc {
 		UIEntry<T>* entry = new UIEntry<T>(item,
 			i,
 			[this](UIEntry<T>& p) { this->selectRow(p); },
-			new RelativeHitbox(*this->hb),
+			this->win,
+			this->relhb(),
 			this->getItemFont(),
 			labelFunc(item));
-		entry->setHbExactSizeY(cfg.renderScale(64));
+		entry->setHbExactSizeY(win.cfg.renderScale(64));
 		return entry;
 	}
 

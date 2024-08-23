@@ -1,15 +1,19 @@
 export module fbc.UIFadeOutDriftVFX;
 
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.UIImage;
 import fbc.VFX;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {
 	export class UIFadeOutDriftVFX : public VFX {
 	public:
-		UIFadeOutDriftVFX(uptr<UIImage>&& image, float tOffX = 0, float tOffY = 0, float duration = DEFAULT_DURATION * 0.5f): VFX(duration), image(move(image)), tOffX(tOffX), tOffY(tOffY) {}
+		UIFadeOutDriftVFX(FWindow& window, uptr<UIImage>&& image, float tOffX = 0, float tOffY = 0, float duration = DEFAULT_DURATION * 0.5f): VFX(window, duration), image(move(image)), tOffX(tOffX), tOffY(tOffY) {}
 
 		inline UIFadeOutDriftVFX& setTOff(float tOffX, float tOffY) { return this->tOffX = tOffX, this->tOffY = tOffY, *this; }
 		inline UIFadeOutDriftVFX& setTOffX(float tOffX) { return this->tOffX = tOffX, *this; }
@@ -19,20 +23,20 @@ namespace fbc {
 		float tOffY;
 		uptr<UIImage> image;
 
-		virtual void render() override;
+		virtual void render(sdl::SDLBatchRenderPass& rp) override;
 		virtual void update() override;
 	private:
 		float rate;
 	};
 
-	void UIFadeOutDriftVFX::render()
+	void UIFadeOutDriftVFX::render(sdl::SDLBatchRenderPass& rp)
 	{
-		image->renderImpl();
+		image->renderImpl(rp);
 	}
 
 	void UIFadeOutDriftVFX::update()
 	{
-		image->color.a = 255 * (duration - ticks) / duration;
+		image->color.a = (duration - ticks) / duration;
 		image->setHbOffsetPos(image->hb->getOffPosX() + tOffX, image->hb->getOffPosY() + tOffY);
 	}
 }

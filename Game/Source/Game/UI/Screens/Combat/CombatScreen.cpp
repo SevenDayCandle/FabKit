@@ -44,7 +44,7 @@ namespace fbc {
 				++i;
 			}
 		}
-		instance->queueAction(make_unique<VFXAction>(make_unique<HitboxBatchMoveSmoothVFX>(entries)));
+		instance->queueAction(make_unique<VFXAction>(win, make_unique<HitboxBatchMoveSmoothVFX>(win, entries)));
 	}
 
 	void CombatScreen::onTurnRemoved(const CombatTurn* turn)
@@ -53,7 +53,7 @@ namespace fbc {
 		if (res != turnUIMap.end()) {
 			uptr<CombatTurnRenderable> item = turnUI.extract(res->second);
 			if (item) {
-				addVFX(make_unique<UIFadeOutDriftVFX>(move(item), 0, -10));
+				addVFX(make_unique<UIFadeOutDriftVFX>(win, move(item), 0, -10));
 			}
 		}
 		turnUIMap.erase(turn);
@@ -61,19 +61,22 @@ namespace fbc {
 
 	void CombatScreen::createOccupantRender(const OccupantObject* occupant)
 	{
-		CombatSquare* square = occupant->currentSquare;
-		float offX = 0;
-		float offY = 0;
-		if (square) {
-			offX = square->col * TILE_SIZE;
-			offY = square->row * TILE_SIZE;
+		if (occupant) {
+			const OccupantObject& occRef = *occupant;
+			CombatSquare* square = occupant->currentSquare;
+			float offX = 0;
+			float offY = 0;
+			if (square) {
+				offX = square->col * TILE_SIZE;
+				offY = square->row * TILE_SIZE;
+			}
+			fieldUI.addNew<CreatureRenderable>(fieldUI.relhb(offX, offY, TILE_SIZE, TILE_SIZE), occRef);
 		}
-		fieldUI.add(make_unique<CreatureRenderable>(*occupant, new RelativeHitbox(*fieldUI.hb, offX, offY, TILE_SIZE, TILE_SIZE)));
 	}
 
 	void CombatScreen::createTurnRender(const CombatTurn& turn)
 	{
-		CombatTurnRenderable& render = turnUI.add(make_unique<CombatTurnRenderable>(turn, new RelativeHitbox(*turnUI.hb, 0, turnUI.size() * TILE_SIZE, TURN_W, TILE_SIZE)));
+		CombatTurnRenderable& render = turnUI.addNew<CombatTurnRenderable>(turnUI.relhb(0, turnUI.size() * TILE_SIZE, TURN_W, TILE_SIZE), turn);
 		turnUIMap.emplace(&turn, &render);
 	}
 
@@ -89,7 +92,7 @@ namespace fbc {
 		});
 		// Add buttons for each square
 		for (const CombatSquare& square : instance->getSquares()) {
-			fieldUI.add(make_unique<CombatSquareRenderable>(square, new RelativeHitbox(*fieldUI.hb, square.col * TILE_SIZE, square.row * TILE_SIZE, TILE_SIZE, TILE_SIZE)));
+			fieldUI.addNew<CombatSquareRenderable>(fieldUI.relhb(square.col * TILE_SIZE, square.row * TILE_SIZE, TILE_SIZE, TILE_SIZE), square);
 		}
 		// Add images for each creature
 		for (const OccupantObject* occupant : instance->getOccupants()) {

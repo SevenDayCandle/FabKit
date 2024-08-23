@@ -81,7 +81,10 @@ namespace fbc {
 	export using path = std::filesystem::path;
 	export using str = std::string;
 	export using strv = std::string_view;
+	export using uint16 = std::uint16_t;
 	export using uint32 = std::uint32_t;
+	export using uint64 = std::uint64_t;
+	export using uint8 = std::uint8_t;
 
 	export using std::any;
 	export using std::deque;
@@ -95,6 +98,7 @@ namespace fbc {
 	export using std::span;
 	export using std::type_info;
 
+	export using std::forward;
 	export using std::make_shared;
 	export using std::make_unique;
 	export using std::move;
@@ -136,18 +140,22 @@ namespace fbc::futil {
 	export template <typename TCo, typename Func> str joinStrMap(strv delimiter, const TCo& items, Func strFunc) requires std::ranges::range<TCo>&& c_invc<Func, std::ranges::range_value_t<TCo>, strv>;
 }
 
+/*
+ * IMPLEMENTATIONS
+ */
+
 namespace fbc::futil {
 	// Format a pair as a dimension
-	export str dimensionString(int x, int y) {
+	str dimensionString(int x, int y) {
 		return std::to_string(x) + "x" + std::to_string(y);
 	}
 
-	export str dimensionString(const pair<int,int>& p) {
+	str dimensionString(const pair<int,int>& p) {
 		return dimensionString(p.first, p.second);
 	}
 
 	// Checks if a string-like starts with another string-like
-	export bool isPrefix(strv source, strv prefix) {
+	bool isPrefix(strv source, strv prefix) {
 		if (prefix.size() > source.size()) {
 			return false;
 		}
@@ -160,7 +168,7 @@ namespace fbc::futil {
 	}
 
 	// Create a lowercase version of a string-like
-	export str toLowerCase(strv input) {
+	str toLowerCase(strv input) {
 		str res(input.size(), '\0');
 		std::ranges::transform(input.begin(), input.end(), res.begin(),
 			[](unsigned char c) { return std::tolower(c); });
@@ -168,14 +176,14 @@ namespace fbc::futil {
 	}
 
 	// Modify an existing string to be lowercase
-	export str& toLowerCaseInPlace(str& input) {
+	str& toLowerCaseInPlace(str& input) {
 		std::ranges::transform(input.begin(), input.end(), input.begin(),
 			[](unsigned char c) { return std::tolower(c); });
 		return input;
 	}
 
 	// Create an uppercase version of a string-like
-	export str toUpperCase(strv input) {
+	str toUpperCase(strv input) {
 		str res(input.size(), '\0');
 		std::ranges::transform(input.begin(), input.end(), res.begin(),
 			[](unsigned char c) { return std::toupper(c); });
@@ -183,14 +191,14 @@ namespace fbc::futil {
 	}
 
 	// Modify an existing string to be uppercase
-	export str& toUpperCaseInPlace(str& input) {
+	str& toUpperCaseInPlace(str& input) {
 		std::ranges::transform(input.begin(), input.end(), input.begin(),
 			[](unsigned char c) { return std::toupper(c); });
 		return input;
 	}
 
 	// Find the first item in the container that matches the given value
-	export template<typename T, c_itr<T> TCo> const T* find(const TCo& container, const T& value) {
+	template<typename T, c_itr<T> TCo> const T* find(const TCo& container, const T& value) {
 		if constexpr (c_set<T, TCo>) {
 			auto it = container.find(value);
 			if (it != container.end()) {
@@ -207,18 +215,18 @@ namespace fbc::futil {
 	}
 
 	// Check whether the given container contains the given value
-	export template<typename T, c_itr<T> TCo> bool has(const TCo& container, const T& value) {
+	template<typename T, c_itr<T> TCo> bool has(const TCo& container, const T& value) {
 		const T* res = find<T, TCo>(container, value);
 		return res != nullptr;
 	}
 
 	// Check whether the text can be converted into a number
-	export bool isNumeric(strv text) {
+	bool isNumeric(strv text) {
 		return !text.empty() && std::ranges::all_of(text, [](unsigned char c) {return std::isdigit(c); });
 	}
 
 	// Join a collection of strings with a delimiter
-	export template<c_itr<strv> SCo> str joinStr(strv delimiter, SCo items) {
+	template<c_itr<strv> SCo> str joinStr(strv delimiter, SCo items) {
 		str res;
 		auto iter = items.begin();
 		if (iter != items.end()) {
@@ -232,7 +240,7 @@ namespace fbc::futil {
 	}
 
 	// Represent a collection of objects as a joined string with a delimiter
-	export template<typename TCo, typename Func> str joinStrMap(strv delimiter, const TCo& items, Func strFunc)
+	template<typename TCo, typename Func> str joinStrMap(strv delimiter, const TCo& items, Func strFunc)
 		requires std::ranges::range<TCo>&& c_invc<Func, std::ranges::range_value_t<TCo>, strv>
 	{
 		str res;
@@ -249,7 +257,7 @@ namespace fbc::futil {
 	}
 
 	// Attempt to convert an arbitrary object into a regular string representation
-	export template <typename T> str toString(const T& obj) {
+	template <typename T> str toString(const T& obj) {
 		if constexpr (c_num<T>) {
 			return std::to_string(obj);
 		}
@@ -320,7 +328,7 @@ namespace fbc::futil {
 	}
 
 	// Same as toString but applies string quotes on strings (used for JSON serialization)
-	export template <typename T> str toStringWrapped(const T& obj) {
+	template <typename T> str toStringWrapped(const T& obj) {
 		if constexpr (std::is_same_v<T, str>) {
 			return '"' + obj + '"';
 		}
@@ -334,14 +342,14 @@ namespace fbc::futil {
 	}
 
 	// Transform each of the values in the container into a new value and store the results in a list
-	export template<typename T, typename U, c_itr<T> TCo, c_invc<T, U> Func> vec<U> transform(const TCo& container, Func mapFunc) {
+	template<typename T, typename U, c_itr<T> TCo, c_invc<T, U> Func> vec<U> transform(const TCo& container, Func mapFunc) {
 		vec<U> res(container.size());
 		std::transform(container.begin(), container.end(), res.begin(), mapFunc);
 		return res;
 	}
 
 	// Transform each of the values in the map into a new map
-	export template<typename T, typename U, typename V, c_map_of<T,U> TCo, c_invc<U, V> Func> map<T, V> transformMap(const TCo& src, Func mapFunc) {
+	template<typename T, typename U, typename V, c_map_of<T,U> TCo, c_invc<U, V> Func> map<T, V> transformMap(const TCo& src, Func mapFunc) {
 		map<T, V> res;
 		for (const auto& p : src) {
 			res[p.first] = mapFunc(p.second);
@@ -350,7 +358,7 @@ namespace fbc::futil {
 	}
 
 	// Transform each of the values in the map into a new unordered map
-	export template<typename T, typename U, typename V, c_map_of<T, U> TCo, c_invc<U, V> Func> umap<T, V> transformUmap(const TCo& src, Func mapFunc) {
+	template<typename T, typename U, typename V, c_map_of<T, U> TCo, c_invc<U, V> Func> umap<T, V> transformUmap(const TCo& src, Func mapFunc) {
 		umap<T, V> res;
 		for (const auto& p : src) {
 			res[p.first] = mapFunc(p.second);
@@ -359,7 +367,7 @@ namespace fbc::futil {
 	}
 
 	// For types that do not use syntax characters, we can safely treat everything in between this pos and the next syntax character as being part of the object to be deserialized
-	export strv getView(strv input, size_t& pos)
+	strv getView(strv input, size_t& pos)
 	{
 		size_t start = pos;
 		while (pos < input.size()) {
@@ -377,7 +385,7 @@ namespace fbc::futil {
 	}
 
 	// Removes quotes and escapes from a JSON-string object
-	export str unescape(strv input, size_t& pos) {
+	str unescape(strv input, size_t& pos) {
 		// No need to unescape string-likes that are not quoted
 		if (input[pos] != '"') {
 			return str(input);
@@ -410,12 +418,12 @@ namespace fbc::futil {
 
 	// Attempt to parse a JSON-like string into an object
 	// TODO handle maps
-	export template <typename T> T fromString(strv input) {
+	template <typename T> T fromString(strv input) {
 		size_t pos = 0;
 		return fromString<T>(input, pos);
 	}
 
-	export template <typename T> T fromString(strv input, size_t& pos) {
+	template <typename T> T fromString(strv input, size_t& pos) {
 		// These use syntax characters and handle iteration by their own logic
 		if constexpr (std::is_same_v<T, str>) {
 			return unescape(input, pos);

@@ -2,10 +2,10 @@ export module fbc.CombatRoom;
 
 import fbc.CombatScreen;
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.GameRun;
 import fbc.RunRoom;
 import fbc.RunZone;
-import fbc.ScreenManager;
 import std;
 
 namespace fbc {
@@ -16,16 +16,16 @@ namespace fbc {
 		static constexpr strv ID = "COMBAT";
 		static const CombatRoom instance;
 
-		void onAfterClick() override;
+		void onAfterClick(FWindow& win) override;
 		void onEnter() override;
 	};
 
 	const CombatRoom CombatRoom::instance = CombatRoom();
 
-	void CombatRoom::onAfterClick()
+	void CombatRoom::onAfterClick(FWindow& window)
 	{
 		if (GameRun::current->getCombatInstance() != nullptr) {
-			screenManager::openScreen(make_unique<CombatScreen>());
+			window.openScreen(make_unique<CombatScreen>(window));
 		}
 	}
 

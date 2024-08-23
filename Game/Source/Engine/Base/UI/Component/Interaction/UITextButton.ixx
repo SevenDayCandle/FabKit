@@ -3,39 +3,48 @@ export module fbc.UITextButton;
 import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
-import fbc.TextInfo;
+import fbc.TextDrawable;
 import fbc.UIButton;
+import sdl.SDLBatchRenderPass;
 
 namespace fbc {
-	export class UITextButton : public UIButton, public TextInfo {
+	export class UITextButton : public UIButton {
 	public:
-		UITextButton(Hitbox* hb, IDrawable& image, FFont& f, strv text = "") : UIButton(hb, image), TextInfo(f, text) {
+		UITextButton(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image, FFont& f, strv text = "") : UIButton(window, move(hb), image), text(f, text) {
 			UITextButton::onSizeUpdated();
 		}
-		UITextButton(Hitbox* hb, strv text) : UITextButton(hb, cct.images.panel, cct.fontRegular(), text) {}
+		UITextButton(FWindow& window, uptr<Hitbox>&& hb, strv text) : UITextButton(window, move(hb), window.cct.images.uiPanel, window.cct.fontRegular(), text) {}
 		~UITextButton() override {}
+
+		inline UITextButton& setColor(sdl::Color color) { return text.setColor(color), * this; }
+		inline UITextButton& setColorOutline(sdl::Color colorOutline) { return text.setColorOutline(colorOutline), * this; }
+		inline UITextButton& setFont(const FFont& font) { return text.setFont(font), * this; }
+		inline UITextButton& setText(strv t) { return text.setText(t), * this; }
 
 		virtual void onSizeUpdated() override;
 		virtual void refreshDimensions() override;
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
+	protected:
+		TextDrawable text;
 	};
 
 	void UITextButton::onSizeUpdated()
 	{
-		TextInfo::setPos((this->hb->w - getTextWidth()) / 2, (this->hb->h - getTextHeight()) / 2);
+		text.setPos((this->hb->w - text.getWidth()) / 2, (this->hb->h - text.getHeight()) / 2);
 	}
 
 	void UITextButton::refreshDimensions()
 	{
 		UIButton::refreshDimensions();
-		refreshCache();
-		TextInfo::setPos((this->hb->w - getTextWidth()) / 2, (this->hb->h - getTextHeight()) / 2);
+		text.setWidth(hb->w);
+		text.setPos((this->hb->w - text.getWidth()) / 2, (this->hb->h - text.getHeight()) / 2);
 	}
 
-	void UITextButton::renderImpl() {
-		UIButton::renderImpl();
-		TextInfo::drawText(hb->x, hb->y);
+	void UITextButton::renderImpl(sdl::SDLBatchRenderPass& rp) {
+		UIButton::renderImpl(rp);
+		text.draw(rp, hb->x, hb->y, win.getW(), win.getH());
 	}
 }

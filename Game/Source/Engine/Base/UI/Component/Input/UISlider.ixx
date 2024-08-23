@@ -1,30 +1,43 @@
 export module fbc.UISlider;
 
 import fbc.CoreContent;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.RelativeHitbox;
 import fbc.UIHorizontalScrollbar;
 import fbc.UINumberInput;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLProps; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {
 	export class UISlider : public UINumberInput {
 	public:
-		UISlider(Hitbox* hb, Hitbox* scrollhb, int limMin = 0,
-			int limMax = std::numeric_limits<int>::max(), IDrawable& imageBar = cct.images.sliderEmpty, IDrawable& imageButton = cct.images.scrollbutton, IDrawable& panelImage = cct.images.panel):
-			UINumberInput(hb, limMin, limMax, panelImage), scrollbar(scrollhb, imageBar, imageButton) {
-			scrollbar.setOnScroll([this](float scroll) {this->commitFromScroll(scroll); });
+		UISlider(FWindow& window, uptr<Hitbox>&& hb, uptr<Hitbox>&& scrollhb, int limMin, int limMax,
+			IDrawable& imageBar, IDrawable& imageButton, IDrawable& panelImage) :
+			UINumberInput(window, move(hb), limMin, limMax, panelImage),
+			scrollbar(window, move(scrollhb), imageBar, imageButton) {
+			scrollbar.setOnScroll([this](float scroll) { this->commitFromScroll(scroll); });
 		}
-		UISlider(Hitbox* hb, int limMin = 0,
-			int limMax = std::numeric_limits<int>::max(),IDrawable& imageBar = cct.images.sliderEmpty, IDrawable& imageButton = cct.images.scrollbutton, IDrawable& panelImage = cct.images.panel) :
-			UISlider(hb, new RelativeHitbox(*hb, hb->getOffSizeX() + 4, 0, hb->getOffSizeX() * 3, hb->getOffSizeY()), limMin, limMax, imageBar, imageButton, panelImage) {}
+		UISlider(FWindow& window, uptr<Hitbox>&& hb, int limMin, int limMax,
+			IDrawable& imageBar, IDrawable& imageButton, IDrawable& panelImage) :
+			UISlider(window, move(hb), std::make_unique<RelativeHitbox>(window, *hb, hb->getOffSizeX() + 4, 0, hb->getOffSizeX() * 3, hb->getOffSizeY()),
+				limMin, limMax, imageBar, imageButton, panelImage) {}
+		UISlider(FWindow& window, uptr<Hitbox>&& hb, uptr<Hitbox>&& scrollhb, int limMin = 0, int limMax = std::numeric_limits<int>::max()) :
+			UISlider(window, move(hb), move(scrollhb), limMin, limMax,
+				window.cct.images.uiSliderEmpty, window.cct.images.uiScrollbutton, window.cct.images.uiPanel) {}
+		UISlider(FWindow& window, uptr<Hitbox>&& hb, int limMin = 0, int limMax = std::numeric_limits<int>::max()) :
+			UISlider(window, move(hb), limMin, limMax,
+				window.cct.images.uiSliderEmpty, window.cct.images.uiScrollbutton, window.cct.images.uiPanel) {}
+		UISlider(UISlider&& other) noexcept: UINumberInput(other.win, move(other.hb), other.limMin, other.limMax, other.image), scrollbar(std::move(other.scrollbar)) {}
 
 		virtual UISlider& setValue(int num) override;
 		virtual void onSizeUpdated() override;
 		virtual void refreshDimensions() override;
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		virtual void updateImpl() override;
 	protected:
 		UIHorizontalScrollbar scrollbar;
@@ -46,10 +59,10 @@ namespace fbc {
 		scrollbar.refreshDimensions();
 	}
 
-	void UISlider::renderImpl()
+	void UISlider::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
-		UINumberInput::renderImpl();
-		scrollbar.renderImpl();
+		UINumberInput::renderImpl(rp);
+		scrollbar.renderImpl(rp);
 	}
 
 	UISlider& UISlider::setValue(int num)

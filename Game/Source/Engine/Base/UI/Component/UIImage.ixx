@@ -1,40 +1,34 @@
 export module fbc.UIImage;
 
 import fbc.FUtil;
+import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
-import fbc.TextInfo;
-import fbc.ScreenManager;
 import fbc.Tooltip;
-import fbc.UITipHoverable;
-import sdl;
+import fbc.UIBase;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLRunner;
 
 namespace fbc {
-	export class UIImage : public UITipHoverable {
+	export class UIImage : public UIBase {
 	public:
-		sdl::Color color = sdl::COLOR_WHITE;
-		sdl::FlipMode flip = sdl::FlipMode::SDL_FLIP_NONE;
+		UIImage(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image) : UIBase(window, move(hb)), image(image) {}
+		UIImage(UIImage&& other) noexcept = default;
+		~UIImage() override {}
+
+		sdl::Color color = sdl::COLOR_STANDARD;
 		float rotation = 0;
 		IDrawable& image;
-		sdl::Point origin;
-
-		UIImage(Hitbox* hb, IDrawable& image) : UITipHoverable(hb), image(image), origin({image.getWidth() / 2, image.getHeight() / 2}) {}
-		UIImage(Hitbox* hb, IDrawable& image, sdl::Point origin) : UITipHoverable(hb), image(image), origin(origin) {}
-		~UIImage() override {}
 
 		inline virtual UIImage& setColor(sdl::Color color) { return this->color = color, *this; }
 		inline virtual UIImage& setImage(IDrawable& image) { return this->image = image, *this;}
-		inline virtual UIImage& setOrigin(sdl::Point origin) { return this->origin = origin, *this; }
 		inline virtual UIImage& setRotation(const float rotation) { return this->rotation = rotation, *this; }
-		virtual void renderImpl() override;
-		virtual void updateImpl() override;
+		inline virtual UIImage& setRotationDeg(const float rotation) { return this->rotation = sdl::rads(rotation), *this; }
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 	};
 
-	void UIImage::renderImpl() {
-		image.draw(hb.get(), color, origin, rotation, flip);
-	}
-
-	void UIImage::updateImpl() {
-		this->UITipHoverable::updateImpl();
+	void UIImage::renderImpl(sdl::SDLBatchRenderPass& rp) {
+		image.draw(rp, *hb.get(), win.getW(), win.getH(), 1, 1, rotation, &color);
 	}
 }

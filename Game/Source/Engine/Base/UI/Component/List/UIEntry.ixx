@@ -3,22 +3,25 @@ export module fbc.UIEntry;
 import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.FFont;
-import fbc.TextInfo;
+import fbc.FWindow;
+import fbc.Hitbox;
+import fbc.TextDrawable;
 import fbc.IDrawable;
 import fbc.UIInteractable;
 import fbc.UILabel;
 import fbc.FUtil;
-import fbc.RelativeHitbox;
-import fbc.ScreenManager;
-import sdl;
+import sdl.SDLBase; 
+import sdl.SDLBatchRenderPass; 
+import sdl.SDLRunner;
 import std;
 
 namespace fbc {
-	export template <typename T> class UIEntry : public UIInteractable, public TextInfo {
+	export template <typename T> class UIEntry : public UIInteractable {
 	public:
-		UIEntry(const T& item, int index, const func<void(UIEntry<T>&)>& onClick, fbc::RelativeHitbox* hb, FFont& f, const str& text, IDrawable& image = cct.images.uiCheckboxEmpty, IDrawable& checkImage = cct.images.uiCheckboxFilled, sdl::Color baseColor = sdl::COLOR_WHITE, sdl::Color hoverColor = sdl::COLOR_WHITE) :
-			item(item), index(index), onClick(onClick), baseColor(baseColor), hoverColor(hoverColor), UIInteractable(hb, image), TextInfo(f, text), checkImage(checkImage) {
-		}
+		UIEntry(const T& item, int index, const func<void(UIEntry<T>&)>& onClick, FWindow& window, uptr<Hitbox> hb, FFont& f, const str& text, IDrawable& image, IDrawable& checkImage, sdl::Color baseColor = sdl::COLOR_STANDARD, sdl::Color hoverColor = sdl::COLOR_STANDARD) :
+			UIInteractable(window, move(hb), image), item(item), index(index), onClick(onClick), baseColor(baseColor), hoverColor(hoverColor), text(f, text), checkImage(checkImage) {}
+		UIEntry(const T& item, int index, const func<void(UIEntry<T>&)>& onClick, FWindow& window, uptr<Hitbox> hb, FFont& f, const str& text) :
+			UIEntry(item, index, onClick, window, move(hb), f, text, window.cct.images.uiCheckboxEmpty, window.cct.images.uiCheckboxFilled, sdl::COLOR_STANDARD, sdl::COLOR_STANDARD) {}
 
 		operator const T*() const { return &item; }
 		operator const T&() const { return item; }
@@ -28,7 +31,8 @@ namespace fbc {
 		const T& item;
 		int index;
 
-		inline virtual float getProjectedWidth() { return image.getWidth() + cfg.renderScale(8) + TextInfo::getTextWidth(); };
+		inline strv getText() { return text.getText(); }
+		inline virtual float getProjectedWidth() { return image.getWidth() + win.cfg.renderScale(8) + text.getWidth(); };
 		inline virtual void updateActiveStatus(bool val) { active = val; };
 		inline virtual void updateSelectStatus(bool selected) { toggled = selected; };
 
@@ -36,62 +40,56 @@ namespace fbc {
 		virtual void onHbUnhover();
 		virtual void onSizeUpdated() override;
 		virtual void refreshDimensions() override;
-		virtual void renderImpl() override;
+		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 	protected:
 		sdl::Color baseColor;
 		sdl::Color hoverColor;
 		IDrawable& checkImage;
 		func<void(UIEntry<T>&)> onClick;
+		TextDrawable text;
 
 		inline virtual void clickLeftEvent() override { onClick(*this); }
 	};
 
 	template<typename T> void UIEntry<T>::onHbHover()
 	{
-		TextInfo::setColor(hoverColor);
+		text.setColor(hoverColor);
 	}
 
 	template<typename T> void UIEntry<T>::onHbUnhover()
 	{
-		TextInfo::setColor(baseColor);
+		text.setColor(baseColor);
 	}
 
 	template<typename T> void UIEntry<T>::onSizeUpdated()
 	{
-		TextInfo::setPos(this->hb->h * 1.25f, 0);
+		text.setPos(this->hb->h * 1.25f, 0);
 	}
 
 	template<typename T> void UIEntry<T>::refreshDimensions()
 	{
 		UIInteractable::refreshDimensions();
-		refreshCache();
+		text.reload();
 	}
 
-	template<typename T> void UIEntry<T>::renderImpl() {
-
-		sdl::RectF check = { this->hb->x, this->hb->y, this->hb->h, this->hb->h };
-
-
+	template<typename T> void UIEntry<T>::renderImpl(sdl::SDLBatchRenderPass& rp) {
 		if (active) {
 			if (toggled) {
-				// TODO combine into one draw call once we move to a different draw API
-				checkImage.draw(&check, sdl::COLOR_WHITE);
-				checkImage.draw(&check, sdl::BlendMode::SDL_BLENDMODE_ADD, sdl::COLOR_WHITE);
+				checkImage.draw(rp, this->hb->x, this->hb->y, this->hb->h, this->hb->h, win.getW(), win.getH(), 1, 1, 0, &sdl::COLOR_WHITE);
 			}
 			else {
-				image.draw(&check, sdl::COLOR_WHITE);
-				image.draw(&check, sdl::BlendMode::SDL_BLENDMODE_ADD, sdl::COLOR_WHITE);
+				image.draw(rp, this->hb->x, this->hb->y, this->hb->h, this->hb->h, win.getW(), win.getH(), 1, 1, 0, &sdl::COLOR_WHITE);
 			}
 		}
 		else {
 			if (toggled) {
-				checkImage.draw(&check, sdl::COLOR_WHITE);
+				checkImage.draw(rp, this->hb->x, this->hb->y, this->hb->h, this->hb->h, win.getW(), win.getH());
 			}
 			else {
-				image.draw(&check, sdl::COLOR_WHITE);
+				image.draw(rp, this->hb->x, this->hb->y, this->hb->h, this->hb->h, win.getW(), win.getH());
 			}
 		}
 
-		TextInfo::drawText(check.x, check.y);
+		text.draw(rp, this->hb->x, this->hb->y, win.getW(), win.getH());
 	}
 }
