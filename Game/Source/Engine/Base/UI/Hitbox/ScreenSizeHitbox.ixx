@@ -8,19 +8,17 @@ namespace fbc {
 	/* Hitbox whose position AND size scale with screen dimensions */
 	export class ScreenSizeHitbox : public Hitbox {
 	public:
-		ScreenSizeHitbox(FWindow& window) : ScreenSizeHitbox(window, 0, 0, 1, 1) {}
-		ScreenSizeHitbox(FWindow& window, float offsetWidth, float offsetHeight) : ScreenSizeHitbox(window, 0, 0, offsetWidth, offsetHeight) {}
-		ScreenSizeHitbox(FWindow& window, float screenXPercentPos, float screenYPercentPos, float screenXPercentSize, float screenYPercentSize) : Hitbox(screenXPercentPos, screenYPercentPos, screenXPercentSize, screenYPercentSize), win(window) {
+		ScreenSizeHitbox(FWindow& win) : ScreenSizeHitbox(win, 0, 0, 1, 1) {}
+		ScreenSizeHitbox(FWindow& win, float offsetWidth, float offsetHeight) : ScreenSizeHitbox(win, 0, 0, offsetWidth, offsetHeight) {}
+		ScreenSizeHitbox(FWindow& win, float screenXPercentPos, float screenYPercentPos, float screenXPercentSize, float screenYPercentSize) : Hitbox(win, screenXPercentPos, screenYPercentPos, screenXPercentSize, screenYPercentSize) {
 			refresh();
 		}
 		~ScreenSizeHitbox() override {}
 
-		FWindow& win;
-
-		inline virtual float getScaleOffPosX() const override { return win.getW() * offPosX / cfg.renderScale(); }
-		inline virtual float getScaleOffPosY() const override { return win.getH() * offPosY / cfg.renderScale(); }
-		inline virtual float getScaleOffSizeX() const override { return win.getW() * offSizeX / cfg.renderScale(); }
-		inline virtual float getScaleOffSizeY() const override { return win.getH() * offSizeY / cfg.renderScale(); }
+		inline virtual float getScaleOffPosX() const override { return win.getW() * offPosX / win.cfg.renderScale(); }
+		inline virtual float getScaleOffPosY() const override { return win.getH() * offPosY / win.cfg.renderScale(); }
+		inline virtual float getScaleOffSizeX() const override { return win.getW() * offSizeX / win.cfg.renderScale(); }
+		inline virtual float getScaleOffSizeY() const override { return win.getH() * offSizeY / win.cfg.renderScale(); }
 	protected:
 		inline void refreshOffPosX() override { offPosX = x / win.getW(); }
 		inline void refreshOffPosY() override { offPosY = y / win.getH(); }

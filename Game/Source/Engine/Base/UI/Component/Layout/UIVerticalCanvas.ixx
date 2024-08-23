@@ -14,7 +14,7 @@ namespace fbc {
 	public:
 		UIVerticalCanvas(FWindow& window, uptr<Hitbox>&& hb, float scrollSpeed = 1): UICanvas(window, move(hb)),
 			scrollSpeed(scrollSpeed),
-			scrollbar{ window, make_unique<ScaleHitbox>(hb->w * 0.93f / cfg.renderScale(), hb->y + hb->h * 0.05f / cfg.renderScale(), 48, hb->h * 0.9f / cfg.renderScale())},
+			scrollbar{ window, make_unique<ScaleHitbox>(window, hb->w * 0.93f / window.cfg.renderScale(), hb->y + hb->h * 0.05f / window.cfg.renderScale(), 48, hb->h * 0.9f / window.cfg.renderScale())},
 			baseOffsetY(hb->getOffPosY()) {
 			scrollbar.setOnScroll([this](float f) {reposition(f); });
 		}

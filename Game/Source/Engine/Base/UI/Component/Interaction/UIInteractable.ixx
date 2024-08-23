@@ -18,11 +18,12 @@ import std;
 namespace fbc {
 	export class UIInteractable : public UIImage {
 	public:
-		UIInteractable(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image) : UIImage(window, move(hb), image) {}
+		UIInteractable(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image, FSound* soundClick, FSound* soundHover) : UIImage(window, move(hb), image), soundClick(soundClick), soundHover(soundHover) {}
+		UIInteractable(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image) : UIInteractable(window, move(hb), image, &window.cct.audio.uiClick, nullptr) {}
 
 		bool interactable = true;
-		FSound* soundClick = &cct.audio.uiClick;
-		FSound* soundHover = nullptr;
+		FSound* soundClick;
+		FSound* soundHover;
 
 		inline UIInteractable& setSoundClick(FSound* val) { return soundClick = val, *this; }
 		inline UIInteractable& setSoundHover(FSound* val) { return soundHover = val, *this; }
@@ -47,7 +48,7 @@ namespace fbc {
 				if (sdl::runner::mouseIsLeftJustClicked() || sdl::runner::mouseIsRightJustClicked()) {
 					this->win.activeElement = this;
 				}
-				else if (cfg.actSelect.isKeyJustPressed()) {
+				else if (win.cfg.actSelect.isKeyJustPressed()) {
 					if (soundClick) {
 						soundClick->play();
 					}

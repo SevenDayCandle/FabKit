@@ -1,7 +1,7 @@
 export module fbc.CreatureData;
 
 import fbc.BaseContent;
-import fbc.CoreContent;
+import fbc.EmptyDrawable;
 import fbc.GameObjectData;
 import fbc.FTexture;
 import fbc.FUtil;
@@ -71,7 +71,7 @@ namespace fbc {
 					imageField = tex;
 				}
 				if (!imageField) {
-					imageField = &cct.images.none;
+					imageField = &EMPTY;
 				}
 			}
 		}
@@ -86,7 +86,7 @@ namespace fbc {
 				imagePortrait = tex;
 			}
 			if (!imagePortrait) {
-				imagePortrait = &cct.images.none;
+				imagePortrait = &EMPTY;
 			}
 		}
 		return *imagePortrait;

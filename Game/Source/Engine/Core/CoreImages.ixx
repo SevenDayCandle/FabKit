@@ -1,23 +1,17 @@
 export module fbc.CoreImages;
 
 import fbc.BaseContent;
-import fbc.RBordered;
-import fbc.RHorizontal;
-import fbc.StaticLoadables;
-import fbc.Cache;
-import fbc.CoreConfig;
-import fbc.EmptyDrawable;
 import fbc.FTexture;
 import fbc.FUtil;
+import fbc.RBordered;
+import fbc.RHorizontal;
 import fbc.RVertical;
-import std;
+import fbc.StaticLoadables;
 
 namespace fbc {
 	export class CoreImages : public StaticLoadables {
 	public:
 		CoreImages(BaseContent& cnt) : StaticLoadables(cnt) {}
-
-		EmptyDrawable none = EmptyDrawable();
 
 		FTexture& uiArrowIncrement = cacheTexture("UI/Arrow_Increment.png");
 		FTexture& uiArrowLarge = cacheTexture("UI/Arrow_Large.png");

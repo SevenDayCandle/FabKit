@@ -1,5 +1,6 @@
 export module fbc.BaseContent;
 
+import fbc.CoreConfig;
 import fbc.FMusic;
 import fbc.FSound;
 import fbc.FTexture;
@@ -13,11 +14,12 @@ namespace fbc {
 
 	export class BaseContent {
 	public:
-		BaseContent(strv id, strv contentFolder): id(id), contentFolder(contentFolder) {}
+		BaseContent(CoreConfig& cfg, strv id, strv contentFolder): cfg(cfg), id(id), contentFolder(contentFolder) {}
 		virtual ~BaseContent() = default;
 
 		const path contentFolder;
 		const str id;
+		CoreConfig& cfg;
 
 		inline virtual FMusic* getMusic(strv path) const { return nullptr; }
 		inline virtual FSound* getSound(strv path) const { return nullptr; }

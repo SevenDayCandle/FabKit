@@ -16,7 +16,7 @@ import std;
 namespace fbc {
 	export class CombatTurnRenderable : public UIInteractable {
 	public:
-		CombatTurnRenderable(FWindow& window, uptr<Hitbox> hb, const CombatTurn& turn) : UIInteractable(window, move(hb), cct.images.uiDarkPanelRound), portrait(turn.source.getImagePortrait()) {}
+		CombatTurnRenderable(FWindow& window, uptr<Hitbox> hb, const CombatTurn& turn) : UIInteractable(window, move(hb), window.cct.images.uiDarkPanelRound), portrait(turn.source.getImagePortrait()) {}
 
 		IDrawable& portrait;
 

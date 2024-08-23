@@ -76,7 +76,7 @@ namespace fbc {
 	{
 		SettingsDialogCache<int>& cache = makeCache(conf);
 		UISlider& slider = stackYDir(
-			UITitle<UISlider>::make(UISlider(win, relhb(xOff, 0, 200, 100), min, max), cct.fontBold(), name, -xOff, 25),
+			UITitle<UISlider>::make(UISlider(win, relhb(xOff, 0, 200, 100), min, max), win.cct.fontBold(), name, -xOff, 25),
 			8,
 			getOffsetFromLast());
 
@@ -90,7 +90,7 @@ namespace fbc {
 	{
 		SettingsDialogCache<bool>& cache = makeCache(conf);
 		UIToggle& toggle = stackYDir(
-			create<UIToggle>(relhb(xOff, 0, 100, 100), name, cct.images.uiCheckboxEmpty, cct.images.uiCheckboxFilled, cct.fontBold(), -xOff),
+			create<UIToggle>(relhb(xOff, 0, 100, 100), name, win.cct.images.uiCheckboxEmpty, win.cct.images.uiCheckboxFilled, win.cct.fontBold(), -xOff),
 			8,
 			getOffsetFromLast());
 		toggle.setToggleState(conf.get())
@@ -103,7 +103,7 @@ namespace fbc {
 	{
 		SettingsDialogCache<T>& cache = makeCache(conf);
 		UIDropdown<T>& dr = stackYDir(
-			UITitle<UIDropdown<T>>::make(UIDropdown<T>::singleList(win, relhb(xOff, 0, hb->getScaleOffSizeX() * 0.8f, 100), labelFunc), cct.fontBold(), name, -xOff, 25),
+			UITitle<UIDropdown<T>>::make(UIDropdown<T>::singleList(win, relhb(xOff, 0, hb->getScaleOffSizeX() * 0.8f, 100), labelFunc), win.cct.fontBold(), name, -xOff, 25),
 			8,
 			getOffsetFromLast());
 		dr.setItems(items)
@@ -120,7 +120,7 @@ namespace fbc {
 	{
 		SettingsDialogCache<T>& cache = makeCache(conf);
 		UIDropdown<U>& dr = stackYDir(
-			UITitle<UIDropdown<U>>::make(UIDropdown<U>::singleList(win, relhb(xOff, 0, hb->getScaleOffSizeX() * 0.8f, 100), labelFunc), cct.fontBold(), name, -xOff, 25),
+			UITitle<UIDropdown<U>>::make(UIDropdown<U>::singleList(win, relhb(xOff, 0, hb->getScaleOffSizeX() * 0.8f, 100), labelFunc), win.cct.fontBold(), name, -xOff, 25),
 			8,
 			getOffsetFromLast());
 		dr.setItems(items)
@@ -149,7 +149,7 @@ namespace fbc {
 
 	float SettingsDialogPage::getOffsetFromLast()
 	{
-		FWindow::Hoverable* last = getLastItem();
+		Hoverable* last = getLastItem();
 		return last ? std::max(last->getHb()->x - last->getBeginX(), 0.0f) : 0;
 	}
 }

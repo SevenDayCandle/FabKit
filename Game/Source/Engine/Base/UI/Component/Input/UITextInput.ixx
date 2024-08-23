@@ -19,12 +19,13 @@ import std;
 namespace fbc {
 	export class UITextInput : public UIInteractable, public TextSupplier {
 	public:
-		UITextInput(FWindow& window, uptr<Hitbox>&& hb, 
-			IDrawable& image = cct.images.uiPanel,
-			FFont& textFont = cct.fontRegular()): UIInteractable(window, move(hb), image), TextSupplier(window, textFont) {
+		UITextInput(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image, FFont& textFont) :
+			UIInteractable(window, move(hb), image), TextSupplier(window, textFont) {
 			initCaret(this->hb->x, this->hb->y);
 			UITextInput::onSizeUpdated();
 		}
+		UITextInput(FWindow& window, uptr<Hitbox>&& hb) :
+			UITextInput(window, std::move(hb), window.cct.images.uiPanel, window.cct.fontRegular()) {}
 
 		inline UITextInput& setOnBufferUpdate(const func<void(strv)>& onBufferUpdateCallback) { return this->onBufferUpdateCallback = onBufferUpdateCallback, * this; }
 		inline UITextInput& setOnComplete(const func<void(strv)>& onComplete) { return this->onComplete = onComplete, *this; }
@@ -60,7 +61,7 @@ namespace fbc {
 
 	void UITextInput::onSizeUpdated()
 	{
-		buffer.setPos(cfg.renderScale(24), this->hb->h * 0.25f);
+		buffer.setPos(win.cfg.renderScale(24), this->hb->h * 0.25f);
 		initCaret(this->hb->x, this->hb->y);
 	}
 

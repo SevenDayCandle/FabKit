@@ -27,6 +27,7 @@ namespace fbc {
         };
 
         Config(strv id) : id(id) {}
+        Config(Config&& other) noexcept : id(other.id), values_map(move(other.values_map)), items(move(other.items)) {}
         virtual ~Config() {}
 
         const str id;

@@ -27,7 +27,7 @@ namespace fbc {
 		virtual void initialize() {};
 	protected:
 		inline path getPathForLanguage(const strv& suffix) const {
-			return getPathForLanguage(cfg.getLanguage(), suffix);
+			return getPathForLanguage(content.cfg.getLanguage(), suffix);
 		};
 		inline path getPathForLanguage(const Language& lang, const strv& suffix) const {
 			return (content.contentFolder / STRINGS_PATH / lang.id / suffix).replace_extension(futil::JSON_EXT);

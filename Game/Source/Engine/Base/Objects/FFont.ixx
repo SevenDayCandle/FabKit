@@ -12,8 +12,8 @@ import sdl.SDLRunner;
 namespace fbc {
 	export class FFont : public ILoadable {
     public:
-        FFont(strv path, int size, int outlineSize = 0, int shadowSize = 0): path(path), size(size), outlineSize(outlineSize), shadowSize(shadowSize) {
-            reload();
+        FFont(strv path, float scalar, int size, int outlineSize = 0, int shadowSize = 0): path(path), globalScale(scalar), size(size), outlineSize(outlineSize), shadowSize(shadowSize) {
+            FFont::reload();
         }
         FFont(const FFont&) = delete;
         virtual ~FFont() override {
@@ -27,9 +27,9 @@ namespace fbc {
         inline int getOutlineSize() const { return outlineSize; }
         inline int getShadowSize() const { return outlineSize; }
         inline int getSize() const { return size; }
-        inline sdl::Surface* makeSurfaceScaled(strv text, uint32 w = 0, const sdl::Color& color = sdl::COLOR_STANDARD, const sdl::Color& outlineColor = sdl::COLOR_BLACK, const sdl::Color& shadowColor = sdl::COLOR_BLACK_SHADOW) { return makeSurfaceScaled(text, cfg.renderScale(w), color, outlineColor, shadowColor); }
 
         FFont& setAllSizes(int size, int outlineSize, int shadowSize);
+        FFont& setGlobalScale(float scale);
         FFont& setOutlineSize(int size);
         FFont& setShadowSize(int size);
         FFont& setSize(int size);
@@ -41,6 +41,7 @@ namespace fbc {
         void reload() const override;
     private:
         mutable sdl::Font* font;
+        float globalScale = 1;
         str path;
         int outlineSize;
         int shadowSize;
@@ -81,6 +82,12 @@ namespace fbc {
         return *this;
     }
 
+    FFont& FFont::setGlobalScale(float scale) {
+        this->globalScale = scale;
+        reload();
+        return *this;
+    }
+
     // Update the font size and reload the font with the new size. Note that sizes will be scaled by fontScale and should not be multiplied by it beforehand.
     FFont& FFont::setOutlineSize(int size)
     {
@@ -111,7 +118,7 @@ namespace fbc {
 
         if (targetSurf) {
             if (outlineSize > 0) {
-                int res = cfg.fontScale(outlineSize);
+                int res = globalScale * (outlineSize);
                 sdl::fontOutlineSet(font, res);
                 sdl::Surface* outlineSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, sdl::toTextColor(outlineColor), w);
                 sdl::fontOutlineSet(font, 0);
@@ -122,7 +129,7 @@ namespace fbc {
             }
 
             if (shadowSize > 0) {
-                int res = cfg.fontScale(shadowSize);
+                int res = globalScale * (shadowSize);
                 sdl::Surface* shadowSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, sdl::toTextColor(shadowColor), w);
                 sdl::Surface* newTargetSurf = sdl::surfaceCreate(targetSurf->w + res, targetSurf->h + res, targetSurf->format);
                 sdl::RectI shadowRect = { res, res, shadowSurf->w, shadowSurf->h };
@@ -149,7 +156,7 @@ namespace fbc {
     /* Refreshes the font to match its size */
     void FFont::reload() const
     {
-        int res = cfg.fontScale(size);
+        int res = globalScale * (size);
         font = sdl::fontOpen(path.c_str(), res);
         if (font == nullptr) {
             sdl::logError("Failed to load font %s: %s", path.c_str(), sdl::getError());

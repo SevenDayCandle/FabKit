@@ -17,6 +17,7 @@ namespace fbc {
 	export class StaticLoadables : public ContentLoadables {
 	public:
 		StaticLoadables(const BaseContent& content) : ContentLoadables(content) {}
+		StaticLoadables(StaticLoadables&& other) noexcept : ContentLoadables(move(other)), items(move(other.items)) {}
 
 		virtual void dispose() override;
 		virtual void initialize() override;
@@ -28,8 +29,9 @@ namespace fbc {
 		inline RHorizontal& cacheHorizontal(const strv& key) { return static_cast<RHorizontal&>(*items.emplace_back(std::make_unique<RHorizontal>(getPath(key, IMAGE_PATH)))); }
 		inline RVertical& cacheVertical(const strv& key) { return static_cast<RVertical&>(*items.emplace_back(std::make_unique<RVertical>(getPath(key, IMAGE_PATH)))); }
 	private:
-		str getPath(const strv& key, const strv& folder) const;
 		vec<uptr<ILoadable>> items;
+
+		str getPath(const strv& key, const strv& folder) const;
 	};
 
 	// Clear out all caches

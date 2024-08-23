@@ -18,10 +18,19 @@ import std;
 namespace fbc {
 	export class UIToggle : public UIInteractable {
 	public:
-		UIToggle(FWindow& window, uptr<Hitbox>&& hb, strv text, IDrawable& image = cct.images.uiCheckboxEmpty, IDrawable& checkImage = cct.images.uiCheckboxFilled, FFont& f = cct.fontRegular(), float xOff = cct.images.uiCheckboxEmpty.getWidth() * 1.15f, float yOff = cct.images.uiCheckboxEmpty.getHeight() * 0.25f):
+		UIToggle(FWindow& window, uptr<Hitbox>&& hb, strv text, IDrawable& image, IDrawable& checkImage, FFont& f, float xOff, float yOff) :
 			UIInteractable(window, move(hb), image), checkImage(checkImage), text(f, text), xOff(xOff), yOff(yOff) {
 			UIToggle::onSizeUpdated();
 		}
+		UIToggle(FWindow& window, uptr<Hitbox>&& hb, strv text, IDrawable& image, IDrawable& checkImage, FFont& f, float xOff) :
+			UIToggle(window, move(hb), text, image, checkImage, f, xOff, image.getHeight() * 0.25f) {}
+		UIToggle(FWindow& window, uptr<Hitbox>&& hb, strv text, IDrawable& image, IDrawable& checkImage, FFont& f) :
+			UIToggle(window, move(hb), text, image, checkImage, f,
+				image.getWidth() * 1.15f, image.getHeight() * 0.25f) {}
+		UIToggle(FWindow& window, uptr<Hitbox>&& hb, strv text, IDrawable& image, IDrawable& checkImage) :
+			UIToggle(window, move(hb), text, image, checkImage, window.cct.fontRegular()) {}
+		UIToggle(FWindow& window, uptr<Hitbox>&& hb, strv text) :
+			UIToggle(window, move(hb), text, window.cct.images.uiCheckboxEmpty, window.cct.images.uiCheckboxFilled, window.cct.fontRegular()) {}
 
 		bool toggled = false;
 		IDrawable& checkImage;
@@ -49,7 +58,7 @@ namespace fbc {
 
 	void UIToggle::onSizeUpdated()
 	{
-		text.setPos(cfg.renderScale(xOff), cfg.renderScale(yOff));
+		text.setPos(win.cfg.renderScale(xOff), win.cfg.renderScale(yOff));
 	}
 
 	void UIToggle::refreshDimensions()

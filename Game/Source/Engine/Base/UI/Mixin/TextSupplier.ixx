@@ -16,7 +16,11 @@ import std;
 namespace fbc {
 	export class TextSupplier : public sdl::IKeyInputListener {
 	public:
-		TextSupplier(FWindow& window, FFont& textFont = cct.fontRegular()): fwindow(window), buffer(textFont, "", getLimitWidth()) {}
+		TextSupplier(FWindow& window, FFont& textFont) :
+			fwindow(window), buffer(textFont, "", getLimitWidth()) {}
+		TextSupplier(FWindow& window) :
+			TextSupplier(window, window.cct.fontRegular()) {}
+
 		TextSupplier(TextSupplier&& other) noexcept = default;
 		virtual ~TextSupplier() override = default;
 
@@ -133,7 +137,7 @@ namespace fbc {
 	}
 
 	void TextSupplier::updateCaretPos() {
-		caretPosX = getBasePosX() + cfg.renderScale(9) + buffer.getFont().measureW(buffer.getText().substr(0, bufferPos));
+		caretPosX = getBasePosX() + fwindow.cfg.renderScale(9) + buffer.getFont().measureW(buffer.getText().substr(0, bufferPos));
 		caretPosY = getBasePosY();
 	}
 }

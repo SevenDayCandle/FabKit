@@ -15,7 +15,7 @@ import std;
 namespace fbc {
 	export class CardRenderable : public UIInteractable {
 	public:
-		CardRenderable(FWindow& window, uptr<Hitbox> hb, const Card& card): UIInteractable(window, move(hb), cct.images.uiDarkPanelRound), card(card) {}
+		CardRenderable(FWindow& window, uptr<Hitbox> hb, const Card& card): UIInteractable(window, move(hb), window.cct.images.uiDarkPanelRound), card(card) {}
 
 		const Card& card;
 	};

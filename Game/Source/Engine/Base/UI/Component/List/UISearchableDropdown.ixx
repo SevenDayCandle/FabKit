@@ -25,16 +25,17 @@ import std;
 namespace fbc {
 	export template <typename T> class UISearchableDropdown : public UIDropdown<T>, public TextSupplier {
 	public:
-		UISearchableDropdown(FWindow& window, uptr<Hitbox>&& hb,
-			uptr<UISelectorList<T>> menu,
-			IDrawable& image = cct.images.uiPanel,
-			IDrawable& arrow = cct.images.uiArrowSmall,
-			IDrawable& clear = cct.images.uiClearSmall,
-			FFont& textFont = cct.fontRegular(),
-			func<str(EntryView<T>&)>& buttonLabelFunc = {}
-		) : UIDropdown<T>(window, move(hb), std::move(menu), image, arrow, clear, textFont, buttonLabelFunc), TextSupplier(window) {
+		UISearchableDropdown(FWindow& window, uptr<Hitbox>&& hb, uptr<UISelectorList<T>> menu,
+			IDrawable& image, IDrawable& arrow, IDrawable& clear,
+			FFont& textFont, func<str(EntryView<T>&)>& buttonLabelFunc = {}) :
+			UIDropdown<T>(window, move(hb), std::move(menu), image, arrow, clear, textFont, buttonLabelFunc),
+			TextSupplier(window) {
 			initSearchable();
 		}
+		UISearchableDropdown(FWindow& window, uptr<Hitbox>&& hb, uptr<UISelectorList<T>> menu, func<str(EntryView<T>&)>& buttonLabelFunc = {}) :
+			UISearchableDropdown(window, std::move(hb), std::move(menu),
+				window.cct.images.uiPanel, window.cct.images.uiArrowSmall, window.cct.images.uiClearSmall,
+				window.cct.fontRegular(), buttonLabelFunc) {}
 		UISearchableDropdown(UISearchableDropdown&& other) noexcept : UIDropdown<T>(other), TextSupplier(other.win) {
 			initSearchable();
 		};
@@ -52,24 +53,16 @@ namespace fbc {
 		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		virtual void unsetProxy() override;
 
-		static UISearchableDropdown multiSearch(FWindow& window, uptr<Hitbox>&& hb,
-			func<str(const T&)> labelFunc = futil::toString<T>,
-			func<str(EntryView<T>&)> buttonLabelFunc = {},
-			FFont& itemFont = cct.fontRegular(),
-			FFont& textFont = cct.fontRegular(),
-			IDrawable& background = cct.images.uiDarkPanelRound,
-			IDrawable& image = cct.images.uiPanel,
-			IDrawable& arrow = cct.images.uiArrowSmall,
-			IDrawable& clear = cct.images.uiClearSmall);
-		static UISearchableDropdown singleSearch(FWindow& window, uptr<Hitbox>&& hb,
-			func<str(const T&)> labelFunc = futil::toString<T>,
-			func<str(EntryView<T>&)> buttonLabelFunc = {},
-			FFont& itemFont = cct.fontRegular(),
-			FFont& textFont = cct.fontRegular(),
-			IDrawable& background = cct.images.uiDarkPanelRound,
-			IDrawable& image = cct.images.uiPanel,
-			IDrawable& arrow = cct.images.uiArrowSmall,
-			IDrawable& clear = cct.images.uiClearSmall);
+		inline static UISearchableDropdown multiSearch(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>) {
+			return multiSearch(window, std::move(hb), labelFunc, {}, window.cct.fontRegular(), window.cct.fontRegular(), window.cct.images.uiDarkPanelRound, window.cct.images.uiPanel, window.cct.images.uiArrowSmall, window.cct.images.uiClearSmall);
+		}
+
+		inline static UISearchableDropdown singleSearch(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>) {
+			return singleSearch(window, std::move(hb), labelFunc, {}, window.cct.fontRegular(), window.cct.fontRegular(), window.cct.images.uiDarkPanelRound, window.cct.images.uiPanel, window.cct.images.uiArrowSmall, window.cct.images.uiClearSmall);
+		}
+
+		static UISearchableDropdown multiSearch(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, func<str(EntryView<T>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear);
+		static UISearchableDropdown singleSearch(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, func<str(EntryView<T>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear);
 	protected:
 		virtual void onSelectionUpdate(EntryView<T>& items) override;
 	private:
@@ -171,7 +164,7 @@ namespace fbc {
 		return UISearchableDropdown<T>(
 			window,
 			move(hb),
-			UISelectorList<T>::multiList(make_unique<ScaleHitbox>(ref.getOffSizeX(), ref.getOffSizeY()), std::move(labelFunc), itemFont, background),
+			UISelectorList<T>::multiList(make_unique<ScaleHitbox>(window, ref.getOffSizeX(), ref.getOffSizeY()), std::move(labelFunc), itemFont, background),
 			image,
 			arrow,
 			clear,
@@ -186,7 +179,7 @@ namespace fbc {
 		return UISearchableDropdown<T>(
 			window,
 			move(hb),
-			UISelectorList<T>::singleList(make_unique<ScaleHitbox>(ref.getOffSizeX(), ref.getOffSizeY()), std::move(labelFunc), itemFont, background),
+			UISelectorList<T>::singleList(make_unique<ScaleHitbox>(window, ref.getOffSizeX(), ref.getOffSizeY()), std::move(labelFunc), itemFont, background),
 			image,
 			arrow,
 			clear,

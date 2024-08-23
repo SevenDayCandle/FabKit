@@ -23,16 +23,17 @@ import std;
 namespace fbc {
 	export template <typename T> class UIDropdown : public UIInteractable {
 	public:
-		UIDropdown(FWindow& window, uptr<Hitbox>&& hb,
-			uptr<UISelectorList<T>> menu,
-			IDrawable& image = cct.images.uiPanel,
-			IDrawable& arrow = cct.images.uiArrowSmall,
-			IDrawable& clear = cct.images.uiClearSmall,
-			FFont& textFont = cct.fontRegular(),
-			func<str(EntryView<T>&)>& buttonLabelFunc = {}
-		): UIInteractable(window, move(hb), image), text(textFont), menu(std::move(menu)), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
+		UIDropdown(FWindow& window, uptr<Hitbox>&& hb, uptr<UISelectorList<T>> menu,
+			IDrawable& image, IDrawable& arrow, IDrawable& clear,
+			FFont& textFont, func<str(EntryView<T>&)>& buttonLabelFunc = {}) :
+			UIInteractable(window, move(hb), image), text(textFont),
+			menu(move(menu)), buttonLabelFunc(buttonLabelFunc), arrow(arrow), clear(clear) {
 			init();
 		}
+		UIDropdown(FWindow& window, uptr<Hitbox>&& hb, uptr<UISelectorList<T>> menu, func<str(EntryView<T>&)>& buttonLabelFunc = {}) :
+			UIDropdown(window, move(hb), move(menu),
+				window.cct.images.uiPanel, window.cct.images.uiArrowSmall, window.cct.images.uiClearSmall,
+				window.cct.fontRegular(), buttonLabelFunc) {}
 		UIDropdown(UIDropdown&& other) noexcept : UIInteractable(other.win, move(other.hb), other.image), text(move(other.text)), menu(move(other.menu)), buttonLabelFunc(move(other.buttonLabelFunc)), arrow(other.arrow), clear(other.clear) {
 			init();
 		};
@@ -86,24 +87,17 @@ namespace fbc {
 		virtual void updateImpl() override;
 		virtual void unsetProxy();
 
-		static UIDropdown multiList(FWindow& window, uptr<Hitbox>&& hb,
-			func<str(const T&)> labelFunc = futil::toString<T>,
-			func<str(EntryView<T>&)> buttonLabelFunc = {},
-			FFont& itemFont = cct.fontRegular(),
-			FFont& textFont = cct.fontRegular(),
-			IDrawable& background = cct.images.uiDarkPanelRound,
-			IDrawable& image = cct.images.uiPanel,
-			IDrawable& arrow = cct.images.uiArrowSmall,
-			IDrawable& clear = cct.images.uiClearSmall);
-		static UIDropdown singleList(FWindow& window, uptr<Hitbox>&& hb,
-			func<str(const T&)> labelFunc = futil::toString<T>,
-			func<str(EntryView<T>&)> buttonLabelFunc = {},
-			FFont& itemFont = cct.fontRegular(),
-			FFont& textFont = cct.fontRegular(),
-			IDrawable& background = cct.images.uiDarkPanelRound,
-			IDrawable& image = cct.images.uiPanel,
-			IDrawable& arrow = cct.images.uiArrowSmall,
-			IDrawable& clear = cct.images.uiClearSmall);
+		inline static UIDropdown multiList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>, func<str(EntryView<T>&)> buttonLabelFunc = {}) {
+			return multiList(window, std::move(hb), labelFunc, buttonLabelFunc, window.cct.fontRegular(), window.cct.fontRegular(), window.cct.images.uiDarkPanelRound, window.cct.images.uiPanel, window.cct.images.uiArrowSmall, window.cct.images.uiClearSmall);
+		}
+
+		inline static UIDropdown singleList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>, func<str(EntryView<T>&)> buttonLabelFunc = {}) {
+			return singleList(window, std::move(hb), labelFunc, buttonLabelFunc, window.cct.fontRegular(), window.cct.fontRegular(), window.cct.images.uiDarkPanelRound, window.cct.images.uiPanel, window.cct.images.uiArrowSmall, window.cct.images.uiClearSmall);
+		}
+
+		static UIDropdown multiList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, func<str(EntryView<T>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear);
+		static UIDropdown singleList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, func<str(EntryView<T>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear);
+
 	protected:
 		IDrawable& arrow;
 		IDrawable& clear;
@@ -154,7 +148,7 @@ namespace fbc {
 
 	template<typename T> void UIDropdown<T>::onSizeUpdated()
 	{
-		text.setPos(cfg.renderScale(24), hb->h * 0.25f);
+		text.setPos(win.cfg.renderScale(24), hb->h * 0.25f);
 		arrowRect.w = arrowRect.h = hb->h * 0.5f;
 	}
 
@@ -213,7 +207,7 @@ namespace fbc {
 		return UIDropdown<T>(
 			window,
 			move(hb),
-			UISelectorList<T>::multiList(window, make_unique<ScaleHitbox>(ref.getOffSizeX(), ref.getOffSizeY()), labelFunc, itemFont, background),
+			UISelectorList<T>::multiList(window, make_unique<ScaleHitbox>(window, ref.getOffSizeX(), ref.getOffSizeY()), labelFunc, itemFont, background),
 			image,
 			arrow,
 			clear,
@@ -229,7 +223,7 @@ namespace fbc {
 		return UIDropdown<T>(
 			window,
 			move(hb),
-			UISelectorList<T>::singleList(window, make_unique<ScaleHitbox>(ref.getOffSizeX(), ref.getOffSizeY()), labelFunc, itemFont, background),
+			UISelectorList<T>::singleList(window, make_unique<ScaleHitbox>(window, ref.getOffSizeX(), ref.getOffSizeY()), labelFunc, itemFont, background),
 			image,
 			arrow,
 			clear,
@@ -248,7 +242,7 @@ namespace fbc {
 		else {
 			str displayText = (futil::joinStrMap(", ", items, [](UIEntry<T>& entry) {return entry.getText(); }));
 			if (text.getFont().measureW(displayText) > hb->w) {
-				return str(cct.strings.ui_items(this->selectedSize()));
+				return str(win.cct.strings.ui_items(this->selectedSize()));
 			}
 			else {
 				return displayText;

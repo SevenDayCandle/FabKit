@@ -14,9 +14,13 @@ namespace fbc {
 
 	export class UIVerticalScrollbar : public UIScrollbar {
 	public:
-		UIVerticalScrollbar(FWindow& window, uptr<Hitbox>&& hb, IDrawable& imageBar = cct.images.uiScrollbar, IDrawable& imageButton = cct.images.uiScrollbutton): UIScrollbar(window, move(hb), imageBar, imageButton) {
+		UIVerticalScrollbar(FWindow& window, uptr<Hitbox>&& hb, IDrawable& imageBar, IDrawable& imageButton) :
+			UIScrollbar(window, move(hb), imageBar, imageButton) {
 			UIVerticalScrollbar::updateDropzoneSize(0.05f);
 		}
+		UIVerticalScrollbar(FWindow& window, uptr<Hitbox>&& hb) :
+			UIVerticalScrollbar(window, move(hb), window.cct.images.uiScrollbar, window.cct.images.uiScrollbutton) {}
+
 
 		float toPercentage(float x, float y) override;
 		void updateDropzonePos(float percent) override;

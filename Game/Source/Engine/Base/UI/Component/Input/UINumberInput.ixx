@@ -20,15 +20,15 @@ import std;
 namespace fbc {
 	export class UINumberInput : public UIInteractable, public TextSupplier {
 	public:
-		UINumberInput(FWindow& window, uptr<Hitbox>&& hb,
-			int limMin = 0,
-			int limMax = std::numeric_limits<int>::max(),
-			IDrawable& image = cct.images.uiPanel,
-			IDrawable& arrow = cct.images.uiArrowIncrement,
-			FFont& textFont = cct.fontRegular()) : TextSupplier(window, textFont), UIInteractable(window, move(hb), image), limMin(limMin), limMax(limMax), arrow(arrow) {
+		UINumberInput(FWindow& window, uptr<Hitbox>&& hb, int limMin, int limMax, IDrawable& image, IDrawable& arrow, FFont& textFont) : 
+			TextSupplier(window, textFont), UIInteractable(window, move(hb), image), limMin(limMin), limMax(limMax), arrow(arrow) {
 			initCaret(this->hb->x, this->hb->y);
 			UINumberInput::onSizeUpdated();
 		}
+		UINumberInput(FWindow& window, uptr<Hitbox>&& hb, int limMin, int limMax, IDrawable& image) :
+			UINumberInput(window, move(hb), limMin, limMax, image, window.cct.images.uiArrowIncrement, window.cct.fontRegular()) {}
+		UINumberInput(FWindow& window, uptr<Hitbox>&& hb, int limMin = 0, int limMax = std::numeric_limits<int>::max()) :
+			UINumberInput(window, move(hb), limMin, limMax, window.cct.images.uiPanel, window.cct.images.uiArrowIncrement, window.cct.fontRegular()) {}
 
 		inline int getValue() const { return val; }
 		inline UINumberInput& setOnBufferUpdate(const func<void(int)>& onBufferUpdateCallback) { return this->onBufferUpdateCallback = onBufferUpdateCallback, *this; }
@@ -88,7 +88,7 @@ namespace fbc {
 
 	void UINumberInput::onSizeUpdated()
 	{
-		buffer.setPos(cfg.renderScale(24), this->hb->h * 0.25f);
+		buffer.setPos(win.cfg.renderScale(24), this->hb->h * 0.25f);
 		moreRect.w = moreRect.h = lessRect.w = lessRect.h = hb->h / 2;
 	}
 

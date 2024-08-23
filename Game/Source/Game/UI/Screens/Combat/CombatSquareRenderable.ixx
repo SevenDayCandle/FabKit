@@ -15,7 +15,7 @@ import std;
 namespace fbc {
 	export class CombatSquareRenderable : public UIInteractable {
 	public:
-		CombatSquareRenderable(FWindow& window, uptr<Hitbox>&& hb, const CombatSquare& square): UIInteractable(window, move(hb), cct.images.uiLightPanel), square(square) {}
+		CombatSquareRenderable(FWindow& window, uptr<Hitbox>&& hb, const CombatSquare& square): UIInteractable(window, move(hb), window.cct.images.uiLightPanel), square(square) {}
 
 		const CombatSquare& square;
 

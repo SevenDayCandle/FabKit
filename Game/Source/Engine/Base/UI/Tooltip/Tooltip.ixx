@@ -1,18 +1,13 @@
 export module fbc.Tooltip;
 
-import fbc.CoreConfig;
-import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FWindow;
 import fbc.FUtil;
 import fbc.GenericTip;
-import fbc.UIBase;
 import fbc.IDrawable;
 import fbc.TextDrawable;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
-import sdl.SDLRunner;
+import sdl.SDLBatchRenderPass;
 import std;
 
 namespace fbc {
@@ -21,7 +16,9 @@ namespace fbc {
 
 	export class Tooltip : public GenericTip {
 	public:
-		Tooltip(FWindow& window, strv text, FFont& font = cct.fontSmall(), float wOff = DEFAULT_SIZE, IDrawable& background = cct.images.uiDarkPanelRound) : GenericTip(window), background(background), wOff(wOff), text(font, text, getLimitWidth(wOff)) {}
+		Tooltip(FWindow& window, strv text, FFont& font, float wOff, IDrawable& background) : GenericTip(window), background(background), wOff(wOff), text(font, text, getLimitWidth(wOff)) {}
+		Tooltip(FWindow& window, strv text) : Tooltip(window, text, window.cct.fontSmall(), DEFAULT_SIZE, window.cct.images.uiDarkPanelRound) {}
+
 		virtual ~Tooltip() override = default;
 
 		inline virtual float getHeight() const override { return h; }
@@ -38,7 +35,7 @@ namespace fbc {
 		IDrawable& background;
 		TextDrawable text;
 
-		inline static int getLimitWidth(int w) { return w - cfg.renderScale(PADDING * 2); }
+		inline int getLimitWidth(int w) const { return w - win.cfg.renderScale(PADDING * 2); }
 
 		virtual void updateBounds() override;
 	};
@@ -67,9 +64,9 @@ namespace fbc {
 	// Stretch the box background to fit the words in the tooltip
 	void Tooltip::updateBounds()
 	{
-		float off = cfg.renderScale(PADDING);
+		float off = win.cfg.renderScale(PADDING);
 		text.setPos(off, off);
-		w = cfg.renderScale(wOff);
+		w = win.cfg.renderScale(wOff);
 		h = text.getHeight() + off * 2;
 	}
 }

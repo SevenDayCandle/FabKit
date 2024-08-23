@@ -3,11 +3,10 @@ export module fbc.FWindow;
 import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.FUtil;
-import fbc.Hitbox;
+import sdl.IKeyInputListener;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
 import sdl.SDLRunner;
-import sdl.IKeyInputListener;
 import std;
 
 namespace fbc {
@@ -31,20 +30,6 @@ namespace fbc {
 
 			virtual void render(sdl::SDLBatchRenderPass& rp) = 0;
 			virtual void update() = 0;
-		};
-
-		class Hoverable : public Element {
-		public:
-			Hoverable(FWindow& window) : Element(window) {}
-			virtual ~Hoverable() = default;
-
-			inline virtual float getBeginX() { return getHb()->x; } // The left-most end X coordinate of this object, may be smaller than hb if this has labels
-			inline virtual float getBeginY() { return getHb()->y; } // The left-most end X coordinate of this object, may be smaller than hb if this has labels
-			inline virtual float getEndX() { return getHb()->x + getHb()->w; } // The right-most end X coordinate of this object, may be larger than hb if this has subcomponents
-			inline virtual float getEndY() { return getHb()->y + getHb()->h; } // The bottom-most end Y coordinate of this object, may be larger than hb if this has subcomponents
-			inline virtual bool isHovered() { return getHb()->isHovered(); }
-
-			virtual Hitbox* getHb() = 0;
 		};
 
 		FWindow(CoreConfig& cfg, CoreContent& cct, const char* title) : cfg(cfg), cct(cct) {

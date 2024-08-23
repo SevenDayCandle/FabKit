@@ -21,7 +21,8 @@ namespace fbc {
 
 	export class CoreContent : public BaseContent {
 	public:
-		CoreContent(strv id) : BaseContent(id, sdl::dirBase() + str(BASE_FOLDER)) {}
+		CoreContent(CoreConfig& cfg, strv id) : BaseContent(cfg, id, sdl::dirBase() + str(BASE_FOLDER)) {}
+		CoreContent(CoreContent&& other) noexcept: BaseContent(move(other)), audio(move(other.audio)), images(move(other.images)), strings(move(other.strings)), registeredContents(move(other.registeredContents)), fontBoldData(move(other.fontBoldData)), fontRegularData(move(other.fontRegularData)), fontSmallData(move(other.fontSmallData)) {}
 
 		CoreAudio audio = CoreAudio(*this);
 		CoreImages images = CoreImages(*this);
@@ -51,8 +52,6 @@ namespace fbc {
 		uptr<FFont> fontRegularData;
 		uptr<FFont> fontSmallData;
 	};
-
-	export CoreContent cct = CoreContent(futil::FBC);
 
 	// Gets a registered content with the designated id
 	BaseContent* CoreContent::getContent(strv content)
@@ -123,9 +122,10 @@ namespace fbc {
 
 	void CoreContent::initializeFonts()
 	{
-		fontBoldData = std::make_unique<FFont>(cfg.textFontBold.get(), 48, 2, 4);
-		fontRegularData = std::make_unique<FFont>(cfg.textFont.get(), 48, 0, 4);
-		fontSmallData = std::make_unique<FFont>(cfg.textFont.get(), 32, 0, 3);
+		float fontScale = cfg.fontScale();
+		fontBoldData = std::make_unique<FFont>(cfg.textFontBold.get(), fontScale, 48, 2, 4);
+		fontRegularData = std::make_unique<FFont>(cfg.textFont.get(), fontScale, 48, 0, 4);
+		fontSmallData = std::make_unique<FFont>(cfg.textFont.get(), fontScale, 32, 0, 3);
 	}
 
 	void CoreContent::postInitialize()
@@ -139,9 +139,10 @@ namespace fbc {
 
 	void CoreContent::reloadFonts()
 	{
-		fontBoldData->reload();
-		fontRegularData->reload();
-		fontSmallData->reload();
+		float fontScale = cfg.fontScale();
+		fontBoldData->setGlobalScale(fontScale);
+		fontRegularData->setGlobalScale(fontScale);
+		fontSmallData->setGlobalScale(fontScale);
 	}
 
 	void CoreContent::reloadAudio()

@@ -25,7 +25,7 @@ namespace fbc {
 		CombatScreen(FWindow& window): UIScreen(window),
 			fieldUI(addNew<UICanvas>(relhb(TILE_OFFSET, TILE_OFFSET, hb->getScaleOffSizeX(), hb->getScaleOffSizeY()))),
 			turnUI(addNew<UICanvas>(relhb(0, 0, hb->getScaleOffSizeX(), hb->getScaleOffSizeY()))),
-			endTurnButton(add(make_unique<UITextButton>(win, relhb(hb->getScaleOffSizeX(0.8), hb->getScaleOffSizeY(0.8), END_TURN_SIZE, END_TURN_SIZE), cct.images.uiPanelRound, cct.fontRegular(), cct.strings.combat_end_turn()))) {
+			endTurnButton(add(make_unique<UITextButton>(win, relhb(hb->getScaleOffSizeX(0.8), hb->getScaleOffSizeY(0.8), END_TURN_SIZE, END_TURN_SIZE), window.cct.images.uiPanelRound, window.cct.fontRegular(), window.cct.strings.combat_end_turn()))) {
 		}
 
 		virtual void onPlayerTurnBegin(const CombatTurn* turn) override;

@@ -79,15 +79,15 @@ namespace fbc {
 
 		const Language& getLanguage();
 
+		void fullLoad();
 		void postInitialize() override;
+
 	private:
 		float fontScalePrivate = 1.0;
 		float renderScalePrivate = 1.0;
 
 		void updateScales();
 	};
-
-	export CoreConfig cfg = CoreConfig(futil::FBC);
 
 	// Get the game language, defaulting to English if it is invalid
 	const Language& CoreConfig::getLanguage() {
@@ -98,6 +98,13 @@ namespace fbc {
 			sdl::logError("Language failed to load: %s. Defaulting to ENG", e);
 		}
 		return lang::ENG;
+	}
+
+	void CoreConfig::fullLoad() {
+		load();
+		Hotkey::reload(); // TODO hold Hotkey map and management in CoreConfig
+		// TODO manage other configs
+		postInitialize();
 	}
 
 	void CoreConfig::postInitialize() {

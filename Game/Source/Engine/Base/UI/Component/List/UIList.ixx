@@ -51,13 +51,10 @@ namespace fbc {
 			typename vec<uptr<UIEntry<T>>>::iterator it;
 		};
 
-		UIList(FWindow& window, uptr<Hitbox>&& hb,
-			func<str(const T&)> labelFunc = futil::toString<T>,
-			FFont& itemFont = cct.fontSmall(),
-			IDrawable& background = cct.images.uiPanelRound,
-			bool canAutosize = false) :
-			UIBase(window, move(hb)), background(background), itemFont(itemFont), labelFunc(std::move(labelFunc)), canAutosize(canAutosize) {
-		}
+		UIList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize = false) :
+			UIBase(window, move(hb)), background(background), itemFont(itemFont), labelFunc(move(labelFunc)), canAutosize(canAutosize) {}
+		UIList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>, bool canAutosize = false) :
+			UIList(window, move(hb), move(labelFunc), window.cct.fontSmall(), window.cct.images.uiPanelRound, canAutosize) {}
 		UIList(UIList&& other) noexcept = default;
 
 		~UIList() override {}
@@ -94,13 +91,13 @@ namespace fbc {
 		int topVisibleRowIndex;
 		sdl::Color backgroundColor = sdl::COLOR_STANDARD;
 		IDrawable& background;
-		FFont& itemFont = cct.fontSmall();
+		FFont& itemFont;
 		func<str(const T&)> labelFunc;
 		vec<uptr<UIEntry<T>>> rows;
 
+		inline virtual float rMargin() { return win.cfg.renderScale(MARGIN); }
 		inline virtual int getVisibleRowCount() const { return std::min(static_cast<int>(rows.size()), this->maxRows); }
 		inline virtual void updateTopVisibleRowIndex(int value) { topVisibleRowIndex = value; }
-		inline static float rMargin() { return cfg.renderScale(MARGIN); }
 
 		virtual UIEntry<T>* makeRow(const T& item, int i);
 		virtual void refreshRows();
@@ -233,14 +230,14 @@ namespace fbc {
 		}
 
 		if (activeRow >= 0) {
-			if (cfg.actDirUp.isKeyJustPressed()) {
+			if (win.cfg.actDirUp.isKeyJustPressed()) {
 				activeRow = std::max(0, activeRow - 1);
 				if (activeRow < topVisibleRowIndex) {
 					updateTopVisibleRowIndex(topVisibleRowIndex - 1);
 					updateRowPositions();
 				}
 			}
-			else if (cfg.actDirDown.isKeyJustPressed()) {
+			else if (win.cfg.actDirDown.isKeyJustPressed()) {
 				activeRow = std::min(static_cast<int>(rows.size()) - 1, activeRow + 1);
 				if (activeRow > topVisibleRowIndex + maxRows) {
 					updateTopVisibleRowIndex(topVisibleRowIndex + 1);
@@ -256,7 +253,7 @@ namespace fbc {
 			rows[i]->updateActiveStatus(this->activeRow == i);
 		}
 
-		if (this->activeRow >= 0 && cfg.actSelect.isKeyJustPressed()) {
+		if (this->activeRow >= 0 && win.cfg.actSelect.isKeyJustPressed()) {
 			this->selectRow(*rows[this->activeRow]);
 		}
 	}
@@ -267,10 +264,10 @@ namespace fbc {
 			i,
 			[this](UIEntry<T>& p) { this->selectRow(p); },
 			this->win,
-			make_unique<RelativeHitbox>(*this->hb),
+			this->relhb(),
 			this->getItemFont(),
 			labelFunc(item));
-		entry->setHbExactSizeY(cfg.renderScale(64));
+		entry->setHbExactSizeY(win.cfg.renderScale(64));
 		return entry;
 	}
 

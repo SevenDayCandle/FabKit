@@ -7,6 +7,7 @@ export module fbc.DynamicContent;
 import fbc.BaseContent;
 import fbc.BaseStrings;
 import fbc.CardData;
+import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.CreatureData;
 import fbc.DynamicLoadables;
@@ -19,10 +20,7 @@ import fbc.PassiveData;
 import fbc.RunEncounter;
 import fbc.RunZone;
 import fbc.StatusData;
-import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
-import sdl.SDLRunner;
+import sdl.SDLBase;
 import std;
 
 namespace fbc {
@@ -33,7 +31,7 @@ namespace fbc {
 
 	export class DynamicContent : public BaseContent {
 	public:
-		DynamicContent(strv id, strv folder): BaseContent(id, folder) {}
+		DynamicContent(CoreConfig& cfg, strv id, strv folder): BaseContent(cfg, id, folder) {}
 		~DynamicContent() override {}
 
 		BaseStrings strings = BaseStrings(*this);
@@ -58,7 +56,8 @@ namespace fbc {
 		void reloadImages() override;
 		void unloadObjects();
 
-		static void loadDynamicContent();
+		static CoreContent generate(CoreConfig& cfg, strv id);
+		static void loadDynamicContent(CoreContent& cct);
 	private:
 		void processCard(const path& entry);
 		void processCreature(const path& entry);
@@ -199,8 +198,17 @@ namespace fbc {
 
 	/* STATICS */
 
+	CoreContent DynamicContent::generate(CoreConfig& cfg, strv id) {
+		CoreContent cct = CoreContent(cfg, id);
+		cct.initialize();
+		loadDynamicContent(cct);
+		cct.initializeContents();
+		cct.postInitialize();
+		return cct;
+	}
+
 	// Generate dynamic content from each folder in the content root folder
-	void DynamicContent::loadDynamicContent()
+	void DynamicContent::loadDynamicContent(CoreContent& cct)
 	{
 		for (const dir_entry& entry : std::filesystem::directory_iterator(sdl::dirBase() + str(CONTENT_ROOT))) {
 			if (std::filesystem::is_directory(entry.status())) {
@@ -215,7 +223,7 @@ namespace fbc {
 				}
 				else {
 					str id = sanitizeID(subdir.filename().string());
-					cct.registerContent(std::make_unique<DynamicContent>(id, subdir.string()));
+					cct.registerContent(std::make_unique<DynamicContent>(cct.cfg, id, subdir.string()));
 					sdl::logInfo("Registered content without manifest with ID %s", id.data());
 				}
 			}

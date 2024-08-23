@@ -2,6 +2,7 @@ import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.ConfigHotkey;
 import fbc.DynamicContent;
+import fbc.FUtil;
 import fbc.FWindow;
 import fbc.TitleScreen;
 import sdl.SDLBase; 
@@ -18,13 +19,9 @@ int main()
 		return -1;
 	}
 
-	cfg.load();
-	fbc::Hotkey::reload();
-	cfg.postInitialize();
-	cct.initialize();
-	DynamicContent::loadDynamicContent();
-	cct.initializeContents();
-	cct.postInitialize();
+	CoreConfig cfg = CoreConfig(fbc::futil::FBC);
+	cfg.fullLoad();
+	CoreContent cct = DynamicContent::generate(cfg, fbc::futil::FBC);
 
 	FWindow window(cfg, cct, "Fabricate");
 	window.openScreen(std::make_unique<fbc::TitleScreen>(window));

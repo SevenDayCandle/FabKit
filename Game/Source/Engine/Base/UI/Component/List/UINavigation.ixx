@@ -1,31 +1,26 @@
 export module fbc.UINavigation;
 
-import fbc.CoreConfig;
-import fbc.CoreContent;
+import fbc.EmptyDrawable;
 import fbc.FFont;
 import fbc.FUtil;
 import fbc.FWindow;
 import fbc.Hitbox;
-import fbc.IDrawable;
 import fbc.RelativeHitbox;
 import fbc.UIEntry;
 import fbc.UIBase;
 import fbc.UIList;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
 import sdl.SDLRunner;
 import std;
 
 namespace fbc {
 	export template <c_ext<UIBase> T> class UINavigation : public UIList<T> {
 	public:
-		UINavigation(FWindow& window, uptr<Hitbox>&& hb,
-			func<str(const T&)> labelFunc = futil::toString<T>,
-			FFont& itemFont = cct.fontRegular(),
-			IDrawable& background = cct.images.uiDarkPanelRound,
-			bool canAutosize = false) :
-			UIList<T>(window, move(hb), labelFunc, itemFont, background, canAutosize) {}
+		UINavigation(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize) :
+			UIList<T>(window, move(hb), std::move(labelFunc), itemFont, background, canAutosize) {}
+		UINavigation(FWindow& window, uptr<Hitbox>&& hb) :
+			UINavigation(window, std::move(hb), futil::toString<T>, window.cct.fontRegular(), window.cct.images.uiDarkPanelRound, false) {}
 
 		inline T* getSelectedItem() { return currentItem; }
 		inline UINavigation& setItemFont(FFont& itemFont) { return UIList<T>::setItemFont(itemFont), * this; }
@@ -119,12 +114,12 @@ namespace fbc {
 			i,
 			[this](UIEntry<T>& p) { this->selectRow(p); },
 			this->win,
-			make_unique<RelativeHitbox>(*this->hb),
+			this->relhb(),
 			this->getItemFont(),
 			this->labelFunc(item),
-			cct.images.none,
-			cct.images.uiArrowLarge);
-		entry->setHbExactSizeY(cfg.renderScale(64));
+			EMPTY,
+			this->win.cct.images.uiArrowLarge);
+		entry->setHbExactSizeY(this->win.cfg.renderScale(64));
 		return entry;
 	}
 

@@ -45,7 +45,7 @@ namespace fbc {
 			spacingX(spacingX),
 			spacingY(spacingY),
 			scrollSpeed(scrollSpeed),
-			scrollbar{window, make_unique<ScaleHitbox>(hb->w * 0.93f / cfg.renderScale(), hb->y + hb->h * 0.05f / cfg.renderScale(), 48, hb->h * 0.9f / cfg.renderScale())} {
+			scrollbar{window, make_unique<ScaleHitbox>(window, hb->w * 0.93f / window.cfg.renderScale(), hb->y + hb->h * 0.05f / window.cfg.renderScale(), 48, hb->h * 0.9f / window.cfg.renderScale())} {
 			scrollbar.enabled = false;
 		}
 		UIGrid(UIGrid&& other) noexcept : UIBase(other.win, move(other.hb)), spacingX(other.spacingX), spacingY(other.spacingY), scrollSpeed(other.scrollSpeed), scrollbar(move(other.scrollbar)), items(move(other.items)) {}
@@ -112,8 +112,8 @@ namespace fbc {
 	// Updates the positions of ALL items in the grid, and shows the scrollbar if any of them would extend outside of the grid
 	template<c_ext<UIBase> T> void UIGrid<T>::updateItemOffsets()
 	{
-		float sx = cfg.renderScale(spacingX);
-		float sy = cfg.renderScale(spacingY);
+		float sx = win.cfg.renderScale(spacingX);
+		float sy = win.cfg.renderScale(spacingY);
 		float x = hb->x;
 		float y = hb->y;
 		for (const uptr<T>& item : items) {
@@ -131,8 +131,8 @@ namespace fbc {
 
 	// Updates the positions of items from index begin (inclusive) to index end (exclusive), and shows the scrollbar if any of them would extend outside of the grid
 	template<c_ext<UIBase> T> void UIGrid<T>::updateItemOffsets(int begin, int end) {
-		float sx = cfg.renderScale(spacingX);
-		float sy = cfg.renderScale(spacingY);
+		float sx = win.cfg.renderScale(spacingX);
+		float sy = win.cfg.renderScale(spacingY);
 		int rowsize = hb->w / sx;
 		int xP = begin % rowsize;
 		int yP = begin / rowsize; // Intentional integer division in parentheses to ensure that this multiplier rounds down

@@ -1,7 +1,6 @@
 export module fbc.UIMenu;
 
-import fbc.CoreConfig;
-import fbc.CoreContent;
+import fbc.EmptyDrawable;
 import fbc.FFont;
 import fbc.FWindow;
 import fbc.FUtil;
@@ -12,19 +11,16 @@ import fbc.UIEntry;
 import fbc.UIList;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
 import sdl.SDLRunner;
 import std;
 
 namespace fbc {
 	export template <typename T> class UIMenu : public UIList<T> {
 	public:
-		UIMenu(FWindow& window, uptr<Hitbox>&& hb,
-			func<str(const T&)> labelFunc = futil::toString<T>,
-			FFont& itemFont = cct.fontRegular(),
-			IDrawable& background = cct.images.uiDarkPanelRound,
-			bool canAutosize = false) :
+		UIMenu(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize) :
 			UIList<T>(window, move(hb), std::move(labelFunc), itemFont, background, canAutosize) {}
+		UIMenu(FWindow& window, uptr<Hitbox>&& hb) :
+			UIMenu(window, std::move(hb), futil::toString<T>, window.cct.fontRegular(), window.cct.images.uiDarkPanelRound, false) {}
 		UIMenu(UIMenu&& other) noexcept = default;
 
 		inline const T* getSelectedItem() { return &this->rows[currentIndex]->item; }
@@ -83,9 +79,9 @@ namespace fbc {
 			make_unique<RelativeHitbox>(*this->hb),
 			this->getItemFont(),
 			this->labelFunc(item),
-			cct.images.none,
-			cct.images.none);
-		entry->setHbExactSizeY(cfg.renderScale(64));
+			EMPTY,
+			EMPTY);
+		entry->setHbExactSizeY(this->win.cfg.renderScale(64));
 		return entry;
 	}
 

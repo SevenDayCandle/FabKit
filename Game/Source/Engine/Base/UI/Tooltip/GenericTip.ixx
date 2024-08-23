@@ -19,7 +19,7 @@ namespace fbc {
 		virtual ~GenericTip() = default;
 
 		inline virtual void update() override {}
-		inline void queue() { queue(sdl::runner::mouseGetX() + cfg.renderScale(QUEUE_OFFSET_X), sdl::runner::mouseGetY() + cfg.renderScale(QUEUE_OFFSET_Y)); }
+		inline void queue() { queue(sdl::runner::mouseGetX() + win.cfg.renderScale(QUEUE_OFFSET_X), sdl::runner::mouseGetY() + win.cfg.renderScale(QUEUE_OFFSET_Y)); }
 
 		virtual void queue(float x, float y);
 

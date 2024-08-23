@@ -3,6 +3,7 @@ export module fbc.UIBase;
 import fbc.FUtil;
 import fbc.FWindow;
 import fbc.Hitbox;
+import fbc.Hoverable;
 import fbc.RelativeHitbox;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
@@ -11,7 +12,7 @@ import sdl.SDLRunner;
 import std;
 
 namespace fbc {
-	export class UIBase : public FWindow::Hoverable {
+	export class UIBase : public Hoverable {
 	public:
 		UIBase(FWindow& window, uptr<Hitbox>&& hb) : Hoverable(window), hb(move(hb)) {}
 		UIBase(UIBase&& other) noexcept = default;
@@ -34,7 +35,7 @@ namespace fbc {
 		inline virtual UIBase& setHbOffsetPos(const float x, const float y) { return hb->setOffPos(x, y), * this; }
 		inline virtual UIBase& setHbOffsetPosX(const float x) { return hb->setOffPosX(x), * this; }
 		inline virtual UIBase& setHbOffsetPosY(const float y) { return hb->setOffPosY(y), * this; }
-		template <typename... Args> requires std::constructible_from<RelativeHitbox, Hitbox&, Args&&...> inline uptr<RelativeHitbox> relhb(Args&&... args) { return make_unique<RelativeHitbox>(*hb, forward<Args>(args)...); } // Generate a relative hitbox based on this component's hitbox
+		template <typename... Args> requires std::constructible_from<RelativeHitbox, FWindow&, Hitbox&, Args&&...> inline uptr<RelativeHitbox> relhb(Args&&... args) { return make_unique<RelativeHitbox>(win, *hb, forward<Args>(args)...); } // Generate a relative hitbox based on this component's hitbox
 
 		virtual UIBase& setHbExactSize(const float x, const float y);
 		virtual UIBase& setHbExactSizeX(const float x);

@@ -4,10 +4,11 @@ import fbc.FUtil;
 import fbc.FWindow;
 import fbc.GenericTip;
 import fbc.Hitbox;
+import fbc.Hoverable;
 import fbc.Tooltip;
 
 namespace fbc {
-	export template <c_ext<FWindow::Hoverable> T> class UITipHost : public FWindow::Hoverable {
+	export template <c_ext<Hoverable> T> class UITipHost : public Hoverable {
 	public:
 		UITipHost(T&& item, GenericTip* tooltip) : ui(forward<T>(item)), tooltip(tooltip), Hoverable(item.win) {}
 		UITipHost(T&& item, strv text) : ui(forward<T>(item)), ownedTip(new Tooltip(item.win, text)), Hoverable(item.win) {
@@ -32,7 +33,7 @@ namespace fbc {
 		uptr<GenericTip> ownedTip;
 	};
 
-	template<c_ext<FWindow::Hoverable> T> void UITipHost<T>::refreshDimensions()
+	template<c_ext<Hoverable> T> void UITipHost<T>::refreshDimensions()
 	{
 		ui.refreshDimensions();
 		if (tooltip) {
@@ -40,7 +41,7 @@ namespace fbc {
 		}
 	}
 
-	template<c_ext<FWindow::Hoverable> T> void UITipHost<T>::updateImpl()
+	template<c_ext<Hoverable> T> void UITipHost<T>::updateImpl()
 	{
 		ui.updateImpl();
 		if (ui.getHb()->isHovered() && tooltip) {
@@ -49,7 +50,7 @@ namespace fbc {
 	}
 
 	// Assigns an owned tooltip to this object (i.e. a tooltip that gets destroyed when this object is destroyed)
-	template<c_ext<FWindow::Hoverable> T> UITipHost<T>& UITipHost<T>::makeOwnedTip(uptr<GenericTip>&& tooltip)
+	template<c_ext<Hoverable> T> UITipHost<T>& UITipHost<T>::makeOwnedTip(uptr<GenericTip>&& tooltip)
 	{
 		ownedTip = move(tooltip);
 		this->tooltip = ownedTip.get();

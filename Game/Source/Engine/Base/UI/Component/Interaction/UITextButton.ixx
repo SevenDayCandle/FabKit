@@ -16,7 +16,7 @@ namespace fbc {
 		UITextButton(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image, FFont& f, strv text = "") : UIButton(window, move(hb), image), text(f, text) {
 			UITextButton::onSizeUpdated();
 		}
-		UITextButton(FWindow& window, uptr<Hitbox>&& hb, strv text) : UITextButton(window, move(hb), cct.images.uiPanel, cct.fontRegular(), text) {}
+		UITextButton(FWindow& window, uptr<Hitbox>&& hb, strv text) : UITextButton(window, move(hb), window.cct.images.uiPanel, window.cct.fontRegular(), text) {}
 		~UITextButton() override {}
 
 		inline UITextButton& setColor(sdl::Color color) { return text.setColor(color), * this; }

@@ -1,16 +1,17 @@
 export module fbc.Hitbox;
 
 import fbc.FUtil;
-import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import fbc.FWindow;
+import sdl.SDLBase;
 import sdl.SDLRunner;
 
 namespace fbc {
 	export class Hitbox : public sdl::RectF {
 	public:
-		Hitbox(float offsetX, float offsetY, float offsetWidth, float offsetHeight) : sdl::RectF(0, 0, 0, 0), offPosX(offsetX), offPosY(offsetY), offSizeX(offsetWidth), offSizeY(offsetHeight) {}
+		Hitbox(FWindow& window, float offsetX, float offsetY, float offsetWidth, float offsetHeight) : sdl::RectF(0, 0, 0, 0), win(window), offPosX(offsetX), offPosY(offsetY), offSizeX(offsetWidth), offSizeY(offsetHeight) {}
 		virtual ~Hitbox() = default;
+
+		FWindow& win;
 
 		inline bool isClicked() const { return hovered && sdl::runner::mouseIsLeftClicked(); };
 		inline bool isClickedRight() const { return hovered && sdl::runner::mouseIsRightClicked(); };
@@ -54,8 +55,8 @@ namespace fbc {
 		void refresh();
 		virtual void update();
 	protected:
-		bool just = false;
 		bool hovered = false;
+		bool just = false;
 		float offPosX = 0;
 		float offPosY = 0;
 		float offSizeX = 0;

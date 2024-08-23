@@ -25,14 +25,13 @@ namespace fbc {
 
 	export template <typename T> class UISelectorList : public UIList<T> {
 	public:
-		UISelectorList(FWindow& window, uptr<Hitbox>&& hb,
-		       func<str(const T&)> labelFunc = futil::toString<T>,
-		       FFont& itemFont = cct.fontSmall(),
-		       IDrawable& background = cct.images.uiPanelRound,
-		       bool canAutosize = false):
-			UIList<T>(window, move(hb), std::move(labelFunc), itemFont, background, canAutosize),
-			scrollbar(window, make_unique<RelativeHitbox>(*this->hb, 0, 0, 48, 48))
-		{ scrollbar.setOnScroll([this](float f) { onScroll(f); }); }
+		UISelectorList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize = false) :
+			UIList<T>(window, move(hb), move(labelFunc), itemFont, background, canAutosize),
+			scrollbar(window, make_unique<RelativeHitbox>(window, *this->hb, 0, 0, 48, 48)) {
+			scrollbar.setOnScroll([this](float f) { onScroll(f); });
+		}
+		UISelectorList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>, bool canAutosize = false) :
+			UISelectorList(window, move(hb), move(labelFunc), window.cct.fontSmall(), window.cct.images.uiPanelRound, canAutosize) {}
 		UISelectorList(UISelectorList&& other) noexcept = default;
 
 		~UISelectorList() override {}
@@ -78,8 +77,15 @@ namespace fbc {
 		void updateSingle(T item);
 		void updateSingle(T* item);
 
-		static uptr<UISelectorList> multiList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>, FFont& itemFont = cct.fontSmall(), IDrawable& background = cct.images.uiDarkPanelRound, bool canAutosize = false);
-		static uptr<UISelectorList> singleList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>, FFont& itemFont = cct.fontSmall(), IDrawable& background = cct.images.uiDarkPanelRound, bool canAutosize = false);
+		inline static uptr<UISelectorList> multiList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>, bool canAutosize = false) {
+			return multiList(window, std::move(hb), labelFunc, window.cct.fontSmall(), window.cct.images.uiDarkPanelRound, canAutosize);
+		}
+		inline static uptr<UISelectorList> singleList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>, bool canAutosize = false) {
+			return singleList(window, std::move(hb), labelFunc, window.cct.fontSmall(), window.cct.images.uiDarkPanelRound, canAutosize);
+		}
+
+		static uptr<UISelectorList> multiList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize = false);
+		static uptr<UISelectorList> singleList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize = false);
 	protected:
 		set<int> currentIndices;
 		vec<UIEntry<T>*> rowsForRender;
@@ -99,7 +105,7 @@ namespace fbc {
 		FWindow::Element* proxy;
 
 		inline EntryView<T> selectView() { return EntryView<T>(currentIndices, this->rows); }
-		inline float rMargin() { return cfg.renderScale(MARGIN); }
+		inline float rMargin() { return this->win.cfg.renderScale(MARGIN); }
 
 		void autosize() override;
 		void changeEvent();
@@ -327,14 +333,14 @@ namespace fbc {
 		}
 
 		if (this->activeRow >= 0) {
-			if (cfg.actDirUp.isKeyJustPressed()) {
+			if (this->win.cfg.actDirUp.isKeyJustPressed()) {
 				this->activeRow = std::max(0, this->activeRow - 1);
 				if (this->activeRow < this->topVisibleRowIndex) {
 					updateTopVisibleRowIndex(this->topVisibleRowIndex - 1);
 					updateRowPositions();
 				}
 			}
-			else if (cfg.actDirDown.isKeyJustPressed()) {
+			else if (this->win.cfg.actDirDown.isKeyJustPressed()) {
 				this->activeRow = std::min(static_cast<int>(rowsForRender.size()) - 1, this->activeRow + 1);
 				if (this->activeRow >= this->topVisibleRowIndex + this->maxRows) {
 					updateTopVisibleRowIndex(this->topVisibleRowIndex + 1);
@@ -353,7 +359,7 @@ namespace fbc {
 			rowsForRender[i]->updateActiveStatus(this->activeRow == i);
 		}
 
-		if (this->activeRow >= 0 && cfg.actSelect.isKeyJustPressed()) {
+		if (this->activeRow >= 0 && this->win.cfg.actSelect.isKeyJustPressed()) {
 			this->selectRow(*rowsForRender[this->activeRow]);
 		}
 	}
