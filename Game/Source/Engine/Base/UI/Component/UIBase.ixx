@@ -27,14 +27,15 @@ namespace fbc {
 		inline virtual float getBeginY() { return hb->y; } // The left-most end X coordinate of this object, may be smaller than hb if this has labels
 		inline virtual float getEndX() { return hb->x + hb->w; } // The right-most end X coordinate of this object, may be larger than hb if this has subcomponents
 		inline virtual float getEndY() { return hb->y + hb->h; } // The bottom-most end Y coordinate of this object, may be larger than hb if this has subcomponents
-		inline virtual UIBase& setEnabled(const bool enabled) { return this->enabled = enabled, * this; }
-		inline virtual UIBase& setHbExactPos(const float x, const float y) { return hb->setRealPos(x, y), *this; }
+		inline virtual UIBase& setEnabled(const bool enabled) { return this->enabled = enabled, *this; }
+		inline virtual UIBase& setHbExactPos(const float x, const float y) { return hb->setRealPos(x, y), * this; }
 		inline virtual UIBase& setHbExactPosX(const float x) { return hb->setRealPosX(x), * this; }
 		inline virtual UIBase& setHbExactPosY(const float y) { return hb->setRealPosY(y), * this; }
 		inline virtual UIBase& setHbOffsetPos(const float x, const float y) { return hb->setOffPos(x, y), * this; }
 		inline virtual UIBase& setHbOffsetPosX(const float x) { return hb->setOffPosX(x), * this; }
 		inline virtual UIBase& setHbOffsetPosY(const float y) { return hb->setOffPosY(y), * this; }
 		inline virtual void onSizeUpdated() {}
+		inline virtual void updateImpl() override { hb->update(); }
 		template <typename... Args> requires std::constructible_from<RelativeHitbox, FWindow&, Hitbox&, Args&&...> inline uptr<RelativeHitbox> relhb(Args&&... args) { return make_unique<RelativeHitbox>(win, *hb, forward<Args>(args)...); } // Generate a relative hitbox based on this component's hitbox
 
 		virtual UIBase& setHbExactSize(const float x, const float y);
@@ -46,7 +47,6 @@ namespace fbc {
 		virtual void refreshDimensions() override;
 		virtual void render(sdl::SDLBatchRenderPass& rp) final override;
 		virtual void update() final override;
-		virtual void updateImpl() override;
 	};
 
 	// Wrapper around setRealSize that invokes any size update callbacks
@@ -116,10 +116,5 @@ namespace fbc {
 		if (enabled) {
 			updateImpl();
 		}
-	}
-
-	// Inner logic of the update loop
-	void UIBase::updateImpl() {
-		hb->update();
 	}
 }

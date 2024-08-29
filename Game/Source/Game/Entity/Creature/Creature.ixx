@@ -30,6 +30,8 @@ namespace fbc {
 			PileGroup(const PileType& type) : vec<uptr<Card>>(), type(type) {}
 
 			const PileType& type;
+
+			int getPosition(Card* card);
 		};
 
 		Creature(CreatureData& data, Behavior* behavior, int faction, int upgrades, int startingHealth) :
@@ -50,6 +52,9 @@ namespace fbc {
 		int movement;
 		int movementMax;
 		int upgrades;
+
+		inline int getCardPosition(Card* card, const PileType& type) { return getPile(type).getPosition(card); }
+		inline PileGroup& getHand() { return hand; }
 
 		virtual bool onTurnBegin() override;
 		virtual void onTurnEnd() override;
@@ -76,4 +81,15 @@ namespace fbc {
 
 		void moveBetweenPiles(PileGroup::iterator cardIt, PileGroup& sourcePile, PileGroup& destPile, bool manual = true);
 	};
+
+	int fbc::Creature::PileGroup::getPosition(Card* card) {
+		int i = 0;
+		for (uptr<Card>& entry : *this) {
+			if (entry.get() == card) {
+				return i;
+			}
+			++i;
+		}
+		return -1;
+	}
 }

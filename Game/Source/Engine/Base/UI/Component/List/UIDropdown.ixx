@@ -174,10 +174,10 @@ namespace fbc {
 	template<typename T> void UIDropdown<T>::renderImpl(sdl::SDLBatchRenderPass& rp) {
 		UIInteractable::renderImpl(rp);
 		if (this->selectedSize() > 0 && this->canClear()) {
-			clear.draw(rp, arrowRect, win.getW(), win.getH(), 1, 1, rotation, &this->UIImage::color);
+			clear.draw(rp, arrowRect, win.getW(), win.getH(), scaleX, scaleY, rotation, &this->UIImage::color);
 		}
 		else {
-			arrow.draw(rp, arrowRect, win.getW(), win.getH(), 1, menu->isOpen() ? -1 : 1, rotation, &this->UIImage::color);
+			arrow.draw(rp, arrowRect, win.getW(), win.getH(), scaleX, menu->isOpen() ? -scaleY : scaleY, rotation, &this->UIImage::color);
 		}
 		text.draw(rp, hb->x, hb->y, win.getW(), win.getH());
 	}

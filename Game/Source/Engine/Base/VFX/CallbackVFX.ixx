@@ -20,6 +20,8 @@ namespace fbc {
 		inline VFX& setOnComplete(const func<void(CallbackVFX&)>& onComplete) { return this->onComplete = onComplete, *this; }
 
 		virtual void dispose() override;
+
+		inline static float defaultRate(float duration) { return 15 / (sdl::NANOS_PER_SECOND * duration); }
 	};
 
 	 void CallbackVFX::dispose()

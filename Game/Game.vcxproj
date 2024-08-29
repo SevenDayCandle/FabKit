@@ -204,6 +204,10 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Base\VFX\UI\UIDisposeVFX.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Engine\SDL\SDLBatchRenderPass.ixx">
       <SubType>
       </SubType>
@@ -606,19 +610,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       </SubType>
     </ClCompile>
     <ClCompile Include="Source\Game\UI\Screens\TitleScreen.ixx" />
-    <ClCompile Include="Source\Game\VFX\UI\UIBatchMoveVFX.ixx">
-      <SubType>
-      </SubType>
-    </ClCompile>
-    <ClCompile Include="Source\Game\VFX\UI\UIFadeInVFX.ixx">
-      <SubType>
-      </SubType>
-    </ClCompile>
-    <ClCompile Include="Source\Game\VFX\UI\UIFadeOutDriftVFX.ixx">
-      <SubType>
-      </SubType>
-    </ClCompile>
-    <ClCompile Include="Source\Game\VFX\UI\UIFadeOutVFX.ixx">
+    <ClCompile Include="Source\Engine\Base\VFX\UI\UITransformVFX.ixx">
       <SubType>
       </SubType>
     </ClCompile>

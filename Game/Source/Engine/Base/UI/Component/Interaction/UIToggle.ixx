@@ -70,10 +70,10 @@ namespace fbc {
 	void UIToggle::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
 		if (toggled) {
-			checkImage.draw(rp, *hb.get(), win.getW(), win.getH(), 1, 1, rotation, hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color);
+			checkImage.draw(rp, *hb.get(), win.getW(), win.getH(), scaleX, scaleY, rotation, hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color);
 		}
 		else {
-			image.draw(rp, *hb.get(), win.getW(), win.getH(), 1, 1, rotation, hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color);
+			image.draw(rp, *hb.get(), win.getW(), win.getH(), scaleX, scaleY, rotation, hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color);
 		}
 
 		text.draw(rp, hb->x, hb->y, win.getW(), win.getH());

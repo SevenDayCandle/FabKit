@@ -24,7 +24,7 @@ namespace fbc {
 			inline virtual void renderImpl(sdl::SDLBatchRenderPass& rp) { render(rp); } // 
 			inline virtual void refreshDimensions() {}  // Force resizing of hitboxes when the screen size changes
 			inline virtual void updateImpl() { update(); }
-			template <typename T, typename... Args> requires std::constructible_from<T, FWindow&, Args&&...> uptr<T> inline create(Args&&... args) { return make_unique<T>(win, forward<Args>(args)...); }  // Generate a component using this element's window
+			template <c_ext<Element> T, typename... Args> requires std::constructible_from<T, FWindow&, Args&&...> uptr<T> inline create(Args&&... args) { return make_unique<T>(win, forward<Args>(args)...); }  // Generate a component using this element's window
 
 			virtual void render(sdl::SDLBatchRenderPass& rp) = 0;
 			virtual void update() = 0;

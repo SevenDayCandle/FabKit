@@ -1,5 +1,7 @@
 export module fbc.CombatScreen;
 
+import fbc.Card;
+import fbc.CardRenderable;
 import fbc.CombatInstance;
 import fbc.CombatSquare;
 import fbc.CombatTurn;
@@ -15,6 +17,8 @@ import fbc.UITextButton;
 import std;
 
 namespace fbc {
+	constexpr float CARD_HAND_POS_X = 1000;
+	constexpr float CARD_HAND_POS_Y = 1000;
 	constexpr float END_TURN_SIZE = 300;
 	constexpr float TILE_OFFSET = 300;
 	constexpr float TILE_SIZE = 128;
@@ -34,9 +38,12 @@ namespace fbc {
 		virtual void onTurnAdded(const CombatTurn& turn) override;
 		virtual void onTurnChanged(ref_view<const mset<CombatTurn>> turns) override;
 		virtual void onTurnRemoved(const CombatTurn* turn) override;
-		void createOccupantRender(const OccupantObject* occupant);
-		void createTurnRender(const CombatTurn& turn);
+		CardRenderable& createCardRender(const Card& card, float tOffX, float tOffY, float sOffX = 0, float sOffY = 0);
+		CombatTurnRenderable& createTurnRender(const CombatTurn& turn);
+		CreatureRenderable& createOccupantRender(const OccupantObject& occupant);
 		void open() override;
+		void removeCardRender(Card* card);
+		void removeCardRender(CardRenderable* card);
 		void updateImpl() override;
 	private:
 		CombatInstance* instance;
@@ -44,6 +51,7 @@ namespace fbc {
 		UICanvas& cardUI;
 		UICanvas& fieldUI;
 		UICanvas& turnUI;
+		umap<const Card*, CardRenderable*> cardUIMap;
 		umap<const CombatTurn*, CombatTurnRenderable*> turnUIMap;
 		umap<const OccupantObject*, CreatureRenderable*> occupantUIMap;
 	};
