@@ -19,7 +19,10 @@ namespace fbc {
 
 	void RectDrawable::draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline)
 	{
-		setupMatrix(x, y, w, h, scX, scY, winW, winH, rotZ);
+		// Assume origin is at the center of the drawable
+		float sX = scX * w / winW;
+		float sY = scY * h / winH;
+		setupMatrix((x / winW) + 0.5 * sX, (y / winH) + 0.5 * sY, sX, sY, rotZ);
 		rp.bindPipeline(sdl::runner::shapePipelineForMode(pipeline));
 		rp.bindBufferVertex(sdl::runner::BUFFER_VERTEX);
 		rp.bindBufferIndex(sdl::runner::BUFFER_INDEX);

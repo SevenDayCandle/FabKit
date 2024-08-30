@@ -30,29 +30,28 @@ namespace fbc {
 			0, 0, 1, 0,
 			0, 0, 0, 1
 		};
-		static void setupMatrix(float x, float y, float w, float h, float scX, float scY, float winW, float winH, float rotZ = 0);
+		static void setupMatrix(float tX, float tY, float sX, float sY, float rotZ = 0);
 	};
 
-	void IDrawable::setupMatrix(float x, float y, float w, float h, float scX, float scY, float winW, float winH, float rotZ)
+	void IDrawable::setupMatrix(float tX, float tY, float sX, float sY, float rotZ)
 	{
-		float oX = w / winW;
-		float oY = h / winH;
-		MATRIX_UNIFORM.m41 = (2 * x / winW) - 1 + oX;
-		MATRIX_UNIFORM.m42 = 1 - (2 * y / winH) - oY;
+		MATRIX_UNIFORM.m41 = 2 * tX - 1;
+		MATRIX_UNIFORM.m42 = 1 - 2 * tY;
+
 		if (rotZ != 0) {
 			float cosZ = std::cos(rotZ);
 			float sinZ = std::sin(rotZ);
 
-			MATRIX_UNIFORM.m11 = (scX * oX * 2) * cosZ;
-			MATRIX_UNIFORM.m12 = -(scX * oX * 2) * sinZ;
-			MATRIX_UNIFORM.m21 = (scY * oY * 2) * sinZ;
-			MATRIX_UNIFORM.m22 = (scY * oY * 2) * cosZ;
+			MATRIX_UNIFORM.m11 = 2 * sX * cosZ;
+			MATRIX_UNIFORM.m12 = 2 * sX * sinZ;
+			MATRIX_UNIFORM.m21 = -sY * sinZ;
+			MATRIX_UNIFORM.m22 = sY * cosZ;
 		}
 		else {
-			MATRIX_UNIFORM.m11 = scX * oX * 2;
+			MATRIX_UNIFORM.m11 = 2 * sX;
 			MATRIX_UNIFORM.m12 = 0;
 			MATRIX_UNIFORM.m21 = 0;
-			MATRIX_UNIFORM.m22 = scY * oY * 2;
+			MATRIX_UNIFORM.m22 = 2 * sY;
 		}
 	}
 }

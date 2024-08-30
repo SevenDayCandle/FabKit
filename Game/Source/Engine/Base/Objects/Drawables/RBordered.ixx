@@ -18,22 +18,34 @@ namespace fbc {
 	};
 
 	void RBordered::draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline) {
-		const float cornerW = texW / 2;
-		const float edgeW = w - texW;
-		const float edgeH = h - texW;
-		const float centerX = x + cornerW;
-		const float centerY = y + cornerW;
-		const float endX = centerX + edgeW;
-		const float endY = centerY + edgeH;
+		const float sX = scX * w / winW;
+		const float sY = scY * h / winH;
+		const float tX = x / winW;
+		const float tY = y / winH;
 
-		ImageDrawable::draw(rp, sdl::runner::BUFFER_VERTEX_BORDERED, x, y, cornerW, cornerW, winW, winH, scX, scY, rotZ, tint, pipeline, 0); // Top Left
-		ImageDrawable::draw(rp, sdl::runner::BUFFER_VERTEX_BORDERED, centerX, y, edgeW, cornerW, winW, winH, scX, scY, rotZ, tint, pipeline, 4); // Top
-		ImageDrawable::draw(rp, sdl::runner::BUFFER_VERTEX_BORDERED, endX, y, cornerW, cornerW, winW, winH, scX, scY, rotZ, tint, pipeline, 8); // Top Right
-		ImageDrawable::draw(rp, sdl::runner::BUFFER_VERTEX_BORDERED, x, centerY, cornerW, edgeH, winW, winH, scX, scY, rotZ, tint, pipeline, 12); // Center Left
-		ImageDrawable::draw(rp, sdl::runner::BUFFER_VERTEX_BORDERED, centerX, centerY, edgeW, edgeH, winW, winH, scX, scY, rotZ, tint, pipeline, 16); // Center
-		ImageDrawable::draw(rp, sdl::runner::BUFFER_VERTEX_BORDERED, endX, centerY, cornerW, edgeH, winW, winH, scX, scY, rotZ, tint, pipeline, 20); // Center Right
-		ImageDrawable::draw(rp, sdl::runner::BUFFER_VERTEX_BORDERED, x, endY, cornerW, cornerW, winW, winH, scX, scY, rotZ, tint, pipeline, 24); // Bottom Left
-		ImageDrawable::draw(rp, sdl::runner::BUFFER_VERTEX_BORDERED, centerX, endY, edgeW, cornerW, winW, winH, scX, scY, rotZ, tint, pipeline, 28); // Bottom
-		ImageDrawable::draw(rp, sdl::runner::BUFFER_VERTEX_BORDERED, endX, endY, cornerW, cornerW, winW, winH, scX, scY, rotZ, tint, pipeline, 32); // Bottom Right
+		const float cornerS = scX * texW / (2 * winW);
+		const float cornerO = cornerS / 2;
+
+		const float edgeSX = sX - 2 * cornerS;
+		const float edgeSY = sY - 2 * cornerS;
+		const float centerTX = tX + cornerS;
+		const float centerTY = tY + cornerS;
+		const float endTXO = centerTX + edgeSX + cornerO;
+		const float endTYO = centerTY + edgeSY + cornerO;
+		const float centerTXO = centerTX + edgeSX / 2;
+		const float centerTYO = centerTY + edgeSY / 2;
+
+		const float tXO = tX + cornerO;
+		const float tYO = tY + cornerO;
+
+		drawImpl(rp, sdl::runner::BUFFER_VERTEX_BORDERED, tXO, tYO, cornerS, cornerS, rotZ, tint, pipeline, 0); // Top Left
+		drawImpl(rp, sdl::runner::BUFFER_VERTEX_BORDERED, centerTXO, tYO, edgeSX, cornerS, rotZ, tint, pipeline, 4); // Top
+		drawImpl(rp, sdl::runner::BUFFER_VERTEX_BORDERED, endTXO, tYO, cornerS, cornerS, rotZ, tint, pipeline, 8); // Top Right
+		drawImpl(rp, sdl::runner::BUFFER_VERTEX_BORDERED, tXO, centerTYO, cornerS, edgeSY, rotZ, tint, pipeline, 12); // Center Left
+		drawImpl(rp, sdl::runner::BUFFER_VERTEX_BORDERED, centerTXO, centerTYO, edgeSX, edgeSY, rotZ, tint, pipeline, 16); // Center
+		drawImpl(rp, sdl::runner::BUFFER_VERTEX_BORDERED, endTXO, centerTYO, cornerS, edgeSY, rotZ, tint, pipeline, 20); // Center Right
+		drawImpl(rp, sdl::runner::BUFFER_VERTEX_BORDERED, tXO, endTYO, cornerS, cornerS, rotZ, tint, pipeline, 24); // Bottom Left
+		drawImpl(rp, sdl::runner::BUFFER_VERTEX_BORDERED, centerTXO, endTYO, edgeSX, cornerS, rotZ, tint, pipeline, 28); // Bottom
+		drawImpl(rp, sdl::runner::BUFFER_VERTEX_BORDERED, endTXO, endTYO, cornerS, cornerS,  rotZ, tint, pipeline, 32); // Bottom Right
 	}
 }

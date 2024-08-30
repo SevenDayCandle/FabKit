@@ -29,14 +29,17 @@ namespace fbc {
 		inline bool loaded() const { return texture != nullptr; }
 		inline virtual float getHeight() const override { return texH; }
 		inline virtual float getWidth() const override { return texW; }
-		inline void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) override { draw(rp, sdl::runner::BUFFER_VERTEX, x, y, w, h, winW, winH, scX, scY, rotZ, tint, pipeline, 0); }
+		inline void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) override { 
+			drawImpl(rp, sdl::runner::BUFFER_VERTEX, (x + (0.5f * scX * w)) / winW, (y + (0.5f * scY * h)) / winH, scX * w / winW, scY * h / winH, rotZ, tint, pipeline, 0);
+		}
 
 		void dispose() override;
-		void draw(sdl::SDLBatchRenderPass& rp, sdl::GpuBuffer* bufferVert, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL, int vertexOff = 0);
 	protected:
 		mutable float texH = 0;
 		mutable float texW = 0;
 		mutable sdl::GpuTexture* texture = nullptr;
+
+		void drawImpl(sdl::SDLBatchRenderPass& rp, sdl::GpuBuffer* bufferVert, float tX, float tY, float sX, float sY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL, int vertexOff = 0);
 	};
 
 	void ImageDrawable::dispose()
@@ -45,9 +48,9 @@ namespace fbc {
 		texture = nullptr;
 	}
 
-	void ImageDrawable::draw(sdl::SDLBatchRenderPass& rp, sdl::GpuBuffer* bufferVert, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline, int vertexOff)
+	void ImageDrawable::drawImpl(sdl::SDLBatchRenderPass& rp, sdl::GpuBuffer* bufferVert, float tX, float tY, float sX, float sY, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline, int vertexOff)
 	{
-		setupMatrix(x, y, w, h, scX, scY, winW, winH, rotZ);
+		setupMatrix(tX, tY, sX, sY, rotZ);
 		rp.bindPipeline(sdl::runner::pipelineForMode(pipeline));
 		rp.bindBufferVertex(bufferVert);
 		rp.bindBufferIndex(sdl::runner::BUFFER_INDEX);

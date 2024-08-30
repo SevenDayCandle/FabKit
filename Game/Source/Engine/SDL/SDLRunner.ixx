@@ -20,10 +20,10 @@ namespace sdl {
 	constexpr auto SHADER_NORMAL_VERT = "Shader/Compiled/Normal.vert.spv";
 
 	constexpr std::initializer_list<TexPos> VERTICES = {
-	TexPos{ -0.5f, -0.5f, 0.0f, 0.0f, 1.0f },  // Bottom Left
-	TexPos{ 0.5f, -0.5f, 0.0f, 1.0f, 1.0f },   // Bottom Right
-	TexPos{ 0.5f,  0.5f, 0.0f, 1.0f, 0.0f },   // Top Right
-	TexPos{ -0.5f,  0.5f, 0.0f, 0.0f, 0.0f }   // Top Left
+		TexPos{ -0.5f, -0.5f, 0.0f, 0.0f, 1.0f },  // Bottom Left
+		TexPos{ 0.5f, -0.5f, 0.0f, 1.0f, 1.0f },   // Bottom Right
+		TexPos{ 0.5f,  0.5f, 0.0f, 1.0f, 0.0f },   // Top Right
+		TexPos{ -0.5f,  0.5f, 0.0f, 0.0f, 0.0f }   // Top Left
 	};
 	constexpr std::initializer_list<TexPos> VERTICES_BORDERED = {
 		// Top Left
