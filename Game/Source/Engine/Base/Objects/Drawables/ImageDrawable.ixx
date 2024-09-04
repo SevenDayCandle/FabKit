@@ -30,7 +30,7 @@ namespace fbc {
 		inline virtual float getHeight() const override { return texH; }
 		inline virtual float getWidth() const override { return texW; }
 		inline virtual void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) override {
-			drawImpl(rp, (x + (0.5f * scX * w)) / winW, (y + (0.5f * scY * h)) / winH, scX * w / winW, scY * h / winH, rotZ, tint, pipeline);
+			drawImpl(rp, (x + (0.5f * w)) / winW, (y + (0.5f * h)) / winH, scX * w / winW, scY * h / winH, rotZ, tint, pipeline);
 		}
 		inline virtual void drawCentered(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) {
 			drawImpl(rp, x / winW, y / winH, scX * w / winW, scY * h / winH, rotZ, tint, pipeline);

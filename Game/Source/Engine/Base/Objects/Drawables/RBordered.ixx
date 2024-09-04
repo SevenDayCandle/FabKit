@@ -15,7 +15,7 @@ namespace fbc {
 		RBordered(const RBordered&) = delete;
 
 		inline void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) override {
-			drawPatches(rp, (x + 0.5f * scX * w) / winW, (y + 0.5f * scY * h) / winH, w, h, winW, winH, scX, scY, rotZ, tint, pipeline);
+			drawPatches(rp, (x + 0.5f * w) / winW, (y + 0.5f * h) / winH, w, h, winW, winH, scX, scY, rotZ, tint, pipeline);
 		}
 		inline void drawCentered(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) override {
 			drawPatches(rp, x / winW, y / winH, w, h, winW, winH, scX, scY, rotZ, tint, pipeline);
