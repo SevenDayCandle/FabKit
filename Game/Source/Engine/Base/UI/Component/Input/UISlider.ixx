@@ -32,7 +32,9 @@ namespace fbc {
 		UISlider(FWindow& window, uptr<Hitbox>&& hb, int limMin = 0, int limMax = std::numeric_limits<int>::max()) :
 			UISlider(window, move(hb), limMin, limMax,
 				window.cct.images.uiSliderEmpty, window.cct.images.uiScrollbutton, window.cct.images.uiPanel) {}
-		UISlider(UISlider&& other) noexcept: UINumberInput(other.win, move(other.hb), other.limMin, other.limMax, other.image), scrollbar(std::move(other.scrollbar)) {}
+		UISlider(UISlider&& other) noexcept: UINumberInput(other.win, move(other.hb), other.limMin, other.limMax, other.image), scrollbar(std::move(other.scrollbar)) {
+			scrollbar.setOnScroll([this](float scroll) { this->commitFromScroll(scroll); });
+		}
 
 		virtual UISlider& setValue(int num) override;
 		virtual void onSizeUpdated() override;

@@ -88,7 +88,6 @@ namespace fbc {
 
 	void UINumberInput::onSizeUpdated()
 	{
-		buffer.setPos(win.cfg.renderScale(24), this->hb->h * 0.25f);
 		moreRect.w = moreRect.h = lessRect.w = lessRect.h = hb->h / 2;
 	}
 
@@ -101,7 +100,7 @@ namespace fbc {
 	void UINumberInput::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
 		UIInteractable::renderImpl(rp);
-		buffer.draw(rp, hb->x, hb->y, win.getW(), win.getH());
+		buffer.draw(rp, hb->x + win.cfg.renderScale(24), hb->y + hb->h * 0.25f, win.getW(), win.getH());
 		arrow.draw(rp, lessRect, win.getW(), win.getH());
 		arrow.draw(rp, moreRect, win.getW(), win.getH(), 1, -1);
 		if (sdl::runner::keyboardInputActive(this)) {

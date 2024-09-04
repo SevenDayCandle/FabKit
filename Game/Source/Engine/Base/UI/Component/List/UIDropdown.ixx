@@ -148,7 +148,6 @@ namespace fbc {
 
 	template<typename T> void UIDropdown<T>::onSizeUpdated()
 	{
-		text.setPos(win.cfg.renderScale(24), hb->h * 0.25f);
 		arrowRect.w = arrowRect.h = hb->h * 0.5f;
 	}
 
@@ -179,7 +178,7 @@ namespace fbc {
 		else {
 			arrow.draw(rp, arrowRect, win.getW(), win.getH(), scaleX, menu->isOpen() ? -scaleY : scaleY, rotation, &this->UIImage::color);
 		}
-		text.draw(rp, hb->x, hb->y, win.getW(), win.getH());
+		text.draw(rp, hb->x + win.cfg.renderScale(24), hb->y + hb->h * 0.25f, win.getW(), win.getH());
 	}
 
 	template<typename T> void UIDropdown<T>::updateImpl() {

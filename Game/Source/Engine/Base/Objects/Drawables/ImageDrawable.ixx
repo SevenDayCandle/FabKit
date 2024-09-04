@@ -29,8 +29,11 @@ namespace fbc {
 		inline bool loaded() const { return texture != nullptr; }
 		inline virtual float getHeight() const override { return texH; }
 		inline virtual float getWidth() const override { return texW; }
-		inline void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) override { 
-			drawImpl(rp, sdl::runner::BUFFER_VERTEX, (x + (0.5f * scX * w)) / winW, (y + (0.5f * scY * h)) / winH, scX * w / winW, scY * h / winH, rotZ, tint, pipeline, 0);
+		inline virtual void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) override {
+			drawImpl(rp, (x + (0.5f * scX * w)) / winW, (y + (0.5f * scY * h)) / winH, scX * w / winW, scY * h / winH, rotZ, tint, pipeline);
+		}
+		inline virtual void drawCentered(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) {
+			drawImpl(rp, x / winW, y / winH, scX * w / winW, scY * h / winH, rotZ, tint, pipeline);
 		}
 
 		void dispose() override;
@@ -39,7 +42,7 @@ namespace fbc {
 		mutable float texW = 0;
 		mutable sdl::GpuTexture* texture = nullptr;
 
-		void drawImpl(sdl::SDLBatchRenderPass& rp, sdl::GpuBuffer* bufferVert, float tX, float tY, float sX, float sY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL, int vertexOff = 0);
+		void drawImpl(sdl::SDLBatchRenderPass& rp, float tX, float tY, float sX, float sY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL);
 	};
 
 	void ImageDrawable::dispose()
@@ -48,15 +51,14 @@ namespace fbc {
 		texture = nullptr;
 	}
 
-	void ImageDrawable::drawImpl(sdl::SDLBatchRenderPass& rp, sdl::GpuBuffer* bufferVert, float tX, float tY, float sX, float sY, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline, int vertexOff)
+	void ImageDrawable::drawImpl(sdl::SDLBatchRenderPass& rp, float tX, float tY, float sX, float sY, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline)
 	{
-		setupMatrix(tX, tY, sX, sY, rotZ);
 		rp.bindPipeline(sdl::runner::pipelineForMode(pipeline));
-		rp.bindBufferVertex(bufferVert);
+		rp.bindBufferVertex(sdl::runner::BUFFER_VERTEX);
 		rp.bindBufferIndex(sdl::runner::BUFFER_INDEX);
 		rp.bindTexture(texture, sdl::runner::SAMPLER);
-		rp.pushVertexUniform(&MATRIX_UNIFORM, sizeof(sdl::Matrix4x4));
+		rp.setupVertexUniform(tX, tY, sX, sY, rotZ);
 		rp.pushFragmentUniform(tint, sizeof(sdl::Color));
-		rp.drawIndexedPrimitives(vertexOff);
+		rp.drawIndexedPrimitives(0);
 	}
 }

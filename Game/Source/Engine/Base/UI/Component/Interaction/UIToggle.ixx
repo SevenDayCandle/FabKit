@@ -19,7 +19,7 @@ namespace fbc {
 	export class UIToggle : public UIInteractable {
 	public:
 		UIToggle(FWindow& window, uptr<Hitbox>&& hb, strv text, IDrawable& image, IDrawable& checkImage, FFont& f, float xOff, float yOff) :
-			UIInteractable(window, move(hb), image), checkImage(checkImage), text(f, text), xOff(xOff), yOff(yOff) {
+			UIInteractable(window, move(hb), image), checkImage(checkImage), text(f, text), offX(xOff), offY(yOff) {
 			UIToggle::onSizeUpdated();
 		}
 		UIToggle(FWindow& window, uptr<Hitbox>&& hb, strv text, IDrawable& image, IDrawable& checkImage, FFont& f, float xOff) :
@@ -35,13 +35,12 @@ namespace fbc {
 		bool toggled = false;
 		IDrawable& checkImage;
 
-		inline float getBeginX() override { return std::min(hb->x, hb->x + text.getPosX()); }
-		inline float getBeginY() override { return std::min(hb->y, hb->y + text.getPosY()); }
+		inline float getBeginX() override { return std::min(hb->x, hb->x + posX); }
+		inline float getBeginY() override { return std::min(hb->y, hb->y + posY); }
 		inline UIToggle& setOnClick(const func<void(UIToggle&)>& onClick) { return this->onClick = onClick, *this; }
-		inline UIToggle& setTextOffsetX(float xOff) { return this->xOff = xOff, *this; }
-		inline UIToggle& setTextOffsetY(float yOff) { return this->yOff = yOff, *this; }
 		inline UIToggle& setToggleState(bool val) { return this->toggled = val, *this; }
 
+		UIToggle& setTextOffset(float xOff);
 		void onSizeUpdated() override;
 		void refreshDimensions() override;
 		void renderImpl(sdl::SDLBatchRenderPass& rp) override;
@@ -50,15 +49,17 @@ namespace fbc {
 		TextDrawable text;
 	private:
 		func<void(UIToggle&)> onClick;
-		float xOff = 0;
-		float yOff = 0;
+		float offX = 0;
+		float offY = 0;
+		float posX = 0;
+		float posY = 0;
 
 		virtual void clickLeftEvent() override;
 	};
 
-	void UIToggle::onSizeUpdated()
-	{
-		text.setPos(win.cfg.renderScale(xOff), win.cfg.renderScale(yOff));
+	void UIToggle::onSizeUpdated() {
+		this->posX = win.cfg.renderScale(offX);
+		this->posY = win.cfg.renderScale(offY);
 	}
 
 	void UIToggle::refreshDimensions()
@@ -67,8 +68,7 @@ namespace fbc {
 		text.reload();
 	}
 
-	void UIToggle::renderImpl(sdl::SDLBatchRenderPass& rp)
-	{
+	void UIToggle::renderImpl(sdl::SDLBatchRenderPass& rp) {
 		if (toggled) {
 			checkImage.draw(rp, *hb.get(), win.getW(), win.getH(), scaleX, scaleY, rotation, hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color);
 		}
@@ -76,7 +76,7 @@ namespace fbc {
 			image.draw(rp, *hb.get(), win.getW(), win.getH(), scaleX, scaleY, rotation, hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color);
 		}
 
-		text.draw(rp, hb->x, hb->y, win.getW(), win.getH());
+		text.draw(rp, hb->x + posX, hb->y + posY, win.getW(), win.getH());
 	}
 
 	void UIToggle::toggle(bool val)

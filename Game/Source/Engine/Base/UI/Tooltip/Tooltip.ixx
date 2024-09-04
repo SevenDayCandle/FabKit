@@ -57,16 +57,15 @@ namespace fbc {
 
 	void Tooltip::render(sdl::SDLBatchRenderPass& rp)
 	{
+		float off = win.cfg.renderScale(PADDING);
 		background.draw(rp, x, y, w, h, win.getW(), win.getH());
-		text.draw(rp, x, y, win.getW(), win.getH());
+		text.draw(rp, x + off, y + off, win.getW(), win.getH());
 	}
 
 	// Stretch the box background to fit the words in the tooltip
 	void Tooltip::updateBounds()
 	{
-		float off = win.cfg.renderScale(PADDING);
-		text.setPos(off, off);
 		w = win.cfg.renderScale(wOff);
-		h = text.getHeight() + off * 2;
+		h = text.getHeight() + win.cfg.renderScale(PADDING) * 2;
 	}
 }

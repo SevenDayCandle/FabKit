@@ -23,6 +23,7 @@ namespace sdl {
 		void bindBufferVertex(GpuBuffer* buffer);
 		void bindPipeline(GpuGraphicsPipeline* pipeline);
 		void bindTexture(GpuTexture* texture, GpuSampler* sampler);
+		void setupVertexUniform(float tX, float tY, float sX, float sY, float rotZ = 0);
 	private:
 		GpuBuffer* lastBufferIndex = nullptr;
 		GpuBuffer* lastBufferVertex = nullptr;
@@ -30,8 +31,15 @@ namespace sdl {
 		GpuGraphicsPipeline* lastPipeline = nullptr;
 		GpuRenderPass* renderPass;
 		GpuTexture* lastTexture = nullptr;
+		inline static sdl::Matrix4x4 MATRIX_UNIFORM = {
+		1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			0, 0, 0, 1
+		};
 	};
 
+	// Binds an index buffer if it was not already bound
 	void SDLBatchRenderPass::bindBufferIndex(GpuBuffer* buffer)
 	{
 		if (lastBufferIndex != buffer) {
@@ -41,6 +49,7 @@ namespace sdl {
 		}
 	}
 
+	// Binds a vertex buffer if it was not already bound
 	void SDLBatchRenderPass::bindBufferVertex(GpuBuffer* buffer)
 	{
 		if (lastBufferVertex != buffer) {
@@ -50,6 +59,7 @@ namespace sdl {
 		}
 	}
 
+	// Binds a pipeline if it was not already bound
 	void SDLBatchRenderPass::bindPipeline(GpuGraphicsPipeline* pipeline)
 	{
 		if (lastPipeline != pipeline) {
@@ -58,6 +68,7 @@ namespace sdl {
 		}
 	}
 
+	// Binds a texture if it was not already bound
 	void SDLBatchRenderPass::bindTexture(GpuTexture* texture, GpuSampler* sampler)
 	{
 		if (lastTexture != texture) {
@@ -65,5 +76,28 @@ namespace sdl {
 			sdl::gpuBindFragmentSamplers(renderPass, 0, &b, 1);
 			lastTexture = texture;
 		}
+	}
+
+	// Automatically set up a vertex buffer based on the provided center coordinates, sizes, and rotation
+	void SDLBatchRenderPass::setupVertexUniform(float tX, float tY, float sX, float sY, float rotZ) {
+		MATRIX_UNIFORM.m41 = 2 * tX - 1;
+		MATRIX_UNIFORM.m42 = 1 - 2 * tY;
+
+		if (rotZ != 0) {
+			float cosZ = std::cos(rotZ);
+			float sinZ = std::sin(rotZ);
+
+			MATRIX_UNIFORM.m11 = 2 * sX * cosZ;
+			MATRIX_UNIFORM.m12 = 2 * sX * sinZ;
+			MATRIX_UNIFORM.m21 = -sY * sinZ;
+			MATRIX_UNIFORM.m22 = sY * cosZ;
+		}
+		else {
+			MATRIX_UNIFORM.m11 = 2 * sX;
+			MATRIX_UNIFORM.m12 = 0;
+			MATRIX_UNIFORM.m21 = 0;
+			MATRIX_UNIFORM.m22 = 2 * sY;
+		}
+		pushVertexUniform(&MATRIX_UNIFORM, sizeof(sdl::Matrix4x4));
 	}
 }

@@ -22,11 +22,10 @@ namespace fbc {
 		// Assume origin is at the center of the drawable
 		float sX = scX * w / winW;
 		float sY = scY * h / winH;
-		setupMatrix((x / winW) + 0.5 * sX, (y / winH) + 0.5 * sY, sX, sY, rotZ);
 		rp.bindPipeline(sdl::runner::shapePipelineForMode(pipeline));
 		rp.bindBufferVertex(sdl::runner::BUFFER_VERTEX);
 		rp.bindBufferIndex(sdl::runner::BUFFER_INDEX);
-		rp.pushVertexUniform(&MATRIX_UNIFORM, sizeof(sdl::Matrix4x4));
+		rp.setupVertexUniform((x / winW) + 0.5 * sX, (y / winH) + 0.5 * sY, sX, sY, rotZ);
 		rp.pushFragmentUniform(tint, sizeof(sdl::Color));
 		rp.drawIndexedPrimitives(0);
 	}

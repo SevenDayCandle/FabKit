@@ -61,7 +61,6 @@ namespace fbc {
 
 	void UITextInput::onSizeUpdated()
 	{
-		buffer.setPos(win.cfg.renderScale(24), this->hb->h * 0.25f);
 		initCaret(this->hb->x, this->hb->y);
 	}
 
@@ -74,7 +73,7 @@ namespace fbc {
 	void UITextInput::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
 		UIInteractable::renderImpl(rp);
-		buffer.draw(rp, hb->x, hb->y, win.getW(), win.getH());
+		buffer.draw(rp, hb->x + win.cfg.renderScale(24), hb->y + hb->h * 0.25f, win.getW(), win.getH());
 		if (sdl::runner::keyboardInputActive(this)) {
 			renderCaret(rp);
 		}

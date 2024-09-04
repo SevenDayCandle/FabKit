@@ -4,8 +4,7 @@ import fbc.FFont;
 import fbc.FUtil;
 import fbc.ImageDrawable;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 
 // TODO directly extend imageDrawable
@@ -15,24 +14,27 @@ namespace fbc {
 		TextDrawable(FFont& font, strv text = "", float w = 0, sdl::Color color = sdl::COLOR_STANDARD, sdl::Color colorOutline = sdl::COLOR_BLACK) : font(font), textW(w), text(text), color(color), colorOutline(colorOutline) {
 			TextDrawable::reload();
 		}
-		TextDrawable(FFont& font, strv text, float posX, float posY, float w = 0, sdl::Color color = sdl::COLOR_STANDARD, sdl::Color colorOutline = sdl::COLOR_BLACK) : font(font), posX(posX), posY(posY), textW(w), text(text), color(color), colorOutline(colorOutline) {
-			TextDrawable::reload();
-		}
 		TextDrawable(const TextDrawable&) = delete;
-		TextDrawable(TextDrawable&& other) noexcept : ImageDrawable(move(other)), font(other.font), posX(other.posX), posY(other.posY), textW(other.textW), text(other.text), color(other.color), colorOutline(other.colorOutline) {}
+		TextDrawable(TextDrawable&& other) noexcept : ImageDrawable(move(other)), font(other.font), textW(other.textW), text(other.text), color(other.color), colorOutline(other.colorOutline) {}
 		virtual ~TextDrawable() = default;
 
 		inline bool empty() const { return text.empty(); }
 		inline FFont& getFont() const { return font; }
-		inline float getPosX() const { return posX; }
-		inline float getPosY() const { return posY; }
 		inline str::const_iterator getTextBegin() const { return text.begin(); }
 		inline str::const_iterator getTextEnd() const { return text.end(); }
 		inline size_t getTextLen() const { return text.size(); }
 		inline strv getText() const { return text; }
-		inline void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float winW, float winH, float scX = 1, float scY = 1, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) { draw(rp, x, y, texW, texH, winW, winH, scX, scY, rotZ, tint, pipeline); }
+		inline void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float winW, float winH, float scX = 1, float scY = 1, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) { 
+			if (texture) {
+				ImageDrawable::draw(rp, x, y, texW, texH, winW, winH, scX, scY, rotZ, tint, pipeline);
+			}
+		}
+		inline void drawCentered(sdl::SDLBatchRenderPass& rp, float x, float y, float winW, float winH, float scX = 1, float scY = 1, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) {
+			if (texture) {
+				ImageDrawable::drawCentered(rp, x, y, texW, texH, winW, winH, scX, scY, rotZ, tint, pipeline);
+			}
+		}
 
-		void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) override;
 		void reload() const override;
 		void reload(sdl::GpuCopyPass* copyPass) const;
 		TextDrawable& set(strv text, sdl::Color color);
@@ -41,27 +43,17 @@ namespace fbc {
 		TextDrawable& setColor(sdl::Color color);
 		TextDrawable& setColorOutline(sdl::Color colorOutline);
 		TextDrawable& setFont(const FFont& font);
-		TextDrawable& setPos(float x, float y);
 		TextDrawable& setText(strv text);
 		TextDrawable& setWidth(float w);
 		TextDrawable& textErase(size_t pos, size_t count);
 		TextDrawable& textInsert(size_t pos, const char* text);
 	private:
 		FFont& font;
-		int posX;
-		int posY;
 		int textW = 0;
 		str text;
 		sdl::Color color = sdl::COLOR_STANDARD;
 		sdl::Color colorOutline = sdl::COLOR_BLACK;
 	};
-
-	void TextDrawable::draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline)
-	{
-		if (texture) {
-			ImageDrawable::draw(rp, x + posX, y + posY, w, h, winW, winH, scX, scY, rotZ, tint, pipeline);
-		}
-	}
 
 	void TextDrawable::reload() const
 	{
@@ -133,13 +125,6 @@ namespace fbc {
 	{
 		this->font = font;
 		reload();
-		return *this;
-	}
-
-	TextDrawable& TextDrawable::setPos(float x, float y)
-	{
-		posX = x;
-		posY = y;
 		return *this;
 	}
 

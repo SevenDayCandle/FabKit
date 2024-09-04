@@ -13,22 +13,34 @@ namespace fbc {
 		RHorizontal(strv path) : FTexture(path) {}
 		RHorizontal(const RHorizontal&) = delete;
 
-		void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) override;
+		inline void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) override {
+			drawPatches(rp, (x + 0.5f * scX * w) / winW, (y + 0.5f * scY * h) / winH, w, h, winW, winH, scX, scY, rotZ, tint, pipeline);
+		}
+		inline void drawCentered(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) override {
+			drawPatches(rp, x / winW, y / winH, w, h, winW, winH, scX, scY, rotZ, tint, pipeline);
+		}
+	private:
+		void drawPatches(sdl::SDLBatchRenderPass& rp, float centerX, float centerY, float w, float h, float winW, float winH, float scX, float scY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL);
 	};
 
-	void RHorizontal::draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline) {
-		const float sX = scX * w / winW;
+	void RHorizontal::drawPatches(sdl::SDLBatchRenderPass& rp, float centerX, float centerY, float w, float h, float winW, float winH, float scX, float scY, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline) {
 		const float sY = scY * h / winH;
-		const float tX = x / winW;
+		const float cornerSX = scX * texW / (2 * winW);
+		const float edgeSX = scX * (w - texW) / winW;
 
-		const float cornerS = scX * texW / (2 * winW);
-		const float cornerO = cornerS / 2;
-		const float edgeSX = sX - 2 * cornerS;
-		const float centerTX = tX + cornerS;
-		const float tYO = y / winH + sY / 2;
+		const float distX = (edgeSX + cornerSX) / 2;
 
-		drawImpl(rp, sdl::runner::BUFFER_VERTEX_HORIZONTAL, tX + cornerO, tYO, cornerS, sY, rotZ, tint, pipeline, 0); // Left
-		drawImpl(rp, sdl::runner::BUFFER_VERTEX_HORIZONTAL, centerTX + edgeSX / 2, tYO, edgeSX, sY, rotZ, tint, pipeline, 4); // Center
-		drawImpl(rp, sdl::runner::BUFFER_VERTEX_HORIZONTAL, centerTX + edgeSX + cornerO, tYO, cornerS, sY, rotZ, tint, pipeline, 8); // Right
+		rp.bindPipeline(sdl::runner::pipelineForMode(pipeline));
+		rp.bindBufferVertex(sdl::runner::BUFFER_VERTEX_HORIZONTAL);
+		rp.bindBufferIndex(sdl::runner::BUFFER_INDEX);
+		rp.bindTexture(texture, sdl::runner::SAMPLER);
+		rp.pushFragmentUniform(tint, sizeof(sdl::Color));
+
+		rp.setupVertexUniform(centerX - distX, centerY, cornerSX, sY, rotZ); // Left
+		rp.drawIndexedPrimitives(0);
+		rp.setupVertexUniform(centerX, centerY, edgeSX, sY, rotZ); // Center
+		rp.drawIndexedPrimitives(4);
+		rp.setupVertexUniform(centerX + distX, centerY, cornerSX, sY, rotZ); // Right
+		rp.drawIndexedPrimitives(8);
 	}
 }

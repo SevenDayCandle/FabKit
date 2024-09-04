@@ -24,27 +24,20 @@ namespace fbc {
 		inline UITextButton& setFont(const FFont& font) { return text.setFont(font), * this; }
 		inline UITextButton& setText(strv t) { return text.setText(t), * this; }
 
-		virtual void onSizeUpdated() override;
 		virtual void refreshDimensions() override;
 		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 	protected:
 		TextDrawable text;
 	};
 
-	void UITextButton::onSizeUpdated()
-	{
-		text.setPos((this->hb->w - text.getWidth()) / 2, (this->hb->h - text.getHeight()) / 2);
-	}
-
 	void UITextButton::refreshDimensions()
 	{
 		UIButton::refreshDimensions();
 		text.setWidth(hb->w);
-		text.setPos((this->hb->w - text.getWidth()) / 2, (this->hb->h - text.getHeight()) / 2);
 	}
 
 	void UITextButton::renderImpl(sdl::SDLBatchRenderPass& rp) {
 		UIButton::renderImpl(rp);
-		text.draw(rp, hb->x, hb->y, win.getW(), win.getH());
+		text.drawCentered(rp, hb->cX(), hb->cY(), win.getW(), win.getH());
 	}
 }

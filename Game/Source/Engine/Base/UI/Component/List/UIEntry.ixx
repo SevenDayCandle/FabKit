@@ -38,7 +38,6 @@ namespace fbc {
 
 		virtual void onHbHover();
 		virtual void onHbUnhover();
-		virtual void onSizeUpdated() override;
 		virtual void refreshDimensions() override;
 		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 	protected:
@@ -61,11 +60,6 @@ namespace fbc {
 		text.setColor(baseColor);
 	}
 
-	template<typename T> void UIEntry<T>::onSizeUpdated()
-	{
-		text.setPos(this->hb->h * 1.25f, 0);
-	}
-
 	template<typename T> void UIEntry<T>::refreshDimensions()
 	{
 		UIInteractable::refreshDimensions();
@@ -73,23 +67,24 @@ namespace fbc {
 	}
 
 	template<typename T> void UIEntry<T>::renderImpl(sdl::SDLBatchRenderPass& rp) {
+		Hitbox& h = *this->hb.get();
 		if (active) {
 			if (toggled) {
-				checkImage.draw(rp, this->hb->x, this->hb->y, this->hb->h, this->hb->h, win.getW(), win.getH(), scaleX, scaleY, rotation, &sdl::COLOR_WHITE);
+				checkImage.draw(rp, h.x, h.y, h.h, h.h, win.getW(), win.getH(), scaleX, scaleY, rotation, &sdl::COLOR_WHITE);
 			}
 			else {
-				image.draw(rp, this->hb->x, this->hb->y, this->hb->h, this->hb->h, win.getW(), win.getH(), scaleX, scaleY, rotation, &sdl::COLOR_WHITE);
+				image.draw(rp, h.x, h.y, h.h, h.h, win.getW(), win.getH(), scaleX, scaleY, rotation, &sdl::COLOR_WHITE);
 			}
 		}
 		else {
 			if (toggled) {
-				checkImage.draw(rp, this->hb->x, this->hb->y, this->hb->h, this->hb->h, win.getW(), win.getH(), scaleX, scaleY, rotation);
+				checkImage.draw(rp, h.x, h.y, h.h, h.h, win.getW(), win.getH(), scaleX, scaleY, rotation);
 			}
 			else {
-				image.draw(rp, this->hb->x, this->hb->y, this->hb->h, this->hb->h, win.getW(), win.getH(), scaleX, scaleY, rotation);
+				image.draw(rp, h.x, h.y, h.h, h.h, win.getW(), win.getH(), scaleX, scaleY, rotation);
 			}
 		}
 
-		text.draw(rp, this->hb->x, this->hb->y, win.getW(), win.getH());
+		text.draw(rp, h.x + scaleY * h.h * 1.25f, h.y, win.getW(), win.getH());
 	}
 }
