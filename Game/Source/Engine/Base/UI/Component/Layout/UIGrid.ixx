@@ -4,14 +4,12 @@ import fbc.CoreConfig;
 import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.UIBase;
-import fbc.UIVerticalScrollbar;
 import fbc.FUtil;
 import fbc.ScaleHitbox;
 import sdl.SDLBatchRenderPass;
 import std;
 
 namespace fbc {
-
 	export template <c_ext<UIBase> T> class UIGrid : public UIBase {
 	public:
 		class Iterator {
@@ -41,40 +39,36 @@ namespace fbc {
 			typename vec<uptr<T>>::iterator it;
 		};
 
-		UIGrid(FWindow& window, uptr<Hitbox>&& hb, float spacingX = 100, float spacingY = 100, float scrollSpeed = 1) : UIBase(window, move(hb)),
-			spacingX(spacingX),
-			spacingY(spacingY),
-			scrollSpeed(scrollSpeed),
-			scrollbar{window, make_unique<ScaleHitbox>(window, hb->w * 0.93f / window.cfg.renderScale(), hb->y + hb->h * 0.05f / window.cfg.renderScale(), 48, hb->h * 0.9f / window.cfg.renderScale())} {
-			scrollbar.enabled = false;
-		}
-		UIGrid(UIGrid&& other) noexcept : UIBase(other.win, move(other.hb)), spacingX(other.spacingX), spacingY(other.spacingY), scrollSpeed(other.scrollSpeed), scrollbar(move(other.scrollbar)), items(move(other.items)) {}
+		UIGrid(FWindow& window, uptr<Hitbox>&& hb, float spacingX = 1, float spacingY = 1) : UIBase(window, move(hb)), intervalX(spacingX), intervalY(spacingY) {}
+		UIGrid(UIGrid&& other) noexcept : UIBase(other.win, move(other.hb)), intervalX(other.intervalX), intervalY(other.intervalY), items(move(other.items)) {}
 
-		inline float getSpacingX() const { return spacingX; }
-		inline float getSpacingY() const { return spacingY; }
+		inline float getIntervalX() const { return intervalX; }
+		inline float getIntervalY() const { return intervalY; }
+		inline float updateItemOffsets() { return updateItemOffsets(0, items.size()); }
 		inline Iterator begin() { return Iterator(items.begin()); }
 		inline Iterator end() { return Iterator(items.end()); }
 		inline size_t size() { return items.size(); }
+		template<typename... Args> requires std::constructible_from<T, FWindow&, Args&&...> inline T& addNew(Args&&... args) { return add(create<T>(forward<Args>(args)...)); };
+		template<c_ext<T> U, typename... Args> requires std::constructible_from<U, FWindow&, Args&&...> inline U& addNew(Args&&... args) { return add(create<U>(forward<Args>(args)...)); };
 
 		template <c_itr<uptr<T>> Iterable> UIGrid& addItems(const Iterable& added);
 		template <c_itr<uptr<T>> Iterable> UIGrid& setItems(const Iterable& items);
-		UIGrid& addItem(uptr<T>&& item);
-		UIGrid& setSpacing(float spacingX, float spacingY);
-		UIGrid& setSpacingX(float spacingX);
-		UIGrid& setSpacingY(float spacingY);
+		T& add(uptr<T>&& item);
+		UIGrid& autosetInterval(float spacingX = 0, float spacingY = 0);
+		UIGrid& setInterval(float spacingX, float spacingY);
+		UIGrid& setIntervalX(float spacingX);
+		UIGrid& setIntervalY(float spacingY);
+		uptr<T> extract(T* item);
 		virtual bool isHovered() override;
 		virtual void refreshDimensions() override;
 		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 		virtual void updateImpl() override;
 	protected:
-		float scrollSpeed = 1;
-		float spacingX = 0;
-		float spacingY = 0;
-		UIVerticalScrollbar scrollbar;
+		float intervalX = 0;
+		float intervalY = 0;
 		vec<uptr<T>> items;
 
-		void updateItemOffsets();
-		void updateItemOffsets(int begin, int end);
+		virtual float updateItemOffsets(int begin, int end);
 	};
 
 	template<c_ext<UIBase> T> bool UIGrid<T>::isHovered()
@@ -89,15 +83,13 @@ namespace fbc {
 		for (const uptr<T>& element : items) {
 			element->refreshDimensions();
 		}
-		scrollbar.refreshDimensions();
 	}
 
 	template<c_ext<UIBase> T> void UIGrid<T>::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
 		for (const uptr<T>& item : items) {
-			item->render(*rp);
+			item->render(rp);
 		}
-		scrollbar.render(rp);
 	}
 
 	template<c_ext<UIBase> T> void UIGrid<T>::updateImpl()
@@ -106,34 +98,13 @@ namespace fbc {
 		for (const uptr<T>& item : items) {
 			item->update();
 		}
-		scrollbar.update();
-	}
-
-	// Updates the positions of ALL items in the grid, and shows the scrollbar if any of them would extend outside of the grid
-	template<c_ext<UIBase> T> void UIGrid<T>::updateItemOffsets()
-	{
-		float sx = win.cfg.renderScale(spacingX);
-		float sy = win.cfg.renderScale(spacingY);
-		float x = hb->x;
-		float y = hb->y;
-		for (const uptr<T>& item : items) {
-			item->hb->setRealPos(x, y);
-
-			x += sx;
-			if (x >= hb->x + hb->w) {
-				x = hb->x;
-				y += sy;
-			}
-		}
-
-		scrollbar.enabled = y > hb->y + hb->h;
 	}
 
 	// Updates the positions of items from index begin (inclusive) to index end (exclusive), and shows the scrollbar if any of them would extend outside of the grid
-	template<c_ext<UIBase> T> void UIGrid<T>::updateItemOffsets(int begin, int end) {
-		float sx = win.cfg.renderScale(spacingX);
-		float sy = win.cfg.renderScale(spacingY);
-		int rowsize = hb->w / sx;
+	template<c_ext<UIBase> T> float UIGrid<T>::updateItemOffsets(int begin, int end) {
+		float sx = win.cfg.renderScale(intervalX);
+		float sy = win.cfg.renderScale(intervalY);
+		int rowsize = std::max(1.0f, hb->w / sx);
 		int xP = begin % rowsize;
 		int yP = begin / rowsize; // Intentional integer division in parentheses to ensure that this multiplier rounds down
 		float x = hb->x + sx * xP;
@@ -142,43 +113,64 @@ namespace fbc {
 			items[i]->hb->setRealPos(x, y);
 
 			x += sx;
-			if (x >= hb->x + hb->w) {
+			if (x > hb->x + hb->w) {
 				x = hb->x;
 				y += sy;
 			}
 		}
-
-		scrollbar.enabled = y > hb->y + hb->h;
+		return y;
 	}
 
 	// Add a singular item to the list
-	template<c_ext<UIBase> T> UIGrid<T>& UIGrid<T>::addItem(uptr<T>&& item)
+	template<c_ext<UIBase> T> T& UIGrid<T>::add(uptr<T>&& item)
 	{
+		T& ref = *item;
 		this->items.push_back(std::move(item));
 		updateItemOffsets(this->items.size() - 1, this->items.size());
+		return ref;
+	}
+
+	// Sets up an interval between items based on the hitbox size of the first item. Does nothing if there are no items
+	template<c_ext<UIBase> T> UIGrid<T>& UIGrid<T>::autosetInterval(float spacingX, float spacingY) {
+		if (this->items.size() > 0) {
+			Hitbox& firsth = *this->items[0]->getHb();
+			setInterval(firsth.getScaleOffSizeX() + spacingX, firsth.getScaleOffSizeY() + spacingY);
+		}
 		return *this;
 	}
 
-	// Update the spacing between items
-	template<c_ext<UIBase> T>UIGrid<T>& UIGrid<T>::setSpacing(float spacingX, float spacingY) {
-		this->spacingX = spacingX;
-		this->spacingY = spacingY;
+	// Update the starting interval between items. Note that this interval does not respect the actual sizes of UI elements and can result in overlap if it is smaller than the UI size; use autosetInterval if you want to guarantee avoidance of overlap
+	template<c_ext<UIBase> T> UIGrid<T>& UIGrid<T>::setInterval(float spacingX, float spacingY) {
+		this->intervalX = spacingX;
+		this->intervalY = spacingY;
 		updateItemOffsets();
 		return *this;
 	}
 
-	// Update the X spacing between items
-	template<c_ext<UIBase> T>UIGrid<T>& UIGrid<T>::setSpacingX(float spacingX) {
-		this->spacingX = spacingX;
+	// Update the starting X interval between items. Note that this interval does not respect the actual sizes of UI elements and can result in overlap if it is smaller than the UI size; use autosetInterval if you want to guarantee avoidance of overlap
+	template<c_ext<UIBase> T> UIGrid<T>& UIGrid<T>::setIntervalX(float spacingX) {
+		this->intervalX = spacingX;
 		updateItemOffsets();
 		return *this;
 	}
 
-	// Update the Y spacing between items
-	template<c_ext<UIBase> T>UIGrid<T>& UIGrid<T>::setSpacingY(float spacingY) {
-		this->spacingY = spacingY;
+	// Update the starting Y interval between items. Note that this interval does not respect the actual sizes of UI elements and can result in overlap if it is smaller than the UI size; use autosetInterval if you want to guarantee avoidance of overlap
+	template<c_ext<UIBase> T> UIGrid<T>& UIGrid<T>::setIntervalY(float spacingY) {
+		this->intervalY = spacingY;
 		updateItemOffsets();
 		return *this;
+	}
+
+	// Removes a specified element and returns it
+	template<c_ext<UIBase> T> uptr<T> UIGrid<T>::extract(T* item) {
+		for (auto it = items.begin(); it != items.end(); ++it) {
+			if (it->get() == item) {
+				uptr<T> extracted(it->release());
+				items.erase(it);
+				return extracted;
+			}
+		}
+		return nullptr;
 	}
 
 	// Appends items to the end of the grid

@@ -11,6 +11,7 @@ import fbc.CreatureRenderable;
 import fbc.GameRun;
 import fbc.RelativeHitbox;
 import fbc.UIButton;
+import fbc.UIGrid;
 import fbc.UIDisposeVFX;
 import fbc.UITransformVFX;
 import fbc.VFXAction;
@@ -41,6 +42,7 @@ namespace fbc {
 		for (auto& entry : cardUIMap) {
 			removeCardRender(entry.second);
 		}
+		selectCardRender(nullptr);
 		cardUIMap.clear();
 	}
 
@@ -102,7 +104,7 @@ namespace fbc {
 			offX = square->col * TILE_SIZE;
 			offY = square->row * TILE_SIZE;
 		}
-		return fieldUI.addNew<CreatureRenderable>(fieldUI.relhb(offX, offY, TILE_SIZE, TILE_SIZE), occupant);
+		return creatureUI.addNew<CreatureRenderable>(creatureUI.relhb(offX, offY, TILE_SIZE, TILE_SIZE), occupant);
 	}
 
 	void CombatScreen::open()
@@ -116,10 +118,12 @@ namespace fbc {
 			w.setInteractable(false);
 		});
 		// Add buttons for each square
+		fieldUI.setHbOffsetSize(instance->getFieldColumns() * TILE_SIZE, instance->getFieldRows() * TILE_SIZE);
 		for (const CombatSquare& square : instance->getSquares()) {
 			fieldUI.addNew<CombatSquareRenderable>(fieldUI.relhb(square.col * TILE_SIZE, square.row * TILE_SIZE, TILE_SIZE, TILE_SIZE), square);
 		}
 		// Add images for each creature
+		creatureUI.setHbOffsetSize(fieldUI.hb->getOffSizeX(), fieldUI.hb->getOffSizeY());
 		for (const OccupantObject* occupant : instance->getOccupants()) {
 			if (occupant) {
 				createOccupantRender(*occupant);
@@ -145,6 +149,13 @@ namespace fbc {
 			addVfxNew<UIDisposeVFX>(move(item))
 				.setScale(0)
 				.setMoveRelative(0, -10);
+		}
+	}
+
+	void CombatScreen::selectCardRender(CardRenderable* card) {
+		selectedCard = card;
+		if (selectedCard) {
+			// TODO
 		}
 	}
 

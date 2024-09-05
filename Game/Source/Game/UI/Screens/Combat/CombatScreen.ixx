@@ -4,6 +4,7 @@ import fbc.Card;
 import fbc.CardRenderable;
 import fbc.CombatInstance;
 import fbc.CombatSquare;
+import fbc.CombatSquareRenderable;
 import fbc.CombatTurn;
 import fbc.CombatTurnRenderable;
 import fbc.CoreContent;
@@ -11,7 +12,7 @@ import fbc.CreatureRenderable;
 import fbc.FUtil;
 import fbc.FWindow;
 import fbc.RelativeHitbox;
-import fbc.UICanvas;
+import fbc.UIGrid;
 import fbc.UIScreen;
 import fbc.UITextButton;
 import std;
@@ -27,9 +28,10 @@ namespace fbc {
 	export class CombatScreen : public UIScreen, public CombatInstance::IViewSubscriber {
 	public:
 		CombatScreen(FWindow& window): UIScreen(window),
-			cardUI(addNew<UICanvas>(relhb(0, 0, hb->getScaleOffSizeX(), hb->getScaleOffSizeY()))),
-			fieldUI(addNew<UICanvas>(relhb(TILE_OFFSET, TILE_OFFSET, hb->getScaleOffSizeX(), hb->getScaleOffSizeY()))),
-			turnUI(addNew<UICanvas>(relhb(0, 0, hb->getScaleOffSizeX(), hb->getScaleOffSizeY()))),
+			cardUI(addNew<UIGrid<CardRenderable>>(relhb(hb->getScaleOffSizeX()* CARD_HAND_POS_X, hb->getScaleOffSizeY()* CARD_HAND_POS_Y, hb->getScaleOffSizeX(), hb->getScaleOffSizeY()), CARD_W, CARD_H)),
+			fieldUI(addNew<UIGrid<CombatSquareRenderable>>(relhb(TILE_OFFSET, TILE_OFFSET, hb->getScaleOffSizeX(), hb->getScaleOffSizeY()), TILE_SIZE, TILE_SIZE)),
+			turnUI(addNew<UIGrid<CombatTurnRenderable>>(relhb(0, 0, TILE_SIZE, hb->getScaleOffSizeY()), TURN_W, TILE_SIZE)),
+			creatureUI(addNew<UIGrid<CreatureRenderable>>(fieldUI.relhb(0, 0, hb->getScaleOffSizeX(), hb->getScaleOffSizeY()), TILE_SIZE, TILE_SIZE)),
 			endTurnButton(add(make_unique<UITextButton>(win, relhb(hb->getScaleOffSizeX(0.8), hb->getScaleOffSizeY(0.8), END_TURN_SIZE, END_TURN_SIZE), window.cct.images.uiPanelRound, window.cct.fontRegular(), window.cct.strings.combat_end_turn()))) {
 		}
 
@@ -47,15 +49,18 @@ namespace fbc {
 		void open() override;
 		void removeCardRender(Card* card);
 		void removeCardRender(CardRenderable* card);
+		void selectCardRender(CardRenderable* card);
 		void updateImpl() override;
 	private:
+		CardRenderable* selectedCard;
 		CombatInstance* instance;
 		CombatSquare* distanceSource;
 		CombatSquare* targetingSource;
 		UITextButton& endTurnButton;
-		UICanvas& cardUI;
-		UICanvas& fieldUI;
-		UICanvas& turnUI;
+		UIGrid<CardRenderable>& cardUI;
+		UIGrid<CombatSquareRenderable>& fieldUI;
+		UIGrid<CombatTurnRenderable>& turnUI;
+		UIGrid<CreatureRenderable>& creatureUI;
 		umap<const Card*, CardRenderable*> cardUIMap;
 		umap<const CombatTurn*, CombatTurnRenderable*> turnUIMap;
 		umap<const OccupantObject*, CreatureRenderable*> occupantUIMap;

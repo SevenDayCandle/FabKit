@@ -41,6 +41,8 @@ namespace fbc {
 		inline CombatTurn* getCurrentTurn() const { return currentTurn; }
 		inline Action* getCurrentAction() const { return currentAction; }
 		inline int getCurrentRound() const { return totalActionTime / roundTime; }
+		inline int getFieldColumns() const { return fieldColumns; }
+		inline int getFieldRows() const { return fieldRows; }
 		inline int getTotalActionTime() const { return totalActionTime; }
 		inline ref_view<const mset<CombatTurn>> getTurns() const { return std::views::all(turns); }
 		inline ref_view<const vec<CombatSquare>> getSquares() const { return std::views::all(squares); }
