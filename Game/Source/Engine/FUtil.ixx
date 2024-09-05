@@ -119,6 +119,7 @@ namespace fbc::futil {
 
 	export bool isNumeric(strv text);
 	export bool isPrefix(strv source, strv prefix);
+	export float fastLerp(float start, float end, float t);
 	export str dimensionString(const pair<int, int>& p);
 	export str dimensionString(int x, int y);
 	export str toLowerCase(strv input);
@@ -165,6 +166,11 @@ namespace fbc::futil {
 			}
 		}
 		return true;
+	}
+
+	// Variant of std::lerp for floats without bounds checking and with lower precision
+	float fastLerp(float start, float end, float t) {
+		return (1 - t) * start + t * end;
 	}
 
 	// Create a lowercase version of a string-like

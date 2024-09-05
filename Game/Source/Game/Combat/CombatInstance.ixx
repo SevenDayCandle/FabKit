@@ -1,11 +1,13 @@
 export module fbc.CombatInstance;
 
 import fbc.Action;
+import fbc.Card;
 import fbc.CombatSquare;
 import fbc.CombatTurn;
 import fbc.EncounterCreatureEntry;
 import fbc.FieldObject;
 import fbc.FUtil;
+import fbc.PileType;
 import fbc.RunEncounter;
 import fbc.SavedCreatureEntry;
 import fbc.TurnObject;
@@ -19,11 +21,15 @@ namespace fbc {
 	export class CombatInstance {
 	public:
 		struct IViewSubscriber {
-			virtual void onPlayerTurnBegin(const CombatTurn* turn) = 0;
-			virtual void onPlayerTurnEnd(const CombatTurn* turn) = 0;
-			virtual void onTurnAdded(const CombatTurn& turn) = 0;
-			virtual void onTurnChanged(ref_view<const mset<CombatTurn>> turns) = 0;
-			virtual void onTurnRemoved(const CombatTurn* turn) = 0;
+			virtual ~IViewSubscriber() = default;
+
+			virtual void onCardMove(const Card* card, const OccupantObject* owner, const PileType& type) {}
+			virtual void onCreatureMove(const OccupantObject* occupant) {}
+			virtual void onPlayerTurnBegin(const CombatTurn* turn) {}
+			virtual void onPlayerTurnEnd(const CombatTurn* turn) {}
+			virtual void onTurnAdded(const CombatTurn& turn) {}
+			virtual void onTurnChanged(ref_view<const mset<CombatTurn>> turns) {}
+			virtual void onTurnRemoved(const CombatTurn* turn) {}
 		};
 		CombatInstance() {}
 

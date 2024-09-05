@@ -49,8 +49,18 @@ namespace fbc {
 			currentSquare->setOccupant(nullptr);
 		}
 		square.setOccupant(this);
+		movement -= cost;
 
 		return true;
+	}
+
+	// Add a card to a pile, returning the resulting card
+	Card& Creature::addCardToPile(uptr<Card>&& card, const PileType& type) {
+		Card& ref = *card;
+		vec<uptr<Card>>& pile = getPile(type);
+		pile.push_back(move(card));
+		// TODO hooks
+		return ref;
 	}
 
 	// Move a card from one pile to another, returning the moved card
@@ -66,16 +76,6 @@ namespace fbc {
 			moveBetweenPiles(it, sourcePile, destPile);
 		}
 		return card;
-	}
-
-	// Add a card to a pile, returning the resulting card
-	Card& Creature::cardToPile(uptr<Card>&& card, const PileType& type)
-	{
-		Card& ref = *card;
-		vec<uptr<Card>>& pile = getPile(type);
-		pile.push_back(move(card));
-		// TODO hooks
-		return ref;
 	}
 
 	// Play a card from this creature's hand, and then move the played card to the designated pile if that card was in the hand or draw pile
@@ -170,6 +170,17 @@ namespace fbc {
 		// TODO support custom pile types
 	}
 
+	// Move a card from the draw pile to hand. If draw pile is empty, reshuffle discard pile into draw pile
+	void Creature::drawCard() {
+		if (drawPile.empty()) {
+			reshuffleDrawPile();
+		}
+		auto it = drawPile.begin();
+		if (it != drawPile.end()) {
+			moveBetweenPiles(it, drawPile, hand, false);
+		}
+	}
+
 	// At the start of turn, discard hand and draw new hand
 	void Creature::drawForStartOfTurn()
 	{
@@ -181,11 +192,9 @@ namespace fbc {
 		}
 
 		int draw = getCardDraw();
-		it = drawPile.begin();
-		while (it != drawPile.end() && draw > 0 && hand.size() < handSize) {
-			moveBetweenPiles(it, drawPile, hand, false);
+		while (draw > 0 && hand.size() < handSize) {
+			drawCard();
 			draw -= 1;
-			it = drawPile.begin();
 		}
 	}
 
@@ -199,7 +208,7 @@ namespace fbc {
 			}
 		}
 
-		// TODO shuffle draw pile based on rng
+		shufflePile(drawPile);
 
 		// TODO passives
 		for (ItemListing& listing : setupPassives) {
@@ -222,6 +231,25 @@ namespace fbc {
 	{
 		energy = std::min(energy + getEnergyGain(), energyMax);
 		movement = movementMax;
+		// TODO visuals
+		// TODO hooks
+	}
+
+	// Move the discard pile back into the draw pile and shuffle it
+	void Creature::reshuffleDrawPile() {
+		auto it = discardPile.begin();
+		while (it != discardPile.end()) {
+			moveBetweenPiles(it, discardPile, drawPile, false);
+			it = discardPile.begin();
+		}
+		shufflePile(drawPile);
+		// TODO visuals
+		// TODO hooks
+	}
+
+	// Randomizes the order of a pile based on rng
+	void Creature::shufflePile(PileGroup& group) {
+		GameRun::current->rngCard.shuffle(group);
 		// TODO visuals
 		// TODO hooks
 	}

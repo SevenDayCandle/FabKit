@@ -18,6 +18,7 @@ namespace fbc {
 		bool chance(float chance);
 		float random(float begin, float end);
 		int random(int begin, int end);
+		template <std::ranges::range T> void shuffle(T& range);
 
 	private:
 		int counter = 0;
@@ -56,5 +57,11 @@ namespace fbc {
 		++counter;
 		std::uniform_int_distribution<int> dist(begin, end);
 		return dist(rng);
+	}
+
+	// Shuffle an iterable randomly
+	template<std::ranges::range T> void GameRNG::shuffle(T& range) {
+		counter += std::ranges::size(range) - 1;
+		std::ranges::shuffle(range, rng);
 	}
 }

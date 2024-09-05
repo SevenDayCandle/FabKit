@@ -40,7 +40,7 @@ namespace fbc {
 		inline UIToggle& setOnClick(const func<void(UIToggle&)>& onClick) { return this->onClick = onClick, *this; }
 		inline UIToggle& setToggleState(bool val) { return this->toggled = val, *this; }
 
-		UIToggle& setTextOffset(float xOff);
+		UIToggle& setTextOffset(float xOff, float yOff);
 		void onSizeUpdated() override;
 		void refreshDimensions() override;
 		void renderImpl(sdl::SDLBatchRenderPass& rp) override;
@@ -56,6 +56,13 @@ namespace fbc {
 
 		virtual void clickLeftEvent() override;
 	};
+
+	UIToggle& UIToggle::setTextOffset(float xOff, float yOff) {
+		this->offX = xOff;
+		this->offY = yOff;
+		onSizeUpdated();
+		return *this;
+	}
 
 	void UIToggle::onSizeUpdated() {
 		this->posX = win.cfg.renderScale(offX);

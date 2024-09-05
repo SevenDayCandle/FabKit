@@ -7,8 +7,7 @@ import fbc.Hoverable;
 import fbc.UIImage;
 import fbc.VFX;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -19,7 +18,6 @@ namespace fbc {
 		virtual ~UITransformVFX() = default;
 
 		UIImage& image;
-
 
 		inline UITransformVFX& setMoveRelative(float tOffX, float tOffY) { 
 			return setMove(image.hb->getOffPosX() + tOffX, image.hb->getOffPosY() + tOffY);
@@ -115,7 +113,6 @@ namespace fbc {
 	}
 
 	void UITransformVFX::dispose() {
-		CallbackVFX::dispose();
 		if (alphaBegin != alphaEnd) {
 			image.color.a = alphaEnd;
 		}
@@ -131,6 +128,7 @@ namespace fbc {
 		if (posXBegin != posXEnd || posYBegin != posYEnd) {
 			image.hb->setOffPos(posXEnd, posYEnd);
 		}
+		CallbackVFX::dispose();
 	}
 
 	bool UITransformVFX::tickUpdate() {
@@ -148,19 +146,19 @@ namespace fbc {
 	void UITransformVFX::update() {
 		float rate = 1 - std::pow(1 - ticks / duration, 3);
 		if (alphaBegin != alphaEnd) {
-			image.color.a = std::lerp(alphaBegin, alphaEnd, rate);
+			image.color.a = futil::fastLerp(alphaBegin, alphaEnd, rate);
 		}
 		if (scaleXBegin != scaleXEnd) {
-			image.scaleX = std::lerp(scaleXBegin, scaleXEnd, rate);
+			image.scaleX = futil::fastLerp(scaleXBegin, scaleXEnd, rate);
 		}
 		if (scaleYBegin != scaleYEnd) {
-			image.scaleY = std::lerp(scaleYBegin, scaleYEnd, rate);
+			image.scaleY = futil::fastLerp(scaleYBegin, scaleYEnd, rate);
 		}
 		if (rotBegin != rotEnd) {
-			image.rotation = std::lerp(rotBegin, rotEnd, rate);
+			image.rotation = futil::fastLerp(rotBegin, rotEnd, rate);
 		}
 		if (posXBegin != posXEnd || posYBegin != posYEnd) {
-			image.hb->setOffPos(std::lerp(posXBegin, posXEnd, rate), std::lerp(posYBegin, posYEnd, rate));
+			image.hb->setOffPos(futil::fastLerp(posXBegin, posXEnd, rate), futil::fastLerp(posYBegin, posYEnd, rate));
 		}
 	}
 }

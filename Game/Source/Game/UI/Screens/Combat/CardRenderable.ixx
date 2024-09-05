@@ -15,7 +15,7 @@ import std;
 
 namespace fbc {
 	export constexpr float CARD_H = 600;
-	export constexpr float CARD_W = 300;
+	export constexpr float CARD_W = 400;
 
 	export class CardRenderable : public UIInteractable {
 	public:

@@ -17,8 +17,8 @@ import fbc.UITextButton;
 import std;
 
 namespace fbc {
-	constexpr float CARD_HAND_POS_X = 1000;
-	constexpr float CARD_HAND_POS_Y = 1000;
+	constexpr float CARD_HAND_POS_X = 0.25f;
+	constexpr float CARD_HAND_POS_Y = 0.75f;
 	constexpr float END_TURN_SIZE = 300;
 	constexpr float TILE_OFFSET = 300;
 	constexpr float TILE_SIZE = 128;
@@ -32,6 +32,9 @@ namespace fbc {
 			turnUI(addNew<UICanvas>(relhb(0, 0, hb->getScaleOffSizeX(), hb->getScaleOffSizeY()))),
 			endTurnButton(add(make_unique<UITextButton>(win, relhb(hb->getScaleOffSizeX(0.8), hb->getScaleOffSizeY(0.8), END_TURN_SIZE, END_TURN_SIZE), window.cct.images.uiPanelRound, window.cct.fontRegular(), window.cct.strings.combat_end_turn()))) {
 		}
+
+		inline float cardHandStartX() const { return hb->getScaleOffSizeX() * CARD_HAND_POS_X; }
+		inline float cardHandStartY() const { return hb->getScaleOffSizeY() * CARD_HAND_POS_Y; }
 
 		virtual void onPlayerTurnBegin(const CombatTurn* turn) override;
 		virtual void onPlayerTurnEnd(const CombatTurn* turn) override;
@@ -47,6 +50,8 @@ namespace fbc {
 		void updateImpl() override;
 	private:
 		CombatInstance* instance;
+		CombatSquare* distanceSource;
+		CombatSquare* targetingSource;
 		UITextButton& endTurnButton;
 		UICanvas& cardUI;
 		UICanvas& fieldUI;

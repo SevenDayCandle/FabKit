@@ -28,7 +28,7 @@ namespace fbc {
 			for (const uptr<Card>& card : occupant->getHand()) {
 				auto res = cardUIMap.find(card.get());
 				if (res == cardUIMap.end()) {
-					createCardRender(*card, CARD_HAND_POS_X + i * CARD_W, CARD_HAND_POS_Y);
+					createCardRender(*card, cardHandStartX() + i * CARD_W, cardHandStartY());
 				}
 				++i;
 			}
@@ -154,7 +154,7 @@ namespace fbc {
 
 		CombatTurn* currentTurn = instance->getCurrentTurn();
 		Action* currentAction = instance->getCurrentAction();
-		bool allowInteraction = currentTurn && !currentTurn->isDone;
+		bool allowInteraction = currentTurn && !currentTurn->isDone && !currentAction;
 		endTurnButton.setInteractable(allowInteraction);
 		// TODO disallow moving/cards when actions are going on
 

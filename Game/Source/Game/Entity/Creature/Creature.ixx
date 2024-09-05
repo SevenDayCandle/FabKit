@@ -11,8 +11,7 @@ import fbc.IDrawable;
 import fbc.ItemListing;
 import fbc.PileType;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -31,7 +30,7 @@ namespace fbc {
 
 			const PileType& type;
 
-			int getPosition(Card* card);
+			int getPosition(const Card* card);
 		};
 
 		Creature(CreatureData& data, Behavior* behavior, int faction, int upgrades, int startingHealth) :
@@ -55,12 +54,13 @@ namespace fbc {
 
 		inline int getCardPosition(Card* card, const PileType& type) { return getPile(type).getPosition(card); }
 		inline PileGroup& getHand() { return hand; }
+		inline void shufflePile(const PileType& type) { shufflePile(getPile(type)); }
 
 		virtual bool onTurnBegin() override;
 		virtual void onTurnEnd() override;
 		bool moveTo(CombatSquare& square);
+		Card& addCardToPile(uptr<Card>&& card, const PileType& type); // TODO refactor to use conditions, refactor into action
 		Card& cardFromToPile(Card& card, const PileType& source, const PileType& dest); // TODO refactor to use conditions, refactor into action
-		Card& cardToPile(uptr<Card>&& card, const PileType& type); // TODO refactor to use conditions, refactor into action
 		Card& useCard(Card& card, CombatSquare& square);
 		IDrawable& getImageField() const final override;
 		IDrawable& getImagePortrait() const final override;
@@ -68,10 +68,13 @@ namespace fbc {
 		int getCardDraw();
 		int getEnergyGain();
 		PileGroup& getPile(const PileType& type);
+		void drawCard();
 		void drawForStartOfTurn();
 		void initialize(vec<ItemListing>& cards, vec<ItemListing>& passives);
 		void queueTurn() override;
 		void refreshValuesForStartOfTurn();
+		void reshuffleDrawPile();
+		void shufflePile(PileGroup& group);
 	private:
 		PileGroup discardPile = PileGroup(piletype::DISCARD);
 		PileGroup drawPile = PileGroup(piletype::DRAW);
@@ -82,7 +85,7 @@ namespace fbc {
 		void moveBetweenPiles(PileGroup::iterator cardIt, PileGroup& sourcePile, PileGroup& destPile, bool manual = true);
 	};
 
-	int fbc::Creature::PileGroup::getPosition(Card* card) {
+	int fbc::Creature::PileGroup::getPosition(const Card* card) {
 		int i = 0;
 		for (uptr<Card>& entry : *this) {
 			if (entry.get() == card) {

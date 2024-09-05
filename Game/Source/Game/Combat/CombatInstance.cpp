@@ -301,7 +301,7 @@ namespace fbc {
 		return sq != nullptr ? sq->sDist : -1;
 	}
 
-	// Find a shortest path from the target square (inclusive) to the source square (exclusive)
+	// Find a shortest path from the source square (exclusive) to the target square (inclusive)
 	vec<CombatSquare*> CombatInstance::findShortestPath(CombatSquare* targ)
 	{
 		vec<CombatSquare*> path;
@@ -324,6 +324,7 @@ namespace fbc {
 				}
 			}
 		}
+		std::ranges::reverse(path);
 		return path;
 	}
 }

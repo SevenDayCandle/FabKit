@@ -69,12 +69,14 @@ namespace fbc {
 		inline virtual Hoverable& setHbOffsetPosY(const float y) { return getHb()->setOffPosY(y), * this; }
 
 		Token makeToken();
+		void invalidateTokens();
 
 		virtual Hitbox* getHb() = 0;
 	private:
 		uptr<vec<Token*>> tokens;
 	};
 
+	// Generate a token that can be used to track the existence of this hoverable. The token contains a pointer that is nullified when this object is destroyed.
 	Hoverable::Token Hoverable::makeToken() {
 		Token newToken = Token(this);
 		if (!tokens) {
@@ -82,5 +84,15 @@ namespace fbc {
 		}
 		tokens->push_back(&newToken);
 		return newToken;
+	}
+
+	// Invalidate all tokens doled out by this hoverable and stop tracking them
+	void Hoverable::invalidateTokens() {
+		if (tokens) {
+			for (Token* token : *tokens) {
+				token->source = nullptr;
+			}
+			tokens->clear();
+		}
 	}
 }
