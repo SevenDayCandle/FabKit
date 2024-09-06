@@ -21,6 +21,10 @@ namespace fbc {
 		opt<vec<uptr<Effect>>> effectOverride;
 
 		inline int cost() const { return data.getCost(upgrades); };
+		inline int targetRangeBegin() const { return data.getTargetRangeBegin(upgrades); };
+		inline int targetRangeEnd() const { return data.getTargetRangeEnd(upgrades); };
+		inline int targetSizeX() const { return data.getTargetSizeX(upgrades); };
+		inline int targetSizeY() const { return data.getTargetSizeY(upgrades); };
 		inline vec<uptr<Effect>>& getEffects() { return effectOverride ? effectOverride.value() : data.data.effects; }
 
 		bool isPlayable();

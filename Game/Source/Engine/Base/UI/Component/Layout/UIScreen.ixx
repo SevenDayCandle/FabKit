@@ -10,7 +10,7 @@ import sdl.SDLBatchRenderPass;
 import std;
 
 namespace fbc {
-	export class UIScreen : public UICanvas {
+	export class UIScreen : public UICanvas<> {
 	public:
 		UIScreen(FWindow& window) : UICanvas(window, make_unique<ScreenSizeHitbox>(window)) {}
 		UIScreen(FWindow& window, uptr<Hitbox>&& hb) : UICanvas(window, move(hb)) {}

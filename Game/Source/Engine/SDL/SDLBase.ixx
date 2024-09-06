@@ -12,6 +12,10 @@ export module sdl.SDLBase;
 import sdl.IKeyInputListener;
 import std;
 
+/* Operators */
+export bool operator==(const SDL_FColor& lhs, const SDL_FColor& rhs) { return lhs.r == rhs.r && lhs.g == rhs.g && lhs.b == rhs.b && lhs.a == rhs.a;}
+export bool operator!=(const SDL_FColor& lhs, const SDL_FColor& rhs) { return !(lhs == rhs); }
+
 namespace sdl {
 	export using BlendMode = ::SDL_BlendMode;
 	export using Color = ::SDL_FColor;
@@ -133,7 +137,7 @@ namespace sdl {
 	/* Color constants. RGB can be higher than 1 to make the image brighter */
 	export constexpr Color COLOR_BLACK = { 0, 0, 0, 1 };
 	export constexpr Color COLOR_BLACK_SHADOW = { 0, 0, 0, 0.4f };
-	export constexpr Color COLOR_GOLD = { 0.13373f, 0.11843, 0.5176, 1 };
+	export constexpr Color COLOR_GOLD = { 1.0, 0.843, 0, 1 };
 	export constexpr Color COLOR_GRAY = { 0.5f, 0.5f, 0.5f, 1 };
 	export constexpr Color COLOR_LIME = { 0.6f, 2, 0.84f, 1 };
 	export constexpr Color COLOR_SKY = { 0.6f, 1.1, 1.5f, 1 };

@@ -38,6 +38,7 @@ namespace fbc {
 		inline auto getOccupants() { return std::views::transform(occupants, [](uptr<OccupantObject>& item) {return item.get(); }); }
 		inline bool hasAction() const { return currentAction != nullptr; }
 		inline bool isCompleted() const { return completed; }
+		inline CombatSquare* getDistanceSource() const { return distanceSource; }
 		inline CombatTurn* getCurrentTurn() const { return currentTurn; }
 		inline Action* getCurrentAction() const { return currentAction; }
 		inline int getCurrentRound() const { return totalActionTime / roundTime; }
@@ -58,6 +59,7 @@ namespace fbc {
 		bool update();
 		CombatSquare* getSquare(int col, int row);
 		int getDistanceTo(CombatSquare* square);
+		OccupantObject* getCurrentActor() const;
 		vec<CombatSquare*> findShortestPath(CombatSquare* targ);
 		void endCombat();
 		void endCurrentTurn();

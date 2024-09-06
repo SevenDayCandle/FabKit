@@ -30,8 +30,8 @@ namespace fbc {
 		this->fieldRows = encounter.data.fieldRows;
 		this->roundTime = roundTime;
 		squares.clear();
-		for (int i = 0; i < fieldColumns; i++) {
-			for (int j = 0; j < fieldRows; j++) {
+		for (int j = 0; j < fieldRows; j++) {
+			for (int i = 0; i < fieldColumns; i++) {
 				squares.emplace_back(i, j);
 			}
 		}
@@ -183,12 +183,13 @@ namespace fbc {
 	// Generate a distance map from the source to all other squares
 	void CombatInstance::fillDistances(CombatSquare* source)
 	{
-		if (source != distanceSource) {
+		if (source != distanceSource && source != nullptr) {
 			distanceSource = source;
 			deque<CombatSquare*> queue {source};
 			for (CombatSquare& sq : squares) {
 				sq.sDist = futil::INT_MAX;
 			}
+			source->sDist = 0;
 
 			while (!queue.empty()) {
 				CombatSquare* square = queue.front();
@@ -196,7 +197,7 @@ namespace fbc {
 				int scol = square->col;
 				int srow = square->row;
 				int tDist = square->sDist + 1;
-				for (int i = 0; i < DIR_X.size(); i++) {
+				for (int i = 0; i < 4; i++) {
 					int tcol = scol + DIR_X[i];
 					int trow = srow + DIR_Y[i];
 					CombatSquare* tsquare = getSquare(tcol, trow);
@@ -290,8 +291,11 @@ namespace fbc {
 	// Get the square at the col/row position
 	CombatSquare* CombatInstance::getSquare(int col, int row)
 	{
-		int targetSquare = getSquareIndex(col, row);
-		return (targetSquare < squares.size() && targetSquare >= 0 ? &squares[targetSquare] : nullptr);
+		if (col >= 0 && col < fieldColumns && row >= 0 && row < fieldRows) {
+			int targetSquare = getSquareIndex(col, row);
+			return (targetSquare < squares.size() && targetSquare >= 0 ? &squares[targetSquare] : nullptr);
+		}
+		return nullptr;
 	}
 
 	// Get the distance from the distance source to the given square. Return -1 if unreachable
@@ -299,6 +303,15 @@ namespace fbc {
 	{
 		CombatSquare* sq = getSquare(square->col, square->row);
 		return sq != nullptr ? sq->sDist : -1;
+	}
+
+	// Get the creature who is currently acting, if it exists
+	OccupantObject* CombatInstance::getCurrentActor() const {
+		CombatTurn* currentTurn = getCurrentTurn();
+		if (currentTurn) {
+			return dynamic_cast<OccupantObject*>(&currentTurn->source);
+		}
+		return nullptr;
 	}
 
 	// Find a shortest path from the source square (exclusive) to the target square (inclusive)
@@ -313,7 +326,7 @@ namespace fbc {
 				path.push_back(current);
 				int scol = current->col;
 				int srow = current->row;
-				for (int i = 0; i < DIR_X.size(); i++) {
+				for (int i = 0; i < 4; i++) {
 					int tcol = scol + DIR_X[i];
 					int trow = srow + DIR_Y[i];
 					CombatSquare* tsquare = getSquare(tcol, trow);

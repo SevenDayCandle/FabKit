@@ -14,7 +14,7 @@ import sdl.SDLRunner;
 import std;
 
 namespace fbc {
-	export class UIDialog : public UICanvas {
+	export class UIDialog : public UICanvas<> {
 	public:
 		UIDialog(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image) : UICanvas(window, move(hb)), image(image) {}
 

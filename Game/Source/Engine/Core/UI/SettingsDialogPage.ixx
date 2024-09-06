@@ -20,7 +20,7 @@ import fbc.UITextInput;
 import std;
 
 namespace fbc {
-	export class SettingsDialogPage : public UICanvas {
+	export class SettingsDialogPage : public UICanvas<> {
 		class SettingsDialogBaseCache {
 		public:
 			SettingsDialogBaseCache() {}

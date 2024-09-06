@@ -25,7 +25,7 @@ namespace sdl {
 
     // Generate a new HSVTuple from the given RGB values
     HSVTuple HSVTuple::toHSV(float r, float g, float b) {
-        HSVTuple tuple;
+        HSVTuple tuple = {};
         toHSV(tuple, r, g, b);
         return tuple;
     }
@@ -34,11 +34,11 @@ namespace sdl {
     *  Adapted from https://www.niwa.nu/2013/05/math-behind-colorspace-conversions-rgb-hsl/
        Multiply resulting hue by 6 because it was mapped to the range 0, 1 */
     void HSVTuple::fromHSV(HSVTuple& tuple, float& r, float& g, float& b) {
-        float h = tuple.h < 0 ? tuple.h + 1 : tuple.h > 1 ? tuple.h - 1 : tuple.h;
-        float c = tuple.v * tuple.s;
-        float m = tuple.v - c;
-        float x = c * (1.0f - std::abs(std::fmod(tuple.h, 2.0f) - 1.0f));
-        int i = std::floor(tuple.h * 6);
+        float h = (tuple.h < 0 ? tuple.h + 1 : tuple.h > 1 ? tuple.h - 1 : tuple.h) * 6;  // Scale hue to the [0, 6] range
+        float c = tuple.v * tuple.s;  // Chroma
+        float m = tuple.v - c;        // Match value for RGB conversion
+        float x = c * (1.0f - std::abs(std::fmod(h, 2.0f) - 1.0f));  // Calculate intermediate value
+        int i = std::floor(h);  // Determine the sector of the color wheel
 
         switch (i % 6) {
         case 0:

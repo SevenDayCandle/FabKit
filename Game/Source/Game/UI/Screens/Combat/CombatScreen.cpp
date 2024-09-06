@@ -13,6 +13,7 @@ import fbc.RelativeHitbox;
 import fbc.UIButton;
 import fbc.UIGrid;
 import fbc.UIDisposeVFX;
+import fbc.UIRecolorVFX;
 import fbc.UITransformVFX;
 import fbc.VFXAction;
 
@@ -29,7 +30,7 @@ namespace fbc {
 			for (const uptr<Card>& card : occupant->getHand()) {
 				auto res = cardUIMap.find(card.get());
 				if (res == cardUIMap.end()) {
-					createCardRender(*card, cardHandStartX() + i * CARD_W, cardHandStartY());
+					createCardRender(*card, i * CARD_W, 0);
 				}
 				++i;
 			}
@@ -63,7 +64,6 @@ namespace fbc {
 			}
 			++i;
 		}
-
 	}
 
 	void CombatScreen::onTurnRemoved(const CombatTurn* turn)
@@ -78,12 +78,15 @@ namespace fbc {
 		turnUIMap.erase(turn);
 	}
 
-	CardRenderable& CombatScreen::createCardRender(const Card& card, float tOffX, float tOffY, float sOffX, float sOffY) {
+	CardRenderable& CombatScreen::createCardRender(const Card& card, float tOffX, float sOffX, float sOffY) {
 		CardRenderable& render = cardUI.addNew<CardRenderable>(*cardUI.hb, card, sOffX, sOffY);
 		cardUIMap.emplace(&card, &render);
 		addVfxNew<UITransformVFX>(render)
 			.setFade(0, 1)
-			.setMove(tOffX, tOffY);
+			.setMove(tOffX, 0);
+		render.setOnClick([this](CardRenderable& card) {
+			selectCardRender(&card);
+		});
 		return render;
 	}
 
@@ -105,6 +108,19 @@ namespace fbc {
 			offY = square->row * TILE_SIZE;
 		}
 		return creatureUI.addNew<CreatureRenderable>(creatureUI.relhb(offX, offY, TILE_SIZE, TILE_SIZE), occupant);
+	}
+
+	void CombatScreen::highlightDistance(CombatSquare* source, const sdl::Color* color, int thresholdBegin, int thresholdEnd) {
+		CombatSquare* lastSource = instance->getDistanceSource();
+		if (lastSource != source || highlightColor != color || highlightRangeBegin != thresholdBegin || highlightRangeEnd != thresholdEnd) {
+			instance->fillDistances(source);
+			highlightColor = color;
+			highlightRangeBegin = thresholdBegin;
+			highlightRangeEnd = thresholdEnd;
+			for (CombatSquareRenderable& square : fieldUI) {
+				recolorSquare(square);
+			}
+		}
 	}
 
 	void CombatScreen::open()
@@ -135,6 +151,13 @@ namespace fbc {
 		}
 	}
 
+	void CombatScreen::recolorSquare(CombatSquareRenderable& square) {
+		const sdl::Color& target = square.square.sDist <= highlightRangeEnd && square.square.sDist >= highlightRangeBegin ? *highlightColor : sdl::COLOR_STANDARD;
+		if (square.color != target) {
+			addVfxNew<UIRecolorVFX>(square, target);
+		}
+	}
+
 	void CombatScreen::removeCardRender(Card* card) {
 		auto res = cardUIMap.find(card);
 		if (res != cardUIMap.end()) {
@@ -155,7 +178,13 @@ namespace fbc {
 	void CombatScreen::selectCardRender(CardRenderable* card) {
 		selectedCard = card;
 		if (selectedCard) {
-			// TODO
+			OccupantObject* actor = instance->getCurrentActor();
+			if (actor) {
+				highlightDistance(actor->currentSquare, &sdl::COLOR_GOLD, card->card.targetRangeBegin(), card->card.targetRangeEnd());
+			}
+		}
+		else {
+			resetHighlightDistance();
 		}
 	}
 
@@ -167,7 +196,10 @@ namespace fbc {
 		Action* currentAction = instance->getCurrentAction();
 		bool allowInteraction = currentTurn && !currentTurn->isDone && !currentAction;
 		endTurnButton.setInteractable(allowInteraction);
-		// TODO disallow moving/cards when actions are going on
+		for (CardRenderable& card : cardUI) {
+			card.setInteractable(allowInteraction);
+		}
+		// TODO disallow moving when actions are going on
 
 		UIScreen::updateImpl();
 	}

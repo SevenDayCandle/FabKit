@@ -4,15 +4,16 @@ import fbc.CoreConfig;
 import fbc.FUtil;
 import fbc.FWindow;
 import fbc.Hitbox;
+import fbc.Hoverable;
 import fbc.ScaleHitbox;
 import fbc.UICanvas;
 import fbc.UIVerticalScrollbar;
 import sdl.SDLBatchRenderPass;
 
 namespace fbc {
-	export class UIVerticalCanvas : public UICanvas {
+	export template<c_ext<Hoverable> T = Hoverable> class UIVerticalCanvas : public UICanvas<T> {
 	public:
-		UIVerticalCanvas(FWindow& window, uptr<Hitbox>&& hb, float scrollSpeed = 1): UICanvas(window, move(hb)),
+		UIVerticalCanvas(FWindow& window, uptr<Hitbox>&& hb, float scrollSpeed = 1): UICanvas<T>(window, move(hb)),
 			scrollSpeed(scrollSpeed),
 			scrollbar{ window, make_unique<ScaleHitbox>(window, hb->w * 0.93f / window.cfg.renderScale(), hb->y + hb->h * 0.05f / window.cfg.renderScale(), 48, hb->h * 0.9f / window.cfg.renderScale())},
 			baseOffsetY(hb->getOffPosY()) {
@@ -32,31 +33,31 @@ namespace fbc {
 	private:
 		float baseOffsetY;
 
-		inline void reposition(float percent) { hb->setOffPosY(baseOffsetY - percent * scrollSpeed); }
+		inline void reposition(float percent) { this->hb->setOffPosY(baseOffsetY - percent * scrollSpeed); }
 	};
 
-	UIVerticalCanvas& UIVerticalCanvas::setScrollSpeed(float scrollSpeed)
+	template<c_ext<Hoverable> T> UIVerticalCanvas<T>& UIVerticalCanvas<T>::setScrollSpeed(float scrollSpeed)
 	{
 		this->scrollSpeed = scrollSpeed;
 		reposition(scrollbar.getScroll());
 		return *this;
 	}
 
-	void UIVerticalCanvas::refreshDimensions()
+	template<c_ext<Hoverable> T> void UIVerticalCanvas<T>::refreshDimensions()
 	{
-		UICanvas::refreshDimensions();
+		UICanvas<T>::refreshDimensions();
 		scrollbar.refreshDimensions();
 	}
 
-	void UIVerticalCanvas::renderImpl(sdl::SDLBatchRenderPass& rp)
+	template<c_ext<Hoverable> T> void UIVerticalCanvas<T>::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
-		UICanvas::renderImpl(rp);
+		UICanvas<T>::renderImpl(rp);
 		scrollbar.renderImpl(rp);
 	}
 
-	void UIVerticalCanvas::updateImpl()
+	template<c_ext<Hoverable> T> void UIVerticalCanvas<T>::updateImpl()
 	{
-		UICanvas::updateImpl();
+		UICanvas<T>::updateImpl();
 		scrollbar.updateImpl();
 	}
 }

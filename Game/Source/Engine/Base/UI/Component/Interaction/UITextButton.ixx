@@ -8,6 +8,7 @@ import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.TextDrawable;
 import fbc.UIButton;
+import sdl.SDLBase;
 import sdl.SDLBatchRenderPass;
 
 namespace fbc {

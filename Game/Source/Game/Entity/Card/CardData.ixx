@@ -18,10 +18,10 @@ namespace fbc {
 			bool targetAlly = false;
 			bool targetEnemy = true;
 			bool targetSquare = false;
-			int targetRangeMax = 1;
-			int targetRangeMaxUp = 0;
-			int targetRangeMin = 1;
-			int targetRangeMinUp = 0;
+			int targetRangeBegin = 1;
+			int targetRangeBeginUp = 0;
+			int targetRangeEnd = 1;
+			int targetRangeEndUp = 0;
 			int targetSizeX = 1;
 			int targetSizeXUp = 0;
 			int targetSizeY = 1;
@@ -35,12 +35,12 @@ namespace fbc {
 			bool targetSquare = false;
 			int costBase = 3;
 			int costUp = 0;
-			int maxCopies = -1;
-			int maxUpgrades = 1;
-			int targetRangeMax = 1;
-			int targetRangeMaxUp = 0;
-			int targetRangeMin = 1;
-			int targetRangeMinUp = 0;
+			int BeginCopies = -1;
+			int BeginUpgrades = 1;
+			int targetRangeBegin = 1;
+			int targetRangeBeginUp = 0;
+			int targetRangeEnd = 1;
+			int targetRangeEndUp = 0;
 			int targetSizeX = 1;
 			int targetSizeXUp = 0;
 			int targetSizeY = 1;
@@ -59,15 +59,15 @@ namespace fbc {
 				isUpgradeBranchOptional = fields.isUpgradeBranchOptional;
 				costBase = fields.costBase;
 				costUp = fields.costUp;
-				maxCopies = fields.maxCopies;
-				maxUpgrades = fields.maxUpgrades;
+				BeginCopies = fields.BeginCopies;
+				BeginUpgrades = fields.BeginUpgrades;
 				target.targetAlly = fields.targetAlly;
 				target.targetEnemy = fields.targetEnemy;
 				target.targetSquare = fields.targetSquare;
-				target.targetRangeMax = fields.targetRangeMax;
-				target.targetRangeMaxUp = fields.targetRangeMaxUp;
-				target.targetRangeMin = fields.targetRangeMin;
-				target.targetRangeMinUp = fields.targetRangeMinUp;
+				target.targetRangeBegin = fields.targetRangeBegin;
+				target.targetRangeBeginUp = fields.targetRangeBeginUp;
+				target.targetRangeEnd = fields.targetRangeEnd;
+				target.targetRangeEndUp = fields.targetRangeEndUp;
 				target.targetSizeX = fields.targetSizeX;
 				target.targetSizeXUp = fields.targetSizeXUp;
 				target.targetSizeY = fields.targetSizeY;
@@ -87,8 +87,8 @@ namespace fbc {
 			CardType* type;
 			int costBase = 3;
 			int costUp = 0;
-			int maxCopies = -1;
-			int maxUpgrades = 1;
+			int BeginCopies = -1;
+			int BeginUpgrades = 1;
 			ObjectRarity* rarity;
 			vec<uptr<Effect>> effects;
 			vec<str> tags;
@@ -101,6 +101,10 @@ namespace fbc {
 		RuntimeFields data;
 
 		inline int getCost(int level) const { return data.costBase + data.costUp * level; }
+		inline int getTargetRangeBegin(int level) const { return data.target.targetRangeBegin + data.target.targetRangeBeginUp * level; }
+		inline int getTargetRangeEnd(int level) const { return data.target.targetRangeEnd + data.target.targetRangeEndUp * level; }
+		inline int getTargetSizeX(int level) const { return data.target.targetSizeX + data.target.targetSizeXUp * level; }
+		inline int getTargetSizeY(int level) const { return data.target.targetSizeY + data.target.targetSizeYUp * level; }
 
 		ExportFields createExport() const;
 	};
@@ -112,15 +116,15 @@ namespace fbc {
 		fields.isUpgradeBranchOptional = data.isUpgradeBranchOptional;
 		fields.costBase = data.costBase;
 		fields.costUp = data.costUp;
-		fields.maxCopies = data.maxCopies;
-		fields.maxUpgrades = data.maxUpgrades;
+		fields.BeginCopies = data.BeginCopies;
+		fields.BeginUpgrades = data.BeginUpgrades;
 		fields.targetAlly = data.target.targetAlly;
 		fields.targetEnemy = data.target.targetEnemy;
 		fields.targetSquare = data.target.targetSquare;
-		fields.targetRangeMax = data.target.targetRangeMax;
-		fields.targetRangeMaxUp = data.target.targetRangeMaxUp;
-		fields.targetRangeMin = data.target.targetRangeMin;
-		fields.targetRangeMinUp = data.target.targetRangeMinUp;
+		fields.targetRangeBegin = data.target.targetRangeBegin;
+		fields.targetRangeBeginUp = data.target.targetRangeBeginUp;
+		fields.targetRangeEnd = data.target.targetRangeEnd;
+		fields.targetRangeEndUp = data.target.targetRangeEndUp;
 		fields.targetSizeX = data.target.targetSizeX;
 		fields.targetSizeXUp = data.target.targetSizeXUp;
 		fields.targetSizeY = data.target.targetSizeY;

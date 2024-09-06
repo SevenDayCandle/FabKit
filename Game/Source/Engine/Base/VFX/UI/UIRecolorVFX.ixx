@@ -57,7 +57,7 @@ namespace fbc {
 	void UIRecolorVFX::update() {
 		float rate = 1 - std::pow(1 - ticks / duration, 3);
 		sdl::HSVTuple tuple = {
-			.h = srcHSV.s + rate * interpHue,
+			.h = srcHSV.h + rate * interpHue,
 			.s = futil::fastLerp(srcHSV.s, targHSV.s, rate),
 			.v = futil::fastLerp(srcHSV.v, targHSV.v, rate),
 		};
@@ -65,10 +65,24 @@ namespace fbc {
 	}
 
 	// When interpolating hue, we want to interpolate across the direction that is shorter
+	// If we are interpolating to or from a color with a saturation of 0, we should not change the hue to make transitions smoother
 	void UIRecolorVFX::refreshInterpHue() {
-		interpHue = targHSV.h - srcHSV.h;
-		if (std::abs(interpHue) > 0.5) {
-			interpHue = (interpHue > 0) ? interpHue - 1 : interpHue + 1;
+		if (targHSV.s <= 0) {
+			targHSV.h = srcHSV.h;
+			interpHue = 0;
+		}
+		else if (srcHSV.s <= 0) {
+			srcHSV.h = targHSV.h;
+			interpHue = 0;
+		}
+		else {
+			interpHue = targHSV.h - srcHSV.h;
+			if (interpHue > 0.5) {
+				interpHue -= 1.0;
+			}
+			else if (interpHue < -0.5) {
+				interpHue += 1.0;
+			}
 		}
 	}
 }

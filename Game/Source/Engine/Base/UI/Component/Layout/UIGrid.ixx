@@ -3,14 +3,15 @@ export module fbc.UIGrid;
 import fbc.CoreConfig;
 import fbc.FWindow;
 import fbc.Hitbox;
-import fbc.UIBase;
+import fbc.Hoverable;
 import fbc.FUtil;
 import fbc.ScaleHitbox;
+import fbc.UIBase;
 import sdl.SDLBatchRenderPass;
 import std;
 
 namespace fbc {
-	export template <c_ext<UIBase> T> class UIGrid : public UIBase {
+	export template <c_ext<Hoverable> T> class UIGrid : public UIBase {
 	public:
 		class Iterator {
 		public:
@@ -71,13 +72,13 @@ namespace fbc {
 		virtual float updateItemOffsets(int begin, int end);
 	};
 
-	template<c_ext<UIBase> T> bool UIGrid<T>::isHovered()
+	template<c_ext<Hoverable> T> bool UIGrid<T>::isHovered()
 	{
 		return std::ranges::any_of(items, [](const uptr<T>& i) { return i->isHovered(); });
 	}
 
 	// Updates the dimensions of all children too
-	template<c_ext<UIBase> T> void UIGrid<T>::refreshDimensions()
+	template<c_ext<Hoverable> T> void UIGrid<T>::refreshDimensions()
 	{
 		UIBase::refreshDimensions();
 		for (const uptr<T>& element : items) {
@@ -85,14 +86,14 @@ namespace fbc {
 		}
 	}
 
-	template<c_ext<UIBase> T> void UIGrid<T>::renderImpl(sdl::SDLBatchRenderPass& rp)
+	template<c_ext<Hoverable> T> void UIGrid<T>::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
 		for (const uptr<T>& item : items) {
 			item->render(rp);
 		}
 	}
 
-	template<c_ext<UIBase> T> void UIGrid<T>::updateImpl()
+	template<c_ext<Hoverable> T> void UIGrid<T>::updateImpl()
 	{
 		UIBase::updateImpl();
 		for (const uptr<T>& item : items) {
@@ -101,7 +102,7 @@ namespace fbc {
 	}
 
 	// Updates the positions of items from index begin (inclusive) to index end (exclusive), and shows the scrollbar if any of them would extend outside of the grid
-	template<c_ext<UIBase> T> float UIGrid<T>::updateItemOffsets(int begin, int end) {
+	template<c_ext<Hoverable> T> float UIGrid<T>::updateItemOffsets(int begin, int end) {
 		float sx = win.cfg.renderScale(intervalX);
 		float sy = win.cfg.renderScale(intervalY);
 		int rowsize = std::max(1.0f, hb->w / sx);
@@ -110,7 +111,7 @@ namespace fbc {
 		float x = hb->x + sx * xP;
 		float y = hb->y + sy * yP;
 		for (int i = begin; i < end; ++i) {
-			items[i]->hb->setRealPos(x, y);
+			items[i]->getHb()->setRealPos(x, y);
 
 			x += sx;
 			if (x > hb->x + hb->w) {
@@ -122,7 +123,7 @@ namespace fbc {
 	}
 
 	// Add a singular item to the list
-	template<c_ext<UIBase> T> T& UIGrid<T>::add(uptr<T>&& item)
+	template<c_ext<Hoverable> T> T& UIGrid<T>::add(uptr<T>&& item)
 	{
 		T& ref = *item;
 		this->items.push_back(std::move(item));
@@ -131,7 +132,7 @@ namespace fbc {
 	}
 
 	// Sets up an interval between items based on the hitbox size of the first item. Does nothing if there are no items
-	template<c_ext<UIBase> T> UIGrid<T>& UIGrid<T>::autosetInterval(float spacingX, float spacingY) {
+	template<c_ext<Hoverable> T> UIGrid<T>& UIGrid<T>::autosetInterval(float spacingX, float spacingY) {
 		if (this->items.size() > 0) {
 			Hitbox& firsth = *this->items[0]->getHb();
 			setInterval(firsth.getScaleOffSizeX() + spacingX, firsth.getScaleOffSizeY() + spacingY);
@@ -140,7 +141,7 @@ namespace fbc {
 	}
 
 	// Update the starting interval between items. Note that this interval does not respect the actual sizes of UI elements and can result in overlap if it is smaller than the UI size; use autosetInterval if you want to guarantee avoidance of overlap
-	template<c_ext<UIBase> T> UIGrid<T>& UIGrid<T>::setInterval(float spacingX, float spacingY) {
+	template<c_ext<Hoverable> T> UIGrid<T>& UIGrid<T>::setInterval(float spacingX, float spacingY) {
 		this->intervalX = spacingX;
 		this->intervalY = spacingY;
 		updateItemOffsets();
@@ -148,21 +149,21 @@ namespace fbc {
 	}
 
 	// Update the starting X interval between items. Note that this interval does not respect the actual sizes of UI elements and can result in overlap if it is smaller than the UI size; use autosetInterval if you want to guarantee avoidance of overlap
-	template<c_ext<UIBase> T> UIGrid<T>& UIGrid<T>::setIntervalX(float spacingX) {
+	template<c_ext<Hoverable> T> UIGrid<T>& UIGrid<T>::setIntervalX(float spacingX) {
 		this->intervalX = spacingX;
 		updateItemOffsets();
 		return *this;
 	}
 
 	// Update the starting Y interval between items. Note that this interval does not respect the actual sizes of UI elements and can result in overlap if it is smaller than the UI size; use autosetInterval if you want to guarantee avoidance of overlap
-	template<c_ext<UIBase> T> UIGrid<T>& UIGrid<T>::setIntervalY(float spacingY) {
+	template<c_ext<Hoverable> T> UIGrid<T>& UIGrid<T>::setIntervalY(float spacingY) {
 		this->intervalY = spacingY;
 		updateItemOffsets();
 		return *this;
 	}
 
 	// Removes a specified element and returns it
-	template<c_ext<UIBase> T> uptr<T> UIGrid<T>::extract(T* item) {
+	template<c_ext<Hoverable> T> uptr<T> UIGrid<T>::extract(T* item) {
 		for (auto it = items.begin(); it != items.end(); ++it) {
 			if (it->get() == item) {
 				uptr<T> extracted(it->release());
@@ -174,7 +175,7 @@ namespace fbc {
 	}
 
 	// Appends items to the end of the grid
-	template<c_ext<UIBase> T> template<c_itr<uptr<T>> Iterable> UIGrid<T>& UIGrid<T>::addItems(const Iterable& added) {
+	template<c_ext<Hoverable> T> template<c_itr<uptr<T>> Iterable> UIGrid<T>& UIGrid<T>::addItems(const Iterable& added) {
 		int a = this->items.size();
 		this->items.insert(this->items.end(),
 			std::make_move_iterator(added.begin()),
@@ -185,7 +186,7 @@ namespace fbc {
 	}
 
 	// Replaces the contents of the grid with the incoming items
-	template<c_ext<UIBase> T> template<c_itr<uptr<T>> Iterable> UIGrid<T>& UIGrid<T>::setItems(const Iterable& items)
+	template<c_ext<Hoverable> T> template<c_itr<uptr<T>> Iterable> UIGrid<T>& UIGrid<T>::setItems(const Iterable& items)
 	{
 		this->items = std::move(items);
 		updateItemOffsets();
