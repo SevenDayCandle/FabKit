@@ -74,6 +74,7 @@ namespace fbc {
 	export template <typename T> using strumap = umap<std::string, T, str_hash, std::equal_to<>>;
 	export template <typename T> using uptr = std::unique_ptr<T>;
 	export template <typename T> using vec = std::vector<T>;
+	export using cstr = const char[];
 	export using dir_entry = std::filesystem::directory_entry;
 	export using dir_itr = std::filesystem::directory_iterator;
 	export using file_type = std::filesystem::file_type;

@@ -8,10 +8,11 @@ import fbc.StatusTurnMode;
 import std;
 
 namespace fbc {
-	export constexpr strv PATH_STATUS = "Statuses";
-
 	export class StatusData : public GameObjectData<StatusData> {
 	public:
+		static constexpr cstr FOLDER = "Statuses";
+		static constexpr cstr LOCPATH = "StatusStrings";
+
 		struct Fields {
 			bool removable;
 			bool debuff;

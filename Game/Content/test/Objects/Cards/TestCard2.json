@@ -1,0 +1,8 @@
+{
+  "costBase": 2,
+  "rarity": "COMMON",
+  "targetEnemy": true,
+  "targetRangeEnd": 3,
+  "targetSizeX": 2,
+  "targetSizeY": 2
+}

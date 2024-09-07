@@ -16,6 +16,7 @@ import fbc.UIDisposeVFX;
 import fbc.UIRecolorVFX;
 import fbc.UITransformVFX;
 import fbc.VFXAction;
+import sdl.SDLRunner;
 
 module fbc.CombatScreen;
 
@@ -200,6 +201,11 @@ namespace fbc {
 			card.setInteractable(allowInteraction);
 		}
 		// TODO disallow moving when actions are going on
+
+		// When clicking a non-card, unselect the card
+		if (sdl::runner::mouseIsLeftJustClicked() && !cardUI.isHovered()) {
+			selectCardRender(nullptr);
+		}
 
 		UIScreen::updateImpl();
 	}

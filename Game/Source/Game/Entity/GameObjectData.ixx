@@ -10,7 +10,8 @@ namespace fbc {
 	public:
 		ObjectStrings* strings;
 	protected:
-		GameObjectData(BaseContent& source, strv id) : ContentRegisterable<T>(source, id) {}
+		GameObjectData(BaseContent& source, strv id) : ContentRegisterable<T>(source, id), strings(source.getObjectStrings(T::LOCPATH, id)) {}
+		GameObjectData(BaseContent& source, strv id, ObjectStrings* strings) : ContentRegisterable<T>(source, id), strings(strings) {}
 	private:
 		//map<str,str> customFields;
 	};

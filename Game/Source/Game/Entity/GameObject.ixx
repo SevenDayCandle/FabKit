@@ -24,7 +24,7 @@ namespace fbc {
 
 		T& data;
 
-		inline BaseContent& source() override { return data.source; }
+		inline BaseContent& source() final override { return data.source; }
 		inline ObjectStrings* strings() override { return data.strings; }
 		inline strv description(int ind) { return data.strings && ind < data.strings->DESCRIPTION.size() ? data.strings->DESCRIPTION[ind] : futil::BLANK; }
 		inline strv id() override { return data.id; }

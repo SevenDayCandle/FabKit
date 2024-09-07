@@ -661,6 +661,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
   </ItemGroup>
   <ItemGroup>
     <None Include="Content\test\Objects\Cards\TestCard.json" />
+    <None Include="Content\test\Objects\Cards\TestCard2.json" />
     <None Include="Content\test\Objects\Creatures\TestCreature.json" />
     <None Include="Content\test\Objects\Creatures\TestPlayer.json">
       <SubType>

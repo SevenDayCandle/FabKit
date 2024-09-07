@@ -10,10 +10,11 @@ import fbc.ItemListing;
 import std;
 
 namespace fbc {
-	export constexpr strv PATH_CREATURE = "Creatures";
-
 	export class CreatureData : public GameObjectData<CreatureData> {
 	public:
+		static constexpr cstr FOLDER = "Creatures";
+		static constexpr cstr LOCPATH = "CreatureStrings";
+
 		struct Fields {
 			int actSpeed = 100;
 			int actSpeedUp = 0;
@@ -60,13 +61,13 @@ namespace fbc {
 	{
 		if (!imageField) {
 			if (data.imageField.size() > 0) {
-				FTexture* tex = source.getTexture(str(PATH_CREATURE) + "/" + data.imageField);
+				FTexture* tex = source.getTexture(str(FOLDER) + "/" + data.imageField);
 				if (tex && tex->loaded()) {
 					imageField = tex;
 				}
 			}
 			if (!imageField) {
-				FTexture* tex = source.getTexture(str(PATH_CREATURE) + "/" + id + "_f.png");
+				FTexture* tex = source.getTexture(str(FOLDER) + "/" + id + "_f.png");
 				if (tex && tex->loaded()) {
 					imageField = tex;
 				}
@@ -81,7 +82,7 @@ namespace fbc {
 	IDrawable& CreatureData::getImagePortrait() const
 	{
 		if (!imagePortrait) {
-			FTexture* tex = source.getTexture(str(PATH_CREATURE) + "/" + id + ".png");
+			FTexture* tex = source.getTexture(str(FOLDER) + "/" + id + ".png");
 			if (tex && tex->loaded()) {
 				imagePortrait = tex;
 			}

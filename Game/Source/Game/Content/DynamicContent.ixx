@@ -5,12 +5,12 @@ module;
 export module fbc.DynamicContent;
 
 import fbc.BaseContent;
-import fbc.BaseStrings;
 import fbc.CardData;
 import fbc.CoreConfig;
 import fbc.CoreContent;
 import fbc.CreatureData;
 import fbc.DynamicLoadables;
+import fbc.DynamicStrings;
 import fbc.FMusic;
 import fbc.FSound;
 import fbc.FTexture;
@@ -34,7 +34,7 @@ namespace fbc {
 		DynamicContent(CoreConfig& cfg, strv id, strv folder): BaseContent(cfg, id, folder) {}
 		~DynamicContent() override {}
 
-		BaseStrings strings = BaseStrings(*this);
+		DynamicStrings strings = DynamicStrings(*this);
 		DynamicLoadables<FMusic> music = DynamicLoadables<FMusic>(*this);
 		DynamicLoadables<FSound> sounds = DynamicLoadables<FSound>(*this);
 		DynamicLoadables<FTexture> images = DynamicLoadables<FTexture>(*this);
@@ -42,11 +42,11 @@ namespace fbc {
 		inline FMusic* getMusic(strv key) const override { return music.get(key); }
 		inline FSound* getSound(strv key) const override { return sounds.get(key); }
 		inline FTexture* getTexture(strv key) const override { return images.get(key); }
-		inline void processCards() { setupContentFolder(PATH_CARD, [this](const path& entry) {processCard(entry); }); }
-		inline void processCreatures() { setupContentFolder(PATH_CREATURE, [this](const path& entry) {processCreature(entry); }); }
+		inline void processCards() { setupContentFolder(CardData::FOLDER, [this](const path& entry) {processCard(entry); }); }
+		inline void processCreatures() { setupContentFolder(CreatureData::FOLDER, [this](const path& entry) {processCreature(entry); }); }
 		inline void processKeywords() { setupContentFolder(PATH_KEYWORDS, [this](const path& entry) {processKeyword(entry); }); }
-		inline void processPassives() { setupContentFolder(PATH_PASSIVE, [this](const path& entry) {processKeyword(entry); }); }
-		inline void processStatuses() { setupContentFolder(PATH_STATUS, [this](const path& entry) {processKeyword(entry); }); }
+		inline void processPassives() { setupContentFolder(PassiveData::FOLDER, [this](const path& entry) {processKeyword(entry); }); }
+		inline void processStatuses() { setupContentFolder(StatusData::FOLDER, [this](const path& entry) {processKeyword(entry); }); }
 
 
 		void dispose() override;
@@ -187,7 +187,6 @@ namespace fbc {
 				}
 			}
 		}
-
 	}
 
 	// De-register creatures, objects, etc.

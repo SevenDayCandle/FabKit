@@ -4,6 +4,7 @@
   "health": 150,
   "cards": [
     {
+      "count": 3,
       "id": "test:TestCard"
     }
   ]

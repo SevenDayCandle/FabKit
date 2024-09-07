@@ -12,10 +12,11 @@ import sdl.SDLRunner;
 import std;
 
 namespace fbc {
-	export constexpr strv PATH_PASSIVE = "Passives";
-
 	export class PassiveData : public GameObjectData<PassiveData> {
 	public:
+		static constexpr cstr FOLDER = "Passives";
+		static constexpr cstr LOCPATH = "PassiveStrings";
+
 		struct ExportFields {
 			int maxUpgrades;
 			str effects;

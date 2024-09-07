@@ -1,6 +1,7 @@
 export module fbc.CardData;
 
 import fbc.BaseContent;
+import fbc.BaseStrings;
 import fbc.CardGroup;
 import fbc.CardType;
 import fbc.Effect;
@@ -10,10 +11,11 @@ import fbc.ObjectRarity;
 import std;
 
 namespace fbc {
-	export constexpr strv PATH_CARD = "Cards";
-
 	export class CardData : public GameObjectData<CardData> {
 	public:
+		static constexpr cstr FOLDER = "Cards";
+		static constexpr cstr LOCPATH = "CardStrings";
+
 		struct CardTargeting {
 			bool targetAlly = false;
 			bool targetEnemy = true;

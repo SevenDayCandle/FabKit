@@ -26,28 +26,39 @@ namespace fbc {
 		virtual void dispose() {};
 		virtual void initialize() {};
 	protected:
+		inline path getBasePathForLanguage() const {
+			return getBasePathForLanguage(content.cfg.getLanguage());
+		}
+		inline path getBasePathForLanguage(const Language& lang) const {
+			return content.contentFolder / STRINGS_PATH / lang.id;
+		}
 		inline path getPathForLanguage(const strv& suffix) const {
 			return getPathForLanguage(content.cfg.getLanguage(), suffix);
 		};
 		inline path getPathForLanguage(const Language& lang, const strv& suffix) const {
 			return (content.contentFolder / STRINGS_PATH / lang.id / suffix).replace_extension(futil::JSON_EXT);
 		};
-		void loadKeywordStrings(strumap<KeywordStrings>& res, const strv& suffix = DEFAULT_KEYWORDS);
-		void loadObjectStrings(strumap<ObjectStrings>& res, const strv& suffix);
-		void loadUIStrings(strumap<str>& res, const strv& suffix = DEFAULT_UI);
+		bool loadKeywordStrings(strumap<KeywordStrings>& res, const strv& suffix = DEFAULT_KEYWORDS);
+		bool loadObjectStrings(strumap<ObjectStrings>& res, const strv& suffix);
+		bool loadObjectStringsFromFullPath(strumap<ObjectStrings>& res, const strv& suffix);
+		bool loadUIStrings(strumap<str>& res, const strv& suffix = DEFAULT_UI);
 	};
 
-	void BaseStrings::loadKeywordStrings(strumap<KeywordStrings>& res, const strv& suffix)
+	bool BaseStrings::loadKeywordStrings(strumap<KeywordStrings>& res, const strv& suffix)
 	{
-		glz::read_file_json(res, getPathForLanguage(suffix).string(), str{});
+		return !glz::read_file_json(res, getPathForLanguage(suffix).string(), str{});
 	}
 
-	void BaseStrings::loadObjectStrings(strumap<ObjectStrings>& res, const strv& suffix)
+	bool BaseStrings::loadObjectStrings(strumap<ObjectStrings>& res, const strv& suffix)
 	{
-		glz::read_file_json(res, getPathForLanguage(suffix).string(), str{});
+		return !glz::read_file_json(res, getPathForLanguage(suffix).string(), str{});
 	}
 
-	void BaseStrings::loadUIStrings(strumap<str>& res, const strv& suffix) {
-		glz::read_file_json(res, getPathForLanguage(suffix).string(), str{});
+	bool BaseStrings::loadObjectStringsFromFullPath(strumap<ObjectStrings>& res, const strv& path) {
+		return !glz::read_file_json(res, path, str{});
+	}
+
+	bool BaseStrings::loadUIStrings(strumap<str>& res, const strv& suffix) {
+		return !glz::read_file_json(res, getPathForLanguage(suffix).string(), str{});
 	}
 }
