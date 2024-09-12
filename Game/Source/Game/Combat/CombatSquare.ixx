@@ -18,6 +18,7 @@ namespace fbc {
 
 			CombatSquare* currentSquare;
 
+			virtual inline int getMovement() { return 0; }
 			virtual inline void postInitialize() {}
 			virtual inline void queueTurn() {}
 
@@ -30,6 +31,8 @@ namespace fbc {
 		int row;
 		int sDist;
 
+		inline int getLineDistance(const CombatSquare& other) const { return getLineDistance(other.col, other.row); }
+		inline int getLineDistance(int tCol, int tRow) const { return std::max(std::abs(tCol - col), std::abs(tRow - row)); }
 		inline OccupantObject* getOccupant() const { return occupant; }
 
 		bool passable();

@@ -67,6 +67,7 @@ namespace fbc {
 		int getActionSpeed();
 		int getCardDraw();
 		int getEnergyGain();
+		int getMovement() override;
 		PileGroup& getPile(const PileType& type);
 		void drawCard();
 		void drawForStartOfTurn();

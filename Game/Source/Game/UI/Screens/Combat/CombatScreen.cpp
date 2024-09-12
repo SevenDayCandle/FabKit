@@ -111,13 +111,20 @@ namespace fbc {
 		return creatureUI.addNew<CreatureRenderable>(creatureUI.relhb(offX, offY, TILE_SIZE, TILE_SIZE), occupant);
 	}
 
-	void CombatScreen::highlightDistance(CombatSquare* source, const sdl::Color* color, int thresholdBegin, int thresholdEnd) {
+	void CombatScreen::highlightDistance(CombatSquare* source, const sdl::Color* color, const sdl::Color* moveColor, int highlightRangeBegin, int highlightRangeEnd, int movementRange, int targetSizeX, int targetSizeY) {
 		CombatSquare* lastSource = instance->getDistanceSource();
-		if (lastSource != source || highlightColor != color || highlightRangeBegin != thresholdBegin || highlightRangeEnd != thresholdEnd) {
+		if (lastSource != source || targetingColor != color || halfColor != moveColor
+			|| this->highlightRangeBegin != highlightRangeBegin || this->highlightRangeEnd != highlightRangeEnd
+			|| this->movementRange != movementRange || this->targetSizeX != targetSizeX || this->targetSizeY != targetSizeY) {
 			instance->fillDistances(source);
-			highlightColor = color;
-			highlightRangeBegin = thresholdBegin;
-			highlightRangeEnd = thresholdEnd;
+			targetingColor = color;
+			halfColor = moveColor;
+			this->distanceSource = source;
+			this->highlightRangeBegin = highlightRangeBegin;
+			this->highlightRangeEnd = highlightRangeEnd;
+			this->movementRange = movementRange;
+			this->targetSizeX = targetSizeX;
+			this->targetSizeY = targetSizeY;
 			for (CombatSquareRenderable& square : fieldUI) {
 				recolorSquare(square);
 			}
@@ -153,7 +160,9 @@ namespace fbc {
 	}
 
 	void CombatScreen::recolorSquare(CombatSquareRenderable& square) {
-		const sdl::Color& target = square.square.sDist <= highlightRangeEnd && square.square.sDist >= highlightRangeBegin ? *highlightColor : sdl::COLOR_STANDARD;
+		int lineDistance = distanceSource ? square.square.getLineDistance(*distanceSource) : 0;
+		const sdl::Color& target = lineDistance <= highlightRangeEnd && lineDistance >= highlightRangeBegin ? *targetingColor :
+			lineDistance + square.square.sDist <= highlightRangeEnd + movementRange ? *halfColor : sdl::COLOR_STANDARD;
 		if (square.color != target) {
 			addVfxNew<UIRecolorVFX>(square, target);
 		}
@@ -181,7 +190,8 @@ namespace fbc {
 		if (selectedCard) {
 			OccupantObject* actor = instance->getCurrentActor();
 			if (actor) {
-				highlightDistance(actor->currentSquare, &sdl::COLOR_GOLD, card->card.targetRangeBegin(), card->card.targetRangeEnd());
+				int movement = actor->getMovement();
+				highlightDistance(actor->currentSquare, &sdl::COLOR_GOLD, &sdl::COLOR_LIME, card->card.targetRangeBegin(), card->card.targetRangeEnd(), movement, card->card.targetSizeX(), card->card.targetSizeY());
 			}
 		}
 		else {

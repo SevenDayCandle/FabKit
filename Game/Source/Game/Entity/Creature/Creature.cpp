@@ -1,6 +1,6 @@
 module;
 
-import fbc.CallbackAction;
+import fbc.ArbitraryAction;
 import fbc.Card;
 import fbc.CardData;
 import fbc.CombatInstance;
@@ -32,7 +32,7 @@ namespace fbc {
 	// Reinsert a turn into queue based on current speed
 	void Creature::onTurnEnd()
 	{
-		GameRun::current->getCombatInstance()->queueAction(make_unique<CallbackAction>([this]() {queueTurn(); }));
+		GameRun::current->getCombatInstance()->queueAction(make_unique<ArbitraryAction>([this]() {queueTurn(); }));
 		// TODO end turn hooks
 		// TODO status updates
 	}
@@ -152,6 +152,13 @@ namespace fbc {
 		// TODO subscribers
 		// TODO statuses
 		return base;
+	}
+
+	// How far this creature can move this turn
+	int Creature::getMovement() {
+		// TODO subscribers
+		// TODO statuses
+		return movement;
 	}
 
 	// Get the actual card list associated with this pile type

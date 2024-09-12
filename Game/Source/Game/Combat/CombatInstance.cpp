@@ -258,6 +258,7 @@ namespace fbc {
 		// Run current action
 		if (currentAction) {
 			if (currentAction->run()) {
+				currentAction->complete();
 				currentAction = nullptr;
 				actionQueue.pop_front();
 			}
