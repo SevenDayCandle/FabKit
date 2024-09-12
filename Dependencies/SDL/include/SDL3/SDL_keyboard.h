@@ -31,6 +31,9 @@
 #include <SDL3/SDL_stdinc.h>
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_keycode.h>
+#include <SDL3/SDL_properties.h>
+#include <SDL3/SDL_rect.h>
+#include <SDL3/SDL_scancode.h>
 #include <SDL3/SDL_video.h>
 
 #include <SDL3/SDL_begin_code.h>
@@ -45,8 +48,7 @@ extern "C" {
  *
  * If the keyboard is disconnected and reconnected, it will get a new ID.
  *
- * The ID value starts at 1 and increments from there. The value 0 is an
- * invalid ID.
+ * The value 0 is an invalid ID.
  *
  * \since This datatype is available since SDL 3.0.0.
  */
@@ -117,9 +119,9 @@ extern SDL_DECLSPEC SDL_Window * SDLCALL SDL_GetKeyboardFocus(void);
  * valid for the whole lifetime of the application and should not be freed by
  * the caller.
  *
- * A array element with a value of 1 means that the key is pressed and a value
- * of 0 means that it is not. Indexes into this array are obtained by using
- * SDL_Scancode values.
+ * A array element with a value of SDL_TRUE means that the key is pressed and
+ * a value of SDL_FALSE means that it is not. Indexes into this array are
+ * obtained by using SDL_Scancode values.
  *
  * Use SDL_PumpEvents() to update the state array.
  *
@@ -139,7 +141,7 @@ extern SDL_DECLSPEC SDL_Window * SDLCALL SDL_GetKeyboardFocus(void);
  * \sa SDL_PumpEvents
  * \sa SDL_ResetKeyboard
  */
-extern SDL_DECLSPEC const Uint8 * SDLCALL SDL_GetKeyboardState(int *numkeys);
+extern SDL_DECLSPEC const SDL_bool * SDLCALL SDL_GetKeyboardState(int *numkeys);
 
 /**
  * Clear the state of the keyboard.
@@ -232,14 +234,14 @@ extern SDL_DECLSPEC SDL_Scancode SDLCALL SDL_GetScancodeFromKey(SDL_Keycode key,
  * \param name the name to use for the scancode, encoded as UTF-8. The string
  *             is not copied, so the pointer given to this function must stay
  *             valid while SDL is being used.
- * \returns 0 on success or a negative error code on failure; call
- *          SDL_GetError() for more information.
+ * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *          for more information.
  *
  * \since This function is available since SDL 3.0.0.
  *
  * \sa SDL_GetScancodeName
  */
-extern SDL_DECLSPEC int SDLCALL SDL_SetScancodeName(SDL_Scancode scancode, const char *name);
+extern SDL_DECLSPEC SDL_bool SDLCALL SDL_SetScancodeName(SDL_Scancode scancode, const char *name);
 
 /**
  * Get a human-readable name for a scancode.
@@ -323,8 +325,8 @@ extern SDL_DECLSPEC SDL_Keycode SDLCALL SDL_GetKeyFromName(const char *name);
  * On some platforms using this function shows the screen keyboard.
  *
  * \param window the window to enable text input.
- * \returns 0 on success or a negative error code on failure; call
- *          SDL_GetError() for more information.
+ * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *          for more information.
  *
  * \since This function is available since SDL 3.0.0.
  *
@@ -333,7 +335,7 @@ extern SDL_DECLSPEC SDL_Keycode SDLCALL SDL_GetKeyFromName(const char *name);
  * \sa SDL_StopTextInput
  * \sa SDL_TextInputActive
  */
-extern SDL_DECLSPEC int SDLCALL SDL_StartTextInput(SDL_Window *window);
+extern SDL_DECLSPEC SDL_bool SDLCALL SDL_StartTextInput(SDL_Window *window);
 
 /**
  * Text input type.
@@ -415,8 +417,8 @@ typedef enum SDL_Capitalization
  *
  * \param window the window to enable text input.
  * \param props the properties to use.
- * \returns 0 on success or a negative error code on failure; call
- *          SDL_GetError() for more information.
+ * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *          for more information.
  *
  * \since This function is available since SDL 3.0.0.
  *
@@ -425,7 +427,7 @@ typedef enum SDL_Capitalization
  * \sa SDL_StopTextInput
  * \sa SDL_TextInputActive
  */
-extern SDL_DECLSPEC int SDLCALL SDL_StartTextInputWithProperties(SDL_Window *window, SDL_PropertiesID props);
+extern SDL_DECLSPEC SDL_bool SDLCALL SDL_StartTextInputWithProperties(SDL_Window *window, SDL_PropertiesID props);
 
 #define SDL_PROP_TEXTINPUT_TYPE_NUMBER                  "SDL.textinput.type"
 #define SDL_PROP_TEXTINPUT_CAPITALIZATION_NUMBER        "SDL.textinput.capitalization"
@@ -452,28 +454,28 @@ extern SDL_DECLSPEC SDL_bool SDLCALL SDL_TextInputActive(SDL_Window *window);
  * it.
  *
  * \param window the window to disable text input.
- * \returns 0 on success or a negative error code on failure; call
- *          SDL_GetError() for more information.
+ * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *          for more information.
  *
  * \since This function is available since SDL 3.0.0.
  *
  * \sa SDL_StartTextInput
  */
-extern SDL_DECLSPEC int SDLCALL SDL_StopTextInput(SDL_Window *window);
+extern SDL_DECLSPEC SDL_bool SDLCALL SDL_StopTextInput(SDL_Window *window);
 
 /**
  * Dismiss the composition window/IME without disabling the subsystem.
  *
  * \param window the window to affect.
- * \returns 0 on success or a negative error code on failure; call
- *          SDL_GetError() for more information.
+ * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *          for more information.
  *
  * \since This function is available since SDL 3.0.0.
  *
  * \sa SDL_StartTextInput
  * \sa SDL_StopTextInput
  */
-extern SDL_DECLSPEC int SDLCALL SDL_ClearComposition(SDL_Window *window);
+extern SDL_DECLSPEC SDL_bool SDLCALL SDL_ClearComposition(SDL_Window *window);
 
 /**
  * Set the area used to type Unicode text input.
@@ -486,15 +488,15 @@ extern SDL_DECLSPEC int SDLCALL SDL_ClearComposition(SDL_Window *window);
  *             coordinates, or NULL to clear it.
  * \param cursor the offset of the current cursor location relative to
  *               `rect->x`, in window coordinates.
- * \returns 0 on success or a negative error code on failure; call
- *          SDL_GetError() for more information.
+ * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *          for more information.
  *
  * \since This function is available since SDL 3.0.0.
  *
  * \sa SDL_GetTextInputArea
  * \sa SDL_StartTextInput
  */
-extern SDL_DECLSPEC int SDLCALL SDL_SetTextInputArea(SDL_Window *window, const SDL_Rect *rect, int cursor);
+extern SDL_DECLSPEC SDL_bool SDLCALL SDL_SetTextInputArea(SDL_Window *window, const SDL_Rect *rect, int cursor);
 
 /**
  * Get the area used to type Unicode text input.
@@ -506,14 +508,14 @@ extern SDL_DECLSPEC int SDLCALL SDL_SetTextInputArea(SDL_Window *window, const S
  *             may be NULL.
  * \param cursor a pointer to the offset of the current cursor location
  *               relative to `rect->x`, may be NULL.
- * \returns 0 on success or a negative error code on failure; call
- *          SDL_GetError() for more information.
+ * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *          for more information.
  *
  * \since This function is available since SDL 3.0.0.
  *
  * \sa SDL_SetTextInputArea
  */
-extern SDL_DECLSPEC int SDLCALL SDL_GetTextInputArea(SDL_Window *window, SDL_Rect *rect, int *cursor);
+extern SDL_DECLSPEC SDL_bool SDLCALL SDL_GetTextInputArea(SDL_Window *window, SDL_Rect *rect, int *cursor);
 
 /**
  * Check whether the platform has screen keyboard support.

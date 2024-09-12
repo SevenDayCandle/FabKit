@@ -7,30 +7,30 @@ import std;
 namespace sdl {
 	export class SDLBatchRenderPass {
 	public:
-		SDLBatchRenderPass(GpuCommandBuffer* cmd, GpuColorAttachmentInfo* info, int colorAttachmentAmount = 1, GpuDepthStencilAttachmentInfo* depth = nullptr): cmd(cmd), renderPass(sdl::gpuBeginRenderPass(cmd, info, colorAttachmentAmount, depth)) {}
-		SDLBatchRenderPass(GpuCommandBuffer* cmd, GpuRenderPass* rp): cmd(cmd), renderPass(rp) {}
+		SDLBatchRenderPass(GPUCommandBuffer* cmd, GPUColorTargetInfo* info, int colorAttachmentAmount = 1, GPUDepthStencilTargetnfo* depth = nullptr): cmd(cmd), renderPass(sdl::gpuBeginRenderPass(cmd, info, colorAttachmentAmount, depth)) {}
+		SDLBatchRenderPass(GPUCommandBuffer* cmd, GPURenderPass* rp): cmd(cmd), renderPass(rp) {}
 		SDLBatchRenderPass(const SDLBatchRenderPass& other) = delete;
 		~SDLBatchRenderPass() { gpuEndRenderPass(renderPass); }
 
-		inline void drawIndexedPrimitives(fbc::uint32 baseVertex = 0, fbc::uint32 startIndex = 0, fbc::uint32 primitiveCount = 6, fbc::uint32 instanceCount = 1) { sdl::gpuDrawIndexedPrimitives(renderPass, baseVertex, startIndex, primitiveCount, instanceCount); }
+		inline void drawIndexedPrimitives(Sint32 vertex_offset = 0, Uint32 num_indices = 6, Uint32 num_instances = 1, Uint32 first_index = 0, Uint32 first_instance = 0) const { sdl::gpuDrawIndexedPrimitives(renderPass, num_indices, num_instances, first_index, vertex_offset, first_instance); }
 		inline void pushFragmentUniform(const void* data, fbc::uint32 sizeInBytes, fbc::uint32 slot = 0) { sdl::gpuPushFragmentUniformData(cmd, slot, data, sizeInBytes); };
 		inline void pushVertexUniform(const void* data, fbc::uint32 sizeInBytes, fbc::uint32 slot = 0) { sdl::gpuPushVertexUniformData(cmd, slot, data, sizeInBytes); };
 		inline void setScissor(RectI* rect) { sdl::gpuSetScissor(renderPass, rect); }
 		template <typename T> inline void pushFragmentUniformAuto(const T* data, fbc::uint32 slot = 0) { sdl::gpuPushFragmentUniformData(cmd, slot, data, sizeof(T)); };
 		template <typename T> inline void pushVertexUniformAuto(const T* data, fbc::uint32 slot = 0) { sdl::gpuPushVertexUniformData(cmd, slot, data, sizeof(T)); };
 
-		void bindBufferIndex(GpuBuffer* buffer);
-		void bindBufferVertex(GpuBuffer* buffer);
-		void bindPipeline(GpuGraphicsPipeline* pipeline);
-		void bindTexture(GpuTexture* texture, GpuSampler* sampler);
+		void bindBufferIndex(GPUBuffer* buffer);
+		void bindBufferVertex(GPUBuffer* buffer);
+		void bindPipeline(GPUGraphicsPipeline* pipeline);
+		void bindTexture(GPUTexture* texture, GPUSampler* sampler);
 		void setupVertexUniform(float tX, float tY, float sX, float sY, float rotZ = 0);
 	private:
-		GpuBuffer* lastBufferIndex = nullptr;
-		GpuBuffer* lastBufferVertex = nullptr;
-		GpuCommandBuffer* cmd;
-		GpuGraphicsPipeline* lastPipeline = nullptr;
-		GpuRenderPass* renderPass;
-		GpuTexture* lastTexture = nullptr;
+		GPUBuffer* lastBufferIndex = nullptr;
+		GPUBuffer* lastBufferVertex = nullptr;
+		GPUCommandBuffer* cmd;
+		GPUGraphicsPipeline* lastPipeline = nullptr;
+		GPURenderPass* renderPass;
+		GPUTexture* lastTexture = nullptr;
 		inline static sdl::Matrix4x4 MATRIX_UNIFORM = {
 		1, 0, 0, 0,
 			0, 1, 0, 0,
@@ -40,27 +40,27 @@ namespace sdl {
 	};
 
 	// Binds an index buffer if it was not already bound
-	void SDLBatchRenderPass::bindBufferIndex(GpuBuffer* buffer)
+	void SDLBatchRenderPass::bindBufferIndex(GPUBuffer* buffer)
 	{
 		if (lastBufferIndex != buffer) {
-			sdl::GpuBufferBinding b = { buffer, 0 };
-			sdl::gpuBindIndexBuffer(renderPass, &b, sdl::GpuIndexElementSize::SDL_GPU_INDEXELEMENTSIZE_16BIT);
+			sdl::GPUBufferBinding b = { buffer, 0 };
+			sdl::gpuBindIndexBuffer(renderPass, &b, sdl::GPUIndexElementSize::SDL_GPU_INDEXELEMENTSIZE_16BIT);
 			lastBufferIndex = buffer;
 		}
 	}
 
 	// Binds a vertex buffer if it was not already bound
-	void SDLBatchRenderPass::bindBufferVertex(GpuBuffer* buffer)
+	void SDLBatchRenderPass::bindBufferVertex(GPUBuffer* buffer)
 	{
 		if (lastBufferVertex != buffer) {
-			sdl::GpuBufferBinding b = { buffer, 0 };
+			sdl::GPUBufferBinding b = { buffer, 0 };
 			sdl::gpuBindVertexBuffers(renderPass, 0, &b, 1);
 			lastBufferVertex = buffer;
 		}
 	}
 
 	// Binds a pipeline if it was not already bound
-	void SDLBatchRenderPass::bindPipeline(GpuGraphicsPipeline* pipeline)
+	void SDLBatchRenderPass::bindPipeline(GPUGraphicsPipeline* pipeline)
 	{
 		if (lastPipeline != pipeline) {
 			sdl::gpuBindGraphicsPipeline(renderPass, pipeline);
@@ -69,10 +69,10 @@ namespace sdl {
 	}
 
 	// Binds a texture if it was not already bound
-	void SDLBatchRenderPass::bindTexture(GpuTexture* texture, GpuSampler* sampler)
+	void SDLBatchRenderPass::bindTexture(GPUTexture* texture, GPUSampler* sampler)
 	{
 		if (lastTexture != texture) {
-			sdl::GpuTextureSamplerBinding b = { texture, sampler };
+			sdl::GPUTextureSamplerBinding b = { texture, sampler };
 			sdl::gpuBindFragmentSamplers(renderPass, 0, &b, 1);
 			lastTexture = texture;
 		}

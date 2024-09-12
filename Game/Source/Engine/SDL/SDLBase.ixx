@@ -24,83 +24,77 @@ namespace sdl {
 	export using Font = ::TTF_Font;
 	export using Gamepad = ::SDL_Gamepad;
 	export using GamepadButton = ::SDL_GamepadButton;
-	export using GpuBlendFactor = ::SDL_GpuBlendFactor;
-	export using GpuBlendOp = ::SDL_GpuBlendOp;
-	export using GpuBuffer = ::SDL_GpuBuffer;
-	export using GpuBufferBinding = ::SDL_GpuBufferBinding;
-	export using GpuBufferLocation = ::SDL_GpuBufferLocation;
-	export using GpuBufferRegion = ::SDL_GpuBufferRegion;
-	export using GpuBufferUsageFlagBits = ::SDL_GpuBufferUsageFlagBits;
-	export using GpuColorAttachmentBlendState = ::SDL_GpuColorAttachmentBlendState;
-	export using GpuColorAttachmentDescription = ::SDL_GpuColorAttachmentDescription;
-	export using GpuColorAttachmentInfo = ::SDL_GpuColorAttachmentInfo;
-	export using GpuColorComponentFlagBits = ::SDL_GpuColorComponentFlagBits;
-	export using GpuColorComponentFlags = ::SDL_GpuColorComponentFlags;
-	export using GpuCommandBuffer = ::SDL_GpuCommandBuffer;
-	export using GpuCompareOp = ::SDL_GpuCompareOp;
-	export using GpuComputePass = ::SDL_GpuComputePass;
-	export using GpuComputePipeline = ::SDL_GpuComputePipeline;
-	export using GpuComputePipelineCreateInfo = ::SDL_GpuComputePipelineCreateInfo;
-	export using GpuCopyPass = ::SDL_GpuCopyPass;
-	export using GpuCubeMapFace = ::SDL_GpuCubeMapFace;
-	export using GpuCullMode = ::SDL_GpuCullMode;
-	export using GpuDepthStencilAttachmentInfo = ::SDL_GpuDepthStencilAttachmentInfo;
-	export using GpuDepthStencilState = ::SDL_GpuDepthStencilState;
-	export using GpuDepthStencilValue = ::SDL_GpuDepthStencilValue;
-	export using GpuDevice = ::SDL_GpuDevice;
-	export using GpuDriver = ::SDL_GpuDriver;
-	export using GpuFence = ::SDL_GpuFence;
-	export using GpuFillMode = ::SDL_GpuFillMode;
-	export using GpuFilter = ::SDL_GpuFilter;
-	export using GpuFrontFace = ::SDL_GpuFrontFace;
-	export using GpuGraphicsPipeline = ::SDL_GpuGraphicsPipeline;
-	export using GpuGraphicsPipelineAttachmentInfo = ::SDL_GpuGraphicsPipelineAttachmentInfo;
-	export using GpuGraphicsPipelineCreateInfo = ::SDL_GpuGraphicsPipelineCreateInfo;
-	export using GpuIndexedIndirectDrawCommand = ::SDL_GpuIndexedIndirectDrawCommand;
-	export using GpuIndexElementSize = ::SDL_GpuIndexElementSize;
-	export using GpuIndirectDispatchCommand = ::SDL_GpuIndirectDispatchCommand;
-	export using GpuIndirectDrawCommand = ::SDL_GpuIndirectDrawCommand;
-	export using GpuLoadOp = ::SDL_GpuLoadOp;
-	export using GpuMultisampleState = ::SDL_GpuMultisampleState;
-	export using GpuPresentMode = ::SDL_GpuPresentMode;
-	export using GpuPrimitiveType = ::SDL_GpuPrimitiveType;
-	export using GpuRasterizerState = ::SDL_GpuRasterizerState;
-	export using GpuRenderPass = ::SDL_GpuRenderPass;
-	export using GpuSampleCount = ::SDL_GpuSampleCount;
-	export using GpuSampler = ::SDL_GpuSampler;
-	export using GpuSamplerAddressMode = ::SDL_GpuSamplerAddressMode;
-	export using GpuSamplerCreateInfo = ::SDL_GpuSamplerCreateInfo;
-	export using GpuSamplerMipmapMode = ::SDL_GpuSamplerMipmapMode;
-	export using GpuShader = ::SDL_GpuShader;
-	export using GpuShaderCreateInfo = ::SDL_GpuShaderCreateInfo;
-	export using GpuShaderFormat = ::SDL_GpuShaderFormat;
-	export using GpuShaderStage = ::SDL_GpuShaderStage;
-	export using GpuStencilOp = ::SDL_GpuStencilOp;
-	export using GpuStencilOpState = ::SDL_GpuStencilOpState;
-	export using GpuStorageBufferReadWriteBinding = ::SDL_GpuStorageBufferReadWriteBinding;
-	export using GpuStorageTextureReadWriteBinding = ::SDL_GpuStorageTextureReadWriteBinding;
-	export using GpuStoreOp = ::SDL_GpuStoreOp;
-	export using GpuSwapchainComposition = ::SDL_GpuSwapchainComposition;
-	export using GpuTexture = ::SDL_GpuTexture;
-	export using GpuTextureCreateInfo = ::SDL_GpuTextureCreateInfo;
-	export using GpuTextureFormat = ::SDL_GpuTextureFormat;
-	export using GpuTextureLocation = ::SDL_GpuTextureLocation;
-	export using GpuTextureRegion = ::SDL_GpuTextureRegion;
-	export using GpuTextureSamplerBinding = ::SDL_GpuTextureSamplerBinding;
-	export using GpuTextureSlice = ::SDL_GpuTextureSlice;
-	export using GpuTextureTransferInfo = ::SDL_GpuTextureTransferInfo;
-	export using GpuTextureType = ::SDL_GpuTextureType;
-	export using GpuTextureUsageFlagBits = ::SDL_GpuTextureUsageFlagBits;
-	export using GpuTextureUsageFlags = ::SDL_GpuTextureUsageFlags;
-	export using GpuTransferBuffer = ::SDL_GpuTransferBuffer;
-	export using GpuTransferBufferLocation = ::SDL_GpuTransferBufferLocation;
-	export using GpuTransferBufferUsage = ::SDL_GpuTransferBufferUsage;
-	export using GpuVertexAttribute = ::SDL_GpuVertexAttribute;
-	export using GpuVertexBinding = ::SDL_GpuVertexBinding;
-	export using GpuVertexElementFormat = ::SDL_GpuVertexElementFormat;
-	export using GpuVertexInputRate = ::SDL_GpuVertexInputRate;
-	export using GpuVertexInputState = ::SDL_GpuVertexInputState;
-	export using GpuViewport = ::SDL_GpuViewport;
+	export using GPUBlendFactor = ::SDL_GPUBlendFactor;
+	export using GPUBlendOp = ::SDL_GPUBlendOp;
+	export using GPUBuffer = ::SDL_GPUBuffer;
+	export using GPUBufferBinding = ::SDL_GPUBufferBinding;
+	export using GPUBufferLocation = ::SDL_GPUBufferLocation;
+	export using GPUBufferRegion = ::SDL_GPUBufferRegion;
+	export using GPUBufferUsageFlags = ::SDL_GPUBufferUsageFlags;
+	export using GPUColorComponentFlags = ::SDL_GPUColorComponentFlags;
+	export using GPUColorTargetDescription = ::SDL_GPUColorTargetDescription;
+	export using GPUColorTargetInfo = ::SDL_GPUColorTargetInfo;
+	export using GPUCommandBuffer = ::SDL_GPUCommandBuffer;
+	export using GPUCompareOp = ::SDL_GPUCompareOp;
+	export using GPUComputePass = ::SDL_GPUComputePass;
+	export using GPUComputePipeline = ::SDL_GPUComputePipeline;
+	export using GPUComputePipelineCreateInfo = ::SDL_GPUComputePipelineCreateInfo;
+	export using GPUCopyPass = ::SDL_GPUCopyPass;
+	export using GPUCubeMapFace = ::SDL_GPUCubeMapFace;
+	export using GPUCullMode = ::SDL_GPUCullMode;
+	export using GPUDepthStencilState = ::SDL_GPUDepthStencilState;
+	export using GPUDepthStencilTargetnfo = ::SDL_GPUDepthStencilTargetInfo;
+	export using GPUDevice = ::SDL_GPUDevice;
+	export using GPUDriver = ::SDL_GPUDriver;
+	export using GPUFence = ::SDL_GPUFence;
+	export using GPUFillMode = ::SDL_GPUFillMode;
+	export using GPUFilter = ::SDL_GPUFilter;
+	export using GPUFrontFace = ::SDL_GPUFrontFace;
+	export using GPUGraphicsPipeline = ::SDL_GPUGraphicsPipeline;
+	export using GPUGraphicsPipelineCreateInfo = ::SDL_GPUGraphicsPipelineCreateInfo;
+	export using GPUIndexedIndirectDrawCommand = ::SDL_GPUIndexedIndirectDrawCommand;
+	export using GPUIndexElementSize = ::SDL_GPUIndexElementSize;
+	export using GPUIndirectDispatchCommand = ::SDL_GPUIndirectDispatchCommand;
+	export using GPUIndirectDrawCommand = ::SDL_GPUIndirectDrawCommand;
+	export using GPULoadOp = ::SDL_GPULoadOp;
+	export using GPUMultisampleState = ::SDL_GPUMultisampleState;
+	export using GPUPresentMode = ::SDL_GPUPresentMode;
+	export using GPUPrimitiveType = ::SDL_GPUPrimitiveType;
+	export using GPURasterizerState = ::SDL_GPURasterizerState;
+	export using GPURenderPass = ::SDL_GPURenderPass;
+	export using GPUSampleCount = ::SDL_GPUSampleCount;
+	export using GPUSampler = ::SDL_GPUSampler;
+	export using GPUSamplerAddressMode = ::SDL_GPUSamplerAddressMode;
+	export using GPUSamplerCreateInfo = ::SDL_GPUSamplerCreateInfo;
+	export using GPUSamplerMipmapMode = ::SDL_GPUSamplerMipmapMode;
+	export using GPUShader = ::SDL_GPUShader;
+	export using GPUShaderCreateInfo = ::SDL_GPUShaderCreateInfo;
+	export using GPUShaderFormat = ::SDL_GPUShaderFormat;
+	export using GPUShaderStage = ::SDL_GPUShaderStage;
+	export using GPUStencilOp = ::SDL_GPUStencilOp;
+	export using GPUStencilOpState = ::SDL_GPUStencilOpState;
+	export using GPUStorageBufferReadWriteBinding = ::SDL_GPUStorageBufferWriteOnlyBinding;
+	export using GPUStorageTextureReadWriteBinding = ::SDL_GPUStorageTextureWriteOnlyBinding;
+	export using GPUStoreOp = ::SDL_GPUStoreOp;
+	export using GPUSwapchainComposition = ::SDL_GPUSwapchainComposition;
+	export using GPUTexture = ::SDL_GPUTexture;
+	export using GPUTextureCreateInfo = ::SDL_GPUTextureCreateInfo;
+	export using GPUTextureFormat = ::SDL_GPUTextureFormat;
+	export using GPUTextureLocation = ::SDL_GPUTextureLocation;
+	export using GPUTextureRegion = ::SDL_GPUTextureRegion;
+	export using GPUTextureSamplerBinding = ::SDL_GPUTextureSamplerBinding;
+	export using GPUTextureTransferInfo = ::SDL_GPUTextureTransferInfo;
+	export using GPUTextureType = ::SDL_GPUTextureType;
+	export using GPUTextureUsageFlags = ::SDL_GPUTextureUsageFlags;
+	export using GPUTransferBuffer = ::SDL_GPUTransferBuffer;
+	export using GPUTransferBufferLocation = ::SDL_GPUTransferBufferLocation;
+	export using GPUTransferBufferUsage = ::SDL_GPUTransferBufferUsage;
+	export using GPUVertexAttribute = ::SDL_GPUVertexAttribute;
+	export using GPUVertexBinding = ::SDL_GPUVertexBinding;
+	export using GPUVertexElementFormat = ::SDL_GPUVertexElementFormat;
+	export using GPUVertexInputRate = ::SDL_GPUVertexInputRate;
+	export using GPUVertexInputState = ::SDL_GPUVertexInputState;
+	export using GPUViewport = ::SDL_GPUViewport;
 	export using Keycode = ::SDL_Keycode;
 	export using Music = ::Mix_Music;
 	export using PixelFormat = ::SDL_PixelFormat;
@@ -114,6 +108,12 @@ namespace sdl {
 	export using Sound = ::Mix_Chunk;
 	export using Surface = ::SDL_Surface;
 	export using Window = ::SDL_Window;
+	export using ::Sint32;
+	export using ::Sint64;
+	export using ::Sint8;
+	export using ::Uint32;
+	export using ::Uint64;
+	export using ::Uint8;
 
 	export enum RenderMode {
 		NORMAL,
@@ -165,7 +165,6 @@ namespace sdl {
 	export constexpr Sint32 KEY_UP = SDLK_UP;
 
 	/* Other constants */
-	export constexpr auto PROP_GPU_CREATEDEVICE_NAME_STRING = SDL_PROP_GPU_CREATEDEVICE_NAME_STRING;
 	export constexpr Uint64 NANOS_PER_SECOND = 1000000000ULL;
 
 	/* Directory stuff */
@@ -205,96 +204,105 @@ namespace sdl {
 	export inline void fontStyleSet(TTF_Font* font, int style) { TTF_SetFontStyle(font, style); }
 
 	/* GPU functions */
-	export inline SDL_bool gpuClaimWindow(SDL_GpuDevice* device, SDL_Window* window, SDL_GpuSwapchainComposition swapchainComposition, SDL_GpuPresentMode presentMode) { return SDL_GpuClaimWindow(device, window, swapchainComposition, presentMode); }
-	export inline SDL_bool gpuIsTextureFormatSupported(SDL_GpuDevice* device, SDL_GpuTextureFormat format, SDL_GpuTextureType type, SDL_GpuTextureUsageFlags usage) { return SDL_GpuSupportsTextureFormat(device, format, type, usage); }
-	export inline SDL_bool gpuQueryFence(SDL_GpuDevice* device, SDL_GpuFence* fence) { return SDL_GpuQueryFence(device, fence); }
-	export inline SDL_bool gpuSetSwapchainParameters(SDL_GpuDevice* device, SDL_Window* window, SDL_GpuSwapchainComposition swapchainComposition, SDL_GpuPresentMode presentMode) { return SDL_GpuSetSwapchainParameters(device, window, swapchainComposition, presentMode); }
-	export inline SDL_bool gpuSupportsPresentMode(SDL_GpuDevice* device, SDL_Window* window, SDL_GpuPresentMode presentMode) { return SDL_GpuSupportsPresentMode(device, window, presentMode); }
-	export inline SDL_bool gpuSupportsSwapchainComposition(SDL_GpuDevice* device, SDL_Window* window, SDL_GpuSwapchainComposition swapchainComposition) { return SDL_GpuSupportsSwapchainComposition(device, window, swapchainComposition); }
-	export inline SDL_GpuBuffer* gpuCreateBuffer(SDL_GpuDevice* device, SDL_GpuBufferUsageFlags usageFlags, Uint32 sizeInBytes) { return SDL_GpuCreateBuffer(device, usageFlags, sizeInBytes); }
-	export inline SDL_GpuCommandBuffer* gpuAcquireCommandBuffer(SDL_GpuDevice* device) { return SDL_GpuAcquireCommandBuffer(device); }
-	export inline SDL_GpuComputePass* gpuBeginComputePass(SDL_GpuCommandBuffer* commandBuffer, SDL_GpuStorageTextureReadWriteBinding* storageTextureBindings, Uint32 storageTextureBindingCount, SDL_GpuStorageBufferReadWriteBinding* storageBufferBindings, Uint32 storageBufferBindingCount) { return SDL_GpuBeginComputePass(commandBuffer, storageTextureBindings, storageTextureBindingCount, storageBufferBindings, storageBufferBindingCount); }
-	export inline SDL_GpuComputePipeline* gpuCreateComputePipeline(SDL_GpuDevice* device, SDL_GpuComputePipelineCreateInfo* computePipelineCreateInfo) { return SDL_GpuCreateComputePipeline(device, computePipelineCreateInfo); }
-	export inline SDL_GpuComputePipeline* gpuCompileSpirvCompute(SDL_GpuDevice* device, SDL_GpuShaderCreateInfo* shaderCreateInfo) { return static_cast<SDL_GpuComputePipeline*>(SDL_CompileFromSPIRV(device, &shaderCreateInfo, true)); }
-	export inline SDL_GpuCopyPass* gpuBeginCopyPass(SDL_GpuCommandBuffer* commandBuffer) { return SDL_GpuBeginCopyPass(commandBuffer); }
-	export inline SDL_GpuDriver gpuGetDriver(SDL_GpuDevice* device) { return SDL_GpuGetDriver(device); }
-	export inline SDL_GpuFence* gpuSubmitAndAcquireFence(SDL_GpuCommandBuffer* commandBuffer) { return SDL_GpuSubmitAndAcquireFence(commandBuffer); }
-	export inline SDL_GpuGraphicsPipeline* gpuCreateGraphicsPipeline(SDL_GpuDevice* device, SDL_GpuGraphicsPipelineCreateInfo* pipelineCreateInfo) { return SDL_GpuCreateGraphicsPipeline(device, pipelineCreateInfo); }
-	export inline SDL_GpuRenderPass* gpuBeginRenderPass(SDL_GpuCommandBuffer* commandBuffer, SDL_GpuColorAttachmentInfo* colorAttachmentInfos, Uint32 colorAttachmentCount, SDL_GpuDepthStencilAttachmentInfo* depthStencilAttachmentInfo) { return SDL_GpuBeginRenderPass(commandBuffer, colorAttachmentInfos, colorAttachmentCount, depthStencilAttachmentInfo); }
-	export inline SDL_GpuSampleCount gpuGetBestSampleCount(SDL_GpuDevice* device, SDL_GpuTextureFormat format, SDL_GpuSampleCount desiredSampleCount) { return SDL_GpuGetBestSampleCount(device, format, desiredSampleCount); }
-	export inline SDL_GpuSampler* gpuCreateSampler(SDL_GpuDevice* device, SDL_GpuSamplerCreateInfo* samplerCreateInfo) { return SDL_GpuCreateSampler(device, samplerCreateInfo); }
-	export inline SDL_GpuShader* gpuCompileSpirvShader(SDL_GpuDevice* device, SDL_GpuShaderCreateInfo* shaderCreateInfo) { return static_cast<SDL_GpuShader*>(SDL_CompileFromSPIRV(device, &shaderCreateInfo, false)); }
-	export inline SDL_GpuShader* gpuCreateShader(SDL_GpuDevice* device, SDL_GpuShaderCreateInfo* shaderCreateInfo) { return SDL_GpuCreateShader(device, shaderCreateInfo); }
-	export inline SDL_GpuTexture* gpuAcquireSwapchainTexture( SDL_GpuCommandBuffer* commandBuffer, SDL_Window* window, Uint32* pWidth, Uint32* pHeight) { return SDL_GpuAcquireSwapchainTexture(commandBuffer, window, pWidth, pHeight); }
-	export inline SDL_GpuTexture* gpuCreateTexture(SDL_GpuDevice* device, SDL_GpuTextureCreateInfo* textureCreateInfo) { return SDL_GpuCreateTexture(device, textureCreateInfo); }
-	export inline SDL_GpuTextureFormat gpuGetSwapchainTextureFormat(SDL_GpuDevice* device, SDL_Window* window) { return SDL_GpuGetSwapchainTextureFormat(device, window); }
-	export inline SDL_GpuTransferBuffer* gpuCreateTransferBuffer(SDL_GpuDevice* device, SDL_GpuTransferBufferUsage usage, Uint32 sizeInBytes) { return SDL_GpuCreateTransferBuffer(device, usage, sizeInBytes); }
-	export inline Uint32 gpuTextureFormatTexelBlockSize(SDL_GpuTextureFormat textureFormat) { return SDL_GpuTextureFormatTexelBlockSize(textureFormat); }
-	export inline void gpuBindComputePipeline(SDL_GpuComputePass* computePass, SDL_GpuComputePipeline* computePipeline) { SDL_GpuBindComputePipeline(computePass, computePipeline); }
-	export inline void gpuBindComputeStorageBuffers(SDL_GpuComputePass* computePass, Uint32 firstSlot, SDL_GpuBuffer** storageBuffers, Uint32 bindingCount) { SDL_GpuBindComputeStorageBuffers(computePass, firstSlot, storageBuffers, bindingCount); }
-	export inline void gpuBindComputeStorageTextures(SDL_GpuComputePass* computePass, Uint32 firstSlot, SDL_GpuTextureSlice* storageTextureSlices, Uint32 bindingCount) { SDL_GpuBindComputeStorageTextures(computePass, firstSlot, storageTextureSlices, bindingCount); }
-	export inline void gpuBindFragmentSamplers(SDL_GpuRenderPass* renderPass, Uint32 firstSlot, SDL_GpuTextureSamplerBinding* textureSamplerBindings, Uint32 bindingCount) { SDL_GpuBindFragmentSamplers(renderPass, firstSlot, textureSamplerBindings, bindingCount); }
-	export inline void gpuBindFragmentStorageBuffers(SDL_GpuRenderPass* renderPass, Uint32 firstSlot, SDL_GpuBuffer** storageBuffers, Uint32 bindingCount) { SDL_GpuBindFragmentStorageBuffers(renderPass, firstSlot, storageBuffers, bindingCount); }
-	export inline void gpuBindFragmentStorageTextures(SDL_GpuRenderPass* renderPass, Uint32 firstSlot, SDL_GpuTextureSlice* storageTextureSlices, Uint32 bindingCount) { SDL_GpuBindFragmentStorageTextures(renderPass, firstSlot, storageTextureSlices, bindingCount); }
-	export inline void gpuBindGraphicsPipeline(SDL_GpuRenderPass* renderPass, SDL_GpuGraphicsPipeline* graphicsPipeline) { SDL_GpuBindGraphicsPipeline(renderPass, graphicsPipeline); }
-	export inline void gpuBindIndexBuffer(SDL_GpuRenderPass* renderPass, SDL_GpuBufferBinding* pBinding, SDL_GpuIndexElementSize indexElementSize) { SDL_GpuBindIndexBuffer(renderPass, pBinding, indexElementSize); }
-	export inline void gpuBindVertexBuffers(SDL_GpuRenderPass* renderPass, Uint32 firstBinding, SDL_GpuBufferBinding* pBindings, Uint32 bindingCount) { SDL_GpuBindVertexBuffers(renderPass, firstBinding, pBindings, bindingCount); }
-	export inline void gpuBindVertexSamplers(SDL_GpuRenderPass* renderPass, Uint32 firstSlot, SDL_GpuTextureSamplerBinding* textureSamplerBindings, Uint32 bindingCount) { SDL_GpuBindVertexSamplers(renderPass, firstSlot, textureSamplerBindings, bindingCount); }
-	export inline void gpuBindVertexStorageBuffers(SDL_GpuRenderPass* renderPass, Uint32 firstSlot, SDL_GpuBuffer** storageBuffers, Uint32 bindingCount) { SDL_GpuBindVertexStorageBuffers(renderPass, firstSlot, storageBuffers, bindingCount); }
-	export inline void gpuBindVertexStorageTextures(SDL_GpuRenderPass* renderPass, Uint32 firstSlot, SDL_GpuTextureSlice* storageTextureSlices, Uint32 bindingCount) { SDL_GpuBindVertexStorageTextures(renderPass, firstSlot, storageTextureSlices, bindingCount); }
-	export inline void gpuBlit(SDL_GpuCommandBuffer* commandBuffer, SDL_GpuTextureRegion* source, SDL_GpuTextureRegion* destination, SDL_GpuFilter filterMode, SDL_bool cycle) { SDL_GpuBlit(commandBuffer, source, destination, filterMode, cycle); }
-	export inline void gpuCopyBufferToBuffer(SDL_GpuCopyPass* copyPass, SDL_GpuBufferLocation* source, SDL_GpuBufferLocation* destination, Uint32 size, SDL_bool cycle) { SDL_GpuCopyBufferToBuffer(copyPass, source, destination, size, cycle); }
-	export inline void gpuCopyTextureToTexture(SDL_GpuCopyPass* copyPass, SDL_GpuTextureLocation* source, SDL_GpuTextureLocation* destination, Uint32 w, Uint32 h, Uint32 d, SDL_bool cycle) { SDL_GpuCopyTextureToTexture(copyPass, source, destination, w, h, d, cycle); }
-	export inline void gpuDispatchCompute(SDL_GpuComputePass* computePass, Uint32 groupCountX, Uint32 groupCountY, Uint32 groupCountZ) { SDL_GpuDispatchCompute(computePass, groupCountX, groupCountY, groupCountZ); }
-	export inline void gpuDispatchComputeIndirect(SDL_GpuComputePass* computePass, SDL_GpuBuffer* buffer, Uint32 offsetInBytes) { SDL_GpuDispatchComputeIndirect(computePass, buffer, offsetInBytes); }
-	export inline void gpuDownloadFromBuffer(SDL_GpuCopyPass* copyPass, SDL_GpuBufferRegion* source, SDL_GpuTransferBufferLocation* destination) { SDL_GpuDownloadFromBuffer(copyPass, source, destination); }
-	export inline void gpuDownloadFromTexture(SDL_GpuCopyPass* copyPass, SDL_GpuTextureRegion* source, SDL_GpuTextureTransferInfo* destination) { SDL_GpuDownloadFromTexture(copyPass, source, destination); }
-	export inline void gpuDrawIndexedPrimitives(SDL_GpuRenderPass* renderPass, Uint32 baseVertex, Uint32 startIndex, Uint32 primitiveCount, Uint32 instanceCount) { SDL_GpuDrawIndexedPrimitives(renderPass, baseVertex, startIndex, primitiveCount, instanceCount); }
-	export inline void gpuDrawIndexedPrimitivesIndirect(SDL_GpuRenderPass* renderPass, SDL_GpuBuffer* buffer, Uint32 offsetInBytes, Uint32 drawCount, Uint32 stride) { SDL_GpuDrawIndexedPrimitivesIndirect(renderPass, buffer, offsetInBytes, drawCount, stride); }
-	export inline void gpuDrawPrimitives(SDL_GpuRenderPass* renderPass, Uint32 vertexStart, Uint32 primitiveCount) { SDL_GpuDrawPrimitives(renderPass, vertexStart, primitiveCount); }
-	export inline void gpuDrawPrimitivesIndirect(SDL_GpuRenderPass* renderPass, SDL_GpuBuffer* buffer, Uint32 offsetInBytes, Uint32 drawCount, Uint32 stride) { SDL_GpuDrawPrimitivesIndirect(renderPass, buffer, offsetInBytes, drawCount, stride); }
-	export inline void gpuEndComputePass(SDL_GpuComputePass* computePass) { SDL_GpuEndComputePass(computePass); }
-	export inline void gpuEndCopyPass(SDL_GpuCopyPass* copyPass) { SDL_GpuEndCopyPass(copyPass); }
-	export inline void gpuEndRenderPass(SDL_GpuRenderPass* renderPass) { SDL_GpuEndRenderPass(renderPass); }
-	export inline void gpuGenerateMipmaps(SDL_GpuCopyPass* copyPass, SDL_GpuTexture* texture) { SDL_GpuGenerateMipmaps(copyPass, texture); }
-	export inline void gpuInsertDebugLabel(SDL_GpuCommandBuffer* commandBuffer, const char* text) { SDL_GpuInsertDebugLabel(commandBuffer, text); }
-	export inline void gpuMapTransferBuffer(SDL_GpuDevice* device, SDL_GpuTransferBuffer* transferBuffer, SDL_bool cycle, void** ppData) { SDL_GpuMapTransferBuffer(device, transferBuffer, cycle, ppData); }
-	export inline void gpuPopDebugGroup(SDL_GpuCommandBuffer* commandBuffer) { SDL_GpuPopDebugGroup(commandBuffer); }
-	export inline void gpuPushComputeUniformData(SDL_GpuCommandBuffer* commandBuffer, Uint32 slotIndex, const void* data, Uint32 dataLengthInBytes) { SDL_GpuPushComputeUniformData(commandBuffer, slotIndex, data, dataLengthInBytes); }
-	export inline void gpuPushDebugGroup(SDL_GpuCommandBuffer* commandBuffer, const char* name) { SDL_GpuPushDebugGroup(commandBuffer, name); }
-	export inline void gpuPushFragmentUniformData(SDL_GpuCommandBuffer* commandBuffer, Uint32 slotIndex, const void* data, Uint32 dataLengthInBytes) { SDL_GpuPushFragmentUniformData(commandBuffer, slotIndex, data, dataLengthInBytes); }
-	export inline void gpuPushVertexUniformData(SDL_GpuCommandBuffer* commandBuffer, Uint32 slotIndex, const void* data, Uint32 dataLengthInBytes) { SDL_GpuPushVertexUniformData(commandBuffer, slotIndex, data, dataLengthInBytes); }
-	export inline void gpuReleaseBuffer(SDL_GpuDevice* device, SDL_GpuBuffer* buffer) { SDL_GpuReleaseBuffer(device, buffer); }
-	export inline void gpuReleaseComputePipeline(SDL_GpuDevice* device, SDL_GpuComputePipeline* computePipeline) { SDL_GpuReleaseComputePipeline(device, computePipeline); }
-	export inline void gpuReleaseFence(SDL_GpuDevice* device, SDL_GpuFence* fence) { SDL_GpuReleaseFence(device, fence); }
-	export inline void gpuReleaseGraphicsPipeline(SDL_GpuDevice* device, SDL_GpuGraphicsPipeline* graphicsPipeline) { SDL_GpuReleaseGraphicsPipeline(device, graphicsPipeline); }
-	export inline void gpuReleaseSampler(SDL_GpuDevice* device, SDL_GpuSampler* sampler) { SDL_GpuReleaseSampler(device, sampler); }
-	export inline void gpuReleaseShader(SDL_GpuDevice* device, SDL_GpuShader* shader) { SDL_GpuReleaseShader(device, shader); }
-	export inline void gpuReleaseTexture(SDL_GpuDevice* device, SDL_GpuTexture* texture) { SDL_GpuReleaseTexture(device, texture); }
-	export inline void gpuReleaseTransferBuffer(SDL_GpuDevice* device, SDL_GpuTransferBuffer* transferBuffer) { SDL_GpuReleaseTransferBuffer(device, transferBuffer); }
-	export inline void gpuSetBufferName(SDL_GpuDevice* device, SDL_GpuBuffer* buffer, const char* text) { SDL_GpuSetBufferName(device, buffer, text); }
-	export inline void gpuSetScissor(SDL_GpuRenderPass* renderPass, RectI* scissor) { SDL_GpuSetScissor(renderPass, scissor); }
-	export inline void gpuSetTextureName(SDL_GpuDevice* device, SDL_GpuTexture* texture, const char* text) { SDL_GpuSetTextureName(device, texture, text); }
-	export inline void gpuSetViewport(SDL_GpuRenderPass* renderPass, SDL_GpuViewport* viewport) { SDL_GpuSetViewport(renderPass, viewport); }
-	export inline void gpuSubmit(SDL_GpuCommandBuffer* commandBuffer) { SDL_GpuSubmit(commandBuffer); }
-	export inline void gpuUnclaimWindow(SDL_GpuDevice* device, SDL_Window* window) { SDL_GpuUnclaimWindow(device, window); }
-	export inline void gpuUnmapTransferBuffer(SDL_GpuDevice* device, SDL_GpuTransferBuffer* transferBuffer) { SDL_GpuUnmapTransferBuffer(device, transferBuffer); }
-	export inline void gpuUploadToBuffer(SDL_GpuCopyPass* copyPass, SDL_GpuTransferBufferLocation* source, SDL_GpuBufferRegion* destination, SDL_bool cycle = SDL_FALSE) { SDL_GpuUploadToBuffer(copyPass, source, destination, cycle); }
-	export inline void gpuUploadToTexture(SDL_GpuCopyPass* copyPass, SDL_GpuTextureTransferInfo* source, SDL_GpuTextureRegion* destination, SDL_bool cycle = SDL_FALSE) { SDL_GpuUploadToTexture(copyPass, source, destination, cycle); }
-	export inline void gpuWait(SDL_GpuDevice* device) { SDL_GpuWait(device); }
-	export inline void gpuWaitForFences(SDL_GpuDevice* device, SDL_bool waitAll, SDL_GpuFence** pFences, Uint32 fenceCount) { SDL_GpuWaitForFences(device, waitAll, pFences, fenceCount); }
+	export inline SDL_bool gpuClaimWindow(SDL_GPUDevice* device, SDL_Window* window) { return SDL_ClaimWindowForGPUDevice(device, window); }
+	export inline SDL_bool gpuIsTextureFormatSupported(SDL_GPUDevice* device, SDL_GPUTextureFormat format, SDL_GPUTextureType type, SDL_GPUTextureUsageFlags usage) { return SDL_GPUTextureSupportsFormat(device, format, type, usage); }
+	export inline SDL_bool gpuQueryFence(SDL_GPUDevice* device, SDL_GPUFence* fence) { return SDL_QueryGPUFence(device, fence); }
+	export inline SDL_bool gpuSetSwapchainParameters(SDL_GPUDevice* device, SDL_Window* window, SDL_GPUSwapchainComposition swapchainComposition, SDL_GPUPresentMode presentMode) { return SDL_SetGPUSwapchainParameters(device, window, swapchainComposition, presentMode); }
+	export inline SDL_bool gpuSupportsPresentMode(SDL_GPUDevice* device, SDL_Window* window, SDL_GPUPresentMode presentMode) { return SDL_WindowSupportsGPUPresentMode(device, window, presentMode); }
+	export inline SDL_bool gpuSupportsSwapchainComposition(SDL_GPUDevice* device, SDL_Window* window, SDL_GPUSwapchainComposition swapchainComposition) { return SDL_WindowSupportsGPUSwapchainComposition(device, window, swapchainComposition); }
+	export inline SDL_bool gpuTextureSupportsSampleCount(SDL_GPUDevice* device, SDL_GPUTextureFormat format, SDL_GPUSampleCount desiredSampleCount) { return SDL_GPUTextureSupportsSampleCount(device, format, desiredSampleCount); }
+	export inline SDL_GPUBuffer* gpuCreateBuffer(SDL_GPUDevice* device, SDL_GPUBufferUsageFlags usageFlags, Uint32 sizeInBytes) { 
+		SDL_GPUBufferCreateInfo info = { usageFlags, sizeInBytes };
+		return SDL_CreateGPUBuffer(device, &info);
+	}
+	export inline SDL_GPUCommandBuffer* gpuAcquireCommandBuffer(SDL_GPUDevice* device) { return SDL_AcquireGPUCommandBuffer(device); }
+	export inline SDL_GPUComputePass* gpuBeginComputePass(SDL_GPUCommandBuffer* commandBuffer, SDL_GPUStorageTextureWriteOnlyBinding* storageTextureBindings, Uint32 storageTextureBindingCount, SDL_GPUStorageBufferWriteOnlyBinding* storageBufferBindings, Uint32 storageBufferBindingCount) { return SDL_BeginGPUComputePass(commandBuffer, storageTextureBindings, storageTextureBindingCount, storageBufferBindings, storageBufferBindingCount); }
+	export inline SDL_GPUComputePipeline* gpuCreateComputePipeline(SDL_GPUDevice* device, SDL_GPUComputePipelineCreateInfo* computePipelineCreateInfo) { return SDL_CreateGPUComputePipeline(device, computePipelineCreateInfo); }
+	export inline SDL_GPUComputePipeline* gpuCompileSpirvCompute(SDL_GPUDevice* device, SDL_GPUShaderCreateInfo* shaderCreateInfo) { return static_cast<SDL_GPUComputePipeline*>(SDL_ShaderCross_CompileFromSPIRV(device, shaderCreateInfo, SDL_TRUE)); }
+	export inline SDL_GPUCopyPass* gpuBeginCopyPass(SDL_GPUCommandBuffer* commandBuffer) { return SDL_BeginGPUCopyPass(commandBuffer); }
+	export inline SDL_GPUDevice* gpuCreateDevice(SDL_GPUShaderFormat format_flags, SDL_bool debug_mode, const char* name) { return SDL_CreateGPUDevice(format_flags, debug_mode, name); }
+	export inline SDL_GPUDevice* gpuCreateDeviceWithProperties(SDL_PropertiesID props) { return SDL_CreateGPUDeviceWithProperties(props); }
+	export inline SDL_GPUDriver gpuGetDriver(SDL_GPUDevice* device) { return SDL_GetGPUDriver(device); }
+	export inline SDL_GPUFence* gpuSubmitAndAcquireFence(SDL_GPUCommandBuffer* commandBuffer) { return SDL_SubmitGPUCommandBufferAndAcquireFence(commandBuffer); }
+	export inline SDL_GPUGraphicsPipeline* gpuCreateGraphicsPipeline(SDL_GPUDevice* device, SDL_GPUGraphicsPipelineCreateInfo* pipelineCreateInfo) { return SDL_CreateGPUGraphicsPipeline(device, pipelineCreateInfo); }
+	export inline SDL_GPURenderPass* gpuBeginRenderPass(SDL_GPUCommandBuffer* commandBuffer, SDL_GPUColorTargetInfo* colorAttachmentInfos, Uint32 colorAttachmentCount, SDL_GPUDepthStencilTargetInfo* depthStencilAttachmentInfo) { return SDL_BeginGPURenderPass(commandBuffer, colorAttachmentInfos, colorAttachmentCount, depthStencilAttachmentInfo); }
+	export inline SDL_GPUSampler* gpuCreateSampler(SDL_GPUDevice* device, SDL_GPUSamplerCreateInfo* samplerCreateInfo) { return SDL_CreateGPUSampler(device, samplerCreateInfo); }
+	export inline SDL_GPUShader* gpuCompileSpirvShader(SDL_GPUDevice* device, SDL_GPUShaderCreateInfo* shaderCreateInfo) { return static_cast<SDL_GPUShader*>(SDL_ShaderCross_CompileFromSPIRV(device, shaderCreateInfo, SDL_FALSE)); }
+	export inline SDL_GPUShader* gpuCreateShader(SDL_GPUDevice* device, SDL_GPUShaderCreateInfo* shaderCreateInfo) { return SDL_CreateGPUShader(device, shaderCreateInfo); }
+	export inline SDL_GPUShaderFormat gpuSpirvShaderFormats() { return SDL_ShaderCross_GetSPIRVShaderFormats(); }
+	export inline SDL_GPUTexture* gpuAcquireSwapchainTexture(SDL_GPUCommandBuffer* commandBuffer, SDL_Window* window, Uint32* pWidth, Uint32* pHeight) { return SDL_AcquireGPUSwapchainTexture(commandBuffer, window, pWidth, pHeight); }
+	export inline SDL_GPUTexture* gpuCreateTexture(SDL_GPUDevice* device, SDL_GPUTextureCreateInfo* textureCreateInfo) { return SDL_CreateGPUTexture(device, textureCreateInfo); }
+	export inline SDL_GPUTextureFormat gpuGetSwapchainTextureFormat(SDL_GPUDevice* device, SDL_Window* window) { return SDL_GetGPUSwapchainTextureFormat(device, window); }
+	export inline SDL_GPUTransferBuffer* gpuCreateTransferBuffer(SDL_GPUDevice* device, SDL_GPUTransferBufferUsage usage, Uint32 sizeInBytes) { 
+		SDL_GPUTransferBufferCreateInfo info = { usage, sizeInBytes };
+		return SDL_CreateGPUTransferBuffer(device, &info);
+	}
+	export inline Uint32 gpuTextureFormatTexelBlockSize(SDL_GPUTextureFormat textureFormat) { return SDL_GPUTextureFormatTexelBlockSize(textureFormat); }
+	export inline void gpuBindComputePipeline(SDL_GPUComputePass* computePass, SDL_GPUComputePipeline* computePipeline) { SDL_BindGPUComputePipeline(computePass, computePipeline); }
+	export inline void gpuBindComputeStorageBuffers(SDL_GPUComputePass* computePass, Uint32 firstSlot, SDL_GPUBuffer** storageBuffers, Uint32 bindingCount) { SDL_BindGPUComputeStorageBuffers(computePass, firstSlot, storageBuffers, bindingCount); }
+	export inline void gpuBindComputeStorageTextures(SDL_GPUComputePass* computePass, Uint32 firstSlot, SDL_GPUTexture* const* storageTextureSlices, Uint32 bindingCount) { SDL_BindGPUComputeStorageTextures(computePass, firstSlot, storageTextureSlices, bindingCount); }
+	export inline void gpuBindFragmentSamplers(SDL_GPURenderPass* renderPass, Uint32 firstSlot, SDL_GPUTextureSamplerBinding* textureSamplerBindings, Uint32 bindingCount) { SDL_BindGPUFragmentSamplers(renderPass, firstSlot, textureSamplerBindings, bindingCount); }
+	export inline void gpuBindFragmentStorageBuffers(SDL_GPURenderPass* renderPass, Uint32 firstSlot, SDL_GPUBuffer** storageBuffers, Uint32 bindingCount) { SDL_BindGPUFragmentStorageBuffers(renderPass, firstSlot, storageBuffers, bindingCount); }
+	export inline void gpuBindFragmentStorageTextures(SDL_GPURenderPass* renderPass, Uint32 firstSlot, SDL_GPUTexture* const* storageTextureSlices, Uint32 bindingCount) { SDL_BindGPUFragmentStorageTextures(renderPass, firstSlot, storageTextureSlices, bindingCount); }
+	export inline void gpuBindGraphicsPipeline(SDL_GPURenderPass* renderPass, SDL_GPUGraphicsPipeline* graphicsPipeline) { SDL_BindGPUGraphicsPipeline(renderPass, graphicsPipeline); }
+	export inline void gpuBindIndexBuffer(SDL_GPURenderPass* renderPass, SDL_GPUBufferBinding* pBinding, SDL_GPUIndexElementSize indexElementSize) { SDL_BindGPUIndexBuffer(renderPass, pBinding, indexElementSize); }
+	export inline void gpuBindVertexBuffers(SDL_GPURenderPass* renderPass, Uint32 firstBinding, SDL_GPUBufferBinding* pBindings, Uint32 bindingCount) { SDL_BindGPUVertexBuffers(renderPass, firstBinding, pBindings, bindingCount); }
+	export inline void gpuBindVertexSamplers(SDL_GPURenderPass* renderPass, Uint32 firstSlot, SDL_GPUTextureSamplerBinding* textureSamplerBindings, Uint32 bindingCount) { SDL_BindGPUVertexSamplers(renderPass, firstSlot, textureSamplerBindings, bindingCount); }
+	export inline void gpuBindVertexStorageBuffers(SDL_GPURenderPass* renderPass, Uint32 firstSlot, SDL_GPUBuffer** storageBuffers, Uint32 bindingCount) { SDL_BindGPUVertexStorageBuffers(renderPass, firstSlot, storageBuffers, bindingCount); }
+	export inline void gpuBindVertexStorageTextures(SDL_GPURenderPass* renderPass, Uint32 firstSlot, SDL_GPUTexture* const* storageTextureSlices, Uint32 bindingCount) { SDL_BindGPUVertexStorageTextures(renderPass, firstSlot, storageTextureSlices, bindingCount); }
+	export inline void gpuBlit(SDL_GPUCommandBuffer* commandBuffer, SDL_GPUBlitInfo* info) { SDL_BlitGPUTexture(commandBuffer, info); }
+	export inline void gpuCopyBufferToBuffer(SDL_GPUCopyPass* copyPass, SDL_GPUBufferLocation* source, SDL_GPUBufferLocation* destination, Uint32 size, SDL_bool cycle) { SDL_CopyGPUBufferToBuffer(copyPass, source, destination, size, cycle); }
+	export inline void gpuCopyTextureToTexture(SDL_GPUCopyPass* copyPass, SDL_GPUTextureLocation* source, SDL_GPUTextureLocation* destination, Uint32 w, Uint32 h, Uint32 d, SDL_bool cycle) { SDL_CopyGPUTextureToTexture(copyPass, source, destination, w, h, d, cycle); }
+	export inline void gpuDispatchCompute(SDL_GPUComputePass* computePass, Uint32 groupCountX, Uint32 groupCountY, Uint32 groupCountZ) { SDL_DispatchGPUCompute(computePass, groupCountX, groupCountY, groupCountZ); }
+	export inline void gpuDispatchComputeIndirect(SDL_GPUComputePass* computePass, SDL_GPUBuffer* buffer, Uint32 offsetInBytes) { SDL_DispatchGPUComputeIndirect(computePass, buffer, offsetInBytes); }
+	export inline void gpuDownloadFromBuffer(SDL_GPUCopyPass* copyPass, SDL_GPUBufferRegion* source, SDL_GPUTransferBufferLocation* destination) { SDL_DownloadFromGPUBuffer(copyPass, source, destination); }
+	export inline void gpuDownloadFromTexture(SDL_GPUCopyPass* copyPass, SDL_GPUTextureRegion* source, SDL_GPUTextureTransferInfo* destination) { SDL_DownloadFromGPUTexture(copyPass, source, destination); }
+	export inline void gpuDrawIndexedPrimitives(SDL_GPURenderPass* renderPass, Uint32 num_indices, Uint32 num_instances, Uint32 first_index, Sint32 vertex_offset, Uint32 first_instance) { SDL_DrawGPUIndexedPrimitives(renderPass, num_indices, num_instances, first_index, vertex_offset, first_instance); }
+	export inline void gpuDrawIndexedPrimitivesIndirect(SDL_GPURenderPass* renderPass, SDL_GPUBuffer* buffer, Uint32 offsetInBytes, Uint32 drawCount, Uint32 stride) { SDL_DrawGPUIndexedPrimitivesIndirect(renderPass, buffer, offsetInBytes, drawCount, stride); }
+	export inline void gpuDrawPrimitives(SDL_GPURenderPass* renderPass, Uint32 num_vertices, Uint32 num_instances, Uint32 first_vertex, Uint32 first_instance) { SDL_DrawGPUPrimitives(renderPass, num_vertices, num_instances, first_vertex, first_instance); }
+	export inline void gpuDrawPrimitivesIndirect(SDL_GPURenderPass* renderPass, SDL_GPUBuffer* buffer, Uint32 offsetInBytes, Uint32 drawCount, Uint32 stride) { SDL_DrawGPUPrimitivesIndirect(renderPass, buffer, offsetInBytes, drawCount, stride); }
+	export inline void gpuEndComputePass(SDL_GPUComputePass* computePass) { SDL_EndGPUComputePass(computePass); }
+	export inline void gpuEndCopyPass(SDL_GPUCopyPass* copyPass) { SDL_EndGPUCopyPass(copyPass); }
+	export inline void gpuEndRenderPass(SDL_GPURenderPass* renderPass) { SDL_EndGPURenderPass(renderPass); }
+	export inline void gpuGenerateMipmaps(SDL_GPUCommandBuffer* commandBuffer, SDL_GPUTexture* texture) { SDL_GenerateMipmapsForGPUTexture(commandBuffer, texture); }
+	export inline void gpuInsertDebugLabel(SDL_GPUCommandBuffer* commandBuffer, const char* text) { SDL_InsertGPUDebugLabel(commandBuffer, text); }
+	export inline void gpuPopDebugGroup(SDL_GPUCommandBuffer* commandBuffer) { SDL_PopGPUDebugGroup(commandBuffer); }
+	export inline void gpuPushComputeUniformData(SDL_GPUCommandBuffer* commandBuffer, Uint32 slotIndex, const void* data, Uint32 dataLengthInBytes) { SDL_PushGPUComputeUniformData(commandBuffer, slotIndex, data, dataLengthInBytes); }
+	export inline void gpuPushDebugGroup(SDL_GPUCommandBuffer* commandBuffer, const char* name) { SDL_PushGPUDebugGroup(commandBuffer, name); }
+	export inline void gpuPushFragmentUniformData(SDL_GPUCommandBuffer* commandBuffer, Uint32 slotIndex, const void* data, Uint32 dataLengthInBytes) { SDL_PushGPUFragmentUniformData(commandBuffer, slotIndex, data, dataLengthInBytes); }
+	export inline void gpuPushVertexUniformData(SDL_GPUCommandBuffer* commandBuffer, Uint32 slotIndex, const void* data, Uint32 dataLengthInBytes) { SDL_PushGPUVertexUniformData(commandBuffer, slotIndex, data, dataLengthInBytes); }
+	export inline void gpuReleaseBuffer(SDL_GPUDevice* device, SDL_GPUBuffer* buffer) { SDL_ReleaseGPUBuffer(device, buffer); }
+	export inline void gpuReleaseComputePipeline(SDL_GPUDevice* device, SDL_GPUComputePipeline* computePipeline) { SDL_ReleaseGPUComputePipeline(device, computePipeline); }
+	export inline void gpuReleaseFence(SDL_GPUDevice* device, SDL_GPUFence* fence) { SDL_ReleaseGPUFence(device, fence); }
+	export inline void gpuReleaseGraphicsPipeline(SDL_GPUDevice* device, SDL_GPUGraphicsPipeline* graphicsPipeline) { SDL_ReleaseGPUGraphicsPipeline(device, graphicsPipeline); }
+	export inline void gpuReleaseSampler(SDL_GPUDevice* device, SDL_GPUSampler* sampler) { SDL_ReleaseGPUSampler(device, sampler); }
+	export inline void gpuReleaseShader(SDL_GPUDevice* device, SDL_GPUShader* shader) { SDL_ReleaseGPUShader(device, shader); }
+	export inline void gpuReleaseTexture(SDL_GPUDevice* device, SDL_GPUTexture* texture) { SDL_ReleaseGPUTexture(device, texture); }
+	export inline void gpuReleaseTransferBuffer(SDL_GPUDevice* device, SDL_GPUTransferBuffer* transferBuffer) { SDL_ReleaseGPUTransferBuffer(device, transferBuffer); }
+	export inline void gpuSetBufferName(SDL_GPUDevice* device, SDL_GPUBuffer* buffer, const char* text) { SDL_SetGPUBufferName(device, buffer, text); }
+	export inline void gpuSetScissor(SDL_GPURenderPass* renderPass, RectI* scissor) { SDL_SetGPUScissor(renderPass, scissor); }
+	export inline void gpuSetTextureName(SDL_GPUDevice* device, SDL_GPUTexture* texture, const char* text) { SDL_SetGPUTextureName(device, texture, text); }
+	export inline void gpuSetViewport(SDL_GPURenderPass* renderPass, SDL_GPUViewport* viewport) { SDL_SetGPUViewport(renderPass, viewport); }
+	export inline void gpuSubmit(SDL_GPUCommandBuffer* commandBuffer) { SDL_SubmitGPUCommandBuffer(commandBuffer); }
+	export inline void gpuUnclaimWindow(SDL_GPUDevice* device, SDL_Window* window) { SDL_ReleaseWindowFromGPUDevice(device, window); }
+	export inline void gpuUnmapTransferBuffer(SDL_GPUDevice* device, SDL_GPUTransferBuffer* transferBuffer) { SDL_UnmapGPUTransferBuffer(device, transferBuffer); }
+	export inline void gpuUploadToBuffer(SDL_GPUCopyPass* copyPass, SDL_GPUTransferBufferLocation* source, SDL_GPUBufferRegion* destination, SDL_bool cycle = SDL_FALSE) { SDL_UploadToGPUBuffer(copyPass, source, destination, cycle); }
+	export inline void gpuUploadToTexture(SDL_GPUCopyPass* copyPass, SDL_GPUTextureTransferInfo* source, SDL_GPUTextureRegion* destination, SDL_bool cycle = SDL_FALSE) { SDL_UploadToGPUTexture(copyPass, source, destination, cycle); }
+	export inline void gpuWait(SDL_GPUDevice* device) { SDL_WaitForGPUIdle(device); }
+	export inline void gpuWaitForFences(SDL_GPUDevice* device, SDL_bool waitAll, SDL_GPUFence** pFences, Uint32 fenceCount) { SDL_WaitForGPUFences(device, waitAll, pFences, fenceCount); }
+	export inline void* gpuMapTransferBuffer(SDL_GPUDevice* device, SDL_GPUTransferBuffer* transferBuffer, SDL_bool cycle) { return SDL_MapGPUTransferBuffer(device, transferBuffer, cycle); }
 
 	/* Music management functions */
 	export double musicGetPosition(Mix_Music* music) { return Mix_GetMusicPosition(music); }
 	export inline int musicFadeOut(int ms) { return Mix_FadeOutMusic(ms); }
 	export inline int musicGetVolume() { return Mix_VolumeMusic(-1); }
-	export inline int musicHalt() { return Mix_HaltMusic(); }
 	export inline int musicIsPaused() { return Mix_PausedMusic(); }
 	export inline int musicPlay(Mix_Music* music, int loops = -1) { return Mix_PlayMusic(music, loops); }
 	export inline int musicPlayFade(Mix_Music* music, int fade, int loops = -1) { return Mix_FadeInMusic(music, loops, fade); }
 	export inline int musicSetPosition(double position) { return Mix_SetMusicPosition(position); }
 	export inline Mix_Music* musicLoad(const char* path) { return Mix_LoadMUS(path); }
 	export inline void musicFree(Mix_Music* music) { Mix_FreeMusic(music); }
+	export inline void musicHalt() { return Mix_HaltMusic(); }
 	export inline void musicPause() { Mix_PauseMusic(); }
 	export inline void musicResume() { Mix_ResumeMusic(); }
 	export inline void musicRewind() { Mix_RewindMusic(); }
@@ -325,7 +333,6 @@ namespace sdl {
 	export inline int soundExpireChannel(int channel, int ticks) { return Mix_ExpireChannel(channel, ticks); }
 	export inline int soundFadeOutChannel(int channel, int ms) { return Mix_FadeOutChannel(channel, ms); }
 	export inline int soundGetChannelVolume(int channel) { return Mix_Volume(channel, -1); }
-	export inline int soundHaltChannel(int channel) { return Mix_HaltChannel(channel); }
 	export inline int soundPlay(Sound* sound, int loops = 0, int time = -1) { return Mix_PlayChannelTimed(-1, sound, loops, time); }
 	export inline int soundPlayFade(Sound* sound, int fade, int loops = 0, int time = -1) { return Mix_FadeInChannelTimed(-1, sound, loops, fade, time); }
 	export inline int soundReserveChannels(int num) { return Mix_ReserveChannels(num); }
@@ -333,6 +340,7 @@ namespace sdl {
 	export inline Sound* soundGetChunk(int channel) { return Mix_GetChunk(channel); }
 	export inline Sound* soundLoad(const char* path) { return Mix_LoadWAV(path); }
 	export inline void soundFree(Sound* sound) { Mix_FreeChunk(sound); }
+	export inline void soundHaltChannel(int channel) { return Mix_HaltChannel(channel); }
 	export inline void soundPauseChannel(int channel) { Mix_Pause(channel); }
 	export inline void soundResumeChannel(int channel) { Mix_Resume(channel); }
 	export inline void soundSetAllVolume(int volume) {
@@ -374,7 +382,7 @@ namespace sdl {
 	export inline void windowRaise(Window* window) { SDL_RaiseWindow(window); }
 	export inline void windowRestore(Window* window) { SDL_RestoreWindow(window); }
 	export inline void windowSetIcon(Window* window, SDL_Surface* icon) { SDL_SetWindowIcon(window, icon); }
-	export inline void windowSetModalFor(SDL_Window* modal_window, SDL_Window* parent_window) { SDL_SetWindowModalFor(modal_window, parent_window); }
+	export inline void windowSetModal(SDL_Window* modal_window, SDL_Window* parent_window) { SDL_SetWindowModal(modal_window, parent_window); }
 	export inline void windowSetMouseGrab(Window* window, SDL_bool grabbed) { SDL_SetWindowMouseGrab(window, grabbed); }
 	export inline void windowSetOpacity(Window* window, float opacity) { SDL_SetWindowOpacity(window, opacity); }
 	export inline void windowSetPosition(Window* window, int x, int y) { SDL_SetWindowPosition(window, x, y); }
@@ -383,7 +391,7 @@ namespace sdl {
 	export inline void windowShow(Window* window) { SDL_ShowWindow(window); }
 
 	/* Misc functions */
-	export inline const char* __cdecl getError() { return TTF_GetError(); }
+	export inline const char* __cdecl getError() { return SDL_GetError(); }
 	export inline constexpr float rads(float deg) { return deg * std::numbers::pi_v<float> / 180; }
 	export inline SDL_Color toTextColor(const Color& c) {
 		return {

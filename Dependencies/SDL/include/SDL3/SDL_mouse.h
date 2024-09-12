@@ -30,6 +30,7 @@
 
 #include <SDL3/SDL_stdinc.h>
 #include <SDL3/SDL_error.h>
+#include <SDL3/SDL_surface.h>
 #include <SDL3/SDL_video.h>
 
 #include <SDL3/SDL_begin_code.h>
@@ -38,9 +39,26 @@
 extern "C" {
 #endif
 
+/**
+ * This is a unique ID for a mouse for the time it is connected to the system,
+ * and is never reused for the lifetime of the application.
+ *
+ * If the mouse is disconnected and reconnected, it will get a new ID.
+ *
+ * The value 0 is an invalid ID.
+ *
+ * \since This datatype is available since SDL 3.0.0.
+ */
 typedef Uint32 SDL_MouseID;
 
-typedef struct SDL_Cursor SDL_Cursor;   /**< Implementation dependent */
+/**
+ * The structure used to identify an SDL cursor.
+ *
+ * This is opaque data.
+ *
+ * \since This struct is available since SDL 3.0.0.
+ */
+typedef struct SDL_Cursor SDL_Cursor;
 
 /**
  * Cursor types for SDL_CreateSystemCursor().
@@ -69,7 +87,7 @@ typedef enum SDL_SystemCursor
     SDL_SYSTEM_CURSOR_S_RESIZE,     /**< Window resize bottom. May be NS_RESIZE. */
     SDL_SYSTEM_CURSOR_SW_RESIZE,    /**< Window resize bottom-left. May be NESW_RESIZE. */
     SDL_SYSTEM_CURSOR_W_RESIZE,     /**< Window resize left. May be EW_RESIZE. */
-    SDL_NUM_SYSTEM_CURSORS
+    SDL_SYSTEM_CURSOR_COUNT
 } SDL_SystemCursor;
 
 /**
@@ -278,14 +296,14 @@ extern SDL_DECLSPEC void SDLCALL SDL_WarpMouseInWindow(SDL_Window * window,
  *
  * \param x the x coordinate.
  * \param y the y coordinate.
- * \returns 0 on success or a negative error code on failure; call
- *          SDL_GetError() for more information.
+ * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *          for more information.
  *
  * \since This function is available since SDL 3.0.0.
  *
  * \sa SDL_WarpMouseInWindow
  */
-extern SDL_DECLSPEC int SDLCALL SDL_WarpMouseGlobal(float x, float y);
+extern SDL_DECLSPEC SDL_bool SDLCALL SDL_WarpMouseGlobal(float x, float y);
 
 /**
  * Set relative mouse mode for a window.
@@ -299,14 +317,14 @@ extern SDL_DECLSPEC int SDLCALL SDL_WarpMouseGlobal(float x, float y);
  *
  * \param window the window to change.
  * \param enabled SDL_TRUE to enable relative mode, SDL_FALSE to disable.
- * \returns 0 on success or a negative error code on failure; call
- *          SDL_GetError() for more information.
+ * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *          for more information.
  *
  * \since This function is available since SDL 3.0.0.
  *
  * \sa SDL_GetWindowRelativeMouseMode
  */
-extern SDL_DECLSPEC int SDLCALL SDL_SetWindowRelativeMouseMode(SDL_Window *window, SDL_bool enabled);
+extern SDL_DECLSPEC SDL_bool SDLCALL SDL_SetWindowRelativeMouseMode(SDL_Window *window, SDL_bool enabled);
 
 /**
  * Query whether relative mouse mode is enabled for a window.
@@ -358,14 +376,14 @@ extern SDL_DECLSPEC SDL_bool SDLCALL SDL_GetWindowRelativeMouseMode(SDL_Window *
  * `SDL_HINT_MOUSE_AUTO_CAPTURE` hint to zero.
  *
  * \param enabled SDL_TRUE to enable capturing, SDL_FALSE to disable.
- * \returns 0 on success or a negative error code on failure; call
- *          SDL_GetError() for more information.
+ * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *          for more information.
  *
  * \since This function is available since SDL 3.0.0.
  *
  * \sa SDL_GetGlobalMouseState
  */
-extern SDL_DECLSPEC int SDLCALL SDL_CaptureMouse(SDL_bool enabled);
+extern SDL_DECLSPEC SDL_bool SDLCALL SDL_CaptureMouse(SDL_bool enabled);
 
 /**
  * Create a cursor using the specified bitmap data and mask (in MSB format).
@@ -423,8 +441,9 @@ extern SDL_DECLSPEC SDL_Cursor * SDLCALL SDL_CreateCursor(const Uint8 * data,
  * situations. For example, if the original surface is 32x32, then on a 2x
  * macOS display or 200% display scale on Windows, a 64x64 version of the
  * image will be used, if available. If a matching version of the image isn't
- * available, the closest size image will be scaled to the appropriate size
- * and be used instead.
+ * available, the closest larger size image will be downscaled to the
+ * appropriate size and be used instead, if available. Otherwise, the closest
+ * smaller image will be upscaled and be used instead.
  *
  * \param surface an SDL_Surface structure representing the cursor image.
  * \param hot_x the x position of the cursor hot spot.
@@ -465,14 +484,14 @@ extern SDL_DECLSPEC SDL_Cursor * SDLCALL SDL_CreateSystemCursor(SDL_SystemCursor
  * this is desired for any reason.
  *
  * \param cursor a cursor to make active.
- * \returns 0 on success or a negative error code on failure; call
- *          SDL_GetError() for more information.
+ * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *          for more information.
  *
  * \since This function is available since SDL 3.0.0.
  *
  * \sa SDL_GetCursor
  */
-extern SDL_DECLSPEC int SDLCALL SDL_SetCursor(SDL_Cursor *cursor);
+extern SDL_DECLSPEC SDL_bool SDLCALL SDL_SetCursor(SDL_Cursor *cursor);
 
 /**
  * Get the active cursor.
@@ -520,28 +539,28 @@ extern SDL_DECLSPEC void SDLCALL SDL_DestroyCursor(SDL_Cursor *cursor);
 /**
  * Show the cursor.
  *
- * \returns 0 on success or a negative error code on failure; call
- *          SDL_GetError() for more information.
+ * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *          for more information.
  *
  * \since This function is available since SDL 3.0.0.
  *
  * \sa SDL_CursorVisible
  * \sa SDL_HideCursor
  */
-extern SDL_DECLSPEC int SDLCALL SDL_ShowCursor(void);
+extern SDL_DECLSPEC SDL_bool SDLCALL SDL_ShowCursor(void);
 
 /**
  * Hide the cursor.
  *
- * \returns 0 on success or a negative error code on failure; call
- *          SDL_GetError() for more information.
+ * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ *          for more information.
  *
  * \since This function is available since SDL 3.0.0.
  *
  * \sa SDL_CursorVisible
  * \sa SDL_ShowCursor
  */
-extern SDL_DECLSPEC int SDLCALL SDL_HideCursor(void);
+extern SDL_DECLSPEC SDL_bool SDLCALL SDL_HideCursor(void);
 
 /**
  * Return whether the cursor is currently being shown.

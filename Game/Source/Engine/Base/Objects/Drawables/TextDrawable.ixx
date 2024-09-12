@@ -36,7 +36,7 @@ namespace fbc {
 		}
 
 		void reload() const override;
-		void reload(sdl::GpuCopyPass* copyPass) const;
+		void reload(sdl::GPUCopyPass* copyPass) const;
 		TextDrawable& set(strv text, sdl::Color color);
 		TextDrawable& set(strv text, sdl::Color color, sdl::Color colorOutline);
 		TextDrawable& set(strv text, sdl::Color color, sdl::Color colorOutline, const FFont& font);
@@ -57,14 +57,14 @@ namespace fbc {
 
 	void TextDrawable::reload() const
 	{
-		sdl::GpuCommandBuffer* uploadCmdBuf = sdl::runner::deviceAcquireCommandBuffer();
-		sdl::GpuCopyPass* copyPass = sdl::gpuBeginCopyPass(uploadCmdBuf);
+		sdl::GPUCommandBuffer* uploadCmdBuf = sdl::runner::deviceAcquireCommandBuffer();
+		sdl::GPUCopyPass* copyPass = sdl::gpuBeginCopyPass(uploadCmdBuf);
 		reload(copyPass);
 		sdl::gpuEndCopyPass(copyPass);
 		sdl::gpuSubmit(uploadCmdBuf);
 	}
 
-	void TextDrawable::reload(sdl::GpuCopyPass* copyPass) const
+	void TextDrawable::reload(sdl::GPUCopyPass* copyPass) const
 	{
 		if (texture) {
 			sdl::runner::deviceReleaseTexture(texture);

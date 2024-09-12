@@ -16,7 +16,7 @@ namespace fbc {
 		ImageDrawable(ImageDrawable&& other) noexcept : texH(other.texH), texW(other.texW), texture(other.texture) {
 			other.texture = nullptr;
 		}
-		ImageDrawable(float w, float h, sdl::GpuTexture* texture): texH(h), texW(w), texture(texture) {}
+		ImageDrawable(float w, float h, sdl::GPUTexture* texture): texH(h), texW(w), texture(texture) {}
 		virtual ~ImageDrawable() override {
 			if (texture && sdl::runner::enabled()) {
 				sdl::runner::deviceReleaseTexture(texture);
@@ -40,7 +40,7 @@ namespace fbc {
 	protected:
 		mutable float texH = 0;
 		mutable float texW = 0;
-		mutable sdl::GpuTexture* texture = nullptr;
+		mutable sdl::GPUTexture* texture = nullptr;
 
 		void drawImpl(sdl::SDLBatchRenderPass& rp, float tX, float tY, float sX, float sY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL);
 	};
@@ -59,6 +59,6 @@ namespace fbc {
 		rp.bindTexture(texture, sdl::runner::SAMPLER);
 		rp.setupVertexUniform(tX, tY, sX, sY, rotZ);
 		rp.pushFragmentUniform(tint, sizeof(sdl::Color));
-		rp.drawIndexedPrimitives(0);
+		rp.drawIndexedPrimitives();
 	}
 }

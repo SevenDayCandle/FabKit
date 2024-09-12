@@ -96,13 +96,13 @@ namespace fbc {
 		}
 
 		// Setup device for this window
-		if (!sdl::runner::deviceClaimWindow(window, sdl::GpuSwapchainComposition::SDL_GPU_SWAPCHAINCOMPOSITION_SDR, cfg.graphicsVSync.get() ? sdl::GpuPresentMode::SDL_GPU_PRESENTMODE_VSYNC : sdl::GpuPresentMode::SDL_GPU_PRESENTMODE_IMMEDIATE))
+		if (!sdl::runner::deviceClaimWindow(window))
 		{
-			sdl::logCritical("GpuClaimWindow went derp: %s", sdl::getError());
+			sdl::logCritical("GPUClaimWindow went derp: %s", sdl::getError());
 			return false;
 		}
-
-		cfg.graphicsVSync.addOnReload([this](const bool& val) { sdl::runner::deviceSetSwapchainParameters(window, sdl::GpuSwapchainComposition::SDL_GPU_SWAPCHAINCOMPOSITION_SDR, val ? sdl::GpuPresentMode::SDL_GPU_PRESENTMODE_VSYNC : sdl::GpuPresentMode::SDL_GPU_PRESENTMODE_IMMEDIATE); });
+		sdl::runner::deviceSetSwapchainParameters(window, sdl::GPUSwapchainComposition::SDL_GPU_SWAPCHAINCOMPOSITION_SDR, cfg.graphicsVSync.get() ? sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_VSYNC : sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_IMMEDIATE);
+		cfg.graphicsVSync.addOnReload([this](const bool& val) { sdl::runner::deviceSetSwapchainParameters(window, sdl::GPUSwapchainComposition::SDL_GPU_SWAPCHAINCOMPOSITION_SDR, val ? sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_VSYNC : sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_IMMEDIATE); });
 
 		return true;
 	}
@@ -188,21 +188,21 @@ namespace fbc {
 
 	// Render the last opened screen, as well as all overlays
 	void FWindow::render() {
-		sdl::GpuCommandBuffer* cd = sdl::runner::deviceAcquireCommandBuffer();
+		sdl::GPUCommandBuffer* cd = sdl::runner::deviceAcquireCommandBuffer();
 		if (cd) {
 			uint32 w, h;
-			sdl::GpuTexture* swapchain = sdl::gpuAcquireSwapchainTexture(cd, window, &w, &h);
+			sdl::GPUTexture* swapchain = sdl::gpuAcquireSwapchainTexture(cd, window, &w, &h);
 			if (swapchain) {
-				sdl::GpuColorAttachmentInfo colorAttachmentInfo = {
-					.textureSlice = {
-						.texture = swapchain
-					},
-					.clearColor = { 0.0f, 0.0f, 0.0f, 1.0f },
-					.loadOp = sdl::GpuLoadOp::SDL_GPU_LOADOP_CLEAR,
-					.storeOp = sdl::GpuStoreOp::SDL_GPU_STOREOP_STORE
+				sdl::GPUColorTargetInfo colorAttachmentInfo = {
+					.texture = swapchain,
+					.mip_level = 0,
+					.layer_or_depth_plane = 0,
+					.clear_color = { 0.0f, 0.0f, 0.0f, 1.0f },
+					.load_op = sdl::GPULoadOp::SDL_GPU_LOADOP_CLEAR,
+					.store_op = sdl::GPUStoreOp::SDL_GPU_STOREOP_STORE
 				};
 
-				sdl::GpuRenderPass* r = sdl::gpuBeginRenderPass(cd, &colorAttachmentInfo, 1, nullptr);
+				sdl::GPURenderPass* r = sdl::gpuBeginRenderPass(cd, &colorAttachmentInfo, 1, nullptr);
 				sdl::SDLBatchRenderPass rp = sdl::SDLBatchRenderPass(cd, r);
 				// Render screen elements
 				// TODO pass in z index

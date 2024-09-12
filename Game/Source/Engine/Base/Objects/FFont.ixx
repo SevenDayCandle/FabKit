@@ -123,7 +123,7 @@ namespace fbc {
                 sdl::Surface* outlineSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, sdl::toTextColor(outlineColor), w);
                 sdl::fontOutlineSet(font, 0);
                 sdl::RectI targetRect = { res, res, targetSurf->w, targetSurf->h };
-                sdl::surfaceBlitScaled(targetSurf, nullptr, outlineSurf, &targetRect, sdl::ScaleMode::SDL_SCALEMODE_BEST);
+                sdl::surfaceBlitScaled(targetSurf, nullptr, outlineSurf, &targetRect, sdl::ScaleMode::SDL_SCALEMODE_LINEAR);
                 sdl::surfaceDestroy(targetSurf);
                 targetSurf = outlineSurf;
             }
@@ -135,8 +135,8 @@ namespace fbc {
                 sdl::RectI shadowRect = { res, res, shadowSurf->w, shadowSurf->h };
                 sdl::RectI clipRect;
                 sdl::surfaceGetClipRect(targetSurf, &clipRect);
-                sdl::surfaceBlitScaled(shadowSurf, nullptr, newTargetSurf, &shadowRect, sdl::ScaleMode::SDL_SCALEMODE_BEST);
-                sdl::surfaceBlitScaled(targetSurf, nullptr, newTargetSurf, &clipRect, sdl::ScaleMode::SDL_SCALEMODE_BEST);
+                sdl::surfaceBlitScaled(shadowSurf, nullptr, newTargetSurf, &shadowRect, sdl::ScaleMode::SDL_SCALEMODE_LINEAR);
+                sdl::surfaceBlitScaled(targetSurf, nullptr, newTargetSurf, &clipRect, sdl::ScaleMode::SDL_SCALEMODE_LINEAR);
                 sdl::surfaceDestroy(targetSurf);
                 sdl::surfaceDestroy(shadowSurf);
                 targetSurf = newTargetSurf;

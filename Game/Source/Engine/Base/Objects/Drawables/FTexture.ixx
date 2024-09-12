@@ -16,20 +16,20 @@ namespace fbc {
         FTexture(FTexture&& other) noexcept = default;
 
         void reload() const override;
-        void reload(sdl::GpuCopyPass* copyPass) const;
+        void reload(sdl::GPUCopyPass* copyPass) const;
         str path;
 	};
 
     void FTexture::reload() const
     {
-        sdl::GpuCommandBuffer* uploadCmdBuf = sdl::runner::deviceAcquireCommandBuffer();
-        sdl::GpuCopyPass* copyPass = sdl::gpuBeginCopyPass(uploadCmdBuf);
+        sdl::GPUCommandBuffer* uploadCmdBuf = sdl::runner::deviceAcquireCommandBuffer();
+        sdl::GPUCopyPass* copyPass = sdl::gpuBeginCopyPass(uploadCmdBuf);
         reload(copyPass);
         sdl::gpuEndCopyPass(copyPass);
         sdl::gpuSubmit(uploadCmdBuf);
     }
 
-    void FTexture::reload(sdl::GpuCopyPass* copyPass) const {
+    void FTexture::reload(sdl::GPUCopyPass* copyPass) const {
         if (texture) {
             sdl::runner::deviceReleaseTexture(texture);
         }
