@@ -32,8 +32,6 @@ namespace fbc {
 	protected:
 		inline virtual void clickLeftEvent() {}
 		inline virtual void clickRightEvent() {}
-		inline virtual void justHoveredEvent() {}
-		inline virtual void justUnhoveredEvent() {}
 	};
 
 	void UIInteractable::updateImpl()
@@ -45,7 +43,6 @@ namespace fbc {
 					if (soundHover) {
 						soundHover->play();
 					}
-					justHoveredEvent();
 				}
 
 				if (sdl::runner::mouseIsLeftJustClicked() || sdl::runner::mouseIsRightJustClicked()) {
@@ -80,9 +77,6 @@ namespace fbc {
 		}
 		else if (this->win.activeElement == this && (sdl::runner::mouseIsLeftJustReleased() || sdl::runner::mouseIsRightJustReleased())) {
 			this->win.activeElement = nullptr;
-		}
-		else if (hb->isJust() && interactable) {
-			justUnhoveredEvent();
 		}
 	}
 }

@@ -4,17 +4,14 @@ import fbc.FUtil;
 import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
-
 import fbc.UIInteractable;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 
 namespace fbc {
 	export class UIButton : public UIInteractable {
 	public:
-
 		UIButton(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image) : UIInteractable(window, move(hb), image) {}
 		~UIButton() override {}
 

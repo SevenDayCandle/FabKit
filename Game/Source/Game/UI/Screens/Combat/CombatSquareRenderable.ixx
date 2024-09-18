@@ -5,7 +5,7 @@ import fbc.CoreContent;
 import fbc.FUtil;
 import fbc.FWindow;
 import fbc.Hitbox;
-import fbc.UIInteractable;
+import fbc.UICallbackInteractable;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
 import sdl.SDLProps; 
@@ -13,17 +13,19 @@ import sdl.SDLRunner;
 import std;
 
 namespace fbc {
-	export class CombatSquareRenderable : public UIInteractable {
+	export class CombatSquareRenderable : public UICallbackInteractable<CombatSquareRenderable> {
 	public:
-		CombatSquareRenderable(FWindow& window, uptr<Hitbox>&& hb, const CombatSquare& square): UIInteractable(window, move(hb), window.cct.images.uiLightPanel), square(square) {}
+		CombatSquareRenderable(FWindow& window, uptr<Hitbox>&& hb, const CombatSquare& square): UICallbackInteractable<CombatSquareRenderable>(window, move(hb), window.cct.images.uiLightPanel), square(square) {}
 
+		bool valid;
 		const CombatSquare& square;
+		const sdl::Color* originalColor = &sdl::COLOR_STANDARD;
 
 		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 	};
 
 	void CombatSquareRenderable::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
-		UIInteractable::renderImpl(rp);
+		UIImage::renderImpl(rp);
 	}
 }

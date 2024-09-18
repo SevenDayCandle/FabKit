@@ -36,8 +36,6 @@ namespace fbc {
 			endTurnButton(add(make_unique<UITextButton>(win, relhb(hb->getScaleOffSizeX(0.8), hb->getScaleOffSizeY(0.8), END_TURN_SIZE, END_TURN_SIZE), window.cct.images.uiPanelRound, window.cct.fontRegular(), window.cct.strings.combat_end_turn()))) {
 		}
 
-		inline void resetHighlightDistance() { highlightDistance(instance->getDistanceSource(), &sdl::COLOR_STANDARD, &sdl::COLOR_STANDARD, 0, 0, 0, 0, 0); }
-
 		virtual void onPlayerTurnBegin(const CombatTurn* turn) override;
 		virtual void onPlayerTurnEnd(const CombatTurn* turn) override;
 		virtual void onTurnAdded(const CombatTurn& turn) override;
@@ -46,23 +44,22 @@ namespace fbc {
 		CardRenderable& createCardRender(const Card& card, float tOffX, float sOffX = 0, float sOffY = CARD_H * 2);
 		CombatTurnRenderable& createTurnRender(const CombatTurn& turn);
 		CreatureRenderable& createOccupantRender(const OccupantObject& occupant);
-		void highlightDistance(CombatSquare* object, const sdl::Color* color, const sdl::Color* moveColor, int highlightRangeBegin, int highlightRangeEnd, int movementRange, int targetSizeX, int targetSizeY);
+		void hoverSquareUpdate(CombatSquareRenderable* newHovered);
 		void open() override;
-		void recolorSquare(CombatSquareRenderable& square);
+		void previewMovement(CombatSquare* object, const sdl::Color& color, int movementRange);
+		void previewTargeting(CombatSquare* object, const sdl::Color& color, int highlightRangeBegin, int highlightRangeEnd, int targetSizeX, int targetSizeY);
+		void recolorSquare(CombatSquareRenderable& square, const sdl::Color& color);
 		void removeCardRender(Card* card);
 		void removeCardRender(CardRenderable* card);
+		void resetHighlights();
 		void selectCardRender(CardRenderable* card);
+		void selectSquare(CombatSquareRenderable* square);
 		void updateImpl() override;
 	private:
 		CardRenderable* selectedCard;
 		CombatInstance* instance;
-		CombatSquare* distanceSource;
-		CombatSquare* targetingSource;
-		const sdl::Color* halfColor = &sdl::COLOR_STANDARD;
-		const sdl::Color* targetingColor = &sdl::COLOR_STANDARD;
-		int highlightRangeBegin;
-		int highlightRangeEnd;
-		int movementRange;
+		CombatSquareRenderable* hovered;
+		const sdl::Color* hoverColor = &sdl::COLOR_STANDARD;
 		int targetSizeX;
 		int targetSizeY;
 		UITextButton& endTurnButton;

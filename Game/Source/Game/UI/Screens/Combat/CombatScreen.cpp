@@ -85,9 +85,7 @@ namespace fbc {
 		addVfxNew<UITransformVFX>(render)
 			.setFade(0, 1)
 			.setMove(tOffX, 0);
-		render.setOnClick([this](CardRenderable& card) {
-			selectCardRender(&card);
-		});
+		render.setOnClick([this](CardRenderable& card) {selectCardRender(&card);});
 		return render;
 	}
 
@@ -111,22 +109,57 @@ namespace fbc {
 		return creatureUI.addNew<CreatureRenderable>(creatureUI.relhb(offX, offY, TILE_SIZE, TILE_SIZE), occupant);
 	}
 
-	void CombatScreen::highlightDistance(CombatSquare* source, const sdl::Color* color, const sdl::Color* moveColor, int highlightRangeBegin, int highlightRangeEnd, int movementRange, int targetSizeX, int targetSizeY) {
-		CombatSquare* lastSource = instance->getDistanceSource();
-		if (lastSource != source || targetingColor != color || halfColor != moveColor
-			|| this->highlightRangeBegin != highlightRangeBegin || this->highlightRangeEnd != highlightRangeEnd
-			|| this->movementRange != movementRange || this->targetSizeX != targetSizeX || this->targetSizeY != targetSizeY) {
-			instance->fillDistances(source);
-			targetingColor = color;
-			halfColor = moveColor;
-			this->distanceSource = source;
-			this->highlightRangeBegin = highlightRangeBegin;
-			this->highlightRangeEnd = highlightRangeEnd;
-			this->movementRange = movementRange;
-			this->targetSizeX = targetSizeX;
-			this->targetSizeY = targetSizeY;
-			for (CombatSquareRenderable& square : fieldUI) {
-				recolorSquare(square);
+	void CombatScreen::previewMovement(CombatSquare* source, const sdl::Color& color, int movementRange) {
+		instance->fillDistances(source);
+		this->targetSizeX = 0;
+		this->targetSizeY = 0;
+		for (CombatSquareRenderable& square : fieldUI) {
+			square.valid = square.square.sDist <= movementRange;
+			recolorSquare(square, square.valid ? color : sdl::COLOR_STANDARD);
+		}
+	}
+
+	void CombatScreen::previewTargeting(CombatSquare* source, const sdl::Color& color, int highlightRangeBegin, int highlightRangeEnd, int targetSizeX, int targetSizeY) {
+		this->targetSizeX = targetSizeX;
+		this->targetSizeY = targetSizeY;
+		for (CombatSquareRenderable& square : fieldUI) {
+			int lineDistance = source ? square.square.getLineDistance(*source) : 0;
+			square.valid = lineDistance <= highlightRangeEnd && lineDistance >= highlightRangeBegin;
+			recolorSquare(square, square.valid ? color : sdl::COLOR_STANDARD);
+		}
+	}
+
+	void CombatScreen::hoverSquareUpdate(CombatSquareRenderable* newHovered) {
+		if (this->hovered != newHovered) {
+			this->hovered = newHovered;
+			if (newHovered && newHovered->valid) {
+				if (targetSizeX > 0 && targetSizeY > 0) {
+					int minCol = newHovered->square.col - targetSizeX / 2;
+					int minRow = newHovered->square.row - targetSizeY / 2;
+					int maxCol = minCol + targetSizeX;
+					int maxRow = minRow + targetSizeY;
+					for (CombatSquareRenderable& square : fieldUI) {
+						const sdl::Color& target = square.square.col >= minCol && square.square.col < maxCol && square.square.row >= minRow && square.square.row < maxRow ? *hoverColor : *square.originalColor;
+						if (target != square.color) {
+							addVfxNew<UIRecolorVFX>(square, target);
+						}
+					}
+				}
+				else {
+					for (CombatSquareRenderable& square : fieldUI) {
+						const sdl::Color& target = &square == newHovered ? *hoverColor : *square.originalColor;
+						if (target != square.color) {
+							addVfxNew<UIRecolorVFX>(square, target);
+						}
+					}
+				}
+			}
+			else {
+				for (CombatSquareRenderable& square : fieldUI) {
+					if (*square.originalColor != square.color) {
+						addVfxNew<UIRecolorVFX>(square, *square.originalColor);
+					}
+				}
 			}
 		}
 	}
@@ -144,7 +177,8 @@ namespace fbc {
 		// Add buttons for each square
 		fieldUI.setHbOffsetSize(instance->getFieldColumns() * TILE_SIZE, instance->getFieldRows() * TILE_SIZE);
 		for (const CombatSquare& square : instance->getSquares()) {
-			fieldUI.addNew<CombatSquareRenderable>(fieldUI.relhb(square.col * TILE_SIZE, square.row * TILE_SIZE, TILE_SIZE, TILE_SIZE), square);
+			fieldUI.addNew<CombatSquareRenderable>(fieldUI.relhb(square.col * TILE_SIZE, square.row * TILE_SIZE, TILE_SIZE, TILE_SIZE), square)
+				.setOnClick([this](CombatSquareRenderable& card) {selectSquare(&card); });
 		}
 		// Add images for each creature
 		creatureUI.setHbOffsetSize(fieldUI.hb->getOffSizeX(), fieldUI.hb->getOffSizeY());
@@ -159,12 +193,10 @@ namespace fbc {
 		}
 	}
 
-	void CombatScreen::recolorSquare(CombatSquareRenderable& square) {
-		int lineDistance = distanceSource ? square.square.getLineDistance(*distanceSource) : 0;
-		const sdl::Color& target = lineDistance <= highlightRangeEnd && lineDistance >= highlightRangeBegin ? *targetingColor :
-			lineDistance + square.square.sDist <= highlightRangeEnd + movementRange ? *halfColor : sdl::COLOR_STANDARD;
-		if (square.color != target) {
-			addVfxNew<UIRecolorVFX>(square, target);
+	void CombatScreen::recolorSquare(CombatSquareRenderable& square, const sdl::Color& color) {
+		square.originalColor = &color;
+		if (square.color != color) {
+			addVfxNew<UIRecolorVFX>(square, color);
 		}
 	}
 
@@ -185,17 +217,32 @@ namespace fbc {
 		}
 	}
 
+	void CombatScreen::resetHighlights() {
+		for (CombatSquareRenderable& square : fieldUI) {
+			square.valid = false;
+			recolorSquare(square, sdl::COLOR_STANDARD);
+		}
+	}
+
 	void CombatScreen::selectCardRender(CardRenderable* card) {
 		selectedCard = card;
 		if (selectedCard) {
 			OccupantObject* actor = instance->getCurrentActor();
 			if (actor) {
-				int movement = actor->getMovement();
-				highlightDistance(actor->currentSquare, &sdl::COLOR_GOLD, &sdl::COLOR_LIME, card->card.targetRangeBegin(), card->card.targetRangeEnd(), movement, card->card.targetSizeX(), card->card.targetSizeY());
+				previewTargeting(actor->currentSquare, sdl::COLOR_GOLD, card->card.targetRangeBegin(), card->card.targetRangeEnd(), card->card.targetSizeX(), card->card.targetSizeY());
 			}
 		}
 		else {
-			resetHighlightDistance();
+			resetHighlights();
+		}
+	}
+
+	void CombatScreen::selectSquare(CombatSquareRenderable* square) {
+		if (square && square->valid) {
+			// When clicking on a square while a card is selected, play the card on the square
+			if (selectedCard) {
+
+			}
 		}
 	}
 
@@ -207,15 +254,35 @@ namespace fbc {
 		Action* currentAction = instance->getCurrentAction();
 		bool allowInteraction = currentTurn && !currentTurn->isDone && !currentAction;
 		endTurnButton.setInteractable(allowInteraction);
+
+		bool cHovered = false;
 		for (CardRenderable& card : cardUI) {
 			card.setInteractable(allowInteraction);
+			if (card.isHovered()) {
+				cHovered = true;
+			}
 		}
+
+		// When hovering over a square, highlight squares. Otherwise, unhighlight them
+		bool sqHovered = false;
+		for (CombatSquareRenderable& sq : fieldUI) {
+			sq.setInteractable(allowInteraction);
+			if (sq.isHovered()) {
+				sqHovered = true;
+				hoverSquareUpdate(&sq);
+			}
+		}
+		if (!sqHovered) {
+			hoverSquareUpdate(nullptr);
+		}
+
 		// TODO disallow moving when actions are going on
 
 		// When clicking a non-card, unselect the card
-		if (sdl::runner::mouseIsLeftJustClicked() && !cardUI.isHovered()) {
+		if (sdl::runner::mouseIsLeftJustClicked() && !cHovered && !sqHovered) {
 			selectCardRender(nullptr);
 		}
+
 
 		UIScreen::updateImpl();
 	}
