@@ -22,6 +22,8 @@ namespace fbc {
 			virtual inline void postInitialize() {}
 			virtual inline void queueTurn() {}
 
+			virtual void onMoved() {}
+
 			virtual IDrawable& getImageField() const = 0;
 		};
 

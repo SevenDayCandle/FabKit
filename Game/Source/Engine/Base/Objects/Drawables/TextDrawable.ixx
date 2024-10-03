@@ -7,7 +7,6 @@ import sdl.SDLBase;
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 
-// TODO directly extend imageDrawable
 namespace fbc {
 	export class TextDrawable : public ImageDrawable {
 	public:

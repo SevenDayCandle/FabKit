@@ -19,6 +19,7 @@ namespace fbc {
         inline const T& get() const {return value;}
 
         void addOnReload(const func<void(const T&)>& onChangeNew);
+        void addOnReload(func<void(const T&)>&& onChangeNew);
         void reload() override;
         void set(const T& newValue);
     protected:
@@ -58,6 +59,19 @@ namespace fbc {
         }
         else {
             this->onChange = onChangeNew;
+        }
+    }
+
+    template<typename T> void ConfigValue<T>::addOnReload(func<void(const T&)>&& onChangeNew) {
+        auto previousOnChange = this->onChange;
+        if (previousOnChange) {
+            this->onChange = [previousOnChange, o = move(onChangeNew)](const T& val) {
+                previousOnChange(val);
+                o(val);
+            };
+        }
+        else {
+            this->onChange = move(onChangeNew);
         }
     }
 

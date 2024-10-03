@@ -39,13 +39,19 @@ namespace fbc {
 		inline auto getSelectedItems() { return std::views::transform(currentIndices, [this](int i) { return &(this->rows[i]->item); }); }
 		inline bool isOpen() const { return proxy != nullptr; }
 		inline UISelectorList& setFilterFunc(const func<bool(const UIEntry<T>*)>& filterFunc) { return this->filterFunc = filterFunc, *this; }
+		inline UISelectorList& setFilterFunc(func<bool(const UIEntry<T>*)>&& filterFunc) { return this->filterFunc = move(filterFunc), *this; }
 		inline UISelectorList& setItemFont(const FFont& itemFont) { return UIList<T>::setItemFont(itemFont), * this; }
 		inline UISelectorList& setLabelFunc(const func<str(const T&)>& labelFunc) { return UIList<T>::setLabelFunc(labelFunc), * this; }
+		inline UISelectorList& setLabelFunc(func<str(const T&)>&& labelFunc) { return UIList<T>::setLabelFunc(move(labelFunc)), * this; }
 		inline UISelectorList& setMaxRows(int rows) { return UIList<T>::setMaxRows(rows), *this; }
 		inline UISelectorList& setOnChange(const func<void(EntryView<T>&)>& onChange) { return this->onChange = onChange, *this; }
+		inline UISelectorList& setOnChange(func<void(EntryView<T>&)>&& onChange) { return this->onChange = move(onChange), *this; }
 		inline UISelectorList& setOnClose(const func<void()>& onClose) { return this->onClose = onClose, *this; }
+		inline UISelectorList& setOnClose(func<void()>&& onClose) { return this->onClose = move(onClose), *this; }
 		inline UISelectorList& setOnOpen(const func<void()>& onOpen) { return this->onOpen = onOpen, *this; }
+		inline UISelectorList& setOnOpen(func<void()>&& onOpen) { return this->onOpen = move(onOpen), *this; }
 		inline UISelectorList& setOnSelectionUpdate(const func<void(EntryView<T>&)>& onSelectionUpdate) {return this->onSelectionUpdate = onSelectionUpdate, *this;}
+		inline UISelectorList& setOnSelectionUpdate(func<void(EntryView<T>&)>&& onSelectionUpdate) { return this->onSelectionUpdate = move(onSelectionUpdate), *this; }
 
 		inline int getMinSelections() const { return selectionMin; }
 		inline int selectedSize() const { return static_cast<int>(currentIndices.size()); }

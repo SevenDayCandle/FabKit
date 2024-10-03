@@ -44,16 +44,20 @@ namespace fbc {
 		CardRenderable& createCardRender(const Card& card, float tOffX, float sOffX = 0, float sOffY = CARD_H * 2);
 		CombatTurnRenderable& createTurnRender(const CombatTurn& turn);
 		CreatureRenderable& createOccupantRender(const OccupantObject& occupant);
+		void clearHighlights();
+		void clearSelectedPath();
 		void hoverSquareUpdate(CombatSquareRenderable* newHovered);
 		void open() override;
 		void previewMovement(CombatSquare* object, const sdl::Color& color, int movementRange);
 		void previewTargeting(CombatSquare* object, const sdl::Color& color, int highlightRangeBegin, int highlightRangeEnd, int targetSizeX, int targetSizeY);
+		void queueMove(CombatSquareRenderable& square);
 		void recolorSquare(CombatSquareRenderable& square, const sdl::Color& color);
 		void removeCardRender(Card* card);
 		void removeCardRender(CardRenderable* card);
 		void resetHighlights();
 		void selectCardRender(CardRenderable* card);
 		void selectSquare(CombatSquareRenderable* square);
+		void setSelectedPath(vec<const CombatSquare*>&& squares);
 		void updateImpl() override;
 	private:
 		CardRenderable* selectedCard;
@@ -62,6 +66,7 @@ namespace fbc {
 		const sdl::Color* hoverColor = &sdl::COLOR_STANDARD;
 		int targetSizeX;
 		int targetSizeY;
+		OccupantObject* activeOccupant;
 		UITextButton& endTurnButton;
 		UICanvas<CardRenderable>& cardUI;
 		UICanvas<CombatSquareRenderable>& fieldUI;
@@ -70,5 +75,6 @@ namespace fbc {
 		umap<const Card*, CardRenderable*> cardUIMap;
 		umap<const CombatTurn*, CombatTurnRenderable*> turnUIMap;
 		umap<const OccupantObject*, CreatureRenderable*> occupantUIMap;
+		vec<const CombatSquare*> selectedPath;
 	};
 }

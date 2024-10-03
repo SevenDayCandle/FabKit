@@ -9,42 +9,46 @@ namespace fbc {
 	export class SequentialAction : public CallbackAction<SequentialAction> {
 	public:
 		SequentialAction(): CallbackAction<SequentialAction>() {}
+		template <c_varg<uptr<Action>>... Args> SequentialAction(Args&&... items) : CallbackAction<SequentialAction>() {
+			actions.reserve(sizeof...(items));
+			(actions.push_back(move(items)), ...);
+		}
 		virtual ~SequentialAction() = default;
 
-		template <c_varg<uptr<Action>>... Args> SequentialAction& addActions(Args&&... items);
+		inline bool isSuccess() override { return executeIndex >= actions.size(); }
+		inline int executedCount() const { return executeIndex; }
+		inline int totalCount() const { return actions.size(); }
+		inline SequentialAction& addAction(uptr<Action>&& act) { return actions.push_back(move(act)), * this; }
+		template <c_varg<uptr<Action>&&>... Args> inline SequentialAction& addActions(Args&&... items) { return (actions.push_back(move(items)), ...), * this; }
+
 		virtual bool run() override;
 		virtual void start() override;
 	protected:
 		vec<uptr<Action>> actions;
 	private:
-		int i = 0;
+		int executeIndex = 0;
 	};
 
-	template<c_varg<uptr<Action>> ...Args> SequentialAction& SequentialAction::addActions(Args&&... items) {
-		(actions.push_back(move(items)), ...);
-		return *this;
-	}
-
 	inline bool SequentialAction::run() {
-		if (i >= actions.size()) {
+		if (executeIndex >= actions.size()) {
 			return true;
 		}
-		if (actions[i]->run()) {
-			if (!actions[i]->isSuccess()) {
+		if (actions[executeIndex]->run()) {
+			if (!actions[executeIndex]->isSuccess()) {
 				return true;
 			}
-			++i;
-			if (i >= actions.size()) {
+			++executeIndex;
+			if (executeIndex >= actions.size()) {
 				return true;
 			}
-			actions[i]->start();
+			actions[executeIndex]->start();
 		}
 		return false;
 	}
 
 	void SequentialAction::start() {
-		if (i < actions.size()) {
-			actions[i]->start();
+		if (executeIndex < actions.size()) {
+			actions[executeIndex]->start();
 		}
 	}
 }

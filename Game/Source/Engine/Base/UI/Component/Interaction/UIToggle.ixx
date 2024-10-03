@@ -38,6 +38,7 @@ namespace fbc {
 		inline float getBeginX() override { return std::min(hb->x, hb->x + posX); }
 		inline float getBeginY() override { return std::min(hb->y, hb->y + posY); }
 		inline UIToggle& setOnClick(const func<void(UIToggle&)>& onClick) { return this->onClick = onClick, *this; }
+		inline UIToggle& setOnClick(func<void(UIToggle&)>&& onClick) { return this->onClick = move(onClick), *this; }
 		inline UIToggle& setToggleState(bool val) { return this->toggled = val, *this; }
 
 		UIToggle& setTextOffset(float xOff, float yOff);

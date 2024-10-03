@@ -16,7 +16,9 @@ namespace fbc {
 		~UICallbackInteractable() override {}
 
 		inline UICallbackInteractable& setOnClick(const func<void(T&)>& onClick) { return this->onLeftClick = onClick, *this; }
+		inline UICallbackInteractable& setOnClick(func<void(T&)>&& onClick) { return this->onLeftClick = move(onClick), *this; }
 		inline UICallbackInteractable& setOnRightClick(const func<void(T&)>& onRightClick) { return this->onRightClick = onRightClick, *this; }
+		inline UICallbackInteractable& setOnRightClick(func<void(T&)>&& onRightClick) { return this->onRightClick = move(onRightClick), *this; }
 	private:
 		func<void(T&)> onLeftClick;
 		func<void(T&)> onRightClick;

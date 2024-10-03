@@ -23,6 +23,7 @@ namespace fbc {
 		this->occupant = occupant;
 		if (occupant) {
 			occupant->currentSquare = this;
+			occupant->onMoved();
 		}
 		// TODO hooks
 		// TODO power triggers

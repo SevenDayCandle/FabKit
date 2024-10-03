@@ -29,6 +29,7 @@ namespace fbc {
 			func<void()> onReset;
 
 			inline void setOnReset(const func<void()>& onReset) { this->onReset = onReset; }
+			inline void setOnReset(func<void()>&& onReset) { this->onReset = move(onReset); }
 
 			virtual void commit() = 0;
 		};

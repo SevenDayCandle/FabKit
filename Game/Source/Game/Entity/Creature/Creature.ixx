@@ -58,7 +58,7 @@ namespace fbc {
 
 		virtual bool onTurnBegin() override;
 		virtual void onTurnEnd() override;
-		bool moveTo(CombatSquare& square);
+		bool checkCanMove(CombatSquare& square);
 		Card& addCardToPile(uptr<Card>&& card, const PileType& type); // TODO refactor to use conditions, refactor into action
 		Card& cardFromToPile(Card& card, const PileType& source, const PileType& dest); // TODO refactor to use conditions, refactor into action
 		Card& useCard(Card& card, CombatSquare& square);

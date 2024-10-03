@@ -38,17 +38,13 @@ namespace fbc {
 	}
 
 	// Attempt to move to the designated square. Return true if successful
-	bool Creature::moveTo(CombatSquare& square)
+	bool Creature::checkCanMove(CombatSquare& square)
 	{
 		// TODO hooks for movement amount
 		int cost = 1;
 		if (movement < cost) {
 			return false;
 		}
-		if (currentSquare) {
-			currentSquare->setOccupant(nullptr);
-		}
-		square.setOccupant(this);
 		movement -= cost;
 
 		return true;

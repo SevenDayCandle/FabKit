@@ -8,6 +8,7 @@ namespace fbc {
 	export class ArbitraryAction : public Action {
 	public:
 		ArbitraryAction(const func<void()>& onStart): onStart(onStart) {}
+		ArbitraryAction(func<void()>&& onStart) : onStart(move(onStart)) {}
 		virtual ~ArbitraryAction() = default;
 
 		func<void()> onStart;

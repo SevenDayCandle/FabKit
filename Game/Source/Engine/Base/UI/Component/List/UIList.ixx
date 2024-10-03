@@ -77,6 +77,7 @@ namespace fbc {
 		template <c_varg<T*>... Args> UIList& setItems(Args&&... items);
 		UIList& setItemFont(const FFont& itemFont);
 		UIList& setLabelFunc(const func<str(const T&)>& labelFunc);
+		UIList& setLabelFunc(func<str(const T&)>&& labelFunc);
 		UIList& setMaxRows(int rows);
 		void refreshDimensions() override;
 		void renderImpl(sdl::SDLBatchRenderPass& rp) override;
@@ -188,6 +189,13 @@ namespace fbc {
 	// Updates the label function used for row titles. This will update titles on existing rows and will setRealSize the menu
 	template<typename T> UIList<T>& UIList<T>::setLabelFunc(const func<str(const T&)>& labelFunc) {
 		this->labelFunc = labelFunc;
+		for (const uptr<UIEntry<T>>& row : rows) { row->setText(this->labelFunc(row->item)); }
+		autosize();
+		return *this;
+	}
+
+	template<typename T> UIList<T>& UIList<T>::setLabelFunc(func<str(const T&)>&& labelFunc) {
+		this->labelFunc = move(labelFunc);
 		for (const uptr<UIEntry<T>>& row : rows) { row->setText(this->labelFunc(row->item)); }
 		autosize();
 		return *this;

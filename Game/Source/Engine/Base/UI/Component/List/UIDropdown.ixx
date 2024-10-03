@@ -46,14 +46,17 @@ namespace fbc {
 		inline UIDropdown& setItemFont(const FFont& itemFont) { return menu->setItemFont(itemFont), * this; }
 		inline UIDropdown& setMaxRows(int rows) { return menu->setMaxRows(rows), * this; }
 		inline UIDropdown& setOnChange(const func<void(EntryView<T>&)>& onChange) { return menu->setOnChange(onChange), * this; }
+		inline UIDropdown& setOnChange(func<void(EntryView<T>&)>&& onChange) { return menu->setOnChange(move(onChange)), * this; }
 		inline UIDropdown& setOnOpen(const func<void()>& onOpen) { return this->onOpen = onOpen, *this; }
+		inline UIDropdown& setOnOpen(func<void()>&& onOpen) { return this->onOpen = move(onOpen), *this; }
 		inline UIDropdown& setSelectionLimit(int rows) { return menu->setSelectionLimit(rows), * this; }
 		inline UIDropdown& setSelectionMin(int rows) { return menu->setSelectionMin(rows), * this; }
 		inline vec<const T*> getAllItemsAsList() { return menu->toVec(); }
 		inline vec<const T*> getSelectedItemsAsList() { return menu->getSelectedItemsAsList(); }
 		inline EntryView<T>& getAllItems() { return menu->getAllItems(); }
 		inline EntryView<T>& getSelectedItems() { return menu->getSelectedItems(); }
-		inline virtual UIDropdown& setOnClose(const func<void()>& onClose) { return this->onClose = onClose, *this; }
+		inline UIDropdown& setOnClose(const func<void()>& onClose) { return this->onClose = onClose, *this; }
+		inline UIDropdown& setOnClose(func<void()>&& onClose) { return this->onClose = move(onClose), *this; }
 		inline void clearItems() { menu->clearItems(); }
 		inline void clearSelection() { menu->clearSelection(); }
 		inline void selectSingle(T item) { menu->selectSingle(item); }

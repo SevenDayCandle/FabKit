@@ -25,10 +25,11 @@ namespace fbc {
 	void CombatScreen::onPlayerTurnBegin(const CombatTurn* turn)
 	{
 		endTurnButton.setEnabled(true);
-		Creature* occupant = dynamic_cast<Creature*>(&turn->source);
-		if (occupant) {
+		Creature* creature = dynamic_cast<Creature*>(&turn->source);
+		if (creature) {
+			activeOccupant = creature;
 			int i = 0;
-			for (const uptr<Card>& card : occupant->getHand()) {
+			for (const uptr<Card>& card : creature->getHand()) {
 				auto res = cardUIMap.find(card.get());
 				if (res == cardUIMap.end()) {
 					createCardRender(*card, i * CARD_W, 0);
@@ -36,10 +37,14 @@ namespace fbc {
 				++i;
 			}
 		}
+		else {
+			activeOccupant = dynamic_cast<OccupantObject*>(&turn->source);
+		}
 	}
 
 	void CombatScreen::onPlayerTurnEnd(const CombatTurn* turn)
 	{
+		activeOccupant = nullptr;
 		endTurnButton.setInteractable(false).setEnabled(false);
 		for (auto& entry : cardUIMap) {
 			removeCardRender(entry.second);
@@ -107,6 +112,18 @@ namespace fbc {
 			offY = square->row * TILE_SIZE;
 		}
 		return creatureUI.addNew<CreatureRenderable>(creatureUI.relhb(offX, offY, TILE_SIZE, TILE_SIZE), occupant);
+	}
+
+	void CombatScreen::clearHighlights() {
+		for (CombatSquareRenderable& square : fieldUI) {
+			square.valid = false;
+			recolorSquare(square, sdl::COLOR_STANDARD);
+		}
+	}
+
+	void CombatScreen::clearSelectedPath() {
+		this->selectedPath.clear();
+
 	}
 
 	void CombatScreen::previewMovement(CombatSquare* source, const sdl::Color& color, int movementRange) {
@@ -217,19 +234,22 @@ namespace fbc {
 		}
 	}
 
+	// Reset the highlights to the default state for the turn (i.e. if you are not hovering over anything or clicking on anything)
+	// If it is currently the turn of an actor and it is awaiting input, highlight movable squares. Otherwise, clear highlights
 	void CombatScreen::resetHighlights() {
-		for (CombatSquareRenderable& square : fieldUI) {
-			square.valid = false;
-			recolorSquare(square, sdl::COLOR_STANDARD);
+		if (activeOccupant) {
+			previewMovement(activeOccupant->currentSquare, sdl::COLOR_SKY, activeOccupant->getMovement());
+		}
+		else {
+			clearHighlights();
 		}
 	}
 
 	void CombatScreen::selectCardRender(CardRenderable* card) {
 		selectedCard = card;
 		if (selectedCard) {
-			OccupantObject* actor = instance->getCurrentActor();
-			if (actor) {
-				previewTargeting(actor->currentSquare, sdl::COLOR_GOLD, card->card.targetRangeBegin(), card->card.targetRangeEnd(), card->card.targetSizeX(), card->card.targetSizeY());
+			if (activeOccupant) {
+				previewTargeting(activeOccupant->currentSquare, sdl::COLOR_GOLD, card->card.targetRangeBegin(), card->card.targetRangeEnd(), card->card.targetSizeX(), card->card.targetSizeY());
 			}
 		}
 		else {
@@ -243,7 +263,20 @@ namespace fbc {
 			if (selectedCard) {
 
 			}
+			// When clicking on a square at the end of a highlighted path, move to that square
+			else if (!this->selectedPath.empty() && this->selectedPath.back() == &square->square && activeOccupant) {
+
+			}
+			// Otherwise, highlight the path to be taken
+			else {
+				setSelectedPath(instance->findShortestPath(&square->square));
+			}
 		}
+	}
+
+	void CombatScreen::setSelectedPath(vec<const CombatSquare*>&& squares) {
+		this->selectedPath = squares;
+		// TODO draw arrows over the selected path squares
 	}
 
 	void CombatScreen::updateImpl()

@@ -139,7 +139,13 @@ namespace sdl {
 	export constexpr Color COLOR_BLACK_SHADOW = { 0, 0, 0, 0.4f };
 	export constexpr Color COLOR_GOLD = { 1.0, 0.843, 0, 1 };
 	export constexpr Color COLOR_GRAY = { 0.5f, 0.5f, 0.5f, 1 };
-	export constexpr Color COLOR_LIME = { 0.6f, 2, 0.84f, 1 };
+	export constexpr Color COLOR_HIGHLIGHT_BLUE = { 0.5f, 0.66f, 1.5f, 1 };
+	export constexpr Color COLOR_HIGHLIGHT_BLUE_LIGHT = { 0.8f, 0.96f, 1.7f, 1 };
+	export constexpr Color COLOR_HIGHLIGHT_GREEN = { 0.66f, 1.5f, 0.5f, 1 };
+	export constexpr Color COLOR_HIGHLIGHT_GREEN_LIGHT = { 0.96f, 1.7f, 0.8f, 1 };
+	export constexpr Color COLOR_HIGHLIGHT_RED = { 1.5f, 0.5f, 0.6f, 1 };
+	export constexpr Color COLOR_HIGHLIGHT_RED_LIGHT = { 1.7f, 0.8f, 0.9f, 1 };
+	export constexpr Color COLOR_LIME = { 0.6f, 1.5f, 0.84f, 1 };
 	export constexpr Color COLOR_SKY = { 0.6f, 1.1, 1.5f, 1 };
 	export constexpr Color COLOR_STANDARD = { 1, 1, 1, 1 };
 	export constexpr Color COLOR_WHITE = { 2, 2, 2, 1 };

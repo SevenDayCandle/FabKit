@@ -5,6 +5,7 @@ import fbc.FFont;
 import fbc.FUtil;
 import fbc.FWindow;
 import fbc.Hitbox;
+import fbc.IDrawable;
 import fbc.RelativeHitbox;
 import fbc.UIEntry;
 import fbc.UIBase;
@@ -25,6 +26,7 @@ namespace fbc {
 		inline T* getSelectedItem() { return currentItem; }
 		inline UINavigation& setItemFont(FFont& itemFont) { return UIList<T>::setItemFont(itemFont), * this; }
 		inline UINavigation& setLabelFunc(const func<const str(T&)>& labelFunc) { return UIList<T>::setLabelFunc(labelFunc), * this; }
+		inline UINavigation& setLabelFunc(func<const str(T&)>&& labelFunc) { return UIList<T>::setLabelFunc(move(labelFunc)), * this; }
 		inline UINavigation& setMaxRows(int rows) { return UIList<T>::setMaxRows(rows), * this; }
 
 		virtual bool isHovered() override;

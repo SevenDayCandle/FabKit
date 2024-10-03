@@ -18,6 +18,7 @@ namespace fbc {
 
 		inline float getScroll() const { return scrollPercent; }
 		inline UIScrollbar& setOnScroll(const func<void(float)>& onScroll) { return this->onScroll = onScroll, *this; }
+		inline UIScrollbar& setOnScroll(func<void(float)>&& onScroll) { return this->onScroll = move(onScroll), *this; }
 
 		virtual void onSizeUpdated() override;
 		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;

@@ -19,8 +19,8 @@ namespace fbc {
 
 			FWindow& win;
 
-			inline virtual void dispose() {};
-			inline virtual void open() {}
+			inline virtual void dispose() {} // Should be called when this element is destroyed
+			inline virtual void open() {} // Should be called when this element is added to a window
 			inline virtual void renderImpl(sdl::SDLBatchRenderPass& rp) { render(rp); } // 
 			inline virtual void refreshDimensions() {}  // Force resizing of hitboxes when the screen size changes
 			inline virtual void updateImpl() { update(); }
@@ -173,7 +173,7 @@ namespace fbc {
 		}
 	}
 
-	// Whenever the screen size changes, we need to setRealSize all UI elements
+	// Whenever the screen size changes, we need to resize all UI elements
 	void FWindow::refreshSize(int winW, int winH) {
 		this->winH = winH;
 		this->winW = winW;
@@ -225,7 +225,7 @@ namespace fbc {
 
 	// Close the current screen and switch the specified screen. Also dispose all overlays
 	void FWindow::swapScreen(uptr<FWindow::Element>&& screen) {
-		// Place the screen to be swapped to right behind the last screen and then queue a dispose, ensuring proper disposal of screens. This also handles opening of the enxt screen
+		// Place the screen to be swapped to right behind the last screen and then queue a dispose, ensuring proper disposal of screens. This also handles opening of the next screen
 		if (screens.size() >= 2) {
 			queuedCloseScreen = true;
 			screens.insert(screens.end() - 2, std::move(screen));

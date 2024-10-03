@@ -16,7 +16,9 @@ namespace fbc {
 		~UIButton() override {}
 
 		inline UIButton& setOnClick(const func<void(UIButton&)>& onClick) { return this->onLeftClick = onClick, *this; }
+		inline UIButton& setOnClick(func<void(UIButton&)>&& onClick) { return this->onLeftClick = move(onClick), *this; }
 		inline UIButton& setOnRightClick(const func<void(UIButton&)>& onRightClick) { return this->onRightClick = onRightClick, *this; }
+		inline UIButton& setOnRightClick(func<void(UIButton&)>&& onRightClick) { return this->onRightClick = move(onRightClick), *this; }
 
 		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
 	private:

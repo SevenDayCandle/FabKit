@@ -26,8 +26,10 @@ namespace fbc {
 		inline const T* getSelectedItem() { return &this->rows[currentIndex]->item; }
 		inline UIMenu& setItemFont(const FFont& itemFont) { return UIList<T>::setItemFont(itemFont), * this; }
 		inline UIMenu& setLabelFunc(const func<const str(T&)>& labelFunc) { return UIList<T>::setLabelFunc(labelFunc), * this; }
+		inline UIMenu& setLabelFunc(func<const str(T&)>&& labelFunc) { return UIList<T>::setLabelFunc(move(labelFunc)), * this; }
 		inline UIMenu& setMaxRows(int rows) { return UIList<T>::setMaxRows(rows), * this; }
 		inline UIMenu& setOnChange(const func<void(const T*)>& onChange) { return this->onChange = onChange, *this; }
+		inline UIMenu& setOnChange(func<void(const T*)>&& onChange) { return this->onChange = move(onChange), *this; }
 
 		void select(int ind);
 		void select(T& item);

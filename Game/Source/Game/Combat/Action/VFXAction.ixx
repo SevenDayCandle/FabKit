@@ -9,26 +9,35 @@ import fbc.UIScreen;
 import std;
 
 namespace fbc {
-	export template <c_ext<Action> T = Action> class VFXAction : public CallbackAction<T> {
+	export template <typename T = Action> class VFXAction : public CallbackAction<T> {
 	public:
-		VFXAction(FWindow& window, uptr<CallbackVFX>&& vfx): CallbackAction<T>(), vfx(move(vfx)), win(window) {}
+		VFXAction(const func<uptr<CallbackVFX>()>& vfxFunc) : CallbackAction<T>(), vfxFunc(vfxFunc) {}
+		VFXAction(func<uptr<CallbackVFX>()>&& vfxFunc) : CallbackAction<T>(), vfxFunc(move(vfxFunc)) {}
+		VFXAction(uptr<CallbackVFX>&& vfx) : CallbackAction<T>(), vfxFunc([v = move(vfx)]() mutable {
+			return move(v);
+		}) {}
 
-		bool isDone;
-		FWindow& win;
+		bool isDone = false;
 
 		inline virtual bool run() override { return isDone; }
 
 		virtual void start() override;
 	protected:
-		uptr<CallbackVFX> vfx;
+		func<uptr<CallbackVFX>()> vfxFunc;
 	};
 
-	template <c_ext<Action> T> void VFXAction<T>::start()
+	template <typename T> void VFXAction<T>::start()
 	{
-		UIScreen* screen = dynamic_cast<UIScreen*>(win.currentScreen());
-		if (screen) {
-			vfx->setOnComplete([this](CallbackVFX& v) {isDone = true; });
-			screen->addVfx(move(vfx));
+		uptr<CallbackVFX> vfx = vfxFunc();
+		if (vfx) {
+			UIScreen* screen = dynamic_cast<UIScreen*>(vfx->win.currentScreen());
+			if (screen) {
+				vfx->setOnComplete([this](CallbackVFX& v) {isDone = true; });
+				screen->addVfx(move(vfx));
+			}
+			else {
+				isDone = true;
+			}
 		}
 		else {
 			isDone = true;

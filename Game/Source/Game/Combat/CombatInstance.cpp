@@ -5,16 +5,17 @@ import fbc.CombatSquare;
 import fbc.CombatTurn;
 import fbc.Creature;
 import fbc.CreatureData;
+import fbc.CreatureMoveAction;
 import fbc.EncounterCreatureEntry;
 import fbc.FieldObject;
 import fbc.FUtil;
 import fbc.GameRun;
 import fbc.RunEncounter;
 import fbc.SavedCreatureEntry;
+import fbc.SequentialAction;
 import fbc.TurnObject;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
 import sdl.SDLRunner;
 import std;
 
@@ -126,7 +127,7 @@ namespace fbc {
 	}
 
 	// Queue an action to be executed
-	void CombatInstance::queueAction(uptr<Action>&& action)
+	void CombatInstance::queueActionImpl(uptr<Action>&& action)
 	{
 		actionQueue.push_back(move(action));
 		// TODO hooks
@@ -299,6 +300,13 @@ namespace fbc {
 		return nullptr;
 	}
 
+	// Move the occupant directly to a given target square
+	CreatureMoveAction& CombatInstance::queueOccupantMove(OccupantObject* occupant, CombatSquare* target) {
+		return queueAction<CreatureMoveAction>(
+			make_unique<CreatureMoveAction>(occupant, target, [this, occupant, target]() {return viewSubscriber ? viewSubscriber->creatureMoveVFX(occupant, target) : nullptr; })
+		);
+	}
+
 	// Get the distance from the distance source to the given square. Return -1 if unreachable
 	int CombatInstance::getDistanceTo(CombatSquare* square)
 	{
@@ -315,14 +323,23 @@ namespace fbc {
 		return nullptr;
 	}
 
+	// Move the occupant over a series of squares
+	SequentialAction& CombatInstance::queueOccupantPath(OccupantObject* occupant, vec<CombatSquare*> path) {
+		SequentialAction& action = queueAction<SequentialAction>(make_unique<SequentialAction>());
+		for (CombatSquare* sq : path) {
+			action.addAction(make_unique<CreatureMoveAction>(occupant, sq, [this, occupant, sq]() {return viewSubscriber ? viewSubscriber->creatureMoveVFX(occupant, sq) : nullptr; }));
+		}
+		return action;
+	}
+
 	// Find a shortest path from the source square (exclusive) to the target square (inclusive)
-	vec<CombatSquare*> CombatInstance::findShortestPath(CombatSquare* targ)
+	vec<const CombatSquare*> CombatInstance::findShortestPath(const CombatSquare* targ)
 	{
-		vec<CombatSquare*> path;
+		vec<const CombatSquare*> path;
 		int targDist = targ->sDist;
 		// Distance of -1 or INT_MAX means that the square cannot be reached
 		if (targDist >= 0 && targDist != futil::INT_MAX) {
-			CombatSquare* current = targ;
+			const CombatSquare* current = targ;
 			while (current != distanceSource) {
 				path.push_back(current);
 				int scol = current->col;

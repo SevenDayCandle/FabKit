@@ -15,10 +15,10 @@ import std;
 namespace fbc {
 	export class UIRecolorVFX : public CallbackVFX {
 	public:
-		UIRecolorVFX(FWindow& window, UIImage& image, float r, float g, float b, float duration = DEFAULT_DURATION * 0.5f) : CallbackVFX(window, duration), image(image), targHSV(sdl::HSVTuple::toHSV(r, g, b)), srcHSV(sdl::HSVTuple::toHSV(image.color)), token(image.makeToken()) {
+		UIRecolorVFX(FWindow& window, UIImage& image, float r, float g, float b, float duration = DEFAULT_DURATION * 0.25f) : CallbackVFX(window, duration), image(image), targHSV(sdl::HSVTuple::toHSV(r, g, b)), srcHSV(sdl::HSVTuple::toHSV(image.color)), token(image.makeToken()) {
 			refreshInterpHue();
 		}
-		UIRecolorVFX(FWindow& window, UIImage& image, const sdl::Color& color, float duration = DEFAULT_DURATION * 0.5f) : UIRecolorVFX(window, image, color.r, color.g, color.b, duration) {}
+		UIRecolorVFX(FWindow& window, UIImage& image, const sdl::Color& color, float duration = DEFAULT_DURATION * 0.25f) : UIRecolorVFX(window, image, color.r, color.g, color.b, duration) {}
 		virtual ~UIRecolorVFX() = default;
 
 		UIImage& image;

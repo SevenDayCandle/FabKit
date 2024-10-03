@@ -32,7 +32,9 @@ namespace fbc {
 
 		inline int getValue() const { return val; }
 		inline UINumberInput& setOnBufferUpdate(const func<void(int)>& onBufferUpdateCallback) { return this->onBufferUpdateCallback = onBufferUpdateCallback, *this; }
+		inline UINumberInput& setOnBufferUpdate(func<void(int)>&& onBufferUpdateCallback) { return this->onBufferUpdateCallback = move(onBufferUpdateCallback), *this; }
 		inline UINumberInput& setOnComplete(const func<void(int)>& onComplete) { return this->onComplete = onComplete, *this; }
+		inline UINumberInput& setOnComplete(func<void(int)>&& onComplete) { return this->onComplete = move(onComplete), *this; }
 
 		void commit(int num);
 		virtual UINumberInput& setLimits(int limMin, int limMax);
