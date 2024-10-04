@@ -30,6 +30,7 @@ namespace fbc {
 			setScaleX(sStart, sEnd);
 			return setScaleY(sStart, sEnd);
 		}
+		inline virtual void render(sdl::SDLBatchRenderPass& rp) override {}
 
 		UITransformVFX& setFade(float aEnd);
 		UITransformVFX& setFade(float aStart, float aEnd);
@@ -42,7 +43,6 @@ namespace fbc {
 		UITransformVFX& setScaleY(float sStart, float sEnd);
 		virtual void dispose() override;
 		virtual bool tickUpdate() override;
-		virtual void render(sdl::SDLBatchRenderPass& rp) override;
 		virtual void update() override;
 	protected:
 		UITransformVFX(FWindow& window, UIImage& image, float duration, float alphaEnd) : CallbackVFX(window, duration),
@@ -137,10 +137,6 @@ namespace fbc {
 			return true;
 		}
 		return CallbackVFX::tickUpdate();
-	}
-
-	void UITransformVFX::render(sdl::SDLBatchRenderPass& rp) {
-		image.renderImpl(rp);
 	}
 
 	void UITransformVFX::update() {
