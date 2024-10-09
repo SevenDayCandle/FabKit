@@ -5,9 +5,7 @@ import fbc.Effect;
 import fbc.FUtil;
 import fbc.GameObjectData;
 import fbc.ObjectRarity;
-import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBase;
 import sdl.SDLRunner;
 import std;
 

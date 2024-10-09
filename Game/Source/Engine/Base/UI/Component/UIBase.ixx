@@ -6,8 +6,7 @@ import fbc.Hitbox;
 import fbc.Hoverable;
 import fbc.RelativeHitbox;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 

@@ -1,7 +1,5 @@
 export module fbc.UIToggle;
 
-import fbc.CoreConfig;
-import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FUtil;
 import fbc.FWindow;
@@ -10,8 +8,7 @@ import fbc.IDrawable;
 import fbc.TextDrawable;
 import fbc.UIInteractable;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -28,9 +25,9 @@ namespace fbc {
 			UIToggle(window, move(hb), text, image, checkImage, f,
 				image.getWidth() * 1.15f, image.getHeight() * 0.25f) {}
 		UIToggle(FWindow& window, uptr<Hitbox>&& hb, strv text, IDrawable& image, IDrawable& checkImage) :
-			UIToggle(window, move(hb), text, image, checkImage, window.cct.fontRegular()) {}
+			UIToggle(window, move(hb), text, image, checkImage, window.props.fontRegular()) {}
 		UIToggle(FWindow& window, uptr<Hitbox>&& hb, strv text) :
-			UIToggle(window, move(hb), text, window.cct.images.uiCheckboxEmpty, window.cct.images.uiCheckboxFilled, window.cct.fontRegular()) {}
+			UIToggle(window, move(hb), text, window.props.defaultCheckboxEmpty(), window.props.defaultCheckboxFilled(), window.props.fontRegular()) {}
 
 		bool toggled = false;
 		IDrawable& checkImage;
@@ -66,8 +63,8 @@ namespace fbc {
 	}
 
 	void UIToggle::onSizeUpdated() {
-		this->posX = win.cfg.renderScale(offX);
-		this->posY = win.cfg.renderScale(offY);
+		this->posX = win.renderScale(offX);
+		this->posY = win.renderScale(offY);
 	}
 
 	void UIToggle::refreshDimensions()

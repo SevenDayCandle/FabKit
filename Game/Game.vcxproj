@@ -164,11 +164,11 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Engine\Base\Content\BaseContent.ixx">
+    <ClCompile Include="Source\Game\Content\BaseContent.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Content\ContentManifest.ixx">
+    <ClCompile Include="Source\Game\Content\ContentManifest.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -272,7 +272,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Content\ContentLoadables.ixx">
+    <ClCompile Include="Source\Game\Content\ContentLoadables.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -280,8 +280,8 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Base\Content\StaticLoadables.ixx" />
-    <ClCompile Include="Source\Engine\Base\Content\BaseStrings.ixx" />
+    <ClCompile Include="Source\Game\Content\StaticLoadables.ixx" />
+    <ClCompile Include="Source\Game\Content\BaseStrings.ixx" />
     <ClCompile Include="Source\Engine\Base\UI\Component\Layout\UIScreen.ixx">
       <SubType>
       </SubType>
@@ -363,7 +363,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Core\CoreAudio.ixx">
+    <ClCompile Include="Source\Game\Content\Core\CoreAudio.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -434,9 +434,9 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Core\CoreConfig.ixx" />
-    <ClCompile Include="Source\Engine\Core\CoreImages.ixx" />
-    <ClCompile Include="Source\Engine\Core\CoreStrings.ixx" />
+    <ClCompile Include="Source\Game\Content\Core\CoreConfig.ixx" />
+    <ClCompile Include="Source\Game\Content\Core\CoreImages.ixx" />
+    <ClCompile Include="Source\Game\Content\Core\CoreStrings.ixx" />
     <ClCompile Include="Source\Engine\Base\UI\Component\UIBase.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
@@ -490,15 +490,15 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Core\CoreContent.ixx">
+    <ClCompile Include="Source\Game\Content\Core\CoreContent.ixx">
       <FileType>Document</FileType>
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Core\UI\SettingsDialog.ixx">
+    <ClCompile Include="Source\Game\UI\SettingsDialog.ixx">
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Core\UI\SettingsDialogPage.ixx">
+    <ClCompile Include="Source\Game\UI\SettingsDialogPage.ixx">
       <SubType>
       </SubType>
     </ClCompile>
@@ -587,7 +587,7 @@ xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xc
     </ClCompile>
     <ClCompile Include="Source\Game\Entity\Status\StatusTurnMode.ixx" />
     <ClCompile Include="Source\Game\Entity\AttributeObject.ixx" />
-    <ClCompile Include="Source\Engine\Base\Content\ContentRegisterable.ixx">
+    <ClCompile Include="Source\Game\Content\ContentRegisterable.ixx">
       <SubType>
       </SubType>
     </ClCompile>

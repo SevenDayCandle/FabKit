@@ -5,6 +5,7 @@ import fbc.CallbackVFX;
 import fbc.Card;
 import fbc.CombatSquare;
 import fbc.CombatTurn;
+import fbc.CoreContent;
 import fbc.CreatureMoveAction;
 import fbc.EncounterCreatureEntry;
 import fbc.FieldObject;

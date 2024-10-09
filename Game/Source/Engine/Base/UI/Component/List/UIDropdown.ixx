@@ -1,7 +1,5 @@
 export module fbc.UIDropdown;
 
-import fbc.CoreConfig;
-import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FUtil;
 import fbc.FWindow;
@@ -32,8 +30,8 @@ namespace fbc {
 		}
 		UIDropdown(FWindow& window, uptr<Hitbox>&& hb, uptr<UISelectorList<T>> menu, func<str(EntryView<T>&)>& buttonLabelFunc = {}) :
 			UIDropdown(window, move(hb), move(menu),
-				window.cct.images.uiPanel, window.cct.images.uiArrowSmall, window.cct.images.uiClearSmall,
-				window.cct.fontRegular(), buttonLabelFunc) {}
+				window.props.defaultPanel(), window.props.defaultArrowSmall(), window.props.defaultClear(),
+				window.props.fontRegular(), buttonLabelFunc) {}
 		UIDropdown(UIDropdown&& other) noexcept : UIInteractable(other.win, move(other.hb), other.image), text(move(other.text)), menu(move(other.menu)), buttonLabelFunc(move(other.buttonLabelFunc)), arrow(other.arrow), clear(other.clear) {
 			init();
 		};
@@ -91,11 +89,11 @@ namespace fbc {
 		virtual void unsetProxy();
 
 		inline static UIDropdown multiList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>, func<str(EntryView<T>&)> buttonLabelFunc = {}) {
-			return multiList(window, std::move(hb), labelFunc, buttonLabelFunc, window.cct.fontRegular(), window.cct.fontRegular(), window.cct.images.uiDarkPanelRound, window.cct.images.uiPanel, window.cct.images.uiArrowSmall, window.cct.images.uiClearSmall);
+			return multiList(window, std::move(hb), labelFunc, buttonLabelFunc, window.props.fontRegular(), window.props.fontRegular(), window.props.defaultBackground(), window.props.defaultButton(), window.props.defaultArrowSmall(), window.props.defaultClear());
 		}
 
 		inline static UIDropdown singleList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>, func<str(EntryView<T>&)> buttonLabelFunc = {}) {
-			return singleList(window, std::move(hb), labelFunc, buttonLabelFunc, window.cct.fontRegular(), window.cct.fontRegular(), window.cct.images.uiDarkPanelRound, window.cct.images.uiPanel, window.cct.images.uiArrowSmall, window.cct.images.uiClearSmall);
+			return singleList(window, std::move(hb), labelFunc, buttonLabelFunc, window.props.fontRegular(), window.props.fontRegular(), window.props.defaultBackground(), window.props.defaultButton(), window.props.defaultArrowSmall(), window.props.defaultClear());
 		}
 
 		static UIDropdown multiList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, func<str(EntryView<T>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear);
@@ -181,7 +179,7 @@ namespace fbc {
 		else {
 			arrow.draw(rp, arrowRect, win.getW(), win.getH(), scaleX, menu->isOpen() ? -scaleY : scaleY, rotation, &this->UIImage::color);
 		}
-		text.draw(rp, hb->x + win.cfg.renderScale(24), hb->y + hb->h * 0.25f, win.getW(), win.getH());
+		text.draw(rp, hb->x + win.renderScale(24), hb->y + hb->h * 0.25f, win.getW(), win.getH());
 	}
 
 	template<typename T> void UIDropdown<T>::updateImpl() {
@@ -242,13 +240,7 @@ namespace fbc {
 			return buttonLabelFunc(items);
 		}
 		else {
-			str displayText = (futil::joinStrMap(", ", items, [](UIEntry<T>& entry) {return entry.getText(); }));
-			if (text.getFont().measureW(displayText) > hb->w) {
-				return str(win.cct.strings.ui_items(this->selectedSize()));
-			}
-			else {
-				return displayText;
-			}
+			return (futil::joinStrMap(", ", items, [](UIEntry<T>& entry) {return entry.getText(); }));
 		}
 	}
 

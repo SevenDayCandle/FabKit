@@ -1,15 +1,15 @@
 export module fbc.FFont;
 
-import fbc.CoreConfig;
 import fbc.FTexture;
 import fbc.FUtil;
 import fbc.ILoadable;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 
 namespace fbc {
+    export constexpr strv FONT_REGULAR = "Resources/Fonts/NotoSans-Regular.ttf";
+
 	export class FFont : public ILoadable {
     public:
         FFont(strv path, float scalar, int size, int outlineSize = 0, int shadowSize = 0): path(path), globalScale(scalar), size(size), outlineSize(outlineSize), shadowSize(shadowSize) {

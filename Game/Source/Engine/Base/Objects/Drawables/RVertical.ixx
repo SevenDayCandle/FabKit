@@ -3,8 +3,7 @@ export module fbc.RVertical;
 import fbc.FTexture;
 import fbc.FUtil;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 
 namespace fbc {

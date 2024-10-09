@@ -7,8 +7,7 @@ import fbc.UIImage;
 import fbc.UITransformVFX;
 import fbc.VFX;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 

@@ -1,7 +1,5 @@
 export module fbc.UISearchableDropdown;
 
-import fbc.CoreConfig;
-import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FUtil;
 import fbc.FWindow;
@@ -9,7 +7,6 @@ import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.TextSupplier;
 import fbc.ScaleHitbox;
-
 import fbc.SelectView;
 import fbc.TextDrawable;
 import fbc.UIDropdown;
@@ -17,8 +14,7 @@ import fbc.UIEntry;
 import fbc.UIInteractable;
 import fbc.UISelectorList;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -34,8 +30,8 @@ namespace fbc {
 		}
 		UISearchableDropdown(FWindow& window, uptr<Hitbox>&& hb, uptr<UISelectorList<T>> menu, func<str(EntryView<T>&)>& buttonLabelFunc = {}) :
 			UISearchableDropdown(window, std::move(hb), std::move(menu),
-				window.cct.images.uiPanel, window.cct.images.uiArrowSmall, window.cct.images.uiClearSmall,
-				window.cct.fontRegular(), buttonLabelFunc) {}
+				window.props.defaultButton(), window.props.defaultArrowSmall(), window.props.defaultClear(),
+				window.props.fontRegular(), buttonLabelFunc) {}
 		UISearchableDropdown(UISearchableDropdown&& other) noexcept : UIDropdown<T>(other), TextSupplier(other.win) {
 			initSearchable();
 		};
@@ -54,11 +50,11 @@ namespace fbc {
 		virtual void unsetProxy() override;
 
 		inline static UISearchableDropdown multiSearch(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>) {
-			return multiSearch(window, std::move(hb), labelFunc, {}, window.cct.fontRegular(), window.cct.fontRegular(), window.cct.images.uiDarkPanelRound, window.cct.images.uiPanel, window.cct.images.uiArrowSmall, window.cct.images.uiClearSmall);
+			return multiSearch(window, std::move(hb), labelFunc, {}, window.props.fontRegular(), window.props.fontRegular(), window.props.defaultBackground(), window.props.defaultButton(), window.props.defaultArrowSmall(), window.props.defaultClear());
 		}
 
 		inline static UISearchableDropdown singleSearch(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>) {
-			return singleSearch(window, std::move(hb), labelFunc, {}, window.cct.fontRegular(), window.cct.fontRegular(), window.cct.images.uiDarkPanelRound, window.cct.images.uiPanel, window.cct.images.uiArrowSmall, window.cct.images.uiClearSmall);
+			return singleSearch(window, std::move(hb), labelFunc, {}, window.props.fontRegular(), window.props.fontRegular(), window.props.defaultBackground(), window.props.defaultButton(), window.props.defaultArrowSmall(), window.props.defaultClear());
 		}
 
 		static UISearchableDropdown multiSearch(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, func<str(EntryView<T>&)> buttonLabelFunc, FFont& itemFont, FFont& textFont, IDrawable& background, IDrawable& image, IDrawable& arrow, IDrawable& clear);

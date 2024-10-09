@@ -10,16 +10,17 @@ import fbc.FMusic;
 import fbc.FSound;
 import fbc.FTexture;
 import fbc.FUtil;
+import fbc.FWindow;
+import fbc.IDrawable;
+import fbc.WindowMode;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
 import sdl.SDLRunner;
 import std;
 
 namespace fbc {
 	export constexpr strv BASE_FOLDER = "/Resources";
 
-	export class CoreContent : public BaseContent {
+	export class CoreContent : public BaseContent, public FWindow::IProps {
 	public:
 		CoreContent(CoreConfig& cfg, strv id) : BaseContent(cfg, id, sdl::dirBase() + str(BASE_FOLDER)) {}
 		CoreContent(CoreContent&& other) noexcept: BaseContent(move(other)), audio(move(other.audio)), images(move(other.images)), strings(move(other.strings)), registeredContents(move(other.registeredContents)), fontBoldData(move(other.fontBoldData)), fontRegularData(move(other.fontRegularData)), fontSmallData(move(other.fontSmallData)) {}
@@ -28,9 +29,31 @@ namespace fbc {
 		CoreImages images = CoreImages(*this);
 		CoreStrings strings = CoreStrings(*this);
 
-		inline FFont& fontBold() const { return *fontBoldData; }
-		inline FFont& fontRegular() const { return *fontRegularData; }
-		inline FFont& fontSmall() const { return *fontSmallData; }
+		inline bool getVsync() final { return cfg.graphicsVSync.get(); }
+		inline bool hasPressedClose() final { return cfg.actEsc.isKeyJustPressed(); }
+		inline bool hasPressedDirDown() final { return cfg.actDirDown.isKeyJustPressed(); }
+		inline bool hasPressedDirUp() final { return cfg.actDirUp.isKeyJustPressed(); }
+		inline bool hasPressedSelect() final { return cfg.actSelect.isKeyJustPressed(); }
+		inline const char* getTitle() override { return "Fabricate"; }
+		inline FFont& fontBold() const final { return *fontBoldData; }
+		inline FFont& fontRegular() const final { return *fontRegularData; }
+		inline FFont& fontSmall() const final { return *fontSmallData; }
+		inline float fontScale() const noexcept final { return cfg.fontScale(); }
+		inline float renderScale() const noexcept final { return cfg.renderScale(); }
+		inline int effectSpeed() const noexcept final { return cfg.graphicsEffectSpeed.get(); }
+		inline int getResolutionX() const noexcept final { return cfg.graphicsResolution.get().first; }
+		inline int getResolutionY() const noexcept final { return cfg.graphicsResolution.get().second; }
+		inline FSound* defaultClick() final { return &audio.uiClick; }
+		inline IDrawable& defaultArrow() final { return images.uiArrowIncrement; }
+		inline IDrawable& defaultBackground() final { return images.uiDarkPanelRound; }
+		inline IDrawable& defaultButton() final { return images.uiPanel; }
+		inline IDrawable& defaultCheckboxEmpty() final { return images.uiCheckboxEmpty; }
+		inline IDrawable& defaultCheckboxFilled() final { return images.uiCheckboxFilled; }
+		inline IDrawable& defaultPanel() final { return images.uiPanel; }
+		inline IDrawable& defaultScrollBack() final { return images.uiScrollbar; }
+		inline IDrawable& defaultScrollButton() final { return images.uiScrollbutton; }
+		inline IDrawable& defaultSlider() final { return images.uiSliderEmpty; }
+		inline WindowMode getWindowMode() const final { return cfg.graphicsWindowMode.get(); }
 
 		BaseContent* getContent(strv content);
 		FMusic* getMusic(strv content, strv path) const;
@@ -41,6 +64,7 @@ namespace fbc {
 		void initialize() override;
 		void initializeContents();
 		void initializeFonts();
+		void onWindowInitialize(FWindow& window) override;
 		void postInitialize() override;
 		void reloadAudio() override;
 		void reloadFonts();
@@ -126,6 +150,12 @@ namespace fbc {
 		fontBoldData = std::make_unique<FFont>(cfg.textFontBold.get(), fontScale, 48, 2, 4);
 		fontRegularData = std::make_unique<FFont>(cfg.textFont.get(), fontScale, 48, 0, 4);
 		fontSmallData = std::make_unique<FFont>(cfg.textFont.get(), fontScale, 32, 0, 3);
+	}
+
+	void CoreContent::onWindowInitialize(FWindow& win) {
+		cfg.graphicsResolution.addOnReload([&win](const pair<int, int>& val) {win.refreshSize(val.first, val.second); });
+		cfg.graphicsWindowMode.addOnReload([&win](const int& val) {sdl::windowSetFullscreen(win.sdlWindow(), val); });
+		cfg.graphicsVSync.addOnReload([&win](const bool& val) { sdl::runner::deviceSetSwapchainParameters(win.sdlWindow(), sdl::GPUSwapchainComposition::SDL_GPU_SWAPCHAINCOMPOSITION_SDR, val ? sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_VSYNC : sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_IMMEDIATE); });
 	}
 
 	void CoreContent::postInitialize()

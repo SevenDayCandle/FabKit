@@ -7,15 +7,14 @@ import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.UICallbackInteractable;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
 namespace fbc {
 	export class CombatSquareRenderable : public UICallbackInteractable<CombatSquareRenderable> {
 	public:
-		CombatSquareRenderable(FWindow& window, uptr<Hitbox>&& hb, const CombatSquare& square): UICallbackInteractable<CombatSquareRenderable>(window, move(hb), window.cct.images.uiLightPanel), square(square) {}
+		CombatSquareRenderable(FWindow& window, uptr<Hitbox>&& hb, const CombatSquare& square): UICallbackInteractable<CombatSquareRenderable>(window, move(hb), window.props.defaultPanel()), square(square) {}
 
 		bool valid;
 		const CombatSquare& square;

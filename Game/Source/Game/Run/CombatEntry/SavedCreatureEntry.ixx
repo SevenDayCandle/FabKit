@@ -3,10 +3,6 @@ export module fbc.SavedCreatureEntry;
 import fbc.CreatureData;
 import fbc.FUtil;
 import fbc.ItemListing;
-import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
-import sdl.SDLRunner;
 import std;
 
 export namespace fbc {

@@ -1,6 +1,5 @@
 export module fbc.ScreenPosHitbox;
 
-import fbc.CoreConfig;
 import fbc.FWindow;
 import fbc.Hitbox;
 
@@ -16,16 +15,16 @@ namespace fbc {
 		~ScreenPosHitbox() override {}
 
 
-		inline virtual float getScaleOffPosX() const override { return win.getW() * offPosX / win.cfg.renderScale(); }
-		inline virtual float getScaleOffPosY() const override { return win.getH() * offPosY / win.cfg.renderScale(); }
+		inline virtual float getScaleOffPosX() const override { return win.getW() * offPosX / win.renderScale(); }
+		inline virtual float getScaleOffPosY() const override { return win.getH() * offPosY / win.renderScale(); }
 	protected:
 		inline void refreshOffPosX() override { offPosX = x / win.getW(); }
 		inline void refreshOffPosY() override { offPosY = y / win.getH(); }
-		inline void refreshOffSizeX() override { offSizeX = w / win.cfg.renderScale(); }
-		inline void refreshOffSizeY() override { offSizeY = h / win.cfg.renderScale(); }
+		inline void refreshOffSizeX() override { offSizeX = w / win.renderScale(); }
+		inline void refreshOffSizeY() override { offSizeY = h / win.renderScale(); }
 		inline void refreshRealPosX() override { x = win.getW() * offPosX; }
 		inline void refreshRealPosY() override { y = win.getH() * offPosY; }
-		inline void refreshRealSizeX() override { w = win.cfg.renderScale() * offSizeX; }
-		inline void refreshRealSizeY() override { h = win.cfg.renderScale() * offSizeY; }
+		inline void refreshRealSizeX() override { w = win.renderScale() * offSizeX; }
+		inline void refreshRealSizeY() override { h = win.renderScale() * offSizeY; }
 	};
 }

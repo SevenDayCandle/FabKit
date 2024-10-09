@@ -8,15 +8,14 @@ import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.UIInteractable;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
 namespace fbc {
 	export class CombatTurnRenderable : public UIInteractable {
 	public:
-		CombatTurnRenderable(FWindow& window, uptr<Hitbox> hb, const CombatTurn& turn) : UIInteractable(window, move(hb), window.cct.images.uiDarkPanelRound), portrait(turn.source.getImagePortrait()) {}
+		CombatTurnRenderable(FWindow& window, uptr<Hitbox> hb, const CombatTurn& turn) : UIInteractable(window, move(hb), window.props.defaultBackground()), portrait(turn.source.getImagePortrait()) {}
 
 		IDrawable& portrait;
 

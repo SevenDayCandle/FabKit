@@ -1,6 +1,5 @@
 export module fbc.UIVerticalScrollbar;
 
-import fbc.CoreContent;
 import fbc.FUtil;
 import fbc.FWindow;
 import fbc.Hitbox;
@@ -19,7 +18,7 @@ namespace fbc {
 			UIVerticalScrollbar::updateDropzoneSize(0.05f);
 		}
 		UIVerticalScrollbar(FWindow& window, uptr<Hitbox>&& hb) :
-			UIVerticalScrollbar(window, move(hb), window.cct.images.uiScrollbar, window.cct.images.uiScrollbutton) {}
+			UIVerticalScrollbar(window, move(hb), window.props.defaultScrollBack(), window.props.defaultScrollButton()) {}
 
 
 		float toPercentage(float x, float y) override;

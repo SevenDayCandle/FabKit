@@ -1,6 +1,5 @@
 export module fbc.CombatRoom;
 
-import fbc.CombatScreen;
 import fbc.FUtil;
 import fbc.FWindow;
 import fbc.GameRun;
@@ -16,18 +15,10 @@ namespace fbc {
 		static constexpr strv ID = "COMBAT";
 		static const CombatRoom instance;
 
-		void onAfterClick(FWindow& win) override;
 		void onEnter() override;
 	};
 
 	const CombatRoom CombatRoom::instance = CombatRoom();
-
-	void CombatRoom::onAfterClick(FWindow& window)
-	{
-		if (GameRun::current->getCombatInstance() != nullptr) {
-			window.openScreen(make_unique<CombatScreen>(window));
-		}
-	}
 
 	// Start combat upon entering
 	void CombatRoom::onEnter()

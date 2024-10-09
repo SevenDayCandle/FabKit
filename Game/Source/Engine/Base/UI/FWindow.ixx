@@ -1,8 +1,11 @@
 export module fbc.FWindow;
 
-import fbc.CoreConfig;
-import fbc.CoreContent;
+import fbc.EmptyDrawable;
+import fbc.FFont;
+import fbc.FSound;
 import fbc.FUtil;
+import fbc.IDrawable;
+import fbc.WindowMode;
 import sdl.IKeyInputListener;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
@@ -30,23 +33,57 @@ namespace fbc {
 			virtual void update() = 0;
 		};
 
-		FWindow(CoreConfig& cfg, CoreContent& cct, const char* title) : cfg(cfg), cct(cct) {
-			const pair<int, int>& resolution = cfg.graphicsResolution.get();
-			initialize(resolution.first, resolution.second, title, cfg.graphicsWindowMode.get());
-			cfg.graphicsResolution.addOnReload([this](const pair<int, int>& val) {refreshSize(val.first, val.second); });
-			cfg.graphicsWindowMode.addOnReload([this](const int& val) {sdl::windowSetFullscreen(window, val); });
+		struct IProps {
+			IProps() {}
+			virtual ~IProps() = default;
 
-		}
-		FWindow(FWindow& parent, int w, int h, const char* title, uint32 windowFlags = 0): cfg(parent.cfg), cct(parent.cct) {
-			initialize(w, h, title, windowFlags);
-		}
+			virtual inline bool getVsync() { return true; }
+			virtual inline bool hasPressedClose() { return false; }
+			virtual inline bool hasPressedDirDown() { return false; }
+			virtual inline bool hasPressedDirUp() { return false; }
+			virtual inline bool hasPressedSelect() { return false; }
+			virtual inline FFont& fontBold() const { return fontRegular(); }
+			virtual inline FFont& fontSmall() const { return fontRegular(); }
+			virtual inline FSound* defaultClick() { return nullptr; }
+			virtual inline IDrawable& defaultArrow() { return EMPTY; }
+			virtual inline IDrawable& defaultArrowSmall() { return defaultArrow(); }
+			virtual inline IDrawable& defaultBackground() { return EMPTY; }
+			virtual inline IDrawable& defaultButton() { return EMPTY; }
+			virtual inline IDrawable& defaultCheckboxEmpty() { return EMPTY; }
+			virtual inline IDrawable& defaultCheckboxFilled() { return EMPTY; }
+			virtual inline IDrawable& defaultClear() { return EMPTY; }
+			virtual inline IDrawable& defaultPanel() { return EMPTY; }
+			virtual inline IDrawable& defaultScrollBack() { return EMPTY; }
+			virtual inline IDrawable& defaultScrollButton() { return EMPTY; }
+			virtual inline IDrawable& defaultSlider() { return EMPTY; }
+			virtual inline int effectSpeed() const noexcept { return 1; }
+			virtual inline void onWindowInitialize(FWindow& window) {}
+			virtual inline WindowMode getWindowMode() const { return WINDOWED; }
 
-		CoreConfig& cfg;
-		CoreContent& cct;
+			virtual const char* getTitle() = 0;
+			virtual FFont& fontRegular() const = 0;
+			virtual float fontScale() const noexcept = 0;
+			virtual float renderScale() const noexcept = 0;
+			virtual int getResolutionX() const noexcept = 0;
+			virtual int getResolutionY() const noexcept = 0;
+		};
+
+		FWindow(IProps& props) : props(props) {
+			initialize(props.getResolutionX(), props.getResolutionY(), props.getTitle(), props.getWindowMode());
+		}
+		virtual ~FWindow() = default;
+
 		Element* activeElement;
+		IProps& props;
 
+		inline float fontScale() const noexcept { return props.fontScale(); }
+		inline float fontScale(float mult) const noexcept { return fontScale() * mult; }
+		inline float renderScale() const noexcept { return props.renderScale(); }
+		inline float renderScale(float mult) const noexcept { return renderScale() * mult; }
 		inline int getH() const noexcept { return winH; }
 		inline int getW() const noexcept { return winW; }
+		inline int effectSpeed() const noexcept { return props.effectSpeed(); }
+		inline sdl::Window* sdlWindow() const noexcept { return window; }
 		inline void keyboardInputStopRequest(sdl::IKeyInputListener* listener) { sdl::runner::keyboardInputStopRequest(window, listener); }
 		inline void keyboardInputStart(sdl::IKeyInputListener* listener) { sdl::runner::keyboardInputStart(window, listener); }
 
@@ -101,8 +138,8 @@ namespace fbc {
 			sdl::logCritical("GPUClaimWindow went derp: %s", sdl::getError());
 			return false;
 		}
-		sdl::runner::deviceSetSwapchainParameters(window, sdl::GPUSwapchainComposition::SDL_GPU_SWAPCHAINCOMPOSITION_SDR, cfg.graphicsVSync.get() ? sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_VSYNC : sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_IMMEDIATE);
-		cfg.graphicsVSync.addOnReload([this](const bool& val) { sdl::runner::deviceSetSwapchainParameters(window, sdl::GPUSwapchainComposition::SDL_GPU_SWAPCHAINCOMPOSITION_SDR, val ? sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_VSYNC : sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_IMMEDIATE); });
+		sdl::runner::deviceSetSwapchainParameters(window, sdl::GPUSwapchainComposition::SDL_GPU_SWAPCHAINCOMPOSITION_SDR, props.getVsync() ? sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_VSYNC : sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_IMMEDIATE);
+		props.onWindowInitialize(*this);
 
 		return true;
 	}

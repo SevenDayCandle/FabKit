@@ -1,11 +1,9 @@
 export module fbc.GenericTip;
 
-import fbc.CoreConfig;
 import fbc.FUtil;
 import fbc.FWindow;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -19,7 +17,7 @@ namespace fbc {
 		virtual ~GenericTip() = default;
 
 		inline virtual void update() override {}
-		inline void queue() { queue(sdl::runner::mouseGetX() + win.cfg.renderScale(QUEUE_OFFSET_X), sdl::runner::mouseGetY() + win.cfg.renderScale(QUEUE_OFFSET_Y)); }
+		inline void queue() { queue(sdl::runner::mouseGetX() + win.renderScale(QUEUE_OFFSET_X), sdl::runner::mouseGetY() + win.renderScale(QUEUE_OFFSET_Y)); }
 
 		virtual void queue(float x, float y);
 

@@ -1,7 +1,6 @@
 export module fbc.RunRoom;
 
 import fbc.FUtil;
-import fbc.FWindow;
 import fbc.GameRNG;
 import fbc.KeyedItem;
 import fbc.RunEncounter;
@@ -20,7 +19,6 @@ namespace fbc {
 
 
 			virtual bool isEncounterValid(RunEncounter* encounter) { return true; }
-			virtual void onAfterClick(FWindow& window) {}
 			virtual void onEnter() {}
 		};
 
@@ -31,7 +29,6 @@ namespace fbc {
 		int row;
 		RoomType& type;
 
-		inline void onAfterClick(FWindow& window) { type.onAfterClick(window); }
 		inline void onEnter() { type.onEnter(); };
 
 		RunEncounter* getEncounter(RunZone& zone, GameRNG& rng);

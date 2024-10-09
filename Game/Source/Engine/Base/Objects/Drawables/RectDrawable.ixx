@@ -3,8 +3,7 @@ export module fbc.RectDrawable;
 import fbc.FUtil;
 import fbc.IDrawable;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 

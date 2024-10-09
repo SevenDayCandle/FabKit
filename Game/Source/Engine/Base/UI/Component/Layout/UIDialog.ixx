@@ -8,8 +8,7 @@ import fbc.IDrawable;
 import fbc.UICanvas;
 import fbc.UIInteractable;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 

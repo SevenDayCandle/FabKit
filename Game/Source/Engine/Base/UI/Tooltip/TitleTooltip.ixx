@@ -16,7 +16,7 @@ namespace fbc {
 		TitleTooltip(FWindow& window, strv title, strv text, FFont& titleFont, FFont& font, float boxSize, IDrawable& background) :
 			Tooltip(window, text, font, boxSize, background), title(titleFont, title) {}
 		TitleTooltip(FWindow& window, strv title, strv text) :
-			TitleTooltip(window, title, text, window.cct.fontRegular(), window.cct.fontSmall(), DEFAULT_SIZE, window.cct.images.uiDarkPanelRound) {}
+			TitleTooltip(window, title, text, window.props.fontRegular(), window.props.fontSmall(), DEFAULT_SIZE, window.props.defaultBackground()) {}
 
 
 		TitleTooltip& setTitle(strv text, sdl::Color color, sdl::Color colorOutline, const FFont& font);

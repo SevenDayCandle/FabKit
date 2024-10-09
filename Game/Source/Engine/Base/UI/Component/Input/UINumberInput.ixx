@@ -1,7 +1,5 @@
 export module fbc.UINumberInput;
 
-import fbc.CoreConfig;
-import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FWindow;
 import fbc.FUtil;
@@ -12,8 +10,7 @@ import fbc.TextDrawable;
 import fbc.UIButton;
 import fbc.UIInteractable;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -26,9 +23,9 @@ namespace fbc {
 			UINumberInput::onSizeUpdated();
 		}
 		UINumberInput(FWindow& window, uptr<Hitbox>&& hb, int limMin, int limMax, IDrawable& image) :
-			UINumberInput(window, move(hb), limMin, limMax, image, window.cct.images.uiArrowIncrement, window.cct.fontRegular()) {}
+			UINumberInput(window, move(hb), limMin, limMax, image, window.props.defaultArrow(), window.props.fontRegular()) {}
 		UINumberInput(FWindow& window, uptr<Hitbox>&& hb, int limMin = 0, int limMax = std::numeric_limits<int>::max()) :
-			UINumberInput(window, move(hb), limMin, limMax, window.cct.images.uiPanel, window.cct.images.uiArrowIncrement, window.cct.fontRegular()) {}
+			UINumberInput(window, move(hb), limMin, limMax, window.props.defaultPanel(), window.props.defaultArrow(), window.props.fontRegular()) {}
 
 		inline int getValue() const { return val; }
 		inline UINumberInput& setOnBufferUpdate(const func<void(int)>& onBufferUpdateCallback) { return this->onBufferUpdateCallback = onBufferUpdateCallback, *this; }
@@ -102,7 +99,7 @@ namespace fbc {
 	void UINumberInput::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
 		UIInteractable::renderImpl(rp);
-		buffer.draw(rp, hb->x + win.cfg.renderScale(24), hb->y + hb->h * 0.25f, win.getW(), win.getH());
+		buffer.draw(rp, hb->x + win.renderScale(24), hb->y + hb->h * 0.25f, win.getW(), win.getH());
 		arrow.draw(rp, lessRect, win.getW(), win.getH());
 		arrow.draw(rp, moreRect, win.getW(), win.getH(), 1, -1);
 		if (sdl::runner::keyboardInputActive(this)) {

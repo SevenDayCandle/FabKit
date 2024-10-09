@@ -1,6 +1,5 @@
 export module fbc.ScreenSizeHitbox;
 
-import fbc.CoreConfig;
 import fbc.FWindow;
 import fbc.Hitbox;
 
@@ -15,10 +14,10 @@ namespace fbc {
 		}
 		~ScreenSizeHitbox() override {}
 
-		inline virtual float getScaleOffPosX() const override { return win.getW() * offPosX / win.cfg.renderScale(); }
-		inline virtual float getScaleOffPosY() const override { return win.getH() * offPosY / win.cfg.renderScale(); }
-		inline virtual float getScaleOffSizeX() const override { return win.getW() * offSizeX / win.cfg.renderScale(); }
-		inline virtual float getScaleOffSizeY() const override { return win.getH() * offSizeY / win.cfg.renderScale(); }
+		inline virtual float getScaleOffPosX() const override { return win.getW() * offPosX / win.renderScale(); }
+		inline virtual float getScaleOffPosY() const override { return win.getH() * offPosY / win.renderScale(); }
+		inline virtual float getScaleOffSizeX() const override { return win.getW() * offSizeX / win.renderScale(); }
+		inline virtual float getScaleOffSizeY() const override { return win.getH() * offSizeY / win.renderScale(); }
 	protected:
 		inline void refreshOffPosX() override { offPosX = x / win.getW(); }
 		inline void refreshOffPosY() override { offPosY = y / win.getH(); }

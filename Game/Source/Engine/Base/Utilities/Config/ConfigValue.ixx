@@ -3,8 +3,6 @@ export module fbc.ConfigValue;
 import fbc.Config;
 import fbc.FUtil;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
 import sdl.SDLRunner;
 
 namespace fbc {
@@ -16,7 +14,7 @@ namespace fbc {
 
         operator T() { return value; }
 
-        inline const T& get() const {return value;}
+        inline const T& get() const noexcept {return value;}
 
         void addOnReload(const func<void(const T&)>& onChangeNew);
         void addOnReload(func<void(const T&)>&& onChangeNew);

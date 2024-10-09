@@ -1,6 +1,5 @@
 export module fbc.UICanvas;
 
-import fbc.CoreConfig;
 import fbc.FUtil;
 import fbc.FWindow;
 import fbc.Hitbox;
@@ -118,7 +117,7 @@ namespace fbc {
 	 * Spacing will automatically be scaled by renderScale
 	 */
 	template<c_ext<Hoverable> T> template<c_ext<T> U> U& UICanvas<T>::stackXDir(uptr<U>&& element, float spacing, float yOff) {
-		float scaled = win.cfg.renderScale(spacing);
+		float scaled = win.renderScale(spacing);
 		U& ref = *element;
 		elements.push_back(std::move(element));
 		// Only actually do positioning if there is a previous element to reference
@@ -142,7 +141,7 @@ namespace fbc {
 	 * Spacing will automatically be scaled by renderScale
 	 */
 	template<c_ext<Hoverable> T> template<c_ext<T> U> U& UICanvas<T>::stackYDir(uptr<U>&& element, float spacing, float xOff) {
-		float scaled = win.cfg.renderScale(spacing);
+		float scaled = win.renderScale(spacing);
 		U& ref = *element;
 		elements.push_back(std::move(element));
 		// Only actually do positioning if there is a previous element to reference

@@ -1,5 +1,7 @@
 module;
 
+import fbc.CombatRoom;
+import fbc.CombatScreen;
 import fbc.SavedCreatureEntry;
 
 module fbc.RunScreen;
@@ -26,11 +28,19 @@ namespace fbc {
 	{
 		uptr<UITextButton> button = create<UITextButton>(
 			relhb(TILE_OFFSET + room.col * ROOM_SIZE * 2, TILE_OFFSET + room.row * ROOM_SIZE * 2, ROOM_SIZE, ROOM_SIZE),
-			win.cct.images.uiPanel, win.cct.fontRegular(), room.type.id.substr(0, 1));
+			cct.images.uiPanel, cct.fontRegular(), room.type.id.substr(0, 1));
 		button->setOnClick([this, &room](UIButton& i) {
 			GameRun::current->startRoom(&room);
-			room.onAfterClick(win);
+			onRoomClick(room);
 		});
 		return button;
+	}
+
+	void RunScreen::onRoomClick(RunRoom& room) {
+		if (room.type.id == CombatRoom::ID) {
+			if (GameRun::current->getCombatInstance() != nullptr) {
+				win.openScreen(make_unique<CombatScreen>(win, cct));
+			}
+		}
 	}
 }

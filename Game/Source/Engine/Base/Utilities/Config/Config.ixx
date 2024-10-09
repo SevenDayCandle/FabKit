@@ -6,8 +6,6 @@ export module fbc.Config;
 
 import fbc.FUtil;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
 import sdl.SDLRunner;
 import std;
 

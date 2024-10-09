@@ -1,7 +1,5 @@
 export module fbc.UISelectorList;
 
-import fbc.CoreConfig;
-import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FUtil;
 import fbc.FWindow;
@@ -15,8 +13,7 @@ import fbc.UIEntry;
 import fbc.UIList;
 import fbc.UIVerticalScrollbar;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -31,7 +28,7 @@ namespace fbc {
 			scrollbar.setOnScroll([this](float f) { onScroll(f); });
 		}
 		UISelectorList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>, bool canAutosize = false) :
-			UISelectorList(window, move(hb), move(labelFunc), window.cct.fontSmall(), window.cct.images.uiPanelRound, canAutosize) {}
+			UISelectorList(window, move(hb), move(labelFunc), window.props.fontSmall(), window.props.defaultPanel(), canAutosize) {}
 		UISelectorList(UISelectorList&& other) noexcept = default;
 
 		~UISelectorList() override {}
@@ -84,10 +81,10 @@ namespace fbc {
 		void updateSingle(T* item);
 
 		inline static uptr<UISelectorList> multiList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>, bool canAutosize = false) {
-			return multiList(window, std::move(hb), labelFunc, window.cct.fontSmall(), window.cct.images.uiDarkPanelRound, canAutosize);
+			return multiList(window, std::move(hb), labelFunc, window.props.fontSmall(), window.props.defaultBackground(), canAutosize);
 		}
 		inline static uptr<UISelectorList> singleList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>, bool canAutosize = false) {
-			return singleList(window, std::move(hb), labelFunc, window.cct.fontSmall(), window.cct.images.uiDarkPanelRound, canAutosize);
+			return singleList(window, std::move(hb), labelFunc, window.props.fontSmall(), window.props.defaultBackground(), canAutosize);
 		}
 
 		static uptr<UISelectorList> multiList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize = false);
@@ -111,7 +108,7 @@ namespace fbc {
 		FWindow::Element* proxy;
 
 		inline EntryView<T> selectView() { return EntryView<T>(currentIndices, this->rows); }
-		inline float rMargin() { return this->win.cfg.renderScale(MARGIN); }
+		inline float rMargin() { return this->win.renderScale(MARGIN); }
 
 		void autosize() override;
 		void changeEvent();
@@ -339,14 +336,14 @@ namespace fbc {
 		}
 
 		if (this->activeRow >= 0) {
-			if (this->win.cfg.actDirUp.isKeyJustPressed()) {
+			if (this->win.props.hasPressedDirUp()) {
 				this->activeRow = std::max(0, this->activeRow - 1);
 				if (this->activeRow < this->topVisibleRowIndex) {
 					updateTopVisibleRowIndex(this->topVisibleRowIndex - 1);
 					updateRowPositions();
 				}
 			}
-			else if (this->win.cfg.actDirDown.isKeyJustPressed()) {
+			else if (this->win.props.hasPressedDirDown()) {
 				this->activeRow = std::min(static_cast<int>(rowsForRender.size()) - 1, this->activeRow + 1);
 				if (this->activeRow >= this->topVisibleRowIndex + this->maxRows) {
 					updateTopVisibleRowIndex(this->topVisibleRowIndex + 1);
@@ -365,7 +362,7 @@ namespace fbc {
 			rowsForRender[i]->updateActiveStatus(this->activeRow == i);
 		}
 
-		if (this->activeRow >= 0 && this->win.cfg.actSelect.isKeyJustPressed()) {
+		if (this->activeRow >= 0 && this->win.props.hasPressedSelect()) {
 			this->selectRow(*rowsForRender[this->activeRow]);
 		}
 	}

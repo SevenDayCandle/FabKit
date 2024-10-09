@@ -21,7 +21,7 @@ namespace fbc {
 		UINavigation(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize) :
 			UIList<T>(window, move(hb), std::move(labelFunc), itemFont, background, canAutosize) {}
 		UINavigation(FWindow& window, uptr<Hitbox>&& hb) :
-			UINavigation(window, std::move(hb), futil::toString<T>, window.cct.fontRegular(), window.cct.images.uiDarkPanelRound, false) {}
+			UINavigation(window, std::move(hb), futil::toString<T>, window.props.fontRegular(), window.props.defaultBackground(), false) {}
 
 		inline T* getSelectedItem() { return currentItem; }
 		inline UINavigation& setItemFont(FFont& itemFont) { return UIList<T>::setItemFont(itemFont), * this; }
@@ -120,8 +120,8 @@ namespace fbc {
 			this->getItemFont(),
 			this->labelFunc(item),
 			EMPTY,
-			this->win.cct.images.uiArrowLarge);
-		entry->setHbExactSizeY(this->win.cfg.renderScale(64));
+			this->win.props.defaultArrow());
+		entry->setHbExactSizeY(this->win.renderScale(64));
 		return entry;
 	}
 

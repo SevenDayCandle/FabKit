@@ -1,7 +1,5 @@
 export module fbc.TextSupplier;
 
-import fbc.CoreConfig;
-import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FWindow;
 import fbc.FUtil;
@@ -19,7 +17,7 @@ namespace fbc {
 		TextSupplier(FWindow& window, FFont& textFont) :
 			fwindow(window), buffer(textFont, "", getLimitWidth()) {}
 		TextSupplier(FWindow& window) :
-			TextSupplier(window, window.cct.fontRegular()) {}
+			TextSupplier(window, window.props.fontRegular()) {}
 
 		TextSupplier(TextSupplier&& other) noexcept = default;
 		virtual ~TextSupplier() override = default;
@@ -137,7 +135,7 @@ namespace fbc {
 	}
 
 	void TextSupplier::updateCaretPos() {
-		caretPosX = getBasePosX() + fwindow.cfg.renderScale(9) + buffer.getFont().measureW(buffer.getText().substr(0, bufferPos));
+		caretPosX = getBasePosX() + fwindow.renderScale(9) + buffer.getFont().measureW(buffer.getText().substr(0, bufferPos));
 		caretPosY = getBasePosY();
 	}
 }

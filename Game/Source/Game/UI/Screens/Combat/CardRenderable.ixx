@@ -8,8 +8,7 @@ import fbc.Hitbox;
 import fbc.RelativeHitbox;
 import fbc.UICallbackInteractable;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -19,8 +18,8 @@ namespace fbc {
 
 	export class CardRenderable : public UICallbackInteractable<CardRenderable> {
 	public:
-		CardRenderable(FWindow& window, uptr<Hitbox> hb, const Card& card) : UICallbackInteractable<CardRenderable>(window, move(hb), window.cct.images.uiPanel), card(card) {}
-		CardRenderable(FWindow& window, Hitbox& source, const Card& card, float offX = 0, float offY = 0) : UICallbackInteractable<CardRenderable>(window, make_unique<RelativeHitbox>(window, source, offX, offY, CARD_W, CARD_H), window.cct.images.uiPanel), card(card) {}
+		CardRenderable(FWindow& window, uptr<Hitbox> hb, const Card& card) : UICallbackInteractable<CardRenderable>(window, move(hb), window.props.defaultPanel()), card(card) {}
+		CardRenderable(FWindow& window, Hitbox& source, const Card& card, float offX = 0, float offY = 0) : UICallbackInteractable<CardRenderable>(window, make_unique<RelativeHitbox>(window, source, offX, offY, CARD_W, CARD_H), window.props.defaultPanel()), card(card) {}
 
 		const Card& card;
 	};

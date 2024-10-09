@@ -1,7 +1,5 @@
 export module fbc.UITitle;
 
-import fbc.CoreConfig;
-import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FUtil;
 import fbc.FWindow;
@@ -72,8 +70,8 @@ namespace fbc {
 	}
 
 	template<c_ext<Hoverable> T> void UITitle<T>::onSizeUpdated() {
-		this->posX = win.cfg.renderScale(offX);
-		this->posY = win.cfg.renderScale(offY);
+		this->posX = win.renderScale(offX);
+		this->posY = win.renderScale(offY);
 	}
 
 	template<c_ext<Hoverable> T> void UITitle<T>::refreshDimensions() {

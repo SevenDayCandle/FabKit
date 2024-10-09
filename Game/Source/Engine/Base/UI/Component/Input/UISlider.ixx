@@ -1,6 +1,5 @@
 export module fbc.UISlider;
 
-import fbc.CoreContent;
 import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
@@ -8,8 +7,7 @@ import fbc.RelativeHitbox;
 import fbc.UIHorizontalScrollbar;
 import fbc.UINumberInput;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -28,10 +26,10 @@ namespace fbc {
 				limMin, limMax, imageBar, imageButton, panelImage) {}
 		UISlider(FWindow& window, uptr<Hitbox>&& hb, uptr<Hitbox>&& scrollhb, int limMin = 0, int limMax = std::numeric_limits<int>::max()) :
 			UISlider(window, move(hb), move(scrollhb), limMin, limMax,
-				window.cct.images.uiSliderEmpty, window.cct.images.uiScrollbutton, window.cct.images.uiPanel) {}
+				window.props.defaultSlider(), window.props.defaultScrollButton(), window.props.defaultPanel()) {}
 		UISlider(FWindow& window, uptr<Hitbox>&& hb, int limMin = 0, int limMax = std::numeric_limits<int>::max()) :
 			UISlider(window, move(hb), limMin, limMax,
-				window.cct.images.uiSliderEmpty, window.cct.images.uiScrollbutton, window.cct.images.uiPanel) {}
+				window.props.defaultSlider(), window.props.defaultScrollButton(), window.props.defaultPanel()) {}
 		UISlider(UISlider&& other) noexcept: UINumberInput(other.win, move(other.hb), other.limMin, other.limMax, other.image), scrollbar(std::move(other.scrollbar)) {
 			scrollbar.setOnScroll([this](float scroll) { this->commitFromScroll(scroll); });
 		}

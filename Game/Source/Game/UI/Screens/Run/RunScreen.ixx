@@ -18,10 +18,13 @@ namespace fbc {
 
 	export class RunScreen : public UIScreen {
 	public:
-		RunScreen(FWindow& window): UIScreen(window) {}
+		RunScreen(FWindow& window, CoreContent& cct): UIScreen(window), cct(cct) {}
+
+		CoreContent& cct;
 
 		void open() override;
 	private:
 		uptr<UIButton> makeRoomButton(RunRoom& room);
+		void onRoomClick(RunRoom& room);
 	};
 }

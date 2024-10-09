@@ -1,7 +1,5 @@
 export module fbc.UITextInput;
 
-import fbc.CoreConfig;
-import fbc.CoreContent;
 import fbc.FFont;
 import fbc.FUtil;
 import fbc.FWindow;
@@ -11,8 +9,7 @@ import fbc.TextSupplier;
 import fbc.TextDrawable;
 import fbc.UIInteractable;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -25,7 +22,7 @@ namespace fbc {
 			UITextInput::onSizeUpdated();
 		}
 		UITextInput(FWindow& window, uptr<Hitbox>&& hb) :
-			UITextInput(window, std::move(hb), window.cct.images.uiPanel, window.cct.fontRegular()) {}
+			UITextInput(window, std::move(hb), window.props.defaultPanel(), window.props.fontRegular()) {}
 
 		inline UITextInput& setOnBufferUpdate(const func<void(strv)>& onBufferUpdateCallback) { return this->onBufferUpdateCallback = onBufferUpdateCallback, * this; }
 		inline UITextInput& setOnBufferUpdate(func<void(strv)>&& onBufferUpdateCallback) { return this->onBufferUpdateCallback = move(onBufferUpdateCallback), *this; }
@@ -75,7 +72,7 @@ namespace fbc {
 	void UITextInput::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
 		UIInteractable::renderImpl(rp);
-		buffer.draw(rp, hb->x + win.cfg.renderScale(24), hb->y + hb->h * 0.25f, win.getW(), win.getH());
+		buffer.draw(rp, hb->x + win.renderScale(24), hb->y + hb->h * 0.25f, win.getW(), win.getH());
 		if (sdl::runner::keyboardInputActive(this)) {
 			renderCaret(rp);
 		}

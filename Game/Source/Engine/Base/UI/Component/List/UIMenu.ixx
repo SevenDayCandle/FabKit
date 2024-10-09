@@ -20,7 +20,7 @@ namespace fbc {
 		UIMenu(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize) :
 			UIList<T>(window, move(hb), std::move(labelFunc), itemFont, background, canAutosize) {}
 		UIMenu(FWindow& window, uptr<Hitbox>&& hb) :
-			UIMenu(window, std::move(hb), futil::toString<T>, window.cct.fontRegular(), window.cct.images.uiDarkPanelRound, false) {}
+			UIMenu(window, std::move(hb), futil::toString<T>, window.props.fontRegular(), window.props.defaultBackground(), false) {}
 		UIMenu(UIMenu&& other) noexcept = default;
 
 		inline const T* getSelectedItem() { return &this->rows[currentIndex]->item; }
@@ -83,7 +83,7 @@ namespace fbc {
 			this->labelFunc(item),
 			EMPTY,
 			EMPTY);
-		entry->setHbExactSizeY(this->win.cfg.renderScale(64));
+		entry->setHbExactSizeY(this->win.renderScale(64));
 		return entry;
 	}
 

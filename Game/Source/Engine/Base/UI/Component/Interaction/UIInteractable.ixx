@@ -1,17 +1,13 @@
 export module fbc.UIInteractable;
 
-import fbc.CoreConfig;
-import fbc.CoreContent;
 import fbc.FSound;
 import fbc.FUtil;
 import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.IDrawable;
-
 import fbc.UIImage;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -19,7 +15,7 @@ namespace fbc {
 	export class UIInteractable : public UIImage {
 	public:
 		UIInteractable(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image, FSound* soundClick, FSound* soundHover) : UIImage(window, move(hb), image), soundClick(soundClick), soundHover(soundHover) {}
-		UIInteractable(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image) : UIInteractable(window, move(hb), image, &window.cct.audio.uiClick, nullptr) {}
+		UIInteractable(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image) : UIInteractable(window, move(hb), image, window.props.defaultClick(), nullptr) {}
 
 		bool interactable = true;
 		FSound* soundClick;
@@ -48,7 +44,7 @@ namespace fbc {
 				if (sdl::runner::mouseIsLeftJustClicked() || sdl::runner::mouseIsRightJustClicked()) {
 					this->win.activeElement = this;
 				}
-				else if (win.cfg.actSelect.isKeyJustPressed()) {
+				else if (win.props.hasPressedSelect()) {
 					if (soundClick) {
 						soundClick->play();
 					}

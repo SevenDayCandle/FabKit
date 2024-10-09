@@ -3,8 +3,7 @@ export module fbc.RBordered;
 import fbc.FUtil;
 import fbc.FTexture;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 

@@ -1,21 +1,17 @@
 export module fbc.UIList;
 
-import fbc.CoreConfig;
-import fbc.CoreContent;
 import fbc.FFont;
 import fbc.Hitbox;
 import fbc.IDrawable;
 import fbc.FWindow;
 import fbc.RelativeHitbox;
-
 import fbc.UIBase;
 import fbc.UIEntry;
 import fbc.UIVerticalScrollbar;
 import fbc.FUtil;
 import fbc.FWindow;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -54,7 +50,7 @@ namespace fbc {
 		UIList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize = false) :
 			UIBase(window, move(hb)), background(background), itemFont(itemFont), labelFunc(move(labelFunc)), canAutosize(canAutosize) {}
 		UIList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>, bool canAutosize = false) :
-			UIList(window, move(hb), move(labelFunc), window.cct.fontSmall(), window.cct.images.uiPanelRound, canAutosize) {}
+			UIList(window, move(hb), move(labelFunc), window.props.fontSmall(), window.props.defaultBackground(), canAutosize) {}
 		UIList(UIList&& other) noexcept = default;
 
 		~UIList() override {}
@@ -96,7 +92,7 @@ namespace fbc {
 		func<str(const T&)> labelFunc;
 		vec<uptr<UIEntry<T>>> rows;
 
-		inline virtual float rMargin() { return win.cfg.renderScale(MARGIN); }
+		inline virtual float rMargin() { return win.renderScale(MARGIN); }
 		inline virtual int getVisibleRowCount() const { return std::min(static_cast<int>(rows.size()), this->maxRows); }
 		inline virtual void updateTopVisibleRowIndex(int value) { topVisibleRowIndex = value; }
 
@@ -238,14 +234,14 @@ namespace fbc {
 		}
 
 		if (activeRow >= 0) {
-			if (win.cfg.actDirUp.isKeyJustPressed()) {
+			if (win.props.hasPressedDirUp()) {
 				activeRow = std::max(0, activeRow - 1);
 				if (activeRow < topVisibleRowIndex) {
 					updateTopVisibleRowIndex(topVisibleRowIndex - 1);
 					updateRowPositions();
 				}
 			}
-			else if (win.cfg.actDirDown.isKeyJustPressed()) {
+			else if (win.props.hasPressedDirDown()) {
 				activeRow = std::min(static_cast<int>(rows.size()) - 1, activeRow + 1);
 				if (activeRow > topVisibleRowIndex + maxRows) {
 					updateTopVisibleRowIndex(topVisibleRowIndex + 1);
@@ -261,7 +257,7 @@ namespace fbc {
 			rows[i]->updateActiveStatus(this->activeRow == i);
 		}
 
-		if (this->activeRow >= 0 && win.cfg.actSelect.isKeyJustPressed()) {
+		if (this->activeRow >= 0 && win.props.hasPressedSelect()) {
 			this->selectRow(*rows[this->activeRow]);
 		}
 	}
@@ -275,7 +271,7 @@ namespace fbc {
 			this->relhb(),
 			this->getItemFont(),
 			labelFunc(item));
-		entry->setHbExactSizeY(win.cfg.renderScale(64));
+		entry->setHbExactSizeY(win.renderScale(64));
 		return entry;
 	}
 

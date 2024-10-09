@@ -1,6 +1,5 @@
 export module fbc.UIHorizontalScrollbar;
 
-import fbc.CoreContent;
 import fbc.FUtil;
 import fbc.FWindow;
 import fbc.Hitbox;
@@ -15,7 +14,7 @@ namespace fbc {
 			UIHorizontalScrollbar::updateDropzoneSize(0.05f);
 		}
 		UIHorizontalScrollbar(FWindow& window, uptr<Hitbox>&& hb) :
-			UIHorizontalScrollbar(window, move(hb), window.cct.images.uiScrollbar, window.cct.images.uiScrollbutton) {}
+			UIHorizontalScrollbar(window, move(hb), window.props.defaultScrollBack(), window.props.defaultScrollButton()) {}
 
 		float toPercentage(float x, float y) override;
 		void updateDropzonePos(float percent) override;

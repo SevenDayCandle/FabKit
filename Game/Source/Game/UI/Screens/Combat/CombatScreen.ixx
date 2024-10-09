@@ -28,13 +28,15 @@ namespace fbc {
 
 	export class CombatScreen : public UIScreen, public CombatInstance::IViewSubscriber {
 	public:
-		CombatScreen(FWindow& window): UIScreen(window),
+		CombatScreen(FWindow& window, CoreContent& cct): UIScreen(window), cct(cct),
 			cardUI(addNew<UICanvas<CardRenderable>>(relhb(hb->getScaleOffSizeX() * CARD_HAND_POS_X_PCT, hb->getScaleOffSizeY() - CARD_HAND_POS_Y_DIFF - CARD_H, hb->getScaleOffSizeX(), hb->getScaleOffSizeY()))),
 			fieldUI(addNew<UICanvas<CombatSquareRenderable>>(relhb(TILE_OFFSET, TILE_OFFSET, hb->getScaleOffSizeX(), hb->getScaleOffSizeY()))),
 			turnUI(addNew<UICanvas<CombatTurnRenderable>>(relhb(0, 0, TILE_SIZE, hb->getScaleOffSizeY()))),
 			creatureUI(addNew<UICanvas<CreatureRenderable>>(fieldUI.relhb(0, 0, hb->getScaleOffSizeX(), hb->getScaleOffSizeY()))),
-			endTurnButton(add(make_unique<UITextButton>(win, relhb(hb->getScaleOffSizeX(0.8), hb->getScaleOffSizeY(0.8), END_TURN_SIZE, END_TURN_SIZE), window.cct.images.uiPanelRound, window.cct.fontRegular(), window.cct.strings.combat_end_turn()))) {
+			endTurnButton(add(make_unique<UITextButton>(win, relhb(hb->getScaleOffSizeX(0.8), hb->getScaleOffSizeY(0.8), END_TURN_SIZE, END_TURN_SIZE), window.props.defaultButton(), window.props.fontRegular(), cct.strings.combat_end_turn()))) {
 		}
+
+		CoreContent& cct;
 
 		virtual void onPlayerTurnBegin(const CombatTurn* turn) override;
 		virtual void onPlayerTurnEnd(const CombatTurn* turn) override;

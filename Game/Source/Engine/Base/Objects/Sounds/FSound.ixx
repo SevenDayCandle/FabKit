@@ -3,8 +3,6 @@ export module fbc.FSound;
 import fbc.FUtil;
 import fbc.ILoadable;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
 import sdl.SDLRunner;
 import std;
 

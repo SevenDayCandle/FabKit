@@ -7,8 +7,6 @@ import fbc.FUtil;
 import fbc.GameObject;
 import fbc.PileType;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
 import sdl.SDLRunner;
 import std;
 

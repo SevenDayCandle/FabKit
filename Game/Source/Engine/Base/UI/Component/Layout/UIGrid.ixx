@@ -1,6 +1,5 @@
 export module fbc.UIGrid;
 
-import fbc.CoreConfig;
 import fbc.FWindow;
 import fbc.Hitbox;
 import fbc.Hoverable;
@@ -103,8 +102,8 @@ namespace fbc {
 
 	// Updates the positions of items from index begin (inclusive) to index end (exclusive), and shows the scrollbar if any of them would extend outside of the grid
 	template<c_ext<Hoverable> T> float UIGrid<T>::updateItemOffsets(int begin, int end) {
-		float sx = win.cfg.renderScale(intervalX);
-		float sy = win.cfg.renderScale(intervalY);
+		float sx = win.renderScale(intervalX);
+		float sy = win.renderScale(intervalY);
 		int rowsize = std::max(1.0f, hb->w / sx);
 		int xP = begin % rowsize;
 		int yP = begin / rowsize; // Intentional integer division in parentheses to ensure that this multiplier rounds down

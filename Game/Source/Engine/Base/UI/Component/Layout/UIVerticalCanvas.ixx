@@ -1,6 +1,5 @@
 export module fbc.UIVerticalCanvas;
 
-import fbc.CoreConfig;
 import fbc.FUtil;
 import fbc.FWindow;
 import fbc.Hitbox;
@@ -15,7 +14,7 @@ namespace fbc {
 	public:
 		UIVerticalCanvas(FWindow& window, uptr<Hitbox>&& hb, float scrollSpeed = 1): UICanvas<T>(window, move(hb)),
 			scrollSpeed(scrollSpeed),
-			scrollbar{ window, make_unique<ScaleHitbox>(window, hb->w * 0.93f / window.cfg.renderScale(), hb->y + hb->h * 0.05f / window.cfg.renderScale(), 48, hb->h * 0.9f / window.cfg.renderScale())},
+			scrollbar{ window, make_unique<ScaleHitbox>(window, hb->w * 0.93f / window.renderScale(), hb->y + hb->h * 0.05f / window.renderScale(), 48, hb->h * 0.9f / window.renderScale())},
 			baseOffsetY(hb->getOffPosY()) {
 			scrollbar.setOnScroll([this](float f) {reposition(f); });
 		}

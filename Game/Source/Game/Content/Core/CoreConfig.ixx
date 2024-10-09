@@ -7,9 +7,7 @@ import fbc.ConfigNumeric;
 import fbc.FUtil;
 import fbc.Language;
 import fbc.WindowMode;
-import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBase;
 import sdl.SDLRunner;
 import std;
 
@@ -58,7 +56,7 @@ namespace fbc {
 		ConfigValue<str> textFontBold = ConfigValue<str>(*this, "TextFontBold", str(FONT_BOLD));
 		ConfigValue<str> textLanguage = ConfigValue<str>(*this, "TextLanguage", str(lang::ENG_DEFAULT));
 		ConfigValue<WindowMode> graphicsWindowMode = ConfigValue<WindowMode>(*this, "GraphicsWindowMode", WindowMode::WINDOWED);
-		ConfigNumeric gameEffectSpeed = ConfigNumeric(*this, "GameEffectSpeed", 1, 1, 5);
+		ConfigNumeric graphicsEffectSpeed = ConfigNumeric(*this, "GraphicsEffectSpeed", 1, 1, 5);
 		ConfigNumeric graphicsFPS = ConfigNumeric(*this, "GraphicsFPS", 144, 30, 240);
 		ConfigNumeric soundVolumeEffects = ConfigNumeric(*this, "SoundVolumeEffects", 100, 0, 100);
 		ConfigNumeric soundVolumeMaster = ConfigNumeric(*this, "SoundVolumeMaster", 100, 0, 100);

@@ -6,8 +6,7 @@ import fbc.FUtil;
 import fbc.FWindow;
 import fbc.TitleScreen;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
-import sdl.SDLProps; 
+import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -23,8 +22,8 @@ int main()
 	cfg.fullLoad();
 	CoreContent cct = DynamicContent::generate(cfg, fbc::futil::FBC);
 
-	FWindow window(cfg, cct, "Fabricate");
-	window.openScreen(std::make_unique<fbc::TitleScreen>(window));
+	FWindow window = FWindow(cct);
+	window.openScreen(std::make_unique<fbc::TitleScreen>(window, cct));
 
 	while(sdl::runner::poll())
 	{

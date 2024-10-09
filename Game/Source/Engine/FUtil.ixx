@@ -120,7 +120,7 @@ namespace fbc::futil {
 
 	export bool isNumeric(strv text);
 	export bool isPrefix(strv source, strv prefix);
-	export float fastLerp(float start, float end, float t);
+	export float fastLerp(float start, float end, float t) noexcept;
 	export str dimensionString(const pair<int, int>& p);
 	export str dimensionString(int x, int y);
 	export str toLowerCase(strv input);
@@ -170,7 +170,7 @@ namespace fbc::futil {
 	}
 
 	// Variant of std::lerp for floats without bounds checking and with lower precision
-	float fastLerp(float start, float end, float t) {
+	float fastLerp(float start, float end, float t) noexcept {
 		return (1 - t) * start + t * end;
 	}
 

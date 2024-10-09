@@ -15,23 +15,23 @@ import std;
 namespace fbc {
 	export class TitleScreen : public UIScreen {
 	public:
-		TitleScreen(FWindow& window): UIScreen(window, make_unique<ScreenSizeHitbox>(window)) {
+		TitleScreen(FWindow& window, CoreContent& cct): UIScreen(window, make_unique<ScreenSizeHitbox>(window)) {
 			UITextButton& b = add(make_unique<UITextButton>(window,
 				make_unique<ScreenPosHitbox>(window, 0.5f, 0.5f, 290, 170),
-				win.cct.images.uiPanel,
-				win.cct.fontRegular(),
-				win.cct.strings.screen_title_header()));
-			b.setOnClick([this](UIButton& i) {
-				SettingsDialog::openNew(this->win);
+				cct.images.uiPanel,
+				cct.fontRegular(),
+				cct.strings.screen_title_header()));
+			b.setOnClick([this, &cct](UIButton& i) {
+				SettingsDialog::openNew(win, cct);
 				});
 
 			UITextButton& b2 = stackYDir(std::make_unique<UITextButton>(window,
 				make_unique<ScreenPosHitbox>(window, 0.5f, 0.5f, 290, 170),
-				win.cct.images.uiPanel,
-				win.cct.fontRegular(),
-				win.cct.strings.screen_setup_header()));
-			b2.setOnClick([this](UIButton& i) {
-				this->win.openScreen(make_unique<RunScreen>(this->win));
+				cct.images.uiPanel,
+				cct.fontRegular(),
+				cct.strings.screen_setup_header()));
+			b2.setOnClick([this, &cct](UIButton& i) {
+				win.openScreen(make_unique<RunScreen>(win, cct));
 			});
 		}
 	};
