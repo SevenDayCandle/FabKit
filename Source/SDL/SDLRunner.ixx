@@ -14,10 +14,10 @@ import std;
 
 namespace sdl {
 	constexpr auto RENDERER_VULKAN = "VULKAN";
-	constexpr auto SHADER_FILL_FRAG = "Shader/Compiled/Fill.frag.spv";
-	constexpr auto SHADER_FILL_VERT = "Shader/Compiled/Fill.vert.spv";
-	constexpr auto SHADER_NORMAL_FRAG = "Shader/Compiled/Normal.frag.spv";
-	constexpr auto SHADER_NORMAL_VERT = "Shader/Compiled/Normal.vert.spv";
+	constexpr auto SHADER_FILL_FRAG = "Shader/Fill.frag.spv";
+	constexpr auto SHADER_FILL_VERT = "Shader/Fill.vert.spv";
+	constexpr auto SHADER_NORMAL_FRAG = "Shader/Normal.frag.spv";
+	constexpr auto SHADER_NORMAL_VERT = "Shader/Normal.vert.spv";
 
 	constexpr std::initializer_list<TexPos> VERTICES = {
 		TexPos{ -0.5f, -0.5f, 0.0f, 0.0f, 1.0f },  // Bottom Left
@@ -218,7 +218,7 @@ namespace sdl::runner {
 	export inline void setFPSLimit(int fps) { fpsLimit = fps > 0 ? NANOS_PER_SECOND / fps : 0; }
 	export inline void* deviceMapTransferBuffer(SDL_GPUTransferBuffer* transferBuffer, SDL_bool cycle) { return SDL_MapGPUTransferBuffer(device, transferBuffer, cycle); }
 
-	export bool init(const char* renderer = RENDERER_VULKAN);
+	export bool init(IMG_InitFlags imgFormats = IMG_INIT_PNG, const char* renderer = RENDERER_VULKAN, const char* normalFrag = SHADER_NORMAL_FRAG, const char* normalVert = SHADER_NORMAL_VERT, const char* fillFrag = SHADER_FILL_FRAG, const char* fillVert = SHADER_FILL_VERT);
 	export bool poll();
 	export GPUGraphicsPipeline* createPipeline(GPUShader* vertexShader, GPUShader* fragmentShader, GPUTextureFormat textureFormat = GPUTextureFormat::SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM, GPUBlendFactor srcColor = GPUBlendFactor::SDL_GPU_BLENDFACTOR_SRC_ALPHA, GPUBlendFactor dstColor = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, GPUBlendFactor srcAlpha = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE, GPUBlendFactor dstAlpha = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA);
 	export GPUGraphicsPipeline* createShapePipeline(GPUShader* vertexShader, GPUShader* fragmentShader, GPUTextureFormat textureFormat = GPUTextureFormat::SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM, GPUBlendFactor srcColor = GPUBlendFactor::SDL_GPU_BLENDFACTOR_SRC_ALPHA, GPUBlendFactor dstColor = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, GPUBlendFactor srcAlpha = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE, GPUBlendFactor dstAlpha = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA);
@@ -240,14 +240,14 @@ namespace sdl::runner {
 namespace sdl::runner {
 
 	// Set up SDL. Returns true if SDL setup succeeds
-	bool init(const char* renderer) {
+	bool init(IMG_InitFlags imgFormats, const char* renderer, const char* normalFrag, const char* normalVert, const char* fillFrag, const char* fillVert) {
 		int val = SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_GAMEPAD);
 		if (val < 0) {
 			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "SDL_INIT failed with value %d", val);
 			return false;
 		}
 
-		val = IMG_Init(IMG_INIT_PNG);
+		val = IMG_Init(imgFormats);
 		if (val == 0) {
 			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "IMG_Init failed with value %d", val);
 			return false;
@@ -264,17 +264,17 @@ namespace sdl::runner {
 			return false;
 		}
 
-		// Initialize keyboard
-		key = SDL_GetKeyboardState(&numKeys);
-		keyJust = new Uint8[numKeys];
-		memcpy(keyJust, key, numKeys);
-
 		// Initialize driver
 		device = SDL_CreateGPUDevice(gpuSpirvShaderFormats(), SDL_FALSE, renderer);
 		if (!device) {
 			SDL_LogCritical(SDL_LOG_CATEGORY_VIDEO, "Device went derp: %s", getError());
 			return false;
 		}
+
+		// Initialize keyboard
+		key = SDL_GetKeyboardState(&numKeys);
+		keyJust = new Uint8[numKeys];
+		memcpy(keyJust, key, numKeys);
 
 		// Initialize basic vertex and indices
 		constexpr size_t size = sizeof(TexPos);
@@ -357,12 +357,12 @@ namespace sdl::runner {
 		SAMPLER = gpuCreateSampler(device, &samplerInfo);
 
 		// Set up pipelines
-		GPUShader* shaderFragment = loadShader(SHADER_NORMAL_FRAG, SDL_GPU_SHADERSTAGE_FRAGMENT, 1, 1);
-		GPUShader* shaderVertex = loadShader(SHADER_NORMAL_VERT, SDL_GPU_SHADERSTAGE_VERTEX, 0, 1);
+		GPUShader* shaderFragment = loadShader(normalFrag, SDL_GPU_SHADERSTAGE_FRAGMENT, 1, 1);
+		GPUShader* shaderVertex = loadShader(normalVert, SDL_GPU_SHADERSTAGE_VERTEX, 0, 1);
 		RENDER_STANDARD = createPipeline(shaderVertex, shaderFragment);
 
-		GPUShader* shaderFillFragment = loadShader(SHADER_FILL_FRAG, SDL_GPU_SHADERSTAGE_FRAGMENT, 1, 1);
-		GPUShader* shaderFillVertex = loadShader(SHADER_FILL_VERT, SDL_GPU_SHADERSTAGE_VERTEX, 0, 1);
+		GPUShader* shaderFillFragment = loadShader(fillFrag, SDL_GPU_SHADERSTAGE_FRAGMENT, 1, 1);
+		GPUShader* shaderFillVertex = loadShader(fillVert, SDL_GPU_SHADERSTAGE_VERTEX, 0, 1);
 		RENDER_FILL = createPipeline(shaderFillVertex, shaderFillFragment);
 		// TODO more shaders/blending modes
 
