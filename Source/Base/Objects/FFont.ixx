@@ -8,8 +8,6 @@ import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 
 namespace fbc {
-    export constexpr strv FONT_REGULAR = "Resources/Fonts/NotoSans-Regular.ttf";
-
 	export class FFont : public ILoadable {
     public:
         FFont(strv path, float scalar, int size, int outlineSize = 0, int shadowSize = 0): path(path), globalScale(scalar), size(size), outlineSize(outlineSize), shadowSize(shadowSize) {
@@ -160,10 +158,6 @@ namespace fbc {
         font = sdl::fontOpen(path.c_str(), res);
         if (font == nullptr) {
             sdl::logError("Failed to load font %s: %s", path.c_str(), sdl::getError());
-            font = sdl::fontOpen(FONT_REGULAR.data(), res);
-        }
-        if (font == nullptr) {
-            sdl::logError("RIP even the default font failed us %s", sdl::getError());
         }
     }
 }
