@@ -1,16 +1,16 @@
-export module fbc.Tooltip;
+export module fab.Tooltip;
 
-import fbc.FFont;
-import fbc.FWindow;
-import fbc.FUtil;
-import fbc.GenericTip;
-import fbc.IDrawable;
-import fbc.TextDrawable;
+import fab.FFont;
+import fab.FWindow;
+import fab.FUtil;
+import fab.GenericTip;
+import fab.IDrawable;
+import fab.TextDrawable;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import std;
 
-namespace fbc {
+namespace fab {
 	export constexpr float DEFAULT_SIZE = 100;
 	export constexpr float PADDING = 24;
 

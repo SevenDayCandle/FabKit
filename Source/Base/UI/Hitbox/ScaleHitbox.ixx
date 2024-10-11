@@ -1,9 +1,9 @@
-export module fbc.ScaleHitbox;
+export module fab.ScaleHitbox;
 
-import fbc.FWindow;
-import fbc.Hitbox;
+import fab.FWindow;
+import fab.Hitbox;
 
-namespace fbc {
+namespace fab {
 	export class ScaleHitbox : public Hitbox {
 	public:
 		ScaleHitbox(FWindow& win) : Hitbox(win, 0, 0, 0, 0) {}

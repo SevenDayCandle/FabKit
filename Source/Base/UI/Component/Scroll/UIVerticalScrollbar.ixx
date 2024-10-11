@@ -1,15 +1,15 @@
-export module fbc.UIVerticalScrollbar;
+export module fab.UIVerticalScrollbar;
 
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.Hitbox;
-import fbc.IDrawable;
-import fbc.UIScrollbar;
+import fab.FUtil;
+import fab.FWindow;
+import fab.Hitbox;
+import fab.IDrawable;
+import fab.UIScrollbar;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
 import sdl.SDLRunner;
 
-namespace fbc {
+namespace fab {
 
 	export class UIVerticalScrollbar : public UIScrollbar {
 	public:

@@ -1,19 +1,19 @@
-export module fbc.UITextInput;
+export module fab.UITextInput;
 
-import fbc.FFont;
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.Hitbox;
-import fbc.IDrawable;
-import fbc.TextSupplier;
-import fbc.TextDrawable;
-import fbc.UIInteractable;
+import fab.FFont;
+import fab.FUtil;
+import fab.FWindow;
+import fab.Hitbox;
+import fab.IDrawable;
+import fab.TextSupplier;
+import fab.TextDrawable;
+import fab.UIInteractable;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class UITextInput : public UIInteractable, public TextSupplier {
 	public:
 		UITextInput(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image, FFont& textFont) :

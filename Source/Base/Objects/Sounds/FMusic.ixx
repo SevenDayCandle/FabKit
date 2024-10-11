@@ -1,12 +1,12 @@
-export module fbc.FMusic;
+export module fab.FMusic;
 
-import fbc.FUtil;
-import fbc.ILoadable;
+import fab.FUtil;
+import fab.ILoadable;
 import sdl.SDLBase; 
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class FMusic : public ILoadable {
 	public:
 		FMusic(strv path) : path(path) {}

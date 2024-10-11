@@ -1,13 +1,13 @@
-export module fbc.GenericTip;
+export module fab.GenericTip;
 
-import fbc.FUtil;
-import fbc.FWindow;
+import fab.FUtil;
+import fab.FWindow;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export constexpr float QUEUE_OFFSET_X = 36;
 	export constexpr float QUEUE_OFFSET_Y = 18;
 

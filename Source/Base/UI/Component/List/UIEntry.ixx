@@ -1,19 +1,19 @@
-export module fbc.UIEntry;
+export module fab.UIEntry;
 
-import fbc.FFont;
-import fbc.FWindow;
-import fbc.Hitbox;
-import fbc.TextDrawable;
-import fbc.IDrawable;
-import fbc.UIInteractable;
-import fbc.UILabel;
-import fbc.FUtil;
+import fab.FFont;
+import fab.FWindow;
+import fab.Hitbox;
+import fab.TextDrawable;
+import fab.IDrawable;
+import fab.UIInteractable;
+import fab.UILabel;
+import fab.FUtil;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export template <typename T> class UIEntry : public UIInteractable {
 	public:
 		UIEntry(const T& item, int index, const func<void(UIEntry<T>&)>& onClick, FWindow& window, uptr<Hitbox> hb, FFont& f, const str& text, IDrawable& image, IDrawable& checkImage, sdl::Color baseColor = sdl::COLOR_STANDARD, sdl::Color hoverColor = sdl::COLOR_STANDARD) :

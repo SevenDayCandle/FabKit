@@ -1,24 +1,24 @@
-export module fbc.UIDropdown;
+export module fab.UIDropdown;
 
-import fbc.FFont;
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.FWindow;
-import fbc.Hitbox;
-import fbc.IDrawable;
-import fbc.ScaleHitbox;
-import fbc.SelectView;
-import fbc.TextDrawable;
-import fbc.UIEntry;
-import fbc.UIInteractable;
-import fbc.UISelectorList;
-import fbc.UIInteractable;
+import fab.FFont;
+import fab.FUtil;
+import fab.FWindow;
+import fab.FWindow;
+import fab.Hitbox;
+import fab.IDrawable;
+import fab.ScaleHitbox;
+import fab.SelectView;
+import fab.TextDrawable;
+import fab.UIEntry;
+import fab.UIInteractable;
+import fab.UISelectorList;
+import fab.UIInteractable;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export template <typename T> class UIDropdown : public UIInteractable {
 	public:
 		UIDropdown(FWindow& window, uptr<Hitbox>&& hb, uptr<UISelectorList<T>> menu,

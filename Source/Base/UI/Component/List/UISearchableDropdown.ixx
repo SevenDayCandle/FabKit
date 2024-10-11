@@ -1,24 +1,24 @@
-export module fbc.UISearchableDropdown;
+export module fab.UISearchableDropdown;
 
-import fbc.FFont;
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.Hitbox;
-import fbc.IDrawable;
-import fbc.TextSupplier;
-import fbc.ScaleHitbox;
-import fbc.SelectView;
-import fbc.TextDrawable;
-import fbc.UIDropdown;
-import fbc.UIEntry;
-import fbc.UIInteractable;
-import fbc.UISelectorList;
+import fab.FFont;
+import fab.FUtil;
+import fab.FWindow;
+import fab.Hitbox;
+import fab.IDrawable;
+import fab.TextSupplier;
+import fab.ScaleHitbox;
+import fab.SelectView;
+import fab.TextDrawable;
+import fab.UIDropdown;
+import fab.UIEntry;
+import fab.UIInteractable;
+import fab.UISelectorList;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export template <typename T> class UISearchableDropdown : public UIDropdown<T>, public TextSupplier {
 	public:
 		UISearchableDropdown(FWindow& window, uptr<Hitbox>&& hb, uptr<UISelectorList<T>> menu,

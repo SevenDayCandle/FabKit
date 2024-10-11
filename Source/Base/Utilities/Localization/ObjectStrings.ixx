@@ -1,8 +1,8 @@
-export module fbc.ObjectStrings;
+export module fab.ObjectStrings;
 
-import fbc.FUtil;
+import fab.FUtil;
 
-namespace fbc {
+namespace fab {
 	export struct ObjectStrings {
 		str NAME;
 		vec<str> DESCRIPTION;

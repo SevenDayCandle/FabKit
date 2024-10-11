@@ -1,14 +1,14 @@
-export module fbc.CallbackVFX;
+export module fab.CallbackVFX;
 
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.VFX;
+import fab.FUtil;
+import fab.FWindow;
+import fab.VFX;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class CallbackVFX : public VFX {
 	public:
 		CallbackVFX(FWindow& window, float duration = DEFAULT_DURATION): VFX(window, duration) {}

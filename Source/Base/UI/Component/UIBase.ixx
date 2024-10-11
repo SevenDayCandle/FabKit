@@ -1,16 +1,16 @@
-export module fbc.UIBase;
+export module fab.UIBase;
 
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.Hitbox;
-import fbc.Hoverable;
-import fbc.RelativeHitbox;
+import fab.FUtil;
+import fab.FWindow;
+import fab.Hitbox;
+import fab.Hoverable;
+import fab.RelativeHitbox;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class UIBase : public Hoverable {
 	public:
 		UIBase(FWindow& window, uptr<Hitbox>&& hb) : Hoverable(window), hb(move(hb)) {}

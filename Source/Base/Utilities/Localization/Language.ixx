@@ -1,9 +1,9 @@
-export module fbc.Language;
+export module fab.Language;
 
-import fbc.FUtil;
-import fbc.KeyedItem;
+import fab.FUtil;
+import fab.KeyedItem;
 
-namespace fbc {
+namespace fab {
 	export struct Language : public KeyedItem<Language> {
 		Language(strv key): KeyedItem(key) {}
 	};

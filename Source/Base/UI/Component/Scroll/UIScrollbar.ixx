@@ -1,17 +1,17 @@
-export module fbc.UIScrollbar;
+export module fab.UIScrollbar;
 
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.Hitbox;
-import fbc.IDrawable;
+import fab.FUtil;
+import fab.FWindow;
+import fab.Hitbox;
+import fab.IDrawable;
 
-import fbc.UIBase;
+import fab.UIBase;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class UIScrollbar : public UIBase {
 	public:
 		UIScrollbar(FWindow& window, uptr<Hitbox>&& hb, IDrawable& imageBar, IDrawable& imageButton): UIBase(window, move(hb)), imageBar(imageBar), imageButton(imageButton) {}

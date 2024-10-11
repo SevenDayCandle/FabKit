@@ -1,12 +1,12 @@
-export module fbc.RVertical;
+export module fab.RVertical;
 
-import fbc.FTexture;
-import fbc.FUtil;
+import fab.FTexture;
+import fab.FUtil;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 
-namespace fbc {
+namespace fab {
 	export class RVertical : public FTexture {
 	public:
 		RVertical(strv path) : FTexture(path) {}

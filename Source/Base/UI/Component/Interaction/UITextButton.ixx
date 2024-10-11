@@ -1,16 +1,16 @@
-export module fbc.UITextButton;
+export module fab.UITextButton;
 
-import fbc.FFont;
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.Hitbox;
-import fbc.IDrawable;
-import fbc.TextDrawable;
-import fbc.UIButton;
+import fab.FFont;
+import fab.FUtil;
+import fab.FWindow;
+import fab.Hitbox;
+import fab.IDrawable;
+import fab.TextDrawable;
+import fab.UIButton;
 import sdl.SDLBase;
 import sdl.SDLBatchRenderPass;
 
-namespace fbc {
+namespace fab {
 	export class UITextButton : public UIButton {
 	public:
 		UITextButton(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image, FFont& f, strv text = "") : UIButton(window, move(hb), image), text(f, text) {

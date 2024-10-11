@@ -1,15 +1,15 @@
-export module fbc.UIScreen;
+export module fab.UIScreen;
 
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.Hitbox;
-import fbc.ScreenSizeHitbox;
-import fbc.UICanvas;
-import fbc.VFX;
+import fab.FUtil;
+import fab.FWindow;
+import fab.Hitbox;
+import fab.ScreenSizeHitbox;
+import fab.UICanvas;
+import fab.VFX;
 import sdl.SDLBatchRenderPass;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class UIScreen : public UICanvas<> {
 	public:
 		UIScreen(FWindow& window) : UICanvas(window, make_unique<ScreenSizeHitbox>(window)) {}

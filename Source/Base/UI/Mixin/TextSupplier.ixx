@@ -1,17 +1,17 @@
-export module fbc.TextSupplier;
+export module fab.TextSupplier;
 
-import fbc.FFont;
-import fbc.FWindow;
-import fbc.FUtil;
-import fbc.RectDrawable;
-import fbc.TextDrawable;
+import fab.FFont;
+import fab.FWindow;
+import fab.FUtil;
+import fab.RectDrawable;
+import fab.TextDrawable;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
 import sdl.SDLRunner;
 import sdl.IKeyInputListener;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class TextSupplier : public sdl::IKeyInputListener {
 	public:
 		TextSupplier(FWindow& window, FFont& textFont) :

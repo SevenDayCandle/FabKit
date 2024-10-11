@@ -1,12 +1,12 @@
-export module fbc.VFX;
+export module fab.VFX;
 
-import fbc.FUtil;
-import fbc.FWindow;
+import fab.FUtil;
+import fab.FWindow;
 import sdl.SDLBase;
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export constexpr float DEFAULT_DURATION = 1;
 
 	export class VFX : public FWindow::Element {

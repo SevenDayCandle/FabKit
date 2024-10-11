@@ -1,16 +1,16 @@
-export module fbc.TitleTooltip;
+export module fab.TitleTooltip;
 
-import fbc.FFont;
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.IDrawable;
-import fbc.TextDrawable;
-import fbc.Tooltip;
+import fab.FFont;
+import fab.FUtil;
+import fab.FWindow;
+import fab.IDrawable;
+import fab.TextDrawable;
+import fab.Tooltip;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
 import std;
 
-namespace fbc {
+namespace fab {
 	export class TitleTooltip : public Tooltip {
 	public:
 		TitleTooltip(FWindow& window, strv title, strv text, FFont& titleFont, FFont& font, float boxSize, IDrawable& background) :

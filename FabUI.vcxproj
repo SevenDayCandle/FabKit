@@ -31,6 +31,10 @@
     <ClCompile Include="Source\Base\Objects\FFont.ixx" />
     <ClCompile Include="Source\Base\Objects\Sounds\FMusic.ixx" />
     <ClCompile Include="Source\Base\Objects\Sounds\FSound.ixx" />
+    <ClCompile Include="Source\Base\UI\BasicWindowProps.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Base\UI\Component\Input\UINumberInput.ixx" />
     <ClCompile Include="Source\Base\UI\Component\Input\UISlider.ixx" />
     <ClCompile Include="Source\Base\UI\Component\Input\UITextInput.ixx" />
@@ -195,7 +199,7 @@
     <ProjectGuid>{baffc6fb-d3d2-47b0-b5cf-c93549f8965a}</ProjectGuid>
     <RootNamespace>FabUI</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>FabUI</ProjectName>
+    <ProjectName>FabKit</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

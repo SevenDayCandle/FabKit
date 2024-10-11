@@ -2,14 +2,14 @@ module;
 
 #include "glaze/glaze.hpp"
 
-export module fbc.Config;
+export module fab.Config;
 
-import fbc.FUtil;
+import fab.FUtil;
 import sdl.SDLBase; 
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
     export constexpr strv BASE_CONFIG_FILE = "config.json";
 
     export class Config {

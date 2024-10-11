@@ -1,14 +1,14 @@
-export module fbc.MultiVFX;
+export module fab.MultiVFX;
 
-import fbc.CallbackVFX; 
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.VFX;
+import fab.CallbackVFX; 
+import fab.FUtil;
+import fab.FWindow;
+import fab.VFX;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
-namespace fbc {
+namespace fab {
 	export class MultiVFX : public CallbackVFX {
 	public:
 		MultiVFX(FWindow& window, float duration = DEFAULT_DURATION) : CallbackVFX(window, duration) {}

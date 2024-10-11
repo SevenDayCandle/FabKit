@@ -1,9 +1,9 @@
-export module fbc.FUtil;
+export module fab.FUtil;
 
-import fbc.KeyedItem;
+import fab.KeyedItem;
 import std;
 
-namespace fbc {
+namespace fab {
 	// Hasing structure for string_view lookup on str containers
 	export struct str_hash
 	{
@@ -106,11 +106,11 @@ namespace fbc {
 }
 
 // Utility functions
-namespace fbc::futil {
+namespace fab::futil {
 	export constexpr int INT_MAX = std::numeric_limits<int>::max();
 	export constexpr int INT_MIN = std::numeric_limits<int>::min();
 	export constexpr strv BLANK = "";
-	export constexpr strv FBC = "fbc";
+	export constexpr strv FBC = "fab";
 	export constexpr strv JSON_EXT = ".json";
 	export constexpr strv MODS = "mods";
 	export constexpr strv VAL_FALSE = "false";
@@ -146,7 +146,7 @@ namespace fbc::futil {
  * IMPLEMENTATIONS
  */
 
-namespace fbc::futil {
+namespace fab::futil {
 	// Format a pair as a dimension
 	str dimensionString(int x, int y) {
 		return std::to_string(x) + "x" + std::to_string(y);

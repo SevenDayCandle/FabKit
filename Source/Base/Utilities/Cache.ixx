@@ -1,11 +1,11 @@
-export module fbc.Cache;
+export module fab.Cache;
 
-import fbc.FUtil;
-import fbc.ILoadable;
+import fab.FUtil;
+import fab.ILoadable;
 import std;
 
 /* A lazy-initialized pointer that gets created when first invoked. Values can be used in const contexts */
-namespace fbc {
+namespace fab {
 	export template <typename T> class Cache : public ILoadable {
 	public:
 		Cache(const func<T*()>& fetchFunc): fetchFunc(fetchFunc) {}

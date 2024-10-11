@@ -1,18 +1,18 @@
-export module fbc.FWindow;
+export module fab.FWindow;
 
-import fbc.EmptyDrawable;
-import fbc.FFont;
-import fbc.FSound;
-import fbc.FUtil;
-import fbc.IDrawable;
-import fbc.WindowMode;
+import fab.EmptyDrawable;
+import fab.FFont;
+import fab.FSound;
+import fab.FUtil;
+import fab.IDrawable;
+import fab.WindowMode;
 import sdl.IKeyInputListener;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class FWindow {
 	public:
 		class Element {

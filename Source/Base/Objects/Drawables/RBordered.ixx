@@ -1,13 +1,13 @@
-export module fbc.RBordered;
+export module fab.RBordered;
 
-import fbc.FUtil;
-import fbc.FTexture;
+import fab.FUtil;
+import fab.FTexture;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class RBordered : public FTexture {
 	public:
 		RBordered(strv path) : FTexture(path) {}

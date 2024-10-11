@@ -1,15 +1,15 @@
-export module fbc.UIGrid;
+export module fab.UIGrid;
 
-import fbc.FWindow;
-import fbc.Hitbox;
-import fbc.Hoverable;
-import fbc.FUtil;
-import fbc.ScaleHitbox;
-import fbc.UIBase;
+import fab.FWindow;
+import fab.Hitbox;
+import fab.Hoverable;
+import fab.FUtil;
+import fab.ScaleHitbox;
+import fab.UIBase;
 import sdl.SDLBatchRenderPass;
 import std;
 
-namespace fbc {
+namespace fab {
 	export template <c_ext<Hoverable> T> class UIGrid : public UIBase {
 	public:
 		class Iterator {

@@ -1,10 +1,10 @@
-export module fbc.RelativeHitbox;
+export module fab.RelativeHitbox;
 
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.Hitbox;
+import fab.FUtil;
+import fab.FWindow;
+import fab.Hitbox;
 
-namespace fbc {
+namespace fab {
 	export class RelativeHitbox : public Hitbox {
 	public:
 		RelativeHitbox(FWindow& win, Hitbox& parent) : RelativeHitbox(win, parent, 0, 0, 0, 0) {}

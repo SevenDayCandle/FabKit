@@ -1,20 +1,20 @@
-export module fbc.UIMenu;
+export module fab.UIMenu;
 
-import fbc.EmptyDrawable;
-import fbc.FFont;
-import fbc.FWindow;
-import fbc.FUtil;
-import fbc.Hitbox;
-import fbc.IDrawable;
-import fbc.RelativeHitbox;
-import fbc.UIEntry;
-import fbc.UIList;
+import fab.EmptyDrawable;
+import fab.FFont;
+import fab.FWindow;
+import fab.FUtil;
+import fab.Hitbox;
+import fab.IDrawable;
+import fab.RelativeHitbox;
+import fab.UIEntry;
+import fab.UIList;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export template <typename T> class UIMenu : public UIList<T> {
 	public:
 		UIMenu(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize) :

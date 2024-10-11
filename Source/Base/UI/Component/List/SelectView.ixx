@@ -1,10 +1,10 @@
-export module fbc.SelectView;
+export module fab.SelectView;
 
-import fbc.FUtil;
-import fbc.UIEntry;
+import fab.FUtil;
+import fab.UIEntry;
 import std;
 
-namespace fbc {
+namespace fab {
 	export template <typename T> class SelectView : public std::ranges::view_interface<SelectView<T>> {
 	public:
 		class SelectIterator {

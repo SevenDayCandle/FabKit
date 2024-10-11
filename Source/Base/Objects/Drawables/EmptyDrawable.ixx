@@ -1,13 +1,13 @@
-export module fbc.EmptyDrawable;
+export module fab.EmptyDrawable;
 
-import fbc.FUtil;
-import fbc.IDrawable;
+import fab.FUtil;
+import fab.IDrawable;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class EmptyDrawable : public IDrawable {
 	public:
 		EmptyDrawable() {}

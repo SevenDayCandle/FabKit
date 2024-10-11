@@ -1,13 +1,13 @@
-export module fbc.TextDrawable;
+export module fab.TextDrawable;
 
-import fbc.FFont;
-import fbc.FUtil;
-import fbc.ImageDrawable;
+import fab.FFont;
+import fab.FUtil;
+import fab.ImageDrawable;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 
-namespace fbc {
+namespace fab {
 	export class TextDrawable : public ImageDrawable {
 	public:
 		TextDrawable(FFont& font, strv text = "", float w = 0, sdl::Color color = sdl::COLOR_STANDARD, sdl::Color colorOutline = sdl::COLOR_BLACK) : font(font), textW(w), text(text), color(color), colorOutline(colorOutline) {

@@ -1,17 +1,17 @@
-export module fbc.UISlider;
+export module fab.UISlider;
 
-import fbc.FWindow;
-import fbc.Hitbox;
-import fbc.IDrawable;
-import fbc.RelativeHitbox;
-import fbc.UIHorizontalScrollbar;
-import fbc.UINumberInput;
+import fab.FWindow;
+import fab.Hitbox;
+import fab.IDrawable;
+import fab.RelativeHitbox;
+import fab.UIHorizontalScrollbar;
+import fab.UINumberInput;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class UISlider : public UINumberInput {
 	public:
 		UISlider(FWindow& window, uptr<Hitbox>&& hb, uptr<Hitbox>&& scrollhb, int limMin, int limMax,

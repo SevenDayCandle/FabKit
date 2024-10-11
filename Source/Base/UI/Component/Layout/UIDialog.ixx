@@ -1,18 +1,18 @@
-export module fbc.UIDialog;
+export module fab.UIDialog;
 
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.Hitbox;
-import fbc.IDrawable;
+import fab.FUtil;
+import fab.FWindow;
+import fab.Hitbox;
+import fab.IDrawable;
 
-import fbc.UICanvas;
-import fbc.UIInteractable;
+import fab.UICanvas;
+import fab.UIInteractable;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class UIDialog : public UICanvas<> {
 	public:
 		UIDialog(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image) : UICanvas(window, move(hb)), image(image) {}

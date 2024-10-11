@@ -1,12 +1,12 @@
-export module fbc.FSound;
+export module fab.FSound;
 
-import fbc.FUtil;
-import fbc.ILoadable;
+import fab.FUtil;
+import fab.ILoadable;
 import sdl.SDLBase; 
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class FSound : public ILoadable {
 	public:
 		FSound(strv path) : path(path) {}

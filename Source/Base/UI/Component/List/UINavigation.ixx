@@ -1,21 +1,21 @@
-export module fbc.UINavigation;
+export module fab.UINavigation;
 
-import fbc.EmptyDrawable;
-import fbc.FFont;
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.Hitbox;
-import fbc.IDrawable;
-import fbc.RelativeHitbox;
-import fbc.UIEntry;
-import fbc.UIBase;
-import fbc.UIList;
+import fab.EmptyDrawable;
+import fab.FFont;
+import fab.FUtil;
+import fab.FWindow;
+import fab.Hitbox;
+import fab.IDrawable;
+import fab.RelativeHitbox;
+import fab.UIEntry;
+import fab.UIBase;
+import fab.UIList;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export template <c_ext<UIBase> T> class UINavigation : public UIList<T> {
 	public:
 		UINavigation(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize) :

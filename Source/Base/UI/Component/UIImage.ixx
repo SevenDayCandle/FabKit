@@ -1,16 +1,16 @@
-export module fbc.UIImage;
+export module fab.UIImage;
 
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.Hitbox;
-import fbc.IDrawable;
-import fbc.Tooltip;
-import fbc.UIBase;
+import fab.FUtil;
+import fab.FWindow;
+import fab.Hitbox;
+import fab.IDrawable;
+import fab.Tooltip;
+import fab.UIBase;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
 import sdl.SDLRunner;
 
-namespace fbc {
+namespace fab {
 	export class UIImage : public UIBase {
 	public:
 		UIImage(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image) : UIBase(window, move(hb)), image(image) {}

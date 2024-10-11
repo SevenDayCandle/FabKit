@@ -1,11 +1,11 @@
-export module fbc.Hoverable;
+export module fab.Hoverable;
 
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.Hitbox;
+import fab.FUtil;
+import fab.FWindow;
+import fab.Hitbox;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class Hoverable : public FWindow::Element {
 	public:
 		class Token {

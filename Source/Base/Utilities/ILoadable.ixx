@@ -1,13 +1,13 @@
-export module fbc.ILoadable;
+export module fab.ILoadable;
 
-import fbc.FUtil;
+import fab.FUtil;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass; 
 import sdl.SDLProps; 
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export struct ILoadable {
 	public:
 		ILoadable() {}

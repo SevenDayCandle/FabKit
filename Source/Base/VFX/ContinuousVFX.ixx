@@ -1,15 +1,15 @@
-export module fbc.ContinuousVFX;
+export module fab.ContinuousVFX;
 
-import fbc.CallbackVFX; 
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.VFX;
+import fab.CallbackVFX; 
+import fab.FUtil;
+import fab.FWindow;
+import fab.VFX;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class ContinuousVFX : public CallbackVFX {
 	public:
 		ContinuousVFX(FWindow& window, const func<bool()>& endCondition, float duration = DEFAULT_DURATION) : CallbackVFX(window, duration), endCondition(endCondition) {}

@@ -1,14 +1,14 @@
-export module fbc.UICanvas;
+export module fab.UICanvas;
 
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.Hitbox;
-import fbc.Hoverable;
-import fbc.UIBase;
+import fab.FUtil;
+import fab.FWindow;
+import fab.Hitbox;
+import fab.Hoverable;
+import fab.UIBase;
 import sdl.SDLBatchRenderPass;
 import std;
 
-namespace fbc {
+namespace fab {
 	export template<c_ext<Hoverable> T = Hoverable> class UICanvas : public UIBase {
 	public:
 		class Iterator {

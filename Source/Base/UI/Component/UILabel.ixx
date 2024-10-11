@@ -1,16 +1,16 @@
-export module fbc.UILabel;
+export module fab.UILabel;
 
-import fbc.FFont;
-import fbc.FWindow;
-import fbc.FUtil;
-import fbc.Hitbox;
-import fbc.TextDrawable;
-import fbc.Tooltip;
-import fbc.UIBase;
+import fab.FFont;
+import fab.FWindow;
+import fab.FUtil;
+import fab.Hitbox;
+import fab.TextDrawable;
+import fab.Tooltip;
+import fab.UIBase;
 import sdl.SDLBase;
 import sdl.SDLBatchRenderPass;
 
-namespace fbc {
+namespace fab {
 	export class UILabel : public UIBase {
 	public:
 		UILabel(FWindow& window, uptr<Hitbox>&& hb, FFont& f, strv text = "") : UIBase(window, move(hb)), text(f, text, hb->w) {}

@@ -1,15 +1,15 @@
-export module fbc.UICallbackInteractable;
+export module fab.UICallbackInteractable;
 
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.Hitbox;
-import fbc.IDrawable;
-import fbc.UIInteractable;
+import fab.FUtil;
+import fab.FWindow;
+import fab.Hitbox;
+import fab.IDrawable;
+import fab.UIInteractable;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 
-namespace fbc {
+namespace fab {
 	export template <typename T> class UICallbackInteractable : public UIInteractable {
 	public:
 		UICallbackInteractable(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image) : UIInteractable(window, move(hb), image) {}

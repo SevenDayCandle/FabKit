@@ -1,16 +1,16 @@
-export module fbc.ConfigNumeric;
+export module fab.ConfigNumeric;
 
-import fbc.Config;
-import fbc.ConfigValue;
-import fbc.FUtil;
+import fab.Config;
+import fab.ConfigValue;
+import fab.FUtil;
 import sdl.SDLBase; 
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class ConfigNumeric : public ConfigValue<int> {
 	public:
-		ConfigNumeric(fbc::Config& config, strv id, const int& defaultValue, int min = 0, int max = std::numeric_limits<int>::max()): ConfigValue<int>(config, id, defaultValue), min(min), max(max) {}
+		ConfigNumeric(fab::Config& config, strv id, const int& defaultValue, int min = 0, int max = std::numeric_limits<int>::max()): ConfigValue<int>(config, id, defaultValue), min(min), max(max) {}
 
 		inline int getMax() const { return max; }
 		inline int getMin() const { return min; }

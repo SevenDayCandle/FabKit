@@ -1,23 +1,23 @@
-export module fbc.UISelectorList;
+export module fab.UISelectorList;
 
-import fbc.FFont;
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.Hitbox;
-import fbc.IDrawable;
-import fbc.FWindow;
-import fbc.RelativeHitbox;
-import fbc.SelectView;
-import fbc.UIBase;
-import fbc.UIEntry;
-import fbc.UIList;
-import fbc.UIVerticalScrollbar;
+import fab.FFont;
+import fab.FUtil;
+import fab.FWindow;
+import fab.Hitbox;
+import fab.IDrawable;
+import fab.FWindow;
+import fab.RelativeHitbox;
+import fab.SelectView;
+import fab.UIBase;
+import fab.UIEntry;
+import fab.UIList;
+import fab.UIVerticalScrollbar;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	constexpr int MARGIN = 16;
 
 	export template <typename T> class UISelectorList : public UIList<T> {

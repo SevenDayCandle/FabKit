@@ -1,8 +1,8 @@
-export module fbc.WindowMode;
+export module fab.WindowMode;
 
-import fbc.FUtil;
+import fab.FUtil;
 
-namespace fbc {
+namespace fab {
 	export enum WindowMode {
 		WINDOWED,
 		FULLSCREEN,

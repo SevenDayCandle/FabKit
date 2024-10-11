@@ -236,6 +236,7 @@
     <ClCompile Include="Source\SDL\HSVTuple.ixx">
       <Filter>SDL</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Base\UI\BasicWindowProps.ixx" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Base">

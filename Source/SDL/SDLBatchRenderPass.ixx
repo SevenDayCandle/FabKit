@@ -1,6 +1,6 @@
 export module sdl.SDLBatchRenderPass;
 
-import fbc.FUtil;
+import fab.FUtil;
 import sdl.SDLBase;
 import std;
 
@@ -13,11 +13,11 @@ namespace sdl {
 		~SDLBatchRenderPass() { gpuEndRenderPass(renderPass); }
 
 		inline void drawIndexedPrimitives(Sint32 vertex_offset = 0, Uint32 num_indices = 6, Uint32 num_instances = 1, Uint32 first_index = 0, Uint32 first_instance = 0) const { sdl::gpuDrawIndexedPrimitives(renderPass, num_indices, num_instances, first_index, vertex_offset, first_instance); }
-		inline void pushFragmentUniform(const void* data, fbc::uint32 sizeInBytes, fbc::uint32 slot = 0) { sdl::gpuPushFragmentUniformData(cmd, slot, data, sizeInBytes); };
-		inline void pushVertexUniform(const void* data, fbc::uint32 sizeInBytes, fbc::uint32 slot = 0) { sdl::gpuPushVertexUniformData(cmd, slot, data, sizeInBytes); };
+		inline void pushFragmentUniform(const void* data, fab::uint32 sizeInBytes, fab::uint32 slot = 0) { sdl::gpuPushFragmentUniformData(cmd, slot, data, sizeInBytes); };
+		inline void pushVertexUniform(const void* data, fab::uint32 sizeInBytes, fab::uint32 slot = 0) { sdl::gpuPushVertexUniformData(cmd, slot, data, sizeInBytes); };
 		inline void setScissor(RectI* rect) { sdl::gpuSetScissor(renderPass, rect); }
-		template <typename T> inline void pushFragmentUniformAuto(const T* data, fbc::uint32 slot = 0) { sdl::gpuPushFragmentUniformData(cmd, slot, data, sizeof(T)); };
-		template <typename T> inline void pushVertexUniformAuto(const T* data, fbc::uint32 slot = 0) { sdl::gpuPushVertexUniformData(cmd, slot, data, sizeof(T)); };
+		template <typename T> inline void pushFragmentUniformAuto(const T* data, fab::uint32 slot = 0) { sdl::gpuPushFragmentUniformData(cmd, slot, data, sizeof(T)); };
+		template <typename T> inline void pushVertexUniformAuto(const T* data, fab::uint32 slot = 0) { sdl::gpuPushVertexUniformData(cmd, slot, data, sizeof(T)); };
 
 		void bindBufferIndex(GPUBuffer* buffer);
 		void bindBufferVertex(GPUBuffer* buffer);

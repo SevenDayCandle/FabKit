@@ -1,17 +1,17 @@
-export module fbc.UIRecolorVFX;
+export module fab.UIRecolorVFX;
 
-import fbc.CallbackVFX;
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.Hoverable;
-import fbc.UIImage;
-import fbc.VFX;
+import fab.CallbackVFX;
+import fab.FUtil;
+import fab.FWindow;
+import fab.Hoverable;
+import fab.UIImage;
+import fab.VFX;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class UIRecolorVFX : public CallbackVFX {
 	public:
 		UIRecolorVFX(FWindow& window, UIImage& image, float srcR, float srcG, float srcB, float targR, float targG, float targB, float duration = DEFAULT_DURATION * 0.25f) : CallbackVFX(window, duration), image(image), targR(targR), targG(targG), targB(targB), srcR(srcR), srcG(srcG), srcB(srcB), token(image.makeToken()) {}

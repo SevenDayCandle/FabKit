@@ -1,12 +1,12 @@
-export module fbc.RHorizontal;
+export module fab.RHorizontal;
 
-import fbc.FTexture;
-import fbc.FUtil;
+import fab.FTexture;
+import fab.FUtil;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 
-namespace fbc {
+namespace fab {
 	export class RHorizontal : public FTexture {
 	public:
 		RHorizontal(strv path) : FTexture(path) {}

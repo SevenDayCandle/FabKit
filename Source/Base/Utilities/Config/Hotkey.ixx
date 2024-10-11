@@ -2,16 +2,16 @@ module;
 
 #include "glaze/glaze.hpp"
 
-export module fbc.ConfigHotkey;
+export module fab.ConfigHotkey;
 
-import fbc.Config;
-import fbc.FUtil;
-import fbc.KeyedItem;
+import fab.Config;
+import fab.FUtil;
+import fab.KeyedItem;
 import sdl.SDLBase; 
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export constexpr strv BASE_HOTKEY_FILE = "hotkeys.json";
 
 	export class Hotkey : public KeyedItem<Hotkey> {

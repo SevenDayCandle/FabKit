@@ -1,20 +1,20 @@
-export module fbc.UINumberInput;
+export module fab.UINumberInput;
 
-import fbc.FFont;
-import fbc.FWindow;
-import fbc.FUtil;
-import fbc.Hitbox;
-import fbc.IDrawable;
-import fbc.TextSupplier;
-import fbc.TextDrawable;
-import fbc.UIButton;
-import fbc.UIInteractable;
+import fab.FFont;
+import fab.FWindow;
+import fab.FUtil;
+import fab.Hitbox;
+import fab.IDrawable;
+import fab.TextSupplier;
+import fab.TextDrawable;
+import fab.UIButton;
+import fab.UIInteractable;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class UINumberInput : public UIInteractable, public TextSupplier {
 	public:
 		UINumberInput(FWindow& window, uptr<Hitbox>&& hb, int limMin, int limMax, IDrawable& image, IDrawable& arrow, FFont& textFont) : 

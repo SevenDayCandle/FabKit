@@ -1,11 +1,11 @@
-export module fbc.ConfigValue;
+export module fab.ConfigValue;
 
-import fbc.Config;
-import fbc.FUtil;
+import fab.Config;
+import fab.FUtil;
 import sdl.SDLBase; 
 import sdl.SDLRunner;
 
-namespace fbc {
+namespace fab {
     export template<typename T> class ConfigValue : public Config::ConfigEntry {
     public:
         ConfigValue(Config& config, strv id, const T& defaultValue) : Config::ConfigEntry(id), config(config), defaultValue(defaultValue), value(defaultValue) {

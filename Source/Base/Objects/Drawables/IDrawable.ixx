@@ -1,13 +1,13 @@
-export module fbc.IDrawable;
+export module fab.IDrawable;
 
-import fbc.FUtil;
-import fbc.ILoadable;
+import fab.FUtil;
+import fab.ILoadable;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export struct IDrawable : public ILoadable {
 	public:
 		IDrawable() {}

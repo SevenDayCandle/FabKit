@@ -1,21 +1,21 @@
-export module fbc.UIList;
+export module fab.UIList;
 
-import fbc.FFont;
-import fbc.Hitbox;
-import fbc.IDrawable;
-import fbc.FWindow;
-import fbc.RelativeHitbox;
-import fbc.UIBase;
-import fbc.UIEntry;
-import fbc.UIVerticalScrollbar;
-import fbc.FUtil;
-import fbc.FWindow;
+import fab.FFont;
+import fab.Hitbox;
+import fab.IDrawable;
+import fab.FWindow;
+import fab.RelativeHitbox;
+import fab.UIBase;
+import fab.UIEntry;
+import fab.UIVerticalScrollbar;
+import fab.FUtil;
+import fab.FWindow;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	constexpr int MARGIN = 16;
 
 	export template <typename T> class UIList : public UIBase {

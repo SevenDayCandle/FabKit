@@ -1,13 +1,13 @@
-export module fbc.UITipHost;
+export module fab.UITipHost;
 
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.GenericTip;
-import fbc.Hitbox;
-import fbc.Hoverable;
-import fbc.Tooltip;
+import fab.FUtil;
+import fab.FWindow;
+import fab.GenericTip;
+import fab.Hitbox;
+import fab.Hoverable;
+import fab.Tooltip;
 
-namespace fbc {
+namespace fab {
 	export template <c_ext<Hoverable> T> class UITipHost : public Hoverable {
 	public:
 		UITipHost(T&& item, GenericTip* tooltip) : ui(forward<T>(item)), tooltip(tooltip), Hoverable(item.win) {}

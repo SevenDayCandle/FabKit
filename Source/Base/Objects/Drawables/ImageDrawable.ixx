@@ -1,13 +1,13 @@
-export module fbc.ImageDrawable;
+export module fab.ImageDrawable;
 
-import fbc.FUtil;
-import fbc.IDrawable;
+import fab.FUtil;
+import fab.IDrawable;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class ImageDrawable : public IDrawable {
 	public:
 		ImageDrawable() {}

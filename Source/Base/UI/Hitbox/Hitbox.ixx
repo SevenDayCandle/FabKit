@@ -1,11 +1,11 @@
-export module fbc.Hitbox;
+export module fab.Hitbox;
 
-import fbc.FUtil;
-import fbc.FWindow;
+import fab.FUtil;
+import fab.FWindow;
 import sdl.SDLBase;
 import sdl.SDLRunner;
 
-namespace fbc {
+namespace fab {
 	export class Hitbox : public sdl::RectF {
 	public:
 		Hitbox(FWindow& window, float offsetX, float offsetY, float offsetWidth, float offsetHeight) : sdl::RectF(0, 0, 0, 0), win(window), offPosX(offsetX), offPosY(offsetY), offSizeX(offsetWidth), offSizeY(offsetHeight) {}

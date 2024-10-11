@@ -1,17 +1,17 @@
-export module fbc.UIInteractable;
+export module fab.UIInteractable;
 
-import fbc.FSound;
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.Hitbox;
-import fbc.IDrawable;
-import fbc.UIImage;
+import fab.FSound;
+import fab.FUtil;
+import fab.FWindow;
+import fab.Hitbox;
+import fab.IDrawable;
+import fab.UIImage;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class UIInteractable : public UIImage {
 	public:
 		UIInteractable(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image, FSound* soundClick, FSound* soundHover) : UIImage(window, move(hb), image), soundClick(soundClick), soundHover(soundHover) {}

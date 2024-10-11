@@ -1,4 +1,4 @@
-export module fbc.KeyedItem;
+export module fab.KeyedItem;
 
 import std;
 
@@ -6,7 +6,7 @@ import std;
  * A struct intended to mimic Java enums that can be expanded.
  * Every instance of a derivative class of KeyedItem must have a unique id
  */
-namespace fbc {
+namespace fab {
 	export template <typename C> struct KeyedItem {
 	public:
 		KeyedItem(const KeyedItem&) = delete;

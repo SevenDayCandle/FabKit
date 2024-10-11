@@ -1,17 +1,17 @@
-export module fbc.UITransformVFX;
+export module fab.UITransformVFX;
 
-import fbc.CallbackVFX;
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.Hoverable;
-import fbc.UIImage;
-import fbc.VFX;
+import fab.CallbackVFX;
+import fab.FUtil;
+import fab.FWindow;
+import fab.Hoverable;
+import fab.UIImage;
+import fab.VFX;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class UITransformVFX : public CallbackVFX {
 	public:
 		UITransformVFX(FWindow& window, UIImage& image, float duration = DEFAULT_DURATION * 0.5f) : UITransformVFX(window, image, duration, image.color.a) {}

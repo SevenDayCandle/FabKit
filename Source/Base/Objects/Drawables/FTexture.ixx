@@ -1,13 +1,13 @@
-export module fbc.FTexture;
+export module fab.FTexture;
 
-import fbc.FUtil;
-import fbc.ImageDrawable;
+import fab.FUtil;
+import fab.ImageDrawable;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class FTexture : public ImageDrawable {
     public:
         FTexture(strv path) : path(path) {}

@@ -1,9 +1,9 @@
-export module fbc.ScreenSizeHitbox;
+export module fab.ScreenSizeHitbox;
 
-import fbc.FWindow;
-import fbc.Hitbox;
+import fab.FWindow;
+import fab.Hitbox;
 
-namespace fbc {
+namespace fab {
 	/* Hitbox whose position AND size scale with screen dimensions */
 	export class ScreenSizeHitbox : public Hitbox {
 	public:

@@ -1,12 +1,12 @@
-export module fbc.UIHorizontalScrollbar;
+export module fab.UIHorizontalScrollbar;
 
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.Hitbox;
-import fbc.IDrawable;
-import fbc.UIScrollbar;
+import fab.FUtil;
+import fab.FWindow;
+import fab.Hitbox;
+import fab.IDrawable;
+import fab.UIScrollbar;
 
-namespace fbc {
+namespace fab {
 	export class UIHorizontalScrollbar : public UIScrollbar {
 	public:
 		UIHorizontalScrollbar(FWindow& window, uptr<Hitbox>&& hb, IDrawable& imageBar, IDrawable& imageButton) :

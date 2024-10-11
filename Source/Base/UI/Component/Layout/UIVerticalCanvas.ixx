@@ -1,15 +1,15 @@
-export module fbc.UIVerticalCanvas;
+export module fab.UIVerticalCanvas;
 
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.Hitbox;
-import fbc.Hoverable;
-import fbc.ScaleHitbox;
-import fbc.UICanvas;
-import fbc.UIVerticalScrollbar;
+import fab.FUtil;
+import fab.FWindow;
+import fab.Hitbox;
+import fab.Hoverable;
+import fab.ScaleHitbox;
+import fab.UICanvas;
+import fab.UIVerticalScrollbar;
 import sdl.SDLBatchRenderPass;
 
-namespace fbc {
+namespace fab {
 	export template<c_ext<Hoverable> T = Hoverable> class UIVerticalCanvas : public UICanvas<T> {
 	public:
 		UIVerticalCanvas(FWindow& window, uptr<Hitbox>&& hb, float scrollSpeed = 1): UICanvas<T>(window, move(hb)),

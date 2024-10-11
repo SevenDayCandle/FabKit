@@ -1,8 +1,8 @@
-export module fbc.KeywordStrings;
+export module fab.KeywordStrings;
 
-import fbc.FUtil;
+import fab.FUtil;
 
-namespace fbc {
+namespace fab {
 	export struct KeywordStrings {
 		str NAME;
 		str DESCRIPTION;

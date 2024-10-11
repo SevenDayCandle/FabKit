@@ -1,13 +1,13 @@
-export module fbc.FFont;
+export module fab.FFont;
 
-import fbc.FTexture;
-import fbc.FUtil;
-import fbc.ILoadable;
+import fab.FTexture;
+import fab.FUtil;
+import fab.ILoadable;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 
-namespace fbc {
+namespace fab {
 	export class FFont : public ILoadable {
     public:
         FFont(strv path, float scalar, int size, int outlineSize = 0, int shadowSize = 0): path(path), globalScale(scalar), size(size), outlineSize(outlineSize), shadowSize(shadowSize) {

@@ -1,18 +1,18 @@
-export module fbc.UIRecolorHSVVFX;
+export module fab.UIRecolorHSVVFX;
 
-import fbc.CallbackVFX;
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.Hoverable;
-import fbc.UIImage;
-import fbc.VFX;
+import fab.CallbackVFX;
+import fab.FUtil;
+import fab.FWindow;
+import fab.Hoverable;
+import fab.UIImage;
+import fab.VFX;
 import sdl.HSVTuple;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
-namespace fbc {
+namespace fab {
 	export class UIRecolorHSVVFX : public CallbackVFX {
 	public:
 		UIRecolorHSVVFX(FWindow& window, UIImage& image, float r, float g, float b, float duration = DEFAULT_DURATION * 0.25f) : CallbackVFX(window, duration), image(image), targHSV(sdl::HSVTuple::toHSV(r, g, b)), srcHSV(sdl::HSVTuple::toHSV(image.color)), token(image.makeToken()) {

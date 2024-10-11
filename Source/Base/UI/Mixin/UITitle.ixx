@@ -1,16 +1,16 @@
-export module fbc.UITitle;
+export module fab.UITitle;
 
-import fbc.FFont;
-import fbc.FUtil;
-import fbc.FWindow;
-import fbc.Hitbox;
-import fbc.Hoverable;
-import fbc.TextDrawable;
+import fab.FFont;
+import fab.FUtil;
+import fab.FWindow;
+import fab.Hitbox;
+import fab.Hoverable;
+import fab.TextDrawable;
 import sdl.SDLBase;
 import sdl.SDLBatchRenderPass;
 import std;
 
-namespace fbc {
+namespace fab {
 	export template <c_ext<Hoverable> T> class UITitle : public Hoverable {
 	public:
 		UITitle(T&& item, TextDrawable&& text) :
