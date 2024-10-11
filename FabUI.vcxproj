@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Base\Objects\Drawables\EmptyDrawable.ixx" />
+    <ClCompile Include="Source\Base\Objects\Drawables\FTexture.ixx" />
+    <ClCompile Include="Source\Base\Objects\Drawables\IDrawable.ixx" />
+    <ClCompile Include="Source\Base\Objects\Drawables\ImageDrawable.ixx" />
+    <ClCompile Include="Source\Base\Objects\Drawables\RBordered.ixx" />
+    <ClCompile Include="Source\Base\Objects\Drawables\RectDrawable.ixx" />
+    <ClCompile Include="Source\Base\Objects\Drawables\RHorizontal.ixx" />
+    <ClCompile Include="Source\Base\Objects\Drawables\RVertical.ixx" />
+    <ClCompile Include="Source\Base\Objects\Drawables\TextDrawable.ixx" />
+    <ClCompile Include="Source\Base\Objects\FFont.ixx" />
+    <ClCompile Include="Source\Base\Objects\Sounds\FMusic.ixx" />
+    <ClCompile Include="Source\Base\Objects\Sounds\FSound.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\Input\UINumberInput.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\Input\UISlider.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\Input\UITextInput.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\Interaction\UIButton.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\Interaction\UICallbackInteractable.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\Interaction\UIInteractable.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\Interaction\UITextButton.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\Interaction\UIToggle.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\Layout\UICanvas.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\Layout\UIDialog.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\Layout\UIGrid.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\Layout\UIScreen.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\Layout\UIScrollGrid.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\Layout\UIVerticalCanvas.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\List\SelectView.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\List\UIDropdown.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\List\UIEntry.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\List\UIList.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\List\UIMenu.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\List\UINavigation.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\List\UISearchableDropdown.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\List\UISelectorList.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\Scroll\UIHorizontalScrollbar.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\Scroll\UIScrollbar.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\Scroll\UIVerticalScrollbar.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\UIBase.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\UIImage.ixx" />
+    <ClCompile Include="Source\Base\UI\Component\UILabel.ixx" />
+    <ClCompile Include="Source\Base\UI\FWindow.ixx" />
+    <ClCompile Include="Source\Base\UI\Hitbox\Hitbox.ixx" />
+    <ClCompile Include="Source\Base\UI\Hitbox\RelativeHitbox.ixx" />
+    <ClCompile Include="Source\Base\UI\Hitbox\ScaleHitbox.ixx" />
+    <ClCompile Include="Source\Base\UI\Hitbox\ScreenPosHitbox.ixx" />
+    <ClCompile Include="Source\Base\UI\Hitbox\ScreenSizeHitbox.ixx" />
+    <ClCompile Include="Source\Base\UI\Hoverable.ixx" />
+    <ClCompile Include="Source\Base\UI\Mixin\TextSupplier.ixx" />
+    <ClCompile Include="Source\Base\UI\Mixin\UITipHost.ixx" />
+    <ClCompile Include="Source\Base\UI\Mixin\UITitle.ixx" />
+    <ClCompile Include="Source\Base\UI\Tooltip\GenericTip.ixx" />
+    <ClCompile Include="Source\Base\UI\Tooltip\TitleTooltip.ixx" />
+    <ClCompile Include="Source\Base\UI\Tooltip\Tooltip.ixx" />
+    <ClCompile Include="Source\Base\Utilities\Cache.ixx" />
+    <ClCompile Include="Source\Base\Utilities\Config\Config.ixx" />
+    <ClCompile Include="Source\Base\Utilities\Config\ConfigNumeric.ixx" />
+    <ClCompile Include="Source\Base\Utilities\Config\ConfigValue.ixx" />
+    <ClCompile Include="Source\Base\Utilities\Config\Hotkey.ixx" />
+    <ClCompile Include="Source\Base\Utilities\Config\WindowMode.ixx" />
+    <ClCompile Include="Source\Base\Utilities\ILoadable.ixx" />
+    <ClCompile Include="Source\Base\Utilities\KeyedItem.ixx" />
+    <ClCompile Include="Source\Base\Utilities\Localization\KeywordStrings.ixx" />
+    <ClCompile Include="Source\Base\Utilities\Localization\Language.ixx" />
+    <ClCompile Include="Source\Base\Utilities\Localization\ObjectStrings.ixx" />
+    <ClCompile Include="Source\Base\VFX\CallbackVFX.ixx" />
+    <ClCompile Include="Source\Base\VFX\ContinuousVFX.ixx" />
+    <ClCompile Include="Source\Base\VFX\MultiVFX.ixx" />
+    <ClCompile Include="Source\Base\VFX\UI\UIDisposeVFX.ixx" />
+    <ClCompile Include="Source\Base\VFX\UI\UIRecolorHSVVFX.ixx" />
+    <ClCompile Include="Source\Base\VFX\UI\UIRecolorVFX.ixx" />
+    <ClCompile Include="Source\Base\VFX\UI\UITransformVFX.ixx" />
+    <ClCompile Include="Source\Base\VFX\VFX.ixx" />
+    <ClCompile Include="Source\FUtil.ixx" />
+    <ClCompile Include="Source\SDL\HSVTuple.ixx" />
+    <ClCompile Include="Source\SDL\IKeyInputListener.ixx" />
+    <ClCompile Include="Source\SDL\SDLBase.ixx" />
+    <ClCompile Include="Source\SDL\SDLBatchRenderPass.ixx" />
+    <ClCompile Include="Source\SDL\SDLProps.ixx" />
+    <ClCompile Include="Source\SDL\SDLRunner.ixx" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{baffc6fb-d3d2-47b0-b5cf-c93549f8965a}</ProjectGuid>
+    <RootNamespace>FabUI</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>FabUI</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)Builds\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)Builds\Intermediate\$(ProjectName)\$(Configuration)\</IntDir>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <AllProjectBMIsArePublic>true</AllProjectBMIsArePublic>
+    <PublicModuleDirectories>$(IntDir)</PublicModuleDirectories>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)Builds\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)\Builds\Intermediate\$(Configuration)\</IntDir>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)Builds\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)Builds\Intermediate\$(ProjectName)\$(Configuration)\</IntDir>
+    <PublicModuleDirectories>$(IntDir)</PublicModuleDirectories>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)Builds\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)\Builds\Intermediate\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdclatest</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Glaze\include;$(SolutionDir)Dependencies\SDL\include</AdditionalIncludeDirectories>
+      <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdclatest</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;GRAPHICS_API_OPENGL_33;PLATFORM_DESKTOP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Glaze\include;$(SolutionDir)Dependencies\SDL\include</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdclatest</LanguageStandard_C>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <BuildStlModules>true</BuildStlModules>
+      <EnableModules>true</EnableModules>
+      <AdditionalOptions>/Zc:preprocessor %(AdditionalOptions)</AdditionalOptions>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\SDL\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>winmm.lib;SDL3.lib;SDL3_image.lib;SDL3_mixer.lib;SDL3_ttf.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)" &amp;&amp; xcopy /E /I /Y /D "$(ProjectDir)Shader" "$(TargetDir)Shader"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;GRAPHICS_API_OPENGL_33;PLATFORM_DESKTOP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\Glaze\include;$(SolutionDir)Dependencies\SDL\include</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdclatest</LanguageStandard_C>
+      <BuildStlModules>true</BuildStlModules>
+      <EnableModules>true</EnableModules>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\SDL\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>winmm.lib;SDL3.lib;SDL3_image.lib;SDL3_mixer.lib;SDL3_ttf.lib;SDL3_test.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/SUBSYSTEM:WINDOWS 
+/ENTRY:mainCRTStartup %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

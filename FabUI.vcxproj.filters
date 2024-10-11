@@ -1,0 +1,302 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Source\FUtil.ixx" />
+    <ClCompile Include="Source\Base\Objects\FFont.ixx">
+      <Filter>Base\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Objects\Drawables\EmptyDrawable.ixx">
+      <Filter>Base\Objects\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Objects\Drawables\TextDrawable.ixx">
+      <Filter>Base\Objects\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Objects\Drawables\RVertical.ixx">
+      <Filter>Base\Objects\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Objects\Drawables\RHorizontal.ixx">
+      <Filter>Base\Objects\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Objects\Drawables\RectDrawable.ixx">
+      <Filter>Base\Objects\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Objects\Drawables\RBordered.ixx">
+      <Filter>Base\Objects\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Objects\Drawables\ImageDrawable.ixx">
+      <Filter>Base\Objects\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Objects\Drawables\IDrawable.ixx">
+      <Filter>Base\Objects\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Objects\Drawables\FTexture.ixx">
+      <Filter>Base\Objects\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Objects\Sounds\FMusic.ixx">
+      <Filter>Base\Objects\Sounds</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Objects\Sounds\FSound.ixx">
+      <Filter>Base\Objects\Sounds</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Hoverable.ixx">
+      <Filter>Base\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\FWindow.ixx">
+      <Filter>Base\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\UILabel.ixx">
+      <Filter>Base\UI\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\UIImage.ixx">
+      <Filter>Base\UI\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\UIBase.ixx">
+      <Filter>Base\UI\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\List\SelectView.ixx">
+      <Filter>Base\UI\Component\List</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\List\UISelectorList.ixx">
+      <Filter>Base\UI\Component\List</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\List\UISearchableDropdown.ixx">
+      <Filter>Base\UI\Component\List</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\List\UINavigation.ixx">
+      <Filter>Base\UI\Component\List</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\List\UIMenu.ixx">
+      <Filter>Base\UI\Component\List</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\List\UIList.ixx">
+      <Filter>Base\UI\Component\List</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\List\UIEntry.ixx">
+      <Filter>Base\UI\Component\List</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\List\UIDropdown.ixx">
+      <Filter>Base\UI\Component\List</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\Scroll\UIVerticalScrollbar.ixx">
+      <Filter>Base\UI\Component\Scroll</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\Scroll\UIScrollbar.ixx">
+      <Filter>Base\UI\Component\Scroll</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\Scroll\UIHorizontalScrollbar.ixx">
+      <Filter>Base\UI\Component\Scroll</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\Layout\UIDialog.ixx">
+      <Filter>Base\UI\Component\Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\Layout\UICanvas.ixx">
+      <Filter>Base\UI\Component\Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\Layout\UIVerticalCanvas.ixx">
+      <Filter>Base\UI\Component\Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\Layout\UIScrollGrid.ixx">
+      <Filter>Base\UI\Component\Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\Layout\UIScreen.ixx">
+      <Filter>Base\UI\Component\Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\Layout\UIGrid.ixx">
+      <Filter>Base\UI\Component\Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\Interaction\UIToggle.ixx">
+      <Filter>Base\UI\Component\Interaction</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\Interaction\UITextButton.ixx">
+      <Filter>Base\UI\Component\Interaction</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\Interaction\UIInteractable.ixx">
+      <Filter>Base\UI\Component\Interaction</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\Interaction\UICallbackInteractable.ixx">
+      <Filter>Base\UI\Component\Interaction</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\Interaction\UIButton.ixx">
+      <Filter>Base\UI\Component\Interaction</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\Input\UITextInput.ixx">
+      <Filter>Base\UI\Component\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\Input\UISlider.ixx">
+      <Filter>Base\UI\Component\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Component\Input\UINumberInput.ixx">
+      <Filter>Base\UI\Component\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Tooltip\Tooltip.ixx">
+      <Filter>Base\UI\Tooltip</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Tooltip\TitleTooltip.ixx">
+      <Filter>Base\UI\Tooltip</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Tooltip\GenericTip.ixx">
+      <Filter>Base\UI\Tooltip</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Mixin\UITitle.ixx">
+      <Filter>Base\UI\Mixin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Mixin\UITipHost.ixx">
+      <Filter>Base\UI\Mixin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Mixin\TextSupplier.ixx">
+      <Filter>Base\UI\Mixin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Hitbox\ScreenSizeHitbox.ixx">
+      <Filter>Base\UI\Hitbox</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Hitbox\ScreenPosHitbox.ixx">
+      <Filter>Base\UI\Hitbox</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Hitbox\ScaleHitbox.ixx">
+      <Filter>Base\UI\Hitbox</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Hitbox\RelativeHitbox.ixx">
+      <Filter>Base\UI\Hitbox</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\UI\Hitbox\Hitbox.ixx">
+      <Filter>Base\UI\Hitbox</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Utilities\KeyedItem.ixx">
+      <Filter>Base\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Utilities\ILoadable.ixx">
+      <Filter>Base\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Utilities\Cache.ixx">
+      <Filter>Base\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Utilities\Config\Config.ixx">
+      <Filter>Base\Utilities\Config</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Utilities\Config\WindowMode.ixx">
+      <Filter>Base\Utilities\Config</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Utilities\Config\Hotkey.ixx">
+      <Filter>Base\Utilities\Config</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Utilities\Config\ConfigValue.ixx">
+      <Filter>Base\Utilities\Config</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Utilities\Config\ConfigNumeric.ixx">
+      <Filter>Base\Utilities\Config</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Utilities\Localization\ObjectStrings.ixx">
+      <Filter>Base\Utilities\Localization</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Utilities\Localization\Language.ixx">
+      <Filter>Base\Utilities\Localization</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\Utilities\Localization\KeywordStrings.ixx">
+      <Filter>Base\Utilities\Localization</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\VFX\VFX.ixx">
+      <Filter>Base\VFX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\VFX\MultiVFX.ixx">
+      <Filter>Base\VFX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\VFX\ContinuousVFX.ixx">
+      <Filter>Base\VFX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\VFX\CallbackVFX.ixx">
+      <Filter>Base\VFX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\VFX\UI\UITransformVFX.ixx">
+      <Filter>Base\VFX\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\VFX\UI\UIRecolorVFX.ixx">
+      <Filter>Base\VFX\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\VFX\UI\UIRecolorHSVVFX.ixx">
+      <Filter>Base\VFX\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Base\VFX\UI\UIDisposeVFX.ixx">
+      <Filter>Base\VFX\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SDL\SDLRunner.ixx">
+      <Filter>SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SDL\SDLProps.ixx">
+      <Filter>SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SDL\SDLBatchRenderPass.ixx">
+      <Filter>SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SDL\SDLBase.ixx">
+      <Filter>SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SDL\IKeyInputListener.ixx">
+      <Filter>SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SDL\HSVTuple.ixx">
+      <Filter>SDL</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Base">
+      <UniqueIdentifier>{958f9d75-5156-4eae-87eb-e7577870a7c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\Objects">
+      <UniqueIdentifier>{edb0aa79-53cb-42b3-8074-b381df30b885}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\Objects\Drawables">
+      <UniqueIdentifier>{8de97d25-c8fe-4f9c-91a7-6a2133198080}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\Objects\Sounds">
+      <UniqueIdentifier>{50469c78-9542-452c-9db3-4697fd3434e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\UI">
+      <UniqueIdentifier>{e7793666-1ac1-44d4-8b03-2bde39adc15c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\UI\Component">
+      <UniqueIdentifier>{aec687ce-b4e6-4eda-97d9-b7ddea7c255d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\UI\Component\List">
+      <UniqueIdentifier>{76dc87a6-4d8e-413e-a292-0460aa5d5201}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\UI\Component\Scroll">
+      <UniqueIdentifier>{f93f97e0-58a7-46b0-9e78-33dbdcbf27da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\UI\Component\Layout">
+      <UniqueIdentifier>{e5485517-da6e-4712-8f7e-2ede4a2c3dec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\UI\Component\Interaction">
+      <UniqueIdentifier>{48fa169c-eb5e-443b-9509-4fc96dc68b08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\UI\Component\Input">
+      <UniqueIdentifier>{c6ce82ea-3857-4795-9bbb-fde29ff05ba5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\UI\Tooltip">
+      <UniqueIdentifier>{89458b01-72a9-4289-9fa3-aa3ed177aba2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\UI\Mixin">
+      <UniqueIdentifier>{796b7adc-5e25-46d7-8937-ee012db147ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\UI\Hitbox">
+      <UniqueIdentifier>{1b5f84e9-362b-4557-8bb6-f72e11c45c9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\Utilities">
+      <UniqueIdentifier>{8a5dd9e0-0ab7-4ed0-8c95-4d8eef286e1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\Utilities\Config">
+      <UniqueIdentifier>{fd0f1f33-1860-49c5-bf6b-f4898addfc27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\Utilities\Localization">
+      <UniqueIdentifier>{bed00176-e106-46da-a095-e58e2240c52e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\VFX">
+      <UniqueIdentifier>{c7eca5fb-5084-4109-ac7d-5a090914739e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\VFX\UI">
+      <UniqueIdentifier>{5c5b782d-16dd-4474-b628-f40c2f5a34e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SDL">
+      <UniqueIdentifier>{5fbb8694-6997-4568-b84d-daf6c1c8d06c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
