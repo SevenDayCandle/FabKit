@@ -121,7 +121,7 @@ namespace sdl {
 	constexpr std::initializer_list<Uint16> INDICES = { 0, 1, 2, 0, 2, 3 };
 
 	bool enabledInternal;
-	const SDL_bool* key;
+	const bool* key;
 	const Uint8* pad;
 	int mouse = -1;
 	int mouseLast = -1;
@@ -153,6 +153,14 @@ namespace sdl::runner {
 	export SDL_GPUBuffer* BUFFER_VERTEX_VERTICAL;
 	export SDL_GPUSampler* SAMPLER;
 
+	export inline bool deviceClaimWindow(SDL_Window* window) { return SDL_ClaimWindowForGPUDevice(device, window); }
+	export inline bool deviceIsTextureFormatSupported(SDL_GPUTextureFormat format, SDL_GPUTextureType type, SDL_GPUTextureUsageFlags usage) { return SDL_GPUTextureSupportsFormat(device, format, type, usage); }
+	export inline bool deviceQueryFence(SDL_GPUFence* fence) { return SDL_QueryGPUFence(device, fence); }
+	export inline bool deviceSetSwapchainParameters(SDL_Window* window, SDL_GPUSwapchainComposition swapchainComposition, SDL_GPUPresentMode presentMode) { return SDL_SetGPUSwapchainParameters(device, window, swapchainComposition, presentMode); }
+	export inline bool deviceSupportsPresentMode(SDL_Window* window, SDL_GPUPresentMode presentMode) { return SDL_WindowSupportsGPUPresentMode(device, window, presentMode); }
+	export inline bool deviceSupportsSwapchainComposition(SDL_Window* window, SDL_GPUSwapchainComposition swapchainComposition) { return SDL_WindowSupportsGPUSwapchainComposition(device, window, swapchainComposition); }
+	export inline bool deviceTextureSupportsSampleCount(SDL_GPUTextureFormat format, SDL_GPUSampleCount desiredSampleCount) { return SDL_GPUTextureSupportsSampleCount(device, format, desiredSampleCount); }
+	export inline bool enabled() { return enabledInternal; }
 	export inline bool gamepadHasJustPressed(int pressed) { return pad[pressed] && !padLast[pressed]; }
 	export inline bool keyboardInputActive() { return kListener != nullptr; }
 	export inline bool keyboardInputActive(IKeyInputListener* listener) { return kListener == listener; }
@@ -160,10 +168,6 @@ namespace sdl::runner {
 	export inline bool keyboardJustPressedEnter() { return keyboardJustPressed(SDLK_KP_ENTER) || keyboardJustPressed(SDLK_RETURN); }
 	export inline bool keyboardJustPressedEsc() { return keyboardJustPressed(SDLK_ESCAPE); }
 	export inline bool keyboardPressed(int pressed) { return key[pressed] && kListener == nullptr; }
-	export inline int mouseGetWheelX() noexcept { return mouseWheelX; }
-	export inline int mouseGetWheelY() noexcept { return mouseWheelY; }
-	export inline int mouseGetX() noexcept { return mousePosX; }
-	export inline int mouseGetY() noexcept { return mousePosY; }
 	export inline bool mouseIsHovering(const RectF& rect) {return mousePosX >= rect.x && mousePosY >= rect.y && mousePosX < rect.x + rect.w && mousePosY < rect.y + rect.h;}
 	export inline bool mouseIsHovering(const RectI rect) {return mousePosX >= rect.x && mousePosY >= rect.y && mousePosX < rect.x + rect.w && mousePosY < rect.y + rect.h;}
 	export inline bool mouseIsLeftClicked() noexcept { return mouse == SDL_BUTTON_LEFT; }
@@ -174,14 +178,10 @@ namespace sdl::runner {
 	export inline bool mouseIsRightJustClicked() noexcept { return mouse == SDL_BUTTON_RIGHT && mouseLast != SDL_BUTTON_RIGHT; }
 	export inline bool mouseIsRightJustReleased() noexcept { return mouse != SDL_BUTTON_RIGHT && mouseLast == SDL_BUTTON_RIGHT; }
 	export inline bool mouseIsRightReleased() noexcept { return mouse != SDL_BUTTON_RIGHT; }
-	export inline bool enabled() { return enabledInternal; }
-	export inline SDL_bool deviceClaimWindow(SDL_Window* window) { return SDL_ClaimWindowForGPUDevice(device, window); }
-	export inline SDL_bool deviceIsTextureFormatSupported(SDL_GPUTextureFormat format, SDL_GPUTextureType type, SDL_GPUTextureUsageFlags usage) { return SDL_GPUTextureSupportsFormat(device, format, type, usage); }
-	export inline SDL_bool deviceQueryFence(SDL_GPUFence* fence) { return SDL_QueryGPUFence(device, fence); }
-	export inline SDL_bool deviceSetSwapchainParameters(SDL_Window* window, SDL_GPUSwapchainComposition swapchainComposition, SDL_GPUPresentMode presentMode) { return SDL_SetGPUSwapchainParameters(device, window, swapchainComposition, presentMode); }
-	export inline SDL_bool deviceSupportsPresentMode(SDL_Window* window, SDL_GPUPresentMode presentMode) { return SDL_WindowSupportsGPUPresentMode(device, window, presentMode); }
-	export inline SDL_bool deviceSupportsSwapchainComposition(SDL_Window* window, SDL_GPUSwapchainComposition swapchainComposition) { return SDL_WindowSupportsGPUSwapchainComposition(device, window, swapchainComposition); }
-	export inline SDL_bool deviceTextureSupportsSampleCount(SDL_GPUTextureFormat format, SDL_GPUSampleCount desiredSampleCount) { return SDL_GPUTextureSupportsSampleCount(device, format, desiredSampleCount); }
+	export inline int mouseGetWheelX() noexcept { return mouseWheelX; }
+	export inline int mouseGetWheelY() noexcept { return mouseWheelY; }
+	export inline int mouseGetX() noexcept { return mousePosX; }
+	export inline int mouseGetY() noexcept { return mousePosY; }
 	export inline SDL_GPUBuffer* deviceCreateBuffer(Uint32 usageFlags, Uint32 sizeInBytes) { 
 		SDL_GPUBufferCreateInfo info = { usageFlags, sizeInBytes };
 		return SDL_CreateGPUBuffer(device, &info);
@@ -189,7 +189,6 @@ namespace sdl::runner {
 	export inline SDL_GPUCommandBuffer* deviceAcquireCommandBuffer() { return SDL_AcquireGPUCommandBuffer(device); }
 	export inline SDL_GPUComputePipeline* deviceCreateComputePipeline(SDL_GPUComputePipelineCreateInfo* computePipelineCreateInfo) { return SDL_CreateGPUComputePipeline(device, computePipelineCreateInfo); }
 	export inline SDL_GPUCopyPass* deviceBeginCopyPass(SDL_GPUCommandBuffer* commandBuffer) { return SDL_BeginGPUCopyPass(commandBuffer); }
-	export inline SDL_GPUDriver deviceGetDriver() { return SDL_GetGPUDriver(device); }
 	export inline SDL_GPUGraphicsPipeline* deviceCreateGraphicsPipeline(SDL_GPUGraphicsPipelineCreateInfo* pipelineCreateInfo) { return SDL_CreateGPUGraphicsPipeline(device, pipelineCreateInfo); }
 	export inline SDL_GPUSampler* deviceCreateSampler(SDL_GPUSamplerCreateInfo* samplerCreateInfo) { return SDL_CreateGPUSampler(device, samplerCreateInfo); }
 	export inline SDL_GPUShader* deviceCreateShader(SDL_GPUShaderCreateInfo* shaderCreateInfo) { return SDL_CreateGPUShader(device, shaderCreateInfo); }
@@ -214,9 +213,9 @@ namespace sdl::runner {
 	export inline void deviceUnclaimWindow(SDL_Window* window) { SDL_ReleaseWindowFromGPUDevice(device, window); }
 	export inline void deviceUnmapTransferBuffer(SDL_GPUTransferBuffer* transferBuffer) { SDL_UnmapGPUTransferBuffer(device, transferBuffer); }
 	export inline void deviceWait() { SDL_WaitForGPUIdle(device); }
-	export inline void deviceWaitForFences(SDL_bool waitAll, SDL_GPUFence** pFences, Uint32 fenceCount) { SDL_WaitForGPUFences(device, waitAll, pFences, fenceCount); }
+	export inline void deviceWaitForFences(bool waitAll, SDL_GPUFence** pFences, Uint32 fenceCount) { SDL_WaitForGPUFences(device, waitAll, pFences, fenceCount); }
 	export inline void setFPSLimit(int fps) { fpsLimit = fps > 0 ? NANOS_PER_SECOND / fps : 0; }
-	export inline void* deviceMapTransferBuffer(SDL_GPUTransferBuffer* transferBuffer, SDL_bool cycle) { return SDL_MapGPUTransferBuffer(device, transferBuffer, cycle); }
+	export inline void* deviceMapTransferBuffer(SDL_GPUTransferBuffer* transferBuffer, bool cycle) { return SDL_MapGPUTransferBuffer(device, transferBuffer, cycle); }
 
 	export bool init(IMG_InitFlags imgFormats = IMG_INIT_PNG, const char* renderer = RENDERER_VULKAN, const char* normalFrag = SHADER_NORMAL_FRAG, const char* normalVert = SHADER_NORMAL_VERT, const char* fillFrag = SHADER_FILL_FRAG, const char* fillVert = SHADER_FILL_VERT);
 	export bool poll();
@@ -241,7 +240,7 @@ namespace sdl::runner {
 
 	// Set up SDL. Returns true if SDL setup succeeds
 	bool init(IMG_InitFlags imgFormats, const char* renderer, const char* normalFrag, const char* normalVert, const char* fillFrag, const char* fillVert) {
-		int val = SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_GAMEPAD);
+		int val = SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_GAMEPAD);
 		if (val < 0) {
 			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "SDL_INIT failed with value %d", val);
 			return false;
@@ -265,7 +264,7 @@ namespace sdl::runner {
 		}
 
 		// Initialize driver
-		device = SDL_CreateGPUDevice(gpuSpirvShaderFormats(), SDL_FALSE, renderer);
+		device = SDL_CreateGPUDevice(gpuSpirvShaderFormats(), false, renderer);
 		if (!device) {
 			SDL_LogCritical(SDL_LOG_CATEGORY_VIDEO, "Device went derp: %s", getError());
 			return false;
@@ -439,20 +438,20 @@ namespace sdl::runner {
 	// Generates a graphics pipeline to be used for this window
 	GPUGraphicsPipeline* createPipeline(GPUShader* vertexShader, GPUShader* fragmentShader, GPUTextureFormat textureFormat, GPUBlendFactor srcColor, GPUBlendFactor dstColor, GPUBlendFactor srcAlpha, GPUBlendFactor dstAlpha)
 	{
-		GPUVertexBinding vertexBindings[] = { {
-					.index = 0,
+		GPUVertexBufferDescription vertexBindings[] = { {
+					.slot = 0,
 					.pitch = sizeof(TexPos),
 					.input_rate = GPUVertexInputRate::SDL_GPU_VERTEXINPUTRATE_VERTEX,
 					.instance_step_rate = 0
 		} };
 		GPUVertexAttribute vertexAttributes[] = { {
 					.location = 0,
-					.binding_index = 0,
+					.buffer_slot = 0,
 					.format = GPUVertexElementFormat::SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3,
 					.offset = 0
 				}, {
 					.location = 1,
-					.binding_index = 0,
+					.buffer_slot = 0,
 					.format = GPUVertexElementFormat::SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2,
 					.offset = sizeof(float) * 3
 				} };
@@ -473,8 +472,8 @@ namespace sdl::runner {
 			.vertex_shader = vertexShader,
 			.fragment_shader = fragmentShader,
 			.vertex_input_state = {
-				.vertex_bindings = vertexBindings,
-				.num_vertex_bindings = 1,
+				.vertex_buffer_descriptions = vertexBindings,
+				.num_vertex_buffers = 1,
 				.vertex_attributes = vertexAttributes,
 				.num_vertex_attributes = 2,
 			},
@@ -555,7 +554,6 @@ namespace sdl::runner {
 			return nullptr;
 		}
 
-		GPUShader* shader;
 		GPUShaderCreateInfo shaderInfo = {
 			.code_size = codeSize,
 			.code = static_cast<const Uint8*>(code),
@@ -567,14 +565,7 @@ namespace sdl::runner {
 			.num_storage_buffers = storageBufferCount,
 			.num_uniform_buffers = uniformBufferCount,
 		};
-		if (gpuGetDriver(device) == GPUDriver::SDL_GPU_DRIVER_VULKAN)
-		{
-			shader = gpuCreateShader(device, &shaderInfo);
-		}
-		else
-		{
-			shader = gpuCompileSpirvShader(device, &shaderInfo);
-		}
+		GPUShader* shader = gpuCompileSpirvShader(device, &shaderInfo);
 		free(code);
 		return shader;
 	}

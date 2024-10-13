@@ -268,7 +268,7 @@ extern SDL_DECLSPEC SDL_CameraPosition SDLCALL SDL_GetCameraPosition(SDL_CameraI
  *
  * You can call SDL_GetCameraFormat() to get the actual data format if passing
  * a NULL spec here. You can see the exact specs a device can support without
- * conversion with SDL_GetCameraSupportedSpecs().
+ * conversion with SDL_GetCameraSupportedFormats().
  *
  * SDL will not attempt to emulate framerate; it will try to set the hardware
  * to the rate closest to the requested speed, but it won't attempt to limit
@@ -281,10 +281,11 @@ extern SDL_DECLSPEC SDL_CameraPosition SDLCALL SDL_GetCameraPosition(SDL_CameraI
  * the camera, and they can choose Yes or No at that point. Until they do, the
  * camera will not be usable. The app should either wait for an
  * SDL_EVENT_CAMERA_DEVICE_APPROVED (or SDL_EVENT_CAMERA_DEVICE_DENIED) event,
- * or poll SDL_IsCameraApproved() occasionally until it returns non-zero. On
- * platforms that don't require explicit user approval (and perhaps in places
- * where the user previously permitted access), the approval event might come
- * immediately, but it might come seconds, minutes, or hours later!
+ * or poll SDL_GetCameraPermissionState() occasionally until it returns
+ * non-zero. On platforms that don't require explicit user approval (and
+ * perhaps in places where the user previously permitted access), the approval
+ * event might come immediately, but it might come seconds, minutes, or hours
+ * later!
  *
  * \param instance_id the camera device instance ID.
  * \param spec the desired format for data the device will provide. Can be
@@ -369,15 +370,16 @@ extern SDL_DECLSPEC SDL_PropertiesID SDLCALL SDL_GetCameraProperties(SDL_Camera 
  * be converting to this format behind the scenes.
  *
  * If the system is waiting for the user to approve access to the camera, as
- * some platforms require, this will return SDL_FALSE, but this isn't
- * necessarily a fatal error; you should either wait for an
+ * some platforms require, this will return false, but this isn't necessarily
+ * a fatal error; you should either wait for an
  * SDL_EVENT_CAMERA_DEVICE_APPROVED (or SDL_EVENT_CAMERA_DEVICE_DENIED) event,
- * or poll SDL_IsCameraApproved() occasionally until it returns non-zero.
+ * or poll SDL_GetCameraPermissionState() occasionally until it returns
+ * non-zero.
  *
  * \param camera opened camera device.
  * \param spec the SDL_CameraSpec to be initialized by this function.
- * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
- *          for more information.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
  *
  * \threadsafety It is safe to call this function from any thread.
  *
@@ -385,7 +387,7 @@ extern SDL_DECLSPEC SDL_PropertiesID SDLCALL SDL_GetCameraProperties(SDL_Camera 
  *
  * \sa SDL_OpenCamera
  */
-extern SDL_DECLSPEC SDL_bool SDLCALL SDL_GetCameraFormat(SDL_Camera *camera, SDL_CameraSpec *spec);
+extern SDL_DECLSPEC bool SDLCALL SDL_GetCameraFormat(SDL_Camera *camera, SDL_CameraSpec *spec);
 
 /**
  * Acquire a frame.
@@ -413,8 +415,8 @@ extern SDL_DECLSPEC SDL_bool SDLCALL SDL_GetCameraFormat(SDL_Camera *camera, SDL
  * If the system is waiting for the user to approve access to the camera, as
  * some platforms require, this will return NULL (no frames available); you
  * should either wait for an SDL_EVENT_CAMERA_DEVICE_APPROVED (or
- * SDL_EVENT_CAMERA_DEVICE_DENIED) event, or poll SDL_IsCameraApproved()
- * occasionally until it returns non-zero.
+ * SDL_EVENT_CAMERA_DEVICE_DENIED) event, or poll
+ * SDL_GetCameraPermissionState() occasionally until it returns non-zero.
  *
  * \param camera opened camera device.
  * \param timestampNS a pointer filled in with the frame's timestamp, or 0 on

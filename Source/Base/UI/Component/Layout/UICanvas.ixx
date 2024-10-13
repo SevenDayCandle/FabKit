@@ -52,7 +52,8 @@ namespace fab {
 		template<c_ext<T> U = T> U& stackXDir(uptr<U>&& element, float spacing = 8, float yOff = 0);
 		template<c_ext<T> U = T> U& stackYDir(uptr<U>&& element, float spacing = 8, float xOff = 0);
 		template<c_ext<T> U = T> uptr<U> extract(U* item);
-		T* getLastItem() const;
+		T* at(int index) const;
+		T* back() const;
 		virtual bool isHovered() override;
 		virtual bool remove(Hoverable* item);
 		virtual void refreshDimensions() override;
@@ -70,8 +71,16 @@ namespace fab {
 		return ref;
 	}
 
-	// Get the hb for the last item added into the list
-	template<c_ext<Hoverable> T> T* UICanvas<T>::getLastItem() const
+	// Get the item at the given index if it exists
+	template<c_ext<Hoverable> T> T* UICanvas<T>::at(int index) const {
+		if (elements.size() > index) {
+			return elements[index].get();
+		}
+		return nullptr;
+	}
+
+	// Get the last item added into the list if it exists
+	template<c_ext<Hoverable> T> T* UICanvas<T>::back() const
 	{
 		if (elements.size() > 0) {
 			return elements[elements.size() - 1].get();

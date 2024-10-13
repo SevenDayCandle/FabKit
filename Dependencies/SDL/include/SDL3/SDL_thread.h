@@ -89,9 +89,9 @@ typedef SDL_AtomicInt SDL_TLSID;
  *
  * SDL will make system changes as necessary in order to apply the thread
  * priority. Code which attempts to control thread state related to priority
- * should be aware that calling SDL_SetThreadPriority may alter such state.
- * SDL_HINT_THREAD_PRIORITY_POLICY can be used to control aspects of this
- * behavior.
+ * should be aware that calling SDL_SetCurrentThreadPriority may alter such
+ * state. SDL_HINT_THREAD_PRIORITY_POLICY can be used to control aspects of
+ * this behavior.
  *
  * \since This enum is available since SDL 3.0.0.
  */
@@ -380,12 +380,12 @@ extern SDL_DECLSPEC SDL_ThreadID SDLCALL SDL_GetThreadID(SDL_Thread *thread);
  * an administrator account. Be prepared for this to fail.
  *
  * \param priority the SDL_ThreadPriority to set.
- * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
- *          for more information.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
  *
  * \since This function is available since SDL 3.0.0.
  */
-extern SDL_DECLSPEC SDL_bool SDLCALL SDL_SetThreadPriority(SDL_ThreadPriority priority);
+extern SDL_DECLSPEC bool SDLCALL SDL_SetCurrentThreadPriority(SDL_ThreadPriority priority);
 
 /**
  * Wait for a thread to finish.
@@ -503,8 +503,8 @@ typedef void (SDLCALL *SDL_TLSDestructorCallback)(void *value);
  * \param value the value to associate with the ID for the current thread.
  * \param destructor a function called when the thread exits, to free the
  *                   value, may be NULL.
- * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
- *          for more information.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
  *
  * \threadsafety It is safe to call this function from any thread.
  *
@@ -512,7 +512,7 @@ typedef void (SDLCALL *SDL_TLSDestructorCallback)(void *value);
  *
  * \sa SDL_GetTLS
  */
-extern SDL_DECLSPEC SDL_bool SDLCALL SDL_SetTLS(SDL_TLSID *id, const void *value, SDL_TLSDestructorCallback destructor);
+extern SDL_DECLSPEC bool SDLCALL SDL_SetTLS(SDL_TLSID *id, const void *value, SDL_TLSDestructorCallback destructor);
 
 /**
  * Cleanup all TLS data for this thread.

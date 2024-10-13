@@ -1,7 +1,7 @@
 module;
 
 #define SDL_GPU_SHADERCROSS_IMPLEMENTATION
-#include "SDL_gpu_shadercross/SDL_gpu_shadercross.h"
+#include "SDL_gpu_shadercross.h"
 #include "SDL3/SDL.h"
 #include "SDL3_image/SDL_image.h"
 #include "SDL3_mixer/SDL_mixer.h"
@@ -45,7 +45,6 @@ namespace sdl {
 	export using GPUDepthStencilState = ::SDL_GPUDepthStencilState;
 	export using GPUDepthStencilTargetnfo = ::SDL_GPUDepthStencilTargetInfo;
 	export using GPUDevice = ::SDL_GPUDevice;
-	export using GPUDriver = ::SDL_GPUDriver;
 	export using GPUFence = ::SDL_GPUFence;
 	export using GPUFillMode = ::SDL_GPUFillMode;
 	export using GPUFilter = ::SDL_GPUFilter;
@@ -73,8 +72,8 @@ namespace sdl {
 	export using GPUShaderStage = ::SDL_GPUShaderStage;
 	export using GPUStencilOp = ::SDL_GPUStencilOp;
 	export using GPUStencilOpState = ::SDL_GPUStencilOpState;
-	export using GPUStorageBufferReadWriteBinding = ::SDL_GPUStorageBufferWriteOnlyBinding;
-	export using GPUStorageTextureReadWriteBinding = ::SDL_GPUStorageTextureWriteOnlyBinding;
+	export using GPUStorageBufferReadWriteBinding = ::SDL_GPUStorageBufferReadWriteBinding;
+	export using GPUStorageTextureReadWriteBinding = ::SDL_GPUStorageTextureReadWriteBinding;
 	export using GPUStoreOp = ::SDL_GPUStoreOp;
 	export using GPUSwapchainComposition = ::SDL_GPUSwapchainComposition;
 	export using GPUTexture = ::SDL_GPUTexture;
@@ -90,7 +89,7 @@ namespace sdl {
 	export using GPUTransferBufferLocation = ::SDL_GPUTransferBufferLocation;
 	export using GPUTransferBufferUsage = ::SDL_GPUTransferBufferUsage;
 	export using GPUVertexAttribute = ::SDL_GPUVertexAttribute;
-	export using GPUVertexBinding = ::SDL_GPUVertexBinding;
+	export using GPUVertexBufferDescription = ::SDL_GPUVertexBufferDescription;
 	export using GPUVertexElementFormat = ::SDL_GPUVertexElementFormat;
 	export using GPUVertexInputRate = ::SDL_GPUVertexInputRate;
 	export using GPUVertexInputState = ::SDL_GPUVertexInputState;
@@ -184,59 +183,58 @@ namespace sdl {
 	export inline void* fileLoad(const char* file, size_t* datasize) { return SDL_LoadFile(file, datasize); }
 
 	/* Font management functions */
-	export inline int fontAscent(TTF_Font* font) { return TTF_FontAscent(font); }
+	export inline int fontAscent(TTF_Font* font) { return TTF_GetFontAscent(font); }
 	export inline void fontClose(TTF_Font* font) { TTF_CloseFont(font); }
-	export inline int fontDescent(TTF_Font* font) { return TTF_FontDescent(font); }
-	export inline int fontFaceIsFixedWidth(TTF_Font* font) { return TTF_FontFaceIsFixedWidth(font); }
-	export inline long fontFaces(TTF_Font* font) { return TTF_FontFaces(font); }
-	export inline int fontGlyphIsProvided(TTF_Font* font, Uint16 ch) { return TTF_GlyphIsProvided(font, ch); }
-	export inline int fontGlyphMetrics(TTF_Font* font, Uint16 ch, int* minx, int* maxx, int* miny, int* maxy, int* advance) { return TTF_GlyphMetrics(font, ch, minx, maxx, miny, maxy, advance); }
-	export inline int fontHeight(TTF_Font* font) { return TTF_FontHeight(font); }
+	export inline int fontDescent(TTF_Font* font) { return TTF_GetFontDescent(font); }
+	export inline int fontIsFixedWidth(TTF_Font* font) { return TTF_FontIsFixedWidth(font); }
+	export inline int fontGlyphMetrics(TTF_Font* font, Uint16 ch, int* minx, int* maxx, int* miny, int* maxy, int* advance) { return TTF_GetGlyphMetrics(font, ch, minx, maxx, miny, maxy, advance); }
+	export inline int fontHasGlyph(TTF_Font* font, Uint16 ch) { return TTF_FontHasGlyph(font, ch); }
+	export inline int fontHeight(TTF_Font* font) { return TTF_GetFontHeight(font); }
 	export inline int fontHintingGet(TTF_Font* font) { return TTF_GetFontHinting(font); }
 	export inline void fontHintingSet(TTF_Font* font, int hinting) { TTF_SetFontHinting(font, hinting); }
 	export inline int fontKerningGet(TTF_Font* font) { return TTF_GetFontKerning(font); }
 	export inline void fontKerningSet(TTF_Font* font, int allowed) { TTF_SetFontKerning(font, allowed); }
-	export inline int fontLineSkip(TTF_Font* font) { return TTF_FontLineSkip(font); }
+	export inline int fontLineSkipGet(TTF_Font* font) { return TTF_GetFontLineSkip(font); }
 	export inline TTF_Font* fontOpen(const char* file, int ptsize) { return TTF_OpenFont(file, ptsize); }
-	export inline TTF_Font* fontOpenIndex(const char* file, int ptsize, long index) { return TTF_OpenFontIndex(file, ptsize, index); }
-	export inline TTF_Font* fontOpenIndexIO(SDL_IOStream* src, int closeio, int ptsize, long index) { return TTF_OpenFontIndexIO(src, closeio, ptsize, index); }
 	export inline TTF_Font* fontOpenIO(SDL_IOStream* src, int closeio, int ptsize) { return TTF_OpenFontIO(src, closeio, ptsize); }
 	export inline int fontOutlineGet(TTF_Font* font) { return TTF_GetFontOutline(font); }
 	export inline void fontOutlineSet(TTF_Font* font, int outline) { TTF_SetFontOutline(font, outline); }
-	export inline int fontSizeText(TTF_Font* font, const char* text, int* w, int* h) { return TTF_SizeText(font, text, w, h); }
-	export inline int fontSizeUNICODE(TTF_Font* font, const Uint16* text, int* w, int* h) { return TTF_SizeUNICODE(font, text, w, h); }
-	export inline int fontSizeUTF8(TTF_Font* font, const char* text, int* w, int* h) { return TTF_SizeUTF8(font, text, w, h); }
+	export inline int fontSizeText(TTF_Font* font, const char* text, int* w, int* h) { return TTF_GetStringSize(font, text, 0, w, h); }
 	export inline int fontStyleIsSet(TTF_Font* font, int style) { return TTF_GetFontStyle(font) & style; }
 	export inline void fontStyleSet(TTF_Font* font, int style) { TTF_SetFontStyle(font, style); }
 
 	/* GPU functions */
-	export inline SDL_bool gpuClaimWindow(SDL_GPUDevice* device, SDL_Window* window) { return SDL_ClaimWindowForGPUDevice(device, window); }
-	export inline SDL_bool gpuIsTextureFormatSupported(SDL_GPUDevice* device, SDL_GPUTextureFormat format, SDL_GPUTextureType type, SDL_GPUTextureUsageFlags usage) { return SDL_GPUTextureSupportsFormat(device, format, type, usage); }
-	export inline SDL_bool gpuQueryFence(SDL_GPUDevice* device, SDL_GPUFence* fence) { return SDL_QueryGPUFence(device, fence); }
-	export inline SDL_bool gpuSetSwapchainParameters(SDL_GPUDevice* device, SDL_Window* window, SDL_GPUSwapchainComposition swapchainComposition, SDL_GPUPresentMode presentMode) { return SDL_SetGPUSwapchainParameters(device, window, swapchainComposition, presentMode); }
-	export inline SDL_bool gpuSupportsPresentMode(SDL_GPUDevice* device, SDL_Window* window, SDL_GPUPresentMode presentMode) { return SDL_WindowSupportsGPUPresentMode(device, window, presentMode); }
-	export inline SDL_bool gpuSupportsSwapchainComposition(SDL_GPUDevice* device, SDL_Window* window, SDL_GPUSwapchainComposition swapchainComposition) { return SDL_WindowSupportsGPUSwapchainComposition(device, window, swapchainComposition); }
-	export inline SDL_bool gpuTextureSupportsSampleCount(SDL_GPUDevice* device, SDL_GPUTextureFormat format, SDL_GPUSampleCount desiredSampleCount) { return SDL_GPUTextureSupportsSampleCount(device, format, desiredSampleCount); }
+	export inline bool gpuClaimWindow(SDL_GPUDevice* device, SDL_Window* window) { return SDL_ClaimWindowForGPUDevice(device, window); }
+	export inline bool gpuIsTextureFormatSupported(SDL_GPUDevice* device, SDL_GPUTextureFormat format, SDL_GPUTextureType type, SDL_GPUTextureUsageFlags usage) { return SDL_GPUTextureSupportsFormat(device, format, type, usage); }
+	export inline bool gpuQueryFence(SDL_GPUDevice* device, SDL_GPUFence* fence) { return SDL_QueryGPUFence(device, fence); }
+	export inline bool gpuSetSwapchainParameters(SDL_GPUDevice* device, SDL_Window* window, SDL_GPUSwapchainComposition swapchainComposition, SDL_GPUPresentMode presentMode) { return SDL_SetGPUSwapchainParameters(device, window, swapchainComposition, presentMode); }
+	export inline bool gpuSupportsPresentMode(SDL_GPUDevice* device, SDL_Window* window, SDL_GPUPresentMode presentMode) { return SDL_WindowSupportsGPUPresentMode(device, window, presentMode); }
+	export inline bool gpuSupportsSwapchainComposition(SDL_GPUDevice* device, SDL_Window* window, SDL_GPUSwapchainComposition swapchainComposition) { return SDL_WindowSupportsGPUSwapchainComposition(device, window, swapchainComposition); }
+	export inline bool gpuTextureSupportsSampleCount(SDL_GPUDevice* device, SDL_GPUTextureFormat format, SDL_GPUSampleCount desiredSampleCount) { return SDL_GPUTextureSupportsSampleCount(device, format, desiredSampleCount); }
 	export inline SDL_GPUBuffer* gpuCreateBuffer(SDL_GPUDevice* device, SDL_GPUBufferUsageFlags usageFlags, Uint32 sizeInBytes) { 
 		SDL_GPUBufferCreateInfo info = { usageFlags, sizeInBytes };
 		return SDL_CreateGPUBuffer(device, &info);
 	}
+	export inline const char* gpuGetDriver(int index) { return SDL_GetGPUDriver(index); }
 	export inline SDL_GPUCommandBuffer* gpuAcquireCommandBuffer(SDL_GPUDevice* device) { return SDL_AcquireGPUCommandBuffer(device); }
-	export inline SDL_GPUComputePass* gpuBeginComputePass(SDL_GPUCommandBuffer* commandBuffer, SDL_GPUStorageTextureWriteOnlyBinding* storageTextureBindings, Uint32 storageTextureBindingCount, SDL_GPUStorageBufferWriteOnlyBinding* storageBufferBindings, Uint32 storageBufferBindingCount) { return SDL_BeginGPUComputePass(commandBuffer, storageTextureBindings, storageTextureBindingCount, storageBufferBindings, storageBufferBindingCount); }
+	export inline SDL_GPUComputePass* gpuBeginComputePass(SDL_GPUCommandBuffer* commandBuffer, SDL_GPUStorageTextureReadWriteBinding* storageTextureBindings, Uint32 storageTextureBindingCount, SDL_GPUStorageBufferReadWriteBinding* storageBufferBindings, Uint32 storageBufferBindingCount) { return SDL_BeginGPUComputePass(commandBuffer, storageTextureBindings, storageTextureBindingCount, storageBufferBindings, storageBufferBindingCount); }
 	export inline SDL_GPUComputePipeline* gpuCreateComputePipeline(SDL_GPUDevice* device, SDL_GPUComputePipelineCreateInfo* computePipelineCreateInfo) { return SDL_CreateGPUComputePipeline(device, computePipelineCreateInfo); }
-	export inline SDL_GPUComputePipeline* gpuCompileSpirvCompute(SDL_GPUDevice* device, SDL_GPUShaderCreateInfo* shaderCreateInfo) { return static_cast<SDL_GPUComputePipeline*>(SDL_ShaderCross_CompileFromSPIRV(device, shaderCreateInfo, SDL_TRUE)); }
+	export inline SDL_GPUComputePipeline* gpuCompileSpirvCompute(SDL_GPUDevice* device, SDL_GPUComputePipelineCreateInfo* shaderCreateInfo) { return SDL_ShaderCross_CompileComputePipelineFromSPIRV(device, shaderCreateInfo); }
 	export inline SDL_GPUCopyPass* gpuBeginCopyPass(SDL_GPUCommandBuffer* commandBuffer) { return SDL_BeginGPUCopyPass(commandBuffer); }
-	export inline SDL_GPUDevice* gpuCreateDevice(SDL_GPUShaderFormat format_flags, SDL_bool debug_mode, const char* name) { return SDL_CreateGPUDevice(format_flags, debug_mode, name); }
+	export inline SDL_GPUDevice* gpuCreateDevice(SDL_GPUShaderFormat format_flags, bool debug_mode, const char* name) { return SDL_CreateGPUDevice(format_flags, debug_mode, name); }
 	export inline SDL_GPUDevice* gpuCreateDeviceWithProperties(SDL_PropertiesID props) { return SDL_CreateGPUDeviceWithProperties(props); }
-	export inline SDL_GPUDriver gpuGetDriver(SDL_GPUDevice* device) { return SDL_GetGPUDriver(device); }
 	export inline SDL_GPUFence* gpuSubmitAndAcquireFence(SDL_GPUCommandBuffer* commandBuffer) { return SDL_SubmitGPUCommandBufferAndAcquireFence(commandBuffer); }
 	export inline SDL_GPUGraphicsPipeline* gpuCreateGraphicsPipeline(SDL_GPUDevice* device, SDL_GPUGraphicsPipelineCreateInfo* pipelineCreateInfo) { return SDL_CreateGPUGraphicsPipeline(device, pipelineCreateInfo); }
 	export inline SDL_GPURenderPass* gpuBeginRenderPass(SDL_GPUCommandBuffer* commandBuffer, SDL_GPUColorTargetInfo* colorAttachmentInfos, Uint32 colorAttachmentCount, SDL_GPUDepthStencilTargetInfo* depthStencilAttachmentInfo) { return SDL_BeginGPURenderPass(commandBuffer, colorAttachmentInfos, colorAttachmentCount, depthStencilAttachmentInfo); }
 	export inline SDL_GPUSampler* gpuCreateSampler(SDL_GPUDevice* device, SDL_GPUSamplerCreateInfo* samplerCreateInfo) { return SDL_CreateGPUSampler(device, samplerCreateInfo); }
-	export inline SDL_GPUShader* gpuCompileSpirvShader(SDL_GPUDevice* device, SDL_GPUShaderCreateInfo* shaderCreateInfo) { return static_cast<SDL_GPUShader*>(SDL_ShaderCross_CompileFromSPIRV(device, shaderCreateInfo, SDL_FALSE)); }
+	export inline SDL_GPUShader* gpuCompileSpirvShader(SDL_GPUDevice* device, SDL_GPUShaderCreateInfo* shaderCreateInfo) { return SDL_ShaderCross_CompileGraphicsShaderFromSPIRV(device, shaderCreateInfo); }
 	export inline SDL_GPUShader* gpuCreateShader(SDL_GPUDevice* device, SDL_GPUShaderCreateInfo* shaderCreateInfo) { return SDL_CreateGPUShader(device, shaderCreateInfo); }
 	export inline SDL_GPUShaderFormat gpuSpirvShaderFormats() { return SDL_ShaderCross_GetSPIRVShaderFormats(); }
-	export inline SDL_GPUTexture* gpuAcquireSwapchainTexture(SDL_GPUCommandBuffer* commandBuffer, SDL_Window* window, Uint32* pWidth, Uint32* pHeight) { return SDL_AcquireGPUSwapchainTexture(commandBuffer, window, pWidth, pHeight); }
+	export inline SDL_GPUTexture* gpuAcquireSwapchainTexture(SDL_GPUCommandBuffer* commandBuffer, SDL_Window* window, Uint32* pWidth, Uint32* pHeight) { 
+		SDL_GPUTexture* texture;
+		SDL_AcquireGPUSwapchainTexture(commandBuffer, window, &texture, pWidth, pHeight);
+		return texture;
+	}
 	export inline SDL_GPUTexture* gpuCreateTexture(SDL_GPUDevice* device, SDL_GPUTextureCreateInfo* textureCreateInfo) { return SDL_CreateGPUTexture(device, textureCreateInfo); }
 	export inline SDL_GPUTextureFormat gpuGetSwapchainTextureFormat(SDL_GPUDevice* device, SDL_Window* window) { return SDL_GetGPUSwapchainTextureFormat(device, window); }
 	export inline SDL_GPUTransferBuffer* gpuCreateTransferBuffer(SDL_GPUDevice* device, SDL_GPUTransferBufferUsage usage, Uint32 sizeInBytes) { 
@@ -257,16 +255,16 @@ namespace sdl {
 	export inline void gpuBindVertexStorageBuffers(SDL_GPURenderPass* renderPass, Uint32 firstSlot, SDL_GPUBuffer** storageBuffers, Uint32 bindingCount) { SDL_BindGPUVertexStorageBuffers(renderPass, firstSlot, storageBuffers, bindingCount); }
 	export inline void gpuBindVertexStorageTextures(SDL_GPURenderPass* renderPass, Uint32 firstSlot, SDL_GPUTexture* const* storageTextureSlices, Uint32 bindingCount) { SDL_BindGPUVertexStorageTextures(renderPass, firstSlot, storageTextureSlices, bindingCount); }
 	export inline void gpuBlit(SDL_GPUCommandBuffer* commandBuffer, SDL_GPUBlitInfo* info) { SDL_BlitGPUTexture(commandBuffer, info); }
-	export inline void gpuCopyBufferToBuffer(SDL_GPUCopyPass* copyPass, SDL_GPUBufferLocation* source, SDL_GPUBufferLocation* destination, Uint32 size, SDL_bool cycle) { SDL_CopyGPUBufferToBuffer(copyPass, source, destination, size, cycle); }
-	export inline void gpuCopyTextureToTexture(SDL_GPUCopyPass* copyPass, SDL_GPUTextureLocation* source, SDL_GPUTextureLocation* destination, Uint32 w, Uint32 h, Uint32 d, SDL_bool cycle) { SDL_CopyGPUTextureToTexture(copyPass, source, destination, w, h, d, cycle); }
+	export inline void gpuCopyBufferToBuffer(SDL_GPUCopyPass* copyPass, SDL_GPUBufferLocation* source, SDL_GPUBufferLocation* destination, Uint32 size, bool cycle) { SDL_CopyGPUBufferToBuffer(copyPass, source, destination, size, cycle); }
+	export inline void gpuCopyTextureToTexture(SDL_GPUCopyPass* copyPass, SDL_GPUTextureLocation* source, SDL_GPUTextureLocation* destination, Uint32 w, Uint32 h, Uint32 d, bool cycle) { SDL_CopyGPUTextureToTexture(copyPass, source, destination, w, h, d, cycle); }
 	export inline void gpuDispatchCompute(SDL_GPUComputePass* computePass, Uint32 groupCountX, Uint32 groupCountY, Uint32 groupCountZ) { SDL_DispatchGPUCompute(computePass, groupCountX, groupCountY, groupCountZ); }
 	export inline void gpuDispatchComputeIndirect(SDL_GPUComputePass* computePass, SDL_GPUBuffer* buffer, Uint32 offsetInBytes) { SDL_DispatchGPUComputeIndirect(computePass, buffer, offsetInBytes); }
 	export inline void gpuDownloadFromBuffer(SDL_GPUCopyPass* copyPass, SDL_GPUBufferRegion* source, SDL_GPUTransferBufferLocation* destination) { SDL_DownloadFromGPUBuffer(copyPass, source, destination); }
 	export inline void gpuDownloadFromTexture(SDL_GPUCopyPass* copyPass, SDL_GPUTextureRegion* source, SDL_GPUTextureTransferInfo* destination) { SDL_DownloadFromGPUTexture(copyPass, source, destination); }
 	export inline void gpuDrawIndexedPrimitives(SDL_GPURenderPass* renderPass, Uint32 num_indices, Uint32 num_instances, Uint32 first_index, Sint32 vertex_offset, Uint32 first_instance) { SDL_DrawGPUIndexedPrimitives(renderPass, num_indices, num_instances, first_index, vertex_offset, first_instance); }
-	export inline void gpuDrawIndexedPrimitivesIndirect(SDL_GPURenderPass* renderPass, SDL_GPUBuffer* buffer, Uint32 offsetInBytes, Uint32 drawCount, Uint32 stride) { SDL_DrawGPUIndexedPrimitivesIndirect(renderPass, buffer, offsetInBytes, drawCount, stride); }
+	export inline void gpuDrawIndexedPrimitivesIndirect(SDL_GPURenderPass* renderPass, SDL_GPUBuffer* buffer, Uint32 offsetInBytes, Uint32 drawCount) { SDL_DrawGPUIndexedPrimitivesIndirect(renderPass, buffer, offsetInBytes, drawCount); }
 	export inline void gpuDrawPrimitives(SDL_GPURenderPass* renderPass, Uint32 num_vertices, Uint32 num_instances, Uint32 first_vertex, Uint32 first_instance) { SDL_DrawGPUPrimitives(renderPass, num_vertices, num_instances, first_vertex, first_instance); }
-	export inline void gpuDrawPrimitivesIndirect(SDL_GPURenderPass* renderPass, SDL_GPUBuffer* buffer, Uint32 offsetInBytes, Uint32 drawCount, Uint32 stride) { SDL_DrawGPUPrimitivesIndirect(renderPass, buffer, offsetInBytes, drawCount, stride); }
+	export inline void gpuDrawPrimitivesIndirect(SDL_GPURenderPass* renderPass, SDL_GPUBuffer* buffer, Uint32 offsetInBytes, Uint32 drawCount) { SDL_DrawGPUPrimitivesIndirect(renderPass, buffer, offsetInBytes, drawCount); }
 	export inline void gpuEndComputePass(SDL_GPUComputePass* computePass) { SDL_EndGPUComputePass(computePass); }
 	export inline void gpuEndCopyPass(SDL_GPUCopyPass* copyPass) { SDL_EndGPUCopyPass(copyPass); }
 	export inline void gpuEndRenderPass(SDL_GPURenderPass* renderPass) { SDL_EndGPURenderPass(renderPass); }
@@ -292,11 +290,11 @@ namespace sdl {
 	export inline void gpuSubmit(SDL_GPUCommandBuffer* commandBuffer) { SDL_SubmitGPUCommandBuffer(commandBuffer); }
 	export inline void gpuUnclaimWindow(SDL_GPUDevice* device, SDL_Window* window) { SDL_ReleaseWindowFromGPUDevice(device, window); }
 	export inline void gpuUnmapTransferBuffer(SDL_GPUDevice* device, SDL_GPUTransferBuffer* transferBuffer) { SDL_UnmapGPUTransferBuffer(device, transferBuffer); }
-	export inline void gpuUploadToBuffer(SDL_GPUCopyPass* copyPass, SDL_GPUTransferBufferLocation* source, SDL_GPUBufferRegion* destination, SDL_bool cycle = SDL_FALSE) { SDL_UploadToGPUBuffer(copyPass, source, destination, cycle); }
-	export inline void gpuUploadToTexture(SDL_GPUCopyPass* copyPass, SDL_GPUTextureTransferInfo* source, SDL_GPUTextureRegion* destination, SDL_bool cycle = SDL_FALSE) { SDL_UploadToGPUTexture(copyPass, source, destination, cycle); }
+	export inline void gpuUploadToBuffer(SDL_GPUCopyPass* copyPass, SDL_GPUTransferBufferLocation* source, SDL_GPUBufferRegion* destination, bool cycle = false) { SDL_UploadToGPUBuffer(copyPass, source, destination, cycle); }
+	export inline void gpuUploadToTexture(SDL_GPUCopyPass* copyPass, SDL_GPUTextureTransferInfo* source, SDL_GPUTextureRegion* destination, bool cycle = false) { SDL_UploadToGPUTexture(copyPass, source, destination, cycle); }
 	export inline void gpuWait(SDL_GPUDevice* device) { SDL_WaitForGPUIdle(device); }
-	export inline void gpuWaitForFences(SDL_GPUDevice* device, SDL_bool waitAll, SDL_GPUFence** pFences, Uint32 fenceCount) { SDL_WaitForGPUFences(device, waitAll, pFences, fenceCount); }
-	export inline void* gpuMapTransferBuffer(SDL_GPUDevice* device, SDL_GPUTransferBuffer* transferBuffer, SDL_bool cycle) { return SDL_MapGPUTransferBuffer(device, transferBuffer, cycle); }
+	export inline void gpuWaitForFences(SDL_GPUDevice* device, bool waitAll, SDL_GPUFence** pFences, Uint32 fenceCount) { SDL_WaitForGPUFences(device, waitAll, pFences, fenceCount); }
+	export inline void* gpuMapTransferBuffer(SDL_GPUDevice* device, SDL_GPUTransferBuffer* transferBuffer, bool cycle) { return SDL_MapGPUTransferBuffer(device, transferBuffer, cycle); }
 
 	/* Music management functions */
 	export double musicGetPosition(Mix_Music* music) { return Mix_GetMusicPosition(music); }
@@ -323,7 +321,7 @@ namespace sdl {
 	export inline int surfaceLock(SDL_Surface* surface) { return SDL_LockSurface(surface); }
 	export inline int surfaceSetAlphaMod(SDL_Surface* surface, Uint8 alpha) { return SDL_SetSurfaceAlphaMod(surface, alpha); }
 	export inline int surfaceSetBlendMode(SDL_Surface* surface, SDL_BlendMode blendMode) { return SDL_SetSurfaceBlendMode(surface, blendMode); }
-	export inline int surfaceSetColorKey(SDL_Surface* surface, Uint32 key) { return SDL_SetSurfaceColorKey(surface, SDL_TRUE, key); }
+	export inline int surfaceSetColorKey(SDL_Surface* surface, bool enabled, Uint32 key) { return SDL_SetSurfaceColorKey(surface, enabled, key); }
 	export inline int surfaceSetPalette(SDL_Surface* surface, SDL_Palette* palette) { return SDL_SetSurfacePalette(surface, palette); }
 	export inline SDL_Surface* surfaceConvert(SDL_Surface* surface, SDL_PixelFormat pixel_format) { return SDL_ConvertSurface(surface, pixel_format); }
 	export inline SDL_Surface* surfaceCopy(SDL_Surface* src) { return SDL_DuplicateSurface(src); }
@@ -356,25 +354,16 @@ namespace sdl {
 	}
 
 	/* Text rendering functions */
-	export inline SDL_Surface* textRenderBlended(TTF_Font* font, const char* text, SDL_Color fg) { return TTF_RenderText_Blended(font, text, fg); }
-	export inline SDL_Surface* textRenderBlendedWrapped(TTF_Font* font, const char* text, SDL_Color fg, Uint32 wrapLength) { return TTF_RenderText_Blended_Wrapped(font, text, fg, wrapLength); }
-	export inline SDL_Surface* textRenderShaded(TTF_Font* font, const char* text, SDL_Color fg, SDL_Color bg) { return TTF_RenderText_Shaded(font, text, fg, bg); }
-	export inline SDL_Surface* textRenderSolid(TTF_Font* font, const char* text, SDL_Color fg) { return TTF_RenderText_Solid(font, text, fg); }
-	export inline SDL_Surface* textRenderUNICODEBlended(TTF_Font* font, const Uint16* text, SDL_Color fg) { return TTF_RenderUNICODE_Blended(font, text, fg); }
-	export inline SDL_Surface* textRenderUNICODEBlendedWrapped(TTF_Font* font, const Uint16* text, SDL_Color fg, Uint32 wrapLength) { return TTF_RenderUNICODE_Blended_Wrapped(font, text, fg, wrapLength); }
-	export inline SDL_Surface* textRenderUNICODEShaded(TTF_Font* font, const Uint16* text, SDL_Color fg, SDL_Color bg) { return TTF_RenderUNICODE_Shaded(font, text, fg, bg); }
-	export inline SDL_Surface* textRenderUNICODESolid(TTF_Font* font, const Uint16* text, SDL_Color fg) { return TTF_RenderUNICODE_Solid(font, text, fg); }
-	export inline SDL_Surface* textRenderUTF8Blended(TTF_Font* font, const char* text, SDL_Color fg) { return TTF_RenderUTF8_Blended(font, text, fg); }
-	export inline SDL_Surface* textRenderUTF8BlendedWrapped(TTF_Font* font, const char* text, SDL_Color fg, Uint32 wrapLength) { return TTF_RenderUTF8_Blended_Wrapped(font, text, fg, wrapLength); }
-	export inline SDL_Surface* textRenderUTF8Shaded(TTF_Font* font, const char* text, SDL_Color fg, SDL_Color bg) { return TTF_RenderUTF8_Shaded(font, text, fg, bg); }
-	export inline SDL_Surface* textRenderUTF8Solid(TTF_Font* font, const char* text, SDL_Color fg) { return TTF_RenderUTF8_Solid(font, text, fg); }
+	export inline SDL_Surface* textRenderBlended(TTF_Font* font, const char* text, SDL_Color fg, size_t range = 0) { return TTF_RenderText_Blended(font, text, range, fg); }
+	export inline SDL_Surface* textRenderBlendedWrapped(TTF_Font* font, const char* text, SDL_Color fg, Uint32 wrapLength, size_t range = 0) { return TTF_RenderText_Blended_Wrapped(font, text, range, fg, wrapLength); }
+	export inline SDL_Surface* textRenderShaded(TTF_Font* font, const char* text, SDL_Color fg, SDL_Color bg, size_t range = 0) { return TTF_RenderText_Shaded(font, text, range, fg, bg); }
 
 	/* Window functions */
 	export inline const char* windowGetTitle(Window* window) { return SDL_GetWindowTitle(window); }
 	export inline float windowGetOpacity(Window* window) { return SDL_GetWindowOpacity(window); }
 	export inline int windowSetFullscreen(Window* window, Uint32 flags) { return SDL_SetWindowFullscreen(window, flags); }
 	export inline int windowUpdateSurface(Window* window) { return SDL_UpdateWindowSurface(window); }
-	export inline SDL_bool windowGetMouseGrab(Window* window) { return SDL_GetWindowMouseGrab(window); }
+	export inline bool windowGetMouseGrab(Window* window) { return SDL_GetWindowMouseGrab(window); }
 	export inline SDL_Renderer* windowCreateRenderer(Window* window) { return SDL_CreateRenderer(window, nullptr); }
 	export inline SDL_Surface* windowGetSurface(Window* window) { return SDL_GetWindowSurface(window); }
 	export inline SDL_Window* windowCreate(const char* title, int w, int h, SDL_WindowFlags flags) { return SDL_CreateWindow(title, w, h, flags); }
@@ -389,7 +378,7 @@ namespace sdl {
 	export inline void windowRestore(Window* window) { SDL_RestoreWindow(window); }
 	export inline void windowSetIcon(Window* window, SDL_Surface* icon) { SDL_SetWindowIcon(window, icon); }
 	export inline void windowSetModal(SDL_Window* modal_window, SDL_Window* parent_window) { SDL_SetWindowModal(modal_window, parent_window); }
-	export inline void windowSetMouseGrab(Window* window, SDL_bool grabbed) { SDL_SetWindowMouseGrab(window, grabbed); }
+	export inline void windowSetMouseGrab(Window* window, bool grabbed) { SDL_SetWindowMouseGrab(window, grabbed); }
 	export inline void windowSetOpacity(Window* window, float opacity) { SDL_SetWindowOpacity(window, opacity); }
 	export inline void windowSetPosition(Window* window, int x, int y) { SDL_SetWindowPosition(window, x, y); }
 	export inline void windowSetSize(Window* window, int w, int h) {SDL_SetWindowSize(window, w, h);}

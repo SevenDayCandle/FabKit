@@ -27,11 +27,6 @@
  *
  *  This library is a wrapper around the excellent FreeType 2.0 library,
  *  available at: https://www.freetype.org/
- *
- *  Note: In many places, SDL_ttf will say "glyph" when it means "code point."
- *  Unicode is hard, we learn as we go, and we apologize for adding to the
- *  confusion.
- *
  */
 #ifndef SDL_TTF_H_
 #define SDL_TTF_H_
@@ -70,6 +65,8 @@ extern "C" {
  *
  * \returns SDL_ttf version.
  *
+ * \threadsafety It is safe to call this function from any thread.
+ *
  * \since This function is available since SDL_ttf 3.0.0.
  */
 extern SDL_DECLSPEC int SDLCALL TTF_Version(void);
@@ -82,6 +79,8 @@ extern SDL_DECLSPEC int SDLCALL TTF_Version(void);
  * \param major to be filled in with the major version number. Can be NULL.
  * \param minor to be filled in with the minor version number. Can be NULL.
  * \param patch to be filled in with the param version number. Can be NULL.
+ *
+ * \threadsafety It is safe to call this function from any thread.
  *
  * \since This function is available since SDL_ttf 3.0.0.
  *
@@ -98,27 +97,11 @@ extern SDL_DECLSPEC void SDLCALL TTF_GetFreeTypeVersion(int *major, int *minor, 
  * \param minor to be filled in with the minor version number. Can be NULL.
  * \param patch to be filled in with the param version number. Can be NULL.
  *
+ * \threadsafety It is safe to call this function from any thread.
+ *
  * \since This function is available since SDL_ttf 3.0.0.
  */
 extern SDL_DECLSPEC void SDLCALL TTF_GetHarfBuzzVersion(int *major, int *minor, int *patch);
-
-/**
- * ZERO WIDTH NO-BREAKSPACE (Unicode byte order mark)
- */
-#define UNICODE_BOM_NATIVE  0xFEFF
-#define UNICODE_BOM_SWAPPED 0xFFFE
-
-/**
- * Tell SDL_ttf whether UNICODE text is generally byteswapped.
- *
- * A UNICODE BOM character in a string will override this setting for the
- * remainder of that string.
- *
- * \param swapped boolean to indicate whether text is byteswapped.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- */
-extern SDL_DECLSPEC void SDLCALL TTF_ByteSwappedUNICODE(SDL_bool swapped);
 
 /**
  * The internal structure containing font information.
@@ -141,14 +124,14 @@ typedef struct TTF_Font TTF_Font;
  * calls, and decrements it on each call to TTF_Quit, so you must pair your
  * init and quit calls.
  *
- * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
- *          for more information.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
  *
  * \since This function is available since SDL_ttf 3.0.0.
  *
  * \sa TTF_Quit
  */
-extern SDL_DECLSPEC SDL_bool SDLCALL TTF_Init(void);
+extern SDL_DECLSPEC bool SDLCALL TTF_Init(void);
 
 /**
  * Create a font from a file, using a specified point size.
@@ -161,37 +144,16 @@ extern SDL_DECLSPEC SDL_bool SDLCALL TTF_Init(void);
  *
  * \param file path to font file.
  * \param ptsize point size to use for the newly-opened font.
- * \returns a valid TTF_Font, or NULL on error.
+ * \returns a valid TTF_Font, or NULL on failure; call SDL_GetError() for more
+ *          information.
+ *
+ * \threadsafety It is safe to call this function from any thread.
  *
  * \since This function is available since SDL_ttf 3.0.0.
  *
  * \sa TTF_CloseFont
  */
-extern SDL_DECLSPEC TTF_Font * SDLCALL TTF_OpenFont(const char *file, int ptsize);
-
-/**
- * Create a font from a file, using a specified face index.
- *
- * Some .fon fonts will have several sizes embedded in the file, so the point
- * size becomes the index of choosing which size. If the value is too high,
- * the last indexed size will be the default.
- *
- * Some fonts have multiple "faces" included. The index specifies which face
- * to use from the font file. Font files with only one face should specify
- * zero for the index.
- *
- * When done with the returned TTF_Font, use TTF_CloseFont() to dispose of it.
- *
- * \param file path to font file.
- * \param ptsize point size to use for the newly-opened font.
- * \param index index of the face in the font file.
- * \returns a valid TTF_Font, or NULL on error.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_CloseFont
- */
-extern SDL_DECLSPEC TTF_Font * SDLCALL TTF_OpenFontIndex(const char *file, int ptsize, long index);
+extern SDL_DECLSPEC TTF_Font * SDLCALL TTF_OpenFont(const char *file, float ptsize);
 
 /**
  * Create a font from an SDL_IOStream, using a specified point size.
@@ -200,197 +162,182 @@ extern SDL_DECLSPEC TTF_Font * SDLCALL TTF_OpenFontIndex(const char *file, int p
  * size becomes the index of choosing which size. If the value is too high,
  * the last indexed size will be the default.
  *
- * If `closeio` is SDL_TRUE, `src` will be automatically closed once the font
- * is closed. Otherwise you should close `src` yourself after closing the
- * font.
+ * If `closeio` is true, `src` will be automatically closed once the font is
+ * closed. Otherwise you should close `src` yourself after closing the font.
  *
  * When done with the returned TTF_Font, use TTF_CloseFont() to dispose of it.
  *
  * \param src an SDL_IOStream to provide a font file's data.
- * \param closeio SDL_TRUE to close `src` when the font is closed, SDL_FALSE
- *                to leave it open.
+ * \param closeio true to close `src` when the font is closed, false to leave
+ *                it open.
  * \param ptsize point size to use for the newly-opened font.
- * \returns a valid TTF_Font, or NULL on error.
+ * \returns a valid TTF_Font, or NULL on failure; call SDL_GetError() for more
+ *          information.
+ *
+ * \threadsafety It is safe to call this function from any thread.
  *
  * \since This function is available since SDL_ttf 3.0.0.
  *
  * \sa TTF_CloseFont
  */
-extern SDL_DECLSPEC TTF_Font * SDLCALL TTF_OpenFontIO(SDL_IOStream *src, SDL_bool closeio, int ptsize);
+extern SDL_DECLSPEC TTF_Font * SDLCALL TTF_OpenFontIO(SDL_IOStream *src, bool closeio, float ptsize);
 
 /**
- * Create a font from an SDL_IOStream, using a specified face index.
+ * Create a font with the specified properties.
  *
- * Some .fon fonts will have several sizes embedded in the file, so the point
- * size becomes the index of choosing which size. If the value is too high,
- * the last indexed size will be the default.
+ * These are the supported properties:
  *
- * If `closeio` is SDL_TRUE `src` will be automatically closed once the font
- * is closed. Otherwise you should close `src` yourself after closing the
- * font.
+ * - `TTF_PROP_FONT_CREATE_FILENAME_STRING`: the font file to open, if an
+ *   SDL_IOStream isn't being used. This is required if
+ *   `TTF_PROP_FONT_CREATE_IOSTREAM_POINTER` isn't set.
+ * - `TTF_PROP_FONT_CREATE_IOSTREAM_POINTER`: an SDL_IOStream containing the
+ *   font to be opened. This should not be closed until the font is closed.
+ *   This is required if `TTF_PROP_FONT_CREATE_FILENAME_STRING` isn't set.
+ * - `TTF_PROP_FONT_CREATE_IOSTREAM_OFFSET_NUMBER`: the offset in the iostream
+ *   for the beginning of the font, defaults to 0.
+ * - `TTF_PROP_FONT_CREATE_IOSTREAM_AUTOCLOSE_BOOLEAN`: true if closing the
+ *   font should also close the associated SDL_IOStream.
+ * - `TTF_PROP_FONT_CREATE_SIZE_NUMBER`: the point size of the font. Some .fon
+ *   fonts will have several sizes embedded in the file, so the point size
+ *   becomes the index of choosing which size. If the value is too high, the
+ *   last indexed size will be the default.
+ * - `TTF_PROP_FONT_CREATE_FACE_NUMBER`: the face index of the font, if the
+ *   font contains multiple font faces.
+ * - `TTF_PROP_FONT_CREATE_HORIZONTAL_DPI_NUMBER`: the horizontal DPI to use
+ *   for font rendering, defaults to
+ *   `TTF_PROP_FONT_CREATE_VERTICAL_DPI_NUMBER` if set, or 72 otherwise.
+ * - `TTF_PROP_FONT_CREATE_VERTICAL_DPI_NUMBER`: the vertical DPI to use for
+ *   font rendering, defaults to `TTF_PROP_FONT_CREATE_HORIZONTAL_DPI_NUMBER`
+ *   if set, or 72 otherwise.
  *
- * Some fonts have multiple "faces" included. The index specifies which face
- * to use from the font file. Font files with only one face should specify
- * zero for the index.
+ * \param props the properties to use.
+ * \returns a valid TTF_Font, or NULL on failure; call SDL_GetError() for more
+ *          information.
  *
- * When done with the returned TTF_Font, use TTF_CloseFont() to dispose of it.
- *
- * \param src an SDL_IOStream to provide a font file's data.
- * \param closeio SDL_TRUE to close `src` when the font is closed, SDL_FALSE
- *                to leave it open.
- * \param ptsize point size to use for the newly-opened font.
- * \param index index of the face in the font file.
- * \returns a valid TTF_Font, or NULL on error.
+ * \threadsafety It is safe to call this function from any thread.
  *
  * \since This function is available since SDL_ttf 3.0.0.
  *
  * \sa TTF_CloseFont
  */
-extern SDL_DECLSPEC TTF_Font * SDLCALL TTF_OpenFontIndexIO(SDL_IOStream *src, SDL_bool closeio, int ptsize, long index);
+extern SDL_DECLSPEC TTF_Font * SDLCALL TTF_OpenFontWithProperties(SDL_PropertiesID props);
+
+#define TTF_PROP_FONT_CREATE_FILENAME_STRING            "SDL_ttf.font.create.filename"
+#define TTF_PROP_FONT_CREATE_IOSTREAM_POINTER           "SDL_ttf.font.create.iostream"
+#define TTF_PROP_FONT_CREATE_IOSTREAM_OFFSET_NUMBER     "SDL_ttf.font.create.iostream.offset"
+#define TTF_PROP_FONT_CREATE_IOSTREAM_AUTOCLOSE_BOOLEAN "SDL_ttf.font.create.iostream.autoclose"
+#define TTF_PROP_FONT_CREATE_SIZE_FLOAT                 "SDL_ttf.font.create.size"
+#define TTF_PROP_FONT_CREATE_FACE_NUMBER                "SDL_ttf.font.create.face"
+#define TTF_PROP_FONT_CREATE_HORIZONTAL_DPI_NUMBER      "SDL_ttf.font.create.hdpi"
+#define TTF_PROP_FONT_CREATE_VERTICAL_DPI_NUMBER        "SDL_ttf.font.create.vdpi"
 
 /**
- * Create a font from a file, using target resolutions (in DPI).
+ * Get the properties associated with a font.
  *
- * DPI scaling only applies to scalable fonts (e.g. TrueType).
+ * \param font the font to query.
+ * \returns a valid property ID on success or 0 on failure; call
+ *          SDL_GetError() for more information.
  *
- * Some .fon fonts will have several sizes embedded in the file, so the point
- * size becomes the index of choosing which size. If the value is too high,
- * the last indexed size will be the default.
- *
- * When done with the returned TTF_Font, use TTF_CloseFont() to dispose of it.
- *
- * \param file path to font file.
- * \param ptsize point size to use for the newly-opened font.
- * \param hdpi the target horizontal DPI.
- * \param vdpi the target vertical DPI.
- * \returns a valid TTF_Font, or NULL on error.
+ * \threadsafety It is safe to call this function from any thread.
  *
  * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_CloseFont
  */
-extern SDL_DECLSPEC TTF_Font * SDLCALL TTF_OpenFontDPI(const char *file, int ptsize, unsigned int hdpi, unsigned int vdpi);
+extern SDL_DECLSPEC SDL_PropertiesID SDLCALL TTF_GetFontProperties(TTF_Font *font);
 
 /**
- * Create a font from a file, using target resolutions (in DPI).
+ * Get the font generation.
  *
- * DPI scaling only applies to scalable fonts (e.g. TrueType).
+ * The generation is incremented each time font properties change that require
+ * rebuilding glyphs, such as style, size, etc.
  *
- * Some .fon fonts will have several sizes embedded in the file, so the point
- * size becomes the index of choosing which size. If the value is too high,
- * the last indexed size will be the default.
+ * \param font the font to query.
+ * \returns the font generation or 0 on failure; call SDL_GetError() for more
+ *          information.
  *
- * Some fonts have multiple "faces" included. The index specifies which face
- * to use from the font file. Font files with only one face should specify
- * zero for the index.
- *
- * When done with the returned TTF_Font, use TTF_CloseFont() to dispose of it.
- *
- * \param file path to font file.
- * \param ptsize point size to use for the newly-opened font.
- * \param index index of the face in the font file.
- * \param hdpi the target horizontal DPI.
- * \param vdpi the target vertical DPI.
- * \returns a valid TTF_Font, or NULL on error.
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_CloseFont
  */
-extern SDL_DECLSPEC TTF_Font * SDLCALL TTF_OpenFontIndexDPI(const char *file, int ptsize, long index, unsigned int hdpi, unsigned int vdpi);
-
-/**
- * Opens a font from an SDL_IOStream with target resolutions (in DPI).
- *
- * DPI scaling only applies to scalable fonts (e.g. TrueType).
- *
- * Some .fon fonts will have several sizes embedded in the file, so the point
- * size becomes the index of choosing which size. If the value is too high,
- * the last indexed size will be the default.
- *
- * If `closeio` is SDL_TRUE `src` will be automatically closed once the font
- * is closed. Otherwise you should close `src` yourself after closing the
- * font.
- *
- * When done with the returned TTF_Font, use TTF_CloseFont() to dispose of it.
- *
- * \param src an SDL_IOStream to provide a font file's data.
- * \param closeio SDL_TRUE to close `src` when the font is closed, SDL_FALSE
- *                to leave it open.
- * \param ptsize point size to use for the newly-opened font.
- * \param hdpi the target horizontal DPI.
- * \param vdpi the target vertical DPI.
- * \returns a valid TTF_Font, or NULL on error.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_CloseFont
- */
-extern SDL_DECLSPEC TTF_Font * SDLCALL TTF_OpenFontDPIIO(SDL_IOStream *src, SDL_bool closeio, int ptsize, unsigned int hdpi, unsigned int vdpi);
-
-/**
- * Opens a font from an SDL_IOStream with target resolutions (in DPI).
- *
- * DPI scaling only applies to scalable fonts (e.g. TrueType).
- *
- * Some .fon fonts will have several sizes embedded in the file, so the point
- * size becomes the index of choosing which size. If the value is too high,
- * the last indexed size will be the default.
- *
- * If `closeio` is SDL_TRUE `src` will be automatically closed once the font
- * is closed. Otherwise you should close `src` yourself after closing the
- * font.
- *
- * Some fonts have multiple "faces" included. The index specifies which face
- * to use from the font file. Font files with only one face should specify
- * zero for the index.
- *
- * When done with the returned TTF_Font, use TTF_CloseFont() to dispose of it.
- *
- * \param src an SDL_IOStream to provide a font file's data.
- * \param closeio SDL_TRUE to close `src` when the font is closed, SDL_FALSE
- *                to leave it open.
- * \param ptsize point size to use for the newly-opened font.
- * \param index index of the face in the font file.
- * \param hdpi the target horizontal DPI.
- * \param vdpi the target vertical DPI.
- * \returns a valid TTF_Font, or NULL on error.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_CloseFont
- */
-extern SDL_DECLSPEC TTF_Font * SDLCALL TTF_OpenFontIndexDPIIO(SDL_IOStream *src, SDL_bool closeio, int ptsize, long index, unsigned int hdpi, unsigned int vdpi);
+extern SDL_DECLSPEC Uint32 SDLCALL TTF_GetFontGeneration(TTF_Font *font);
 
 /**
  * Set a font's size dynamically.
  *
- * This clears already-generated glyphs, if any, from the cache.
+ * This updates any TTF_Text objects using this font, and clears
+ * already-generated glyphs, if any, from the cache.
  *
  * \param font the font to resize.
  * \param ptsize the new point size.
- * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
- *          for more information.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_GetFontSize
  */
-extern SDL_DECLSPEC SDL_bool SDLCALL TTF_SetFontSize(TTF_Font *font, int ptsize);
+extern SDL_DECLSPEC bool SDLCALL TTF_SetFontSize(TTF_Font *font, float ptsize);
 
 /**
- * Set font size dynamically with target resolutions (in DPI).
+ * Set font size dynamically with target resolutions, in dots per inch.
  *
- * This clears already-generated glyphs, if any, from the cache.
+ * This updates any TTF_Text objects using this font, and clears
+ * already-generated glyphs, if any, from the cache.
  *
  * \param font the font to resize.
  * \param ptsize the new point size.
  * \param hdpi the target horizontal DPI.
  * \param vdpi the target vertical DPI.
- * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
- *          for more information.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_GetFontSize
+ * \sa TTF_GetFontSizeDPI
  */
-extern SDL_DECLSPEC SDL_bool SDLCALL TTF_SetFontSizeDPI(TTF_Font *font, int ptsize, unsigned int hdpi, unsigned int vdpi);
+extern SDL_DECLSPEC bool SDLCALL TTF_SetFontSizeDPI(TTF_Font *font, float ptsize, int hdpi, int vdpi);
+
+/**
+ * Get the size of a font.
+ *
+ * \param font the font to query.
+ * \returns the size of the font, or 0.0f on failure; call SDL_GetError() for
+ *          more information.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
+ *
+ * \since This function is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_SetFontSize
+ * \sa TTF_SetFontSizeDPI
+ */
+extern SDL_DECLSPEC float SDLCALL TTF_GetFontSize(TTF_Font *font);
+
+/**
+ * Get font target resolutions, in dots per inch.
+ *
+ * \param font the font to query.
+ * \param hdpi a pointer filled in with the target horizontal DPI.
+ * \param vdpi a pointer filled in with the target vertical DPI.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
+ *
+ * \since This function is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_SetFontSizeDPI
+ */
+extern SDL_DECLSPEC bool SDLCALL TTF_GetFontDPI(TTF_Font *font, int *hdpi, int *vdpi);
 
 /**
  * Font style flags
@@ -400,6 +347,32 @@ extern SDL_DECLSPEC SDL_bool SDLCALL TTF_SetFontSizeDPI(TTF_Font *font, int ptsi
 #define TTF_STYLE_ITALIC        0x02
 #define TTF_STYLE_UNDERLINE     0x04
 #define TTF_STYLE_STRIKETHROUGH 0x08
+
+/**
+ * Set a font's current style.
+ *
+ * This updates any TTF_Text objects using this font, and clears
+ * already-generated glyphs, if any, from the cache.
+ *
+ * The font styles are a set of bit flags, OR'd together:
+ *
+ * - `TTF_STYLE_NORMAL` (is zero)
+ * - `TTF_STYLE_BOLD`
+ * - `TTF_STYLE_ITALIC`
+ * - `TTF_STYLE_UNDERLINE`
+ * - `TTF_STYLE_STRIKETHROUGH`
+ *
+ * \param font the font to set a new style on.
+ * \param style the new style values to set, OR'd together.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
+ *
+ * \since This function is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_GetFontStyle
+ */
+extern SDL_DECLSPEC void SDLCALL TTF_SetFontStyle(TTF_Font *font, int style);
 
 /**
  * Query a font's current style.
@@ -415,6 +388,8 @@ extern SDL_DECLSPEC SDL_bool SDLCALL TTF_SetFontSizeDPI(TTF_Font *font, int ptsi
  * \param font the font to query.
  * \returns the current font style, as a set of bit flags.
  *
+ * \threadsafety It is safe to call this function from any thread.
+ *
  * \since This function is available since SDL_ttf 3.0.0.
  *
  * \sa TTF_SetFontStyle
@@ -422,26 +397,24 @@ extern SDL_DECLSPEC SDL_bool SDLCALL TTF_SetFontSizeDPI(TTF_Font *font, int ptsi
 extern SDL_DECLSPEC int SDLCALL TTF_GetFontStyle(const TTF_Font *font);
 
 /**
- * Set a font's current style.
+ * Set a font's current outline.
  *
- * Setting the style clears already-generated glyphs, if any, from the cache.
+ * This updates any TTF_Text objects using this font, and clears
+ * already-generated glyphs, if any, from the cache.
  *
- * The font styles are a set of bit flags, OR'd together:
+ * \param font the font to set a new outline on.
+ * \param outline positive outline value, 0 to default.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
  *
- * - `TTF_STYLE_NORMAL` (is zero)
- * - `TTF_STYLE_BOLD`
- * - `TTF_STYLE_ITALIC`
- * - `TTF_STYLE_UNDERLINE`
- * - `TTF_STYLE_STRIKETHROUGH`
- *
- * \param font the font to set a new style on.
- * \param style the new style values to set, OR'd together.
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
  *
- * \sa TTF_GetFontStyle
+ * \sa TTF_GetFontOutline
  */
-extern SDL_DECLSPEC void SDLCALL TTF_SetFontStyle(TTF_Font *font, int style);
+extern SDL_DECLSPEC bool SDLCALL TTF_SetFontOutline(TTF_Font *font, int outline);
 
 /**
  * Query a font's current outline.
@@ -449,24 +422,13 @@ extern SDL_DECLSPEC void SDLCALL TTF_SetFontStyle(TTF_Font *font, int style);
  * \param font the font to query.
  * \returns the font's current outline value.
  *
+ * \threadsafety It is safe to call this function from any thread.
+ *
  * \since This function is available since SDL_ttf 3.0.0.
  *
  * \sa TTF_SetFontOutline
  */
 extern SDL_DECLSPEC int SDLCALL TTF_GetFontOutline(const TTF_Font *font);
-
-/**
- * Set a font's current outline.
- *
- * \param font the font to set a new outline on.
- * \param outline positive outline value, 0 to default.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_GetFontOutline
- */
-extern SDL_DECLSPEC void SDLCALL TTF_SetFontOutline(TTF_Font *font, int outline);
-
 
 /**
  * Hinting flags
@@ -476,6 +438,32 @@ extern SDL_DECLSPEC void SDLCALL TTF_SetFontOutline(TTF_Font *font, int outline)
 #define TTF_HINTING_MONO            2
 #define TTF_HINTING_NONE            3
 #define TTF_HINTING_LIGHT_SUBPIXEL  4
+
+/**
+ * Set a font's current hinter setting.
+ *
+ * This updates any TTF_Text objects using this font, and clears
+ * already-generated glyphs, if any, from the cache.
+ *
+ * The hinter setting is a single value:
+ *
+ * - `TTF_HINTING_NORMAL`
+ * - `TTF_HINTING_LIGHT`
+ * - `TTF_HINTING_MONO`
+ * - `TTF_HINTING_NONE`
+ * - `TTF_HINTING_LIGHT_SUBPIXEL` (available in SDL_ttf 3.0.0 and later)
+ *
+ * \param font the font to set a new hinter setting on.
+ * \param hinting the new hinter setting.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
+ *
+ * \since This function is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_GetFontHinting
+ */
+extern SDL_DECLSPEC void SDLCALL TTF_SetFontHinting(TTF_Font *font, int hinting);
 
 /**
  * Query a font's current FreeType hinter setting.
@@ -491,6 +479,8 @@ extern SDL_DECLSPEC void SDLCALL TTF_SetFontOutline(TTF_Font *font, int outline)
  * \param font the font to query.
  * \returns the font's current hinter value.
  *
+ * \threadsafety It is safe to call this function from any thread.
+ *
  * \since This function is available since SDL_ttf 3.0.0.
  *
  * \sa TTF_SetFontHinting
@@ -498,69 +488,84 @@ extern SDL_DECLSPEC void SDLCALL TTF_SetFontOutline(TTF_Font *font, int outline)
 extern SDL_DECLSPEC int SDLCALL TTF_GetFontHinting(const TTF_Font *font);
 
 /**
- * Set a font's current hinter setting.
+ * Enable Signed Distance Field rendering for a font.
  *
- * Setting it clears already-generated glyphs, if any, from the cache.
+ * This works with the Blended APIs. SDF is a technique that
+ * helps fonts look sharp even when scaling and rotating.
  *
- * The hinter setting is a single value:
+ * This updates any TTF_Text objects using this font, and clears already-generated glyphs, if any, from the cache.
  *
- * - `TTF_HINTING_NORMAL`
- * - `TTF_HINTING_LIGHT`
- * - `TTF_HINTING_MONO`
- * - `TTF_HINTING_NONE`
- * - `TTF_HINTING_LIGHT_SUBPIXEL` (available in SDL_ttf 3.0.0 and later)
+ * \param font the font to set SDF support on.
+ * \param enabled true to enable SDF, false to disable.
+ * \returns true on success or false on failure; call SDL_GetError()
+ *          for more information.
  *
- * \param font the font to set a new hinter setting on.
- * \param hinting the new hinter setting.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_GetFontHinting
- */
-extern SDL_DECLSPEC void SDLCALL TTF_SetFontHinting(TTF_Font *font, int hinting);
-
-/**
- * Special layout option for rendering wrapped text
- */
-#define TTF_WRAPPED_ALIGN_LEFT      0
-#define TTF_WRAPPED_ALIGN_CENTER    1
-#define TTF_WRAPPED_ALIGN_RIGHT     2
-
-/**
- * Query a font's current wrap alignment option.
- *
- * The wrap alignment option can be one of the following:
- *
- * - `TTF_WRAPPED_ALIGN_LEFT`
- * - `TTF_WRAPPED_ALIGN_CENTER`
- * - `TTF_WRAPPED_ALIGN_RIGHT`
- *
- * \param font the font to query.
- * \returns the font's current wrap alignment option.
+ * \threadsafety This function should be called on the thread that created the font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
  *
- * \sa TTF_SetFontWrappedAlign
+ * \sa TTF_GetFontSDF
  */
-extern SDL_DECLSPEC int SDLCALL TTF_GetFontWrappedAlign(const TTF_Font *font);
+extern SDL_DECLSPEC bool TTF_SetFontSDF(TTF_Font *font, bool enabled);
+
+/**
+ * Query whether Signed Distance Field rendering is enabled for a font.
+ *
+ * \param font the font to query
+ *
+ * \returns true if enabled, false otherwise.
+ *
+ * \threadsafety It is safe to call this function from any thread.
+ *
+ * \since This function is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_SetFontSDF
+ */
+extern SDL_DECLSPEC bool TTF_GetFontSDF(const TTF_Font *font);
+
+/**
+ * The horizontal alignment used when rendering wrapped text.
+ *
+ * \since This enum is available since SDL_ttf 3.0.0.
+ */
+typedef enum TTF_HorizontalAlignment
+{
+    TTF_HORIZONTAL_ALIGN_INVALID = -1,
+    TTF_HORIZONTAL_ALIGN_LEFT,
+    TTF_HORIZONTAL_ALIGN_CENTER,
+    TTF_HORIZONTAL_ALIGN_RIGHT
+} TTF_HorizontalAlignment;
 
 /**
  * Set a font's current wrap alignment option.
  *
- * The wrap alignment option can be one of the following:
- *
- * - `TTF_WRAPPED_ALIGN_LEFT`
- * - `TTF_WRAPPED_ALIGN_CENTER`
- * - `TTF_WRAPPED_ALIGN_RIGHT`
+ * This updates any TTF_Text objects using this font.
  *
  * \param font the font to set a new wrap alignment option on.
  * \param align the new wrap alignment option.
  *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
+ *
  * \since This function is available since SDL_ttf 3.0.0.
  *
- * \sa TTF_GetFontWrappedAlign
+ * \sa TTF_GetFontWrapAlignment
  */
-extern SDL_DECLSPEC void SDLCALL TTF_SetFontWrappedAlign(TTF_Font *font, int align);
+extern SDL_DECLSPEC void SDLCALL TTF_SetFontWrapAlignment(TTF_Font *font, TTF_HorizontalAlignment align);
+
+/**
+ * Query a font's current wrap alignment option.
+ *
+ * \param font the font to query.
+ * \returns the font's current wrap alignment option.
+ *
+ * \threadsafety It is safe to call this function from any thread.
+ *
+ * \since This function is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_SetFontWrapAlignment
+ */
+extern SDL_DECLSPEC TTF_HorizontalAlignment SDLCALL TTF_GetFontWrapAlignment(const TTF_Font *font);
 
 /**
  * Query the total height of a font.
@@ -570,9 +575,11 @@ extern SDL_DECLSPEC void SDLCALL TTF_SetFontWrappedAlign(TTF_Font *font, int ali
  * \param font the font to query.
  * \returns the font's height.
  *
+ * \threadsafety It is safe to call this function from any thread.
+ *
  * \since This function is available since SDL_ttf 3.0.0.
  */
-extern SDL_DECLSPEC int SDLCALL TTF_FontHeight(const TTF_Font *font);
+extern SDL_DECLSPEC int SDLCALL TTF_GetFontHeight(const TTF_Font *font);
 
 /**
  * Query the offset from the baseline to the top of a font.
@@ -582,9 +589,11 @@ extern SDL_DECLSPEC int SDLCALL TTF_FontHeight(const TTF_Font *font);
  * \param font the font to query.
  * \returns the font's ascent.
  *
+ * \threadsafety It is safe to call this function from any thread.
+ *
  * \since This function is available since SDL_ttf 3.0.0.
  */
-extern SDL_DECLSPEC int SDLCALL TTF_FontAscent(const TTF_Font *font);
+extern SDL_DECLSPEC int SDLCALL TTF_GetFontAscent(const TTF_Font *font);
 
 /**
  * Query the offset from the baseline to the bottom of a font.
@@ -594,29 +603,42 @@ extern SDL_DECLSPEC int SDLCALL TTF_FontAscent(const TTF_Font *font);
  * \param font the font to query.
  * \returns the font's descent.
  *
+ * \threadsafety It is safe to call this function from any thread.
+ *
  * \since This function is available since SDL_ttf 3.0.0.
  */
-extern SDL_DECLSPEC int SDLCALL TTF_FontDescent(const TTF_Font *font);
+extern SDL_DECLSPEC int SDLCALL TTF_GetFontDescent(const TTF_Font *font);
 
 /**
- * Query the recommended spacing between lines of text for a font.
+ * Set the spacing between lines of text for a font.
+ *
+ * This updates any TTF_Text objects using this font.
+ *
+ * \param font the font to modify.
+ * \param lineskip the new line spacing for the font.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
+ *
+ * \since This function is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_GetFontLineSkip
+ */
+extern SDL_DECLSPEC void SDLCALL TTF_SetFontLineSkip(TTF_Font *font, int lineskip);
+
+/**
+ * Query the spacing between lines of text for a font.
  *
  * \param font the font to query.
  * \returns the font's recommended spacing.
  *
- * \since This function is available since SDL_ttf 3.0.0.
- */
-extern SDL_DECLSPEC int SDLCALL TTF_FontLineSkip(const TTF_Font *font);
-
-/**
- * Query whether or not kerning is enabled for a font.
- *
- * \param font the font to query.
- * \returns SDL_TRUE if kerning is enabled, SDL_FALSE otherwise.
+ * \threadsafety It is safe to call this function from any thread.
  *
  * \since This function is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_SetFontLineSkip
  */
-extern SDL_DECLSPEC SDL_bool SDLCALL TTF_GetFontKerning(const TTF_Font *font);
+extern SDL_DECLSPEC int SDLCALL TTF_GetFontLineSkip(const TTF_Font *font);
 
 /**
  * Set if kerning is enabled for a font.
@@ -626,22 +648,33 @@ extern SDL_DECLSPEC SDL_bool SDLCALL TTF_GetFontKerning(const TTF_Font *font);
  * produce better rendering (with kerning disabled, some fonts might render
  * the word `kerning` as something that looks like `keming` for example).
  *
+ * This updates any TTF_Text objects using this font.
+ *
  * \param font the font to set kerning on.
- * \param enabled SDL_TRUE to enable kerning, SDL_FALSE to disable.
+ * \param enabled true to enable kerning, false to disable.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_GetFontKerning
  */
-extern SDL_DECLSPEC void SDLCALL TTF_SetFontKerning(TTF_Font *font, SDL_bool enabled);
+extern SDL_DECLSPEC void SDLCALL TTF_SetFontKerning(TTF_Font *font, bool enabled);
 
 /**
- * Query the number of faces of a font.
+ * Query whether or not kerning is enabled for a font.
  *
  * \param font the font to query.
- * \returns the number of FreeType font faces.
+ * \returns true if kerning is enabled, false otherwise.
+ *
+ * \threadsafety It is safe to call this function from any thread.
  *
  * \since This function is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_SetFontKerning
  */
-extern SDL_DECLSPEC long SDLCALL TTF_FontFaces(const TTF_Font *font);
+extern SDL_DECLSPEC bool SDLCALL TTF_GetFontKerning(const TTF_Font *font);
 
 /**
  * Query whether a font is fixed-width.
@@ -653,11 +686,30 @@ extern SDL_DECLSPEC long SDLCALL TTF_FontFaces(const TTF_Font *font);
  * are more likely to not be fixed-width in most cases.
  *
  * \param font the font to query.
- * \returns SDL_TRUE if fixed-width, SDL_FALSE if not.
+ * \returns true if the font is fixed-width, false otherwise.
+ *
+ * \threadsafety It is safe to call this function from any thread.
  *
  * \since This function is available since SDL_ttf 3.0.0.
  */
-extern SDL_DECLSPEC SDL_bool SDLCALL TTF_FontFaceIsFixedWidth(const TTF_Font *font);
+extern SDL_DECLSPEC bool SDLCALL TTF_FontIsFixedWidth(const TTF_Font *font);
+
+/**
+ * Query whether a font is scalable or not.
+ *
+ * Scalability lets us distinguish between outline and bitmap fonts.
+ *
+ * \param font the font to query
+ *
+ * \returns true if the font is scalable, false otherwise.
+ *
+ * \threadsafety It is safe to call this function from any thread.
+ *
+ * \since This function is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_SetFontSDF
+ */
+extern SDL_DECLSPEC bool TTF_FontIsScalable(const TTF_Font *font);
 
 /**
  * Query a font's family name.
@@ -671,9 +723,11 @@ extern SDL_DECLSPEC SDL_bool SDLCALL TTF_FontFaceIsFixedWidth(const TTF_Font *fo
  * \param font the font to query.
  * \returns the font's family name.
  *
+ * \threadsafety It is safe to call this function from any thread.
+ *
  * \since This function is available since SDL_ttf 3.0.0.
  */
-extern SDL_DECLSPEC const char * SDLCALL TTF_FontFaceFamilyName(const TTF_Font *font);
+extern SDL_DECLSPEC const char * SDLCALL TTF_GetFontFamilyName(const TTF_Font *font);
 
 /**
  * Query a font's style name.
@@ -687,128 +741,233 @@ extern SDL_DECLSPEC const char * SDLCALL TTF_FontFaceFamilyName(const TTF_Font *
  * \param font the font to query.
  * \returns the font's style name.
  *
+ * \threadsafety It is safe to call this function from any thread.
+ *
  * \since This function is available since SDL_ttf 3.0.0.
  */
-extern SDL_DECLSPEC const char * SDLCALL TTF_FontFaceStyleName(const TTF_Font *font);
+extern SDL_DECLSPEC const char * SDLCALL TTF_GetFontStyleName(const TTF_Font *font);
 
 /**
- * Check whether a glyph is provided by the font for a 16-bit codepoint.
+ * Direction flags
  *
- * Note that this version of the function takes a 16-bit character code, which
- * covers the Basic Multilingual Plane, but is insufficient to cover the
- * entire set of possible Unicode values, including emoji glyphs. You should
- * use TTF_GlyphIsProvided32() instead, which offers the same functionality
- * but takes a 32-bit codepoint instead.
+ * \since This enum is available since SDL_ttf 3.0.0.
  *
- * The only reason to use this function is that it was available since the
- * beginning of time, more or less.
+ * \sa TTF_SetFontDirection
+ */
+typedef enum TTF_Direction
+{
+  TTF_DIRECTION_LTR = 0,    /* Left to Right */
+  TTF_DIRECTION_RTL,        /* Right to Left */
+  TTF_DIRECTION_TTB,        /* Top to Bottom */
+  TTF_DIRECTION_BTT         /* Bottom to Top */
+} TTF_Direction;
+
+/**
+ * Set direction to be used for text shaping by a font.
+ *
+ * Possible direction values are:
+ *
+ * - `TTF_DIRECTION_LTR` (Left to Right)
+ * - `TTF_DIRECTION_RTL` (Right to Left)
+ * - `TTF_DIRECTION_TTB` (Top to Bottom)
+ * - `TTF_DIRECTION_BTT` (Bottom to Top)
+ *
+ * If SDL_ttf was not built with HarfBuzz support, this function returns
+ * false.
+ *
+ * This updates any TTF_Text objects using this font.
+ *
+ * \param font the font to specify a direction for.
+ * \param direction the new direction for text to flow.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
+ *
+ * \since This function is available since SDL_ttf 3.0.0.
+ */
+extern SDL_DECLSPEC bool SDLCALL TTF_SetFontDirection(TTF_Font *font, TTF_Direction direction);
+
+/**
+ * Get direction to be used for text shaping by a font.
+ *
+ * Possible direction values are:
+ *
+ * - `TTF_DIRECTION_LTR` (Left to Right)
+ * - `TTF_DIRECTION_RTL` (Right to Left)
+ * - `TTF_DIRECTION_TTB` (Top to Bottom)
+ * - `TTF_DIRECTION_BTT` (Bottom to Top)
+ *
+ * If SDL_ttf was not built with HarfBuzz support, this function returns
+ * TTF_DIRECTION_LTR.
  *
  * \param font the font to query.
- * \param ch the character code to check.
- * \returns SDL_TRUE if font provides a glyph for this character, SDL_FALSE if
- *          not.
+ * \returns the direction to be used for text shaping.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_GlyphIsProvided32
  */
-extern SDL_DECLSPEC SDL_bool SDLCALL TTF_GlyphIsProvided(TTF_Font *font, Uint16 ch);
+extern SDL_DECLSPEC TTF_Direction SDLCALL TTF_GetFontDirection(TTF_Font *font);
 
 /**
- * Check whether a glyph is provided by the font for a 32-bit codepoint.
+ * Set script to be used for text shaping by a font.
  *
- * This is the same as TTF_GlyphIsProvided(), but takes a 32-bit character
- * instead of 16-bit, and thus can query a larger range. If you are sure
- * you'll have an SDL_ttf that's version 2.0.18 or newer, there's no reason
- * not to use this function exclusively.
+ * The supplied script value must be a null-terminated string of exactly four
+ * characters.
+ *
+ * If SDL_ttf was not built with HarfBuzz support, this function returns
+ * false.
+ *
+ * This updates any TTF_Text objects using this font.
+ *
+ * \param font the font to specify a script name for.
+ * \param script null-terminated string of exactly 4 characters.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ *
+ * \threadsafety This function is not thread-safe.
+ *
+ * \since This function is available since SDL_ttf 3.0.0.
+ */
+extern SDL_DECLSPEC bool SDLCALL TTF_SetFontScript(TTF_Font *font, const char *script);
+
+/**
+ * Get the script used by a 32-bit codepoint.
+ *
+ * The supplied script value will be a null-terminated string of exactly four
+ * characters.
+ *
+ * If SDL_ttf was not built with HarfBuzz support, this function returns
+ * false.
+ *
+ * \param ch the character code to check.
+ * \param script a pointer filled in with the script used by `ch`.
+ * \param script_size the size of the script buffer, which must be at least 5
+ *                    characters.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
+ *
+ * \since This function is available since SDL_ttf 3.0.0.
+ */
+extern SDL_DECLSPEC bool SDLCALL TTF_GetGlyphScript(Uint32 ch, char *script, size_t script_size);
+
+/**
+ * Set language to be used for text shaping by a font.
+ *
+ * If SDL_ttf was not built with HarfBuzz support, this function returns false.
+ *
+ * This updates any TTF_Text objects using this font.
+ *
+ * \param font the font to specify a language for.
+ * \param language_bcp47 a null-terminated string containing the desired language's BCP47 code. Or null to reset the value.
+ * \returns true on success or false on failure; call SDL_GetError()
+ *          for more information.
+ *
+ * \threadsafety This function should be called on the thread that created the font.
+ *
+ * \since This function is available since SDL_ttf 3.0.0.
+ */
+extern SDL_DECLSPEC bool TTF_SetFontLanguage(TTF_Font *font, const char *language_bcp47);
+
+/**
+ * Check whether a glyph is provided by the font for a UNICODE codepoint.
  *
  * \param font the font to query.
- * \param ch the character code to check.
- * \returns SDL_TRUE if font provides a glyph for this character, SDL_FALSE if
- *          not.
+ * \param ch the codepoint to check.
+ * \returns true if font provides a glyph for this character, false if not.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
  */
-extern SDL_DECLSPEC SDL_bool SDLCALL TTF_GlyphIsProvided32(TTF_Font *font, Uint32 ch);
+extern SDL_DECLSPEC bool SDLCALL TTF_FontHasGlyph(TTF_Font *font, Uint32 ch);
 
 /**
- * Query the metrics (dimensions) of a font's 16-bit glyph.
+ * Get the pixel image for a UNICODE codepoint.
+ *
+ * \param font the font to query.
+ * \param ch the codepoint to check.
+ * \returns an SDL_Surface containing the glyph, or NULL on failure; call
+ *          SDL_GetError() for more information.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
+ *
+ * \since This function is available since SDL_ttf 3.0.0.
+ */
+extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_GetGlyphImage(TTF_Font *font, Uint32 ch);
+
+/**
+ * Get the pixel image for a character index.
+ *
+ * This is useful for text engine implementations, which can call this with
+ * the `glyph_index` in a TTF_CopyOperation
+ *
+ * \param font the font to query.
+ * \param glyph_index the index of the glyph to return.
+ * \returns an SDL_Surface containing the glyph, or NULL on failure; call
+ *          SDL_GetError() for more information.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
+ *
+ * \since This function is available since SDL_ttf 3.0.0.
+ */
+extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_GetGlyphImageForIndex(TTF_Font *font, Uint32 glyph_index);
+
+/**
+ * Query the metrics (dimensions) of a font's glyph for a UNICODE codepoint.
  *
  * To understand what these metrics mean, here is a useful link:
  *
  * https://freetype.sourceforge.net/freetype2/docs/tutorial/step2.html
  *
- * Note that this version of the function takes a 16-bit character code, which
- * covers the Basic Multilingual Plane, but is insufficient to cover the
- * entire set of possible Unicode values, including emoji glyphs. You should
- * use TTF_GlyphMetrics32() instead, which offers the same functionality but
- * takes a 32-bit codepoint instead.
- *
- * The only reason to use this function is that it was available since the
- * beginning of time, more or less.
- *
  * \param font the font to query.
- * \param ch the character code to check.
- * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
- *          for more information.
+ * \param ch the codepoint to check.
+ * \param minx a pointer filled in with the minimum x coordinate of the glyph
+ *             from the left edge of its bounding box. This value may be
+ *             negative.
+ * \param maxx a pointer filled in with the maximum x coordinate of the glyph
+ *             from the left edge of its bounding box.
+ * \param miny a pointer filled in with the minimum y coordinate of the glyph
+ *             from the bottom edge of its bounding box. This value may be
+ *             negative.
+ * \param maxy a pointer filled in with the maximum y coordinate of the glyph
+ *             from the bottom edge of its bounding box.
+ * \param advance a pointer filled in with the distance to the next glyph from
+ *                the left edge of this glyph's bounding box.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_GlyphMetrics32
  */
-extern SDL_DECLSPEC SDL_bool SDLCALL TTF_GlyphMetrics(TTF_Font *font, Uint16 ch,
-                        int *minx, int *maxx,
-                        int *miny, int *maxy, int *advance);
+extern SDL_DECLSPEC bool SDLCALL TTF_GetGlyphMetrics(TTF_Font *font, Uint32 ch, int *minx, int *maxx, int *miny, int *maxy, int *advance);
 
 /**
- * Query the metrics (dimensions) of a font's 32-bit glyph.
- *
- * To understand what these metrics mean, here is a useful link:
- *
- * https://freetype.sourceforge.net/freetype2/docs/tutorial/step2.html
- *
- * This is the same as TTF_GlyphMetrics(), but takes a 32-bit character
- * instead of 16-bit, and thus can query a larger range. If you are sure
- * you'll have an SDL_ttf that's version 2.0.18 or newer, there's no reason
- * not to use this function exclusively.
+ * Query the kerning size between the glyphs of two UNICODE codepoints.
  *
  * \param font the font to query.
- * \param ch the character code to check.
- * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
+ * \param previous_ch the previous codepoint.
+ * \param ch the current codepoint.
+ * \param kerning a pointer filled in with the kerning size between the two glyphs, in pixels, may be NULL.
+ * \returns true on success or false on failure; call SDL_GetError()
  *          for more information.
+ *
+ * \threadsafety This function should be called on the thread that created the font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
  */
-extern SDL_DECLSPEC SDL_bool SDLCALL TTF_GlyphMetrics32(TTF_Font *font, Uint32 ch,
-                        int *minx, int *maxx,
-                        int *miny, int *maxy, int *advance);
-
-/**
- * Calculate the dimensions of a rendered string of Latin1 text.
- *
- * This will report the width and height, in pixels, of the space that the
- * specified string will take to fully render.
- *
- * This does not need to render the string to do this calculation.
- *
- * You almost certainly want TTF_SizeUTF8() unless you're sure you have a
- * 1-byte Latin1 encoding. US ASCII characters will work with either function,
- * but most other Unicode characters packed into a `const char *` will need
- * UTF-8.
- *
- * \param font the font to query.
- * \param text text to calculate, in Latin1 encoding.
- * \param w will be filled with width, in pixels, on return.
- * \param h will be filled with height, in pixels, on return.
- * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
- *          for more information.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_SizeUTF8
- * \sa TTF_SizeUNICODE
- */
-extern SDL_DECLSPEC SDL_bool SDLCALL TTF_SizeText(TTF_Font *font, const char *text, int *w, int *h);
+extern SDL_DECLSPEC bool TTF_GetGlyphKerning(TTF_Font *font, Uint32 previous_ch, Uint32 ch, int *kerning);
 
 /**
  * Calculate the dimensions of a rendered string of UTF-8 text.
@@ -816,76 +975,49 @@ extern SDL_DECLSPEC SDL_bool SDLCALL TTF_SizeText(TTF_Font *font, const char *te
  * This will report the width and height, in pixels, of the space that the
  * specified string will take to fully render.
  *
- * This does not need to render the string to do this calculation.
- *
  * \param font the font to query.
  * \param text text to calculate, in UTF-8 encoding.
+ * \param length the length of the text, in bytes, or 0 for null terminated
+ *               text.
  * \param w will be filled with width, in pixels, on return.
  * \param h will be filled with height, in pixels, on return.
- * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
- *          for more information.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_SizeUNICODE
  */
-extern SDL_DECLSPEC SDL_bool SDLCALL TTF_SizeUTF8(TTF_Font *font, const char *text, int *w, int *h);
+extern SDL_DECLSPEC bool SDLCALL TTF_GetStringSize(TTF_Font *font, const char *text, size_t length, int *w, int *h);
 
 /**
- * Calculate the dimensions of a rendered string of UCS-2 text.
+ * Calculate the dimensions of a rendered string of UTF-8 text.
  *
  * This will report the width and height, in pixels, of the space that the
  * specified string will take to fully render.
  *
- * This does not need to render the string to do this calculation.
+ * Text is wrapped to multiple lines on line endings and on word boundaries if
+ * it extends beyond `wrapLength` in pixels.
  *
- * Please note that this function is named "Unicode" but currently expects
- * UCS-2 encoding (16 bits per codepoint). This does not give you access to
- * large Unicode values, such as emoji glyphs. These codepoints are accessible
- * through the UTF-8 version of this function.
+ * If wrapLength is 0, this function will only wrap on newline characters.
  *
  * \param font the font to query.
- * \param text text to calculate, in UCS-2 encoding.
+ * \param text text to calculate, in UTF-8 encoding.
+ * \param length the length of the text, in bytes, or 0 for null terminated
+ *               text.
+ * \param wrapLength the maximum width or 0 to wrap on newline characters.
  * \param w will be filled with width, in pixels, on return.
  * \param h will be filled with height, in pixels, on return.
- * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
- *          for more information.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_SizeUTF8
  */
-extern SDL_DECLSPEC SDL_bool SDLCALL TTF_SizeUNICODE(TTF_Font *font, const Uint16 *text, int *w, int *h);
-
-/**
- * Calculate how much of a Latin1 string will fit in a given width.
- *
- * This reports the number of characters that can be rendered before reaching
- * `measure_width`.
- *
- * This does not need to render the string to do this calculation.
- *
- * You almost certainly want TTF_MeasureUTF8() unless you're sure you have a
- * 1-byte Latin1 encoding. US ASCII characters will work with either function,
- * but most other Unicode characters packed into a `const char *` will need
- * UTF-8.
- *
- * \param font the font to query.
- * \param text text to calculate, in Latin1 encoding.
- * \param measure_width maximum width, in pixels, available for the string.
- * \param extent on return, filled with latest calculated width.
- * \param count on return, filled with number of characters that can be
- *              rendered.
- * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
- *          for more information.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_MeasureText
- * \sa TTF_MeasureUTF8
- * \sa TTF_MeasureUNICODE
- */
-extern SDL_DECLSPEC SDL_bool SDLCALL TTF_MeasureText(TTF_Font *font, const char *text, int measure_width, int *extent, int *count);
+extern SDL_DECLSPEC bool SDLCALL TTF_GetStringSizeWrapped(TTF_Font *font, const char *text, size_t length, int wrapLength, int *w, int *h);
 
 /**
  * Calculate how much of a UTF-8 string will fit in a given width.
@@ -897,314 +1029,24 @@ extern SDL_DECLSPEC SDL_bool SDLCALL TTF_MeasureText(TTF_Font *font, const char 
  *
  * \param font the font to query.
  * \param text text to calculate, in UTF-8 encoding.
+ * \param length the length of the text, in bytes, or 0 for null terminated
+ *               text.
  * \param measure_width maximum width, in pixels, available for the string.
  * \param extent on return, filled with latest calculated width.
  * \param count on return, filled with number of characters that can be
  *              rendered.
- * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
- *          for more information.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_MeasureText
- * \sa TTF_MeasureUTF8
- * \sa TTF_MeasureUNICODE
  */
-extern SDL_DECLSPEC SDL_bool SDLCALL TTF_MeasureUTF8(TTF_Font *font, const char *text, int measure_width, int *extent, int *count);
+extern SDL_DECLSPEC bool SDLCALL TTF_MeasureString(TTF_Font *font, const char *text, size_t length, int measure_width, int *extent, int *count);
 
 /**
- * Calculate how much of a UCS-2 string will fit in a given width.
- *
- * This reports the number of characters that can be rendered before reaching
- * `measure_width`.
- *
- * This does not need to render the string to do this calculation.
- *
- * Please note that this function is named "Unicode" but currently expects
- * UCS-2 encoding (16 bits per codepoint). This does not give you access to
- * large Unicode values, such as emoji glyphs. These codepoints are accessible
- * through the UTF-8 version of this function.
- *
- * \param font the font to query.
- * \param text text to calculate, in UCS-2 encoding.
- * \param measure_width maximum width, in pixels, available for the string.
- * \param extent on return, filled with latest calculated width.
- * \param count on return, filled with number of characters that can be
- *              rendered.
- * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
- *          for more information.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_MeasureText
- * \sa TTF_MeasureUTF8
- * \sa TTF_MeasureUNICODE
- */
-extern SDL_DECLSPEC SDL_bool SDLCALL TTF_MeasureUNICODE(TTF_Font *font, const Uint16 *text, int measure_width, int *extent, int *count);
-
-/**
- * Render Latin1 text at fast quality to a new 8-bit surface.
- *
- * This function will allocate a new 8-bit, palettized surface. The surface's
- * 0 pixel will be the colorkey, giving a transparent background. The 1 pixel
- * will be set to the text color.
- *
- * This will not word-wrap the string; you'll get a surface with a single line
- * of text, as long as the string requires. You can use
- * TTF_RenderText_Solid_Wrapped() instead if you need to wrap the output to
- * multiple lines.
- *
- * This will not wrap on newline characters.
- *
- * You almost certainly want TTF_RenderUTF8_Solid() unless you're sure you
- * have a 1-byte Latin1 encoding. US ASCII characters will work with either
- * function, but most other Unicode characters packed into a `const char *`
- * will need UTF-8.
- *
- * You can render at other quality levels with TTF_RenderText_Shaded,
- * TTF_RenderText_Blended, and TTF_RenderText_LCD.
- *
- * \param font the font to render with.
- * \param text text to render, in Latin1 encoding.
- * \param fg the foreground color for the text.
- * \returns a new 8-bit, palettized surface, or NULL if there was an error.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_RenderUTF8_Solid
- * \sa TTF_RenderUNICODE_Solid
- */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderText_Solid(TTF_Font *font,
-                const char *text, SDL_Color fg);
-
-/**
- * Render UTF-8 text at fast quality to a new 8-bit surface.
- *
- * This function will allocate a new 8-bit, palettized surface. The surface's
- * 0 pixel will be the colorkey, giving a transparent background. The 1 pixel
- * will be set to the text color.
- *
- * This will not word-wrap the string; you'll get a surface with a single line
- * of text, as long as the string requires. You can use
- * TTF_RenderUTF8_Solid_Wrapped() instead if you need to wrap the output to
- * multiple lines.
- *
- * This will not wrap on newline characters.
- *
- * You can render at other quality levels with TTF_RenderUTF8_Shaded,
- * TTF_RenderUTF8_Blended, and TTF_RenderUTF8_LCD.
- *
- * \param font the font to render with.
- * \param text text to render, in UTF-8 encoding.
- * \param fg the foreground color for the text.
- * \returns a new 8-bit, palettized surface, or NULL if there was an error.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_RenderUTF8_Shaded
- * \sa TTF_RenderUTF8_Blended
- * \sa TTF_RenderUTF8_LCD
- */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderUTF8_Solid(TTF_Font *font,
-                const char *text, SDL_Color fg);
-
-/**
- * Render UCS-2 text at fast quality to a new 8-bit surface.
- *
- * This function will allocate a new 8-bit, palettized surface. The surface's
- * 0 pixel will be the colorkey, giving a transparent background. The 1 pixel
- * will be set to the text color.
- *
- * This will not word-wrap the string; you'll get a surface with a single line
- * of text, as long as the string requires. You can use
- * TTF_RenderUNICODE_Solid_Wrapped() instead if you need to wrap the output to
- * multiple lines.
- *
- * This will not wrap on newline characters.
- *
- * Please note that this function is named "Unicode" but currently expects
- * UCS-2 encoding (16 bits per codepoint). This does not give you access to
- * large Unicode values, such as emoji glyphs. These codepoints are accessible
- * through the UTF-8 version of this function.
- *
- * You can render at other quality levels with TTF_RenderUNICODE_Shaded,
- * TTF_RenderUNICODE_Blended, and TTF_RenderUNICODE_LCD.
- *
- * \param font the font to render with.
- * \param text text to render, in UCS-2 encoding.
- * \param fg the foreground color for the text.
- * \returns a new 8-bit, palettized surface, or NULL if there was an error.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_RenderUTF8_Solid
- */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderUNICODE_Solid(TTF_Font *font,
-                const Uint16 *text, SDL_Color fg);
-
-/**
- * Render word-wrapped Latin1 text at fast quality to a new 8-bit surface.
- *
- * This function will allocate a new 8-bit, palettized surface. The surface's
- * 0 pixel will be the colorkey, giving a transparent background. The 1 pixel
- * will be set to the text color.
- *
- * Text is wrapped to multiple lines on line endings and on word boundaries if
- * it extends beyond `wrapLength` in pixels.
- *
- * If wrapLength is 0, this function will only wrap on newline characters.
- *
- * You almost certainly want TTF_RenderUTF8_Solid_Wrapped() unless you're sure
- * you have a 1-byte Latin1 encoding. US ASCII characters will work with
- * either function, but most other Unicode characters packed into a `const
- * char *` will need UTF-8.
- *
- * You can render at other quality levels with TTF_RenderText_Shaded_Wrapped,
- * TTF_RenderText_Blended_Wrapped, and TTF_RenderText_LCD_Wrapped.
- *
- * \param font the font to render with.
- * \param text text to render, in Latin1 encoding.
- * \param fg the foreground color for the text.
- * \returns a new 8-bit, palettized surface, or NULL if there was an error.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_RenderUTF8_Solid_Wrapped
- * \sa TTF_RenderUNICODE_Solid_Wrapped
- */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderText_Solid_Wrapped(TTF_Font *font,
-                const char *text, SDL_Color fg, Uint32 wrapLength);
-
-/**
- * Render word-wrapped UTF-8 text at fast quality to a new 8-bit surface.
- *
- * This function will allocate a new 8-bit, palettized surface. The surface's
- * 0 pixel will be the colorkey, giving a transparent background. The 1 pixel
- * will be set to the text color.
- *
- * Text is wrapped to multiple lines on line endings and on word boundaries if
- * it extends beyond `wrapLength` in pixels.
- *
- * If wrapLength is 0, this function will only wrap on newline characters.
- *
- * You can render at other quality levels with TTF_RenderUTF8_Shaded_Wrapped,
- * TTF_RenderUTF8_Blended_Wrapped, and TTF_RenderUTF8_LCD_Wrapped.
- *
- * \param font the font to render with.
- * \param text text to render, in UTF-8 encoding.
- * \param fg the foreground color for the text.
- * \returns a new 8-bit, palettized surface, or NULL if there was an error.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_RenderUTF8_Shaded_Wrapped
- * \sa TTF_RenderUTF8_Blended_Wrapped
- * \sa TTF_RenderUTF8_LCD_Wrapped
- */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderUTF8_Solid_Wrapped(TTF_Font *font,
-                const char *text, SDL_Color fg, Uint32 wrapLength);
-
-/**
- * Render word-wrapped UCS-2 text at fast quality to a new 8-bit surface.
- *
- * This function will allocate a new 8-bit, palettized surface. The surface's
- * 0 pixel will be the colorkey, giving a transparent background. The 1 pixel
- * will be set to the text color.
- *
- * Text is wrapped to multiple lines on line endings and on word boundaries if
- * it extends beyond `wrapLength` in pixels.
- *
- * If wrapLength is 0, this function will only wrap on newline characters.
- *
- * Please note that this function is named "Unicode" but currently expects
- * UCS-2 encoding (16 bits per codepoint). This does not give you access to
- * large Unicode values, such as emoji glyphs. These codepoints are accessible
- * through the UTF-8 version of this function.
- *
- * You can render at other quality levels with
- * TTF_RenderUNICODE_Shaded_Wrapped, TTF_RenderUNICODE_Blended_Wrapped, and
- * TTF_RenderUNICODE_LCD_Wrapped.
- *
- * \param font the font to render with.
- * \param text text to render, in UCS-2 encoding.
- * \param fg the foreground color for the text.
- * \returns a new 8-bit, palettized surface, or NULL if there was an error.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_RenderUTF8_Solid_Wrapped
- */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderUNICODE_Solid_Wrapped(TTF_Font *font,
-                const Uint16 *text, SDL_Color fg, Uint32 wrapLength);
-
-/**
- * Render a single 16-bit glyph at fast quality to a new 8-bit surface.
- *
- * This function will allocate a new 8-bit, palettized surface. The surface's
- * 0 pixel will be the colorkey, giving a transparent background. The 1 pixel
- * will be set to the text color.
- *
- * The glyph is rendered without any padding or centering in the X direction,
- * and aligned normally in the Y direction.
- *
- * Note that this version of the function takes a 16-bit character code, which
- * covers the Basic Multilingual Plane, but is insufficient to cover the
- * entire set of possible Unicode values, including emoji glyphs. You should
- * use TTF_RenderGlyph32_Solid() instead, which offers the same functionality
- * but takes a 32-bit codepoint instead.
- *
- * The only reason to use this function is that it was available since the
- * beginning of time, more or less.
- *
- * You can render at other quality levels with TTF_RenderGlyph_Shaded,
- * TTF_RenderGlyph_Blended, and TTF_RenderGlyph_LCD.
- *
- * \param font the font to render with.
- * \param ch the character to render.
- * \param fg the foreground color for the text.
- * \returns a new 8-bit, palettized surface, or NULL if there was an error.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_RenderGlyph32_Solid
- */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderGlyph_Solid(TTF_Font *font,
-                Uint16 ch, SDL_Color fg);
-
-/**
- * Render a single 32-bit glyph at fast quality to a new 8-bit surface.
- *
- * This function will allocate a new 8-bit, palettized surface. The surface's
- * 0 pixel will be the colorkey, giving a transparent background. The 1 pixel
- * will be set to the text color.
- *
- * The glyph is rendered without any padding or centering in the X direction,
- * and aligned normally in the Y direction.
- *
- * This is the same as TTF_RenderGlyph_Solid(), but takes a 32-bit character
- * instead of 16-bit, and thus can render a larger range. If you are sure
- * you'll have an SDL_ttf that's version 2.0.18 or newer, there's no reason
- * not to use this function exclusively.
- *
- * You can render at other quality levels with TTF_RenderGlyph32_Shaded,
- * TTF_RenderGlyph32_Blended, and TTF_RenderGlyph32_LCD.
- *
- * \param font the font to render with.
- * \param ch the character to render.
- * \param fg the foreground color for the text.
- * \returns a new 8-bit, palettized surface, or NULL if there was an error.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_RenderGlyph32_Shaded
- * \sa TTF_RenderGlyph32_Blended
- * \sa TTF_RenderGlyph32_LCD
- */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderGlyph32_Solid(TTF_Font *font,
-                Uint32 ch, SDL_Color fg);
-
-/**
- * Render Latin1 text at high quality to a new 8-bit surface.
+ * Render UTF-8 text at high quality to a new 8-bit surface.
  *
  * This function will allocate a new 8-bit, palettized surface. The surface's
  * 0 pixel will be the specified background color, while other pixels have
@@ -1218,128 +1060,24 @@ extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderGlyph32_Solid(TTF_Font *font
  *
  * This will not wrap on newline characters.
  *
- * You almost certainly want TTF_RenderUTF8_Shaded() unless you're sure you
- * have a 1-byte Latin1 encoding. US ASCII characters will work with either
- * function, but most other Unicode characters packed into a `const char *`
- * will need UTF-8.
- *
- * You can render at other quality levels with TTF_RenderText_Solid,
- * TTF_RenderText_Blended, and TTF_RenderText_LCD.
- *
- * \param font the font to render with.
- * \param text text to render, in Latin1 encoding.
- * \param fg the foreground color for the text.
- * \param bg the background color for the text.
- * \returns a new 8-bit, palettized surface, or NULL if there was an error.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_RenderUTF8_Shaded
- * \sa TTF_RenderUNICODE_Shaded
- */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderText_Shaded(TTF_Font *font,
-                const char *text, SDL_Color fg, SDL_Color bg);
-
-/**
- * Render UTF-8 text at high quality to a new 8-bit surface.
- *
- * This function will allocate a new 8-bit, palettized surface. The surface's
- * 0 pixel will be the specified background color, while other pixels have
- * varying degrees of the foreground color. This function returns the new
- * surface, or NULL if there was an error.
- *
- * This will not word-wrap the string; you'll get a surface with a single line
- * of text, as long as the string requires. You can use
- * TTF_RenderUTF8_Shaded_Wrapped() instead if you need to wrap the output to
- * multiple lines.
- *
- * This will not wrap on newline characters.
- *
- * You can render at other quality levels with TTF_RenderUTF8_Solid,
- * TTF_RenderUTF8_Blended, and TTF_RenderUTF8_LCD.
- *
  * \param font the font to render with.
  * \param text text to render, in UTF-8 encoding.
+ * \param length the length of the text, in bytes, or 0 for null terminated
+ *               text.
  * \param fg the foreground color for the text.
  * \param bg the background color for the text.
  * \returns a new 8-bit, palettized surface, or NULL if there was an error.
  *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_RenderUNICODE_Shaded
- */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderUTF8_Shaded(TTF_Font *font,
-                const char *text, SDL_Color fg, SDL_Color bg);
-
-/**
- * Render UCS-2 text at high quality to a new 8-bit surface.
- *
- * This function will allocate a new 8-bit, palettized surface. The surface's
- * 0 pixel will be the specified background color, while other pixels have
- * varying degrees of the foreground color. This function returns the new
- * surface, or NULL if there was an error.
- *
- * This will not word-wrap the string; you'll get a surface with a single line
- * of text, as long as the string requires. You can use
- * TTF_RenderUNICODE_Shaded_Wrapped() instead if you need to wrap the output
- * to multiple lines.
- *
- * This will not wrap on newline characters.
- *
- * Please note that this function is named "Unicode" but currently expects
- * UCS-2 encoding (16 bits per codepoint). This does not give you access to
- * large Unicode values, such as emoji glyphs. These codepoints are accessible
- * through the UTF-8 version of this function.
- *
- * You can render at other quality levels with TTF_RenderUNICODE_Solid,
- * TTF_RenderUNICODE_Blended, and TTF_RenderUNICODE_LCD.
- *
- * \param font the font to render with.
- * \param text text to render, in UCS-2 encoding.
- * \param fg the foreground color for the text.
- * \returns a new 8-bit, palettized surface, or NULL if there was an error.
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
  *
- * \sa TTF_RenderUTF8_Shaded
+ * \sa TTF_RenderText_Blended
+ * \sa TTF_RenderText_LCD
+ * \sa TTF_RenderText_Shaded_Wrapped
  */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderUNICODE_Shaded(TTF_Font *font,
-                const Uint16 *text, SDL_Color fg, SDL_Color bg);
-
-/**
- * Render word-wrapped Latin1 text at high quality to a new 8-bit surface.
- *
- * This function will allocate a new 8-bit, palettized surface. The surface's
- * 0 pixel will be the specified background color, while other pixels have
- * varying degrees of the foreground color. This function returns the new
- * surface, or NULL if there was an error.
- *
- * Text is wrapped to multiple lines on line endings and on word boundaries if
- * it extends beyond `wrapLength` in pixels.
- *
- * If wrapLength is 0, this function will only wrap on newline characters.
- *
- * You almost certainly want TTF_RenderUTF8_Shaded_Wrapped() unless you're
- * sure you have a 1-byte Latin1 encoding. US ASCII characters will work with
- * either function, but most other Unicode characters packed into a `const
- * char *` will need UTF-8.
- *
- * You can render at other quality levels with TTF_RenderText_Solid_Wrapped,
- * TTF_RenderText_Blended_Wrapped, and TTF_RenderText_LCD_Wrapped.
- *
- * \param font the font to render with.
- * \param text text to render, in Latin1 encoding.
- * \param fg the foreground color for the text.
- * \param bg the background color for the text.
- * \returns a new 8-bit, palettized surface, or NULL if there was an error.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_RenderUTF8_Shaded_Wrapped
- * \sa TTF_RenderUNICODE_Shaded_Wrapped
- */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderText_Shaded_Wrapped(TTF_Font *font,
-                const char *text, SDL_Color fg, SDL_Color bg, Uint32 wrapLength);
+extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderText_Shaded(TTF_Font *font, const char *text, size_t length, SDL_Color fg, SDL_Color bg);
 
 /**
  * Render word-wrapped UTF-8 text at high quality to a new 8-bit surface.
@@ -1354,59 +1092,29 @@ extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderText_Shaded_Wrapped(TTF_Font
  *
  * If wrapLength is 0, this function will only wrap on newline characters.
  *
- * You can render at other quality levels with TTF_RenderUTF8_Solid_Wrapped,
- * TTF_RenderUTF8_Blended_Wrapped, and TTF_RenderUTF8_LCD_Wrapped.
- *
  * \param font the font to render with.
  * \param text text to render, in UTF-8 encoding.
+ * \param length the length of the text, in bytes, or 0 for null terminated
+ *               text.
  * \param fg the foreground color for the text.
+ * \param bg the background color for the text.
+ * \param wrapLength the maximum width of the text surface or 0 to wrap on
+ *                   newline characters.
  * \returns a new 8-bit, palettized surface, or NULL if there was an error.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
  *
- * \sa TTF_RenderUTF8_Solid_Wrapped
- * \sa TTF_RenderUTF8_Blended_Wrapped
- * \sa TTF_RenderUTF8_LCD_Wrapped
+ * \sa TTF_RenderText_Blended_Wrapped
+ * \sa TTF_RenderText_LCD_Wrapped
+ * \sa TTF_RenderText_Shaded
  */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderUTF8_Shaded_Wrapped(TTF_Font *font,
-                const char *text, SDL_Color fg, SDL_Color bg, Uint32 wrapLength);
+extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderText_Shaded_Wrapped(TTF_Font *font, const char *text, size_t length, SDL_Color fg, SDL_Color bg, int wrapLength);
 
 /**
- * Render word-wrapped UCS-2 text at high quality to a new 8-bit surface.
- *
- * This function will allocate a new 8-bit, palettized surface. The surface's
- * 0 pixel will be the specified background color, while other pixels have
- * varying degrees of the foreground color. This function returns the new
- * surface, or NULL if there was an error.
- *
- * Text is wrapped to multiple lines on line endings and on word boundaries if
- * it extends beyond `wrapLength` in pixels.
- *
- * If wrapLength is 0, this function will only wrap on newline characters.
- *
- * Please note that this function is named "Unicode" but currently expects
- * UCS-2 encoding (16 bits per codepoint). This does not give you access to
- * large Unicode values, such as emoji glyphs. These codepoints are accessible
- * through the UTF-8 version of this function.
- *
- * You can render at other quality levels with
- * TTF_RenderUNICODE_Solid_Wrapped, TTF_RenderUNICODE_Blended_Wrapped, and
- * TTF_RenderUNICODE_LCD_Wrapped.
- *
- * \param font the font to render with.
- * \param text text to render, in UCS-2 encoding.
- * \param fg the foreground color for the text.
- * \returns a new 8-bit, palettized surface, or NULL if there was an error.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_RenderUTF8_Shaded_Wrapped
- */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderUNICODE_Shaded_Wrapped(TTF_Font *font,
-                const Uint16 *text, SDL_Color fg, SDL_Color bg, Uint32 wrapLength);
-
-/**
- * Render a single 16-bit glyph at high quality to a new 8-bit surface.
+ * Render a single UNICODE codepoint at high quality to a new 8-bit surface.
  *
  * This function will allocate a new 8-bit, palettized surface. The surface's
  * 0 pixel will be the specified background color, while other pixels have
@@ -1416,66 +1124,24 @@ extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderUNICODE_Shaded_Wrapped(TTF_F
  * The glyph is rendered without any padding or centering in the X direction,
  * and aligned normally in the Y direction.
  *
- * Note that this version of the function takes a 16-bit character code, which
- * covers the Basic Multilingual Plane, but is insufficient to cover the
- * entire set of possible Unicode values, including emoji glyphs. You should
- * use TTF_RenderGlyph32_Shaded() instead, which offers the same functionality
- * but takes a 32-bit codepoint instead.
- *
- * The only reason to use this function is that it was available since the
- * beginning of time, more or less.
- *
- * You can render at other quality levels with TTF_RenderGlyph_Solid,
- * TTF_RenderGlyph_Blended, and TTF_RenderGlyph_LCD.
- *
  * \param font the font to render with.
- * \param ch the character to render.
+ * \param ch the codepoint to render.
  * \param fg the foreground color for the text.
  * \param bg the background color for the text.
  * \returns a new 8-bit, palettized surface, or NULL if there was an error.
  *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_RenderGlyph32_Shaded
- */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderGlyph_Shaded(TTF_Font *font,
-                Uint16 ch, SDL_Color fg, SDL_Color bg);
-
-/**
- * Render a single 32-bit glyph at high quality to a new 8-bit surface.
- *
- * This function will allocate a new 8-bit, palettized surface. The surface's
- * 0 pixel will be the specified background color, while other pixels have
- * varying degrees of the foreground color. This function returns the new
- * surface, or NULL if there was an error.
- *
- * The glyph is rendered without any padding or centering in the X direction,
- * and aligned normally in the Y direction.
- *
- * This is the same as TTF_RenderGlyph_Shaded(), but takes a 32-bit character
- * instead of 16-bit, and thus can render a larger range. If you are sure
- * you'll have an SDL_ttf that's version 2.0.18 or newer, there's no reason
- * not to use this function exclusively.
- *
- * You can render at other quality levels with TTF_RenderGlyph32_Solid,
- * TTF_RenderGlyph32_Blended, and TTF_RenderGlyph32_LCD.
- *
- * \param font the font to render with.
- * \param ch the character to render.
- * \param fg the foreground color for the text.
- * \returns a new 8-bit, palettized surface, or NULL if there was an error.
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
  *
- * \sa TTF_RenderGlyph32_Solid
- * \sa TTF_RenderGlyph32_Blended
- * \sa TTF_RenderGlyph32_LCD
+ * \sa TTF_RenderGlyph_Blended
+ * \sa TTF_RenderGlyph_LCD
  */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderGlyph32_Shaded(TTF_Font *font,
-                Uint32 ch, SDL_Color fg, SDL_Color bg);
+extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderGlyph_Shaded(TTF_Font *font, Uint32 ch, SDL_Color fg, SDL_Color bg);
 
 /**
- * Render Latin1 text at high quality to a new ARGB surface.
+ * Render UTF-8 text at high quality to a new ARGB surface.
  *
  * This function will allocate a new 32-bit, ARGB surface, using alpha
  * blending to dither the font with the given color. This function returns the
@@ -1488,122 +1154,23 @@ extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderGlyph32_Shaded(TTF_Font *fon
  *
  * This will not wrap on newline characters.
  *
- * You almost certainly want TTF_RenderUTF8_Blended() unless you're sure you
- * have a 1-byte Latin1 encoding. US ASCII characters will work with either
- * function, but most other Unicode characters packed into a `const char *`
- * will need UTF-8.
- *
- * You can render at other quality levels with TTF_RenderText_Solid,
- * TTF_RenderText_Blended, and TTF_RenderText_LCD.
- *
- * \param font the font to render with.
- * \param text text to render, in Latin1 encoding.
- * \param fg the foreground color for the text.
- * \returns a new 32-bit, ARGB surface, or NULL if there was an error.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_RenderUTF8_Shaded
- * \sa TTF_RenderUNICODE_Shaded
- */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderText_Blended(TTF_Font *font,
-                const char *text, SDL_Color fg);
-
-/**
- * Render UTF-8 text at high quality to a new ARGB surface.
- *
- * This function will allocate a new 32-bit, ARGB surface, using alpha
- * blending to dither the font with the given color. This function returns the
- * new surface, or NULL if there was an error.
- *
- * This will not word-wrap the string; you'll get a surface with a single line
- * of text, as long as the string requires. You can use
- * TTF_RenderUTF8_Blended_Wrapped() instead if you need to wrap the output to
- * multiple lines.
- *
- * This will not wrap on newline characters.
- *
- * You can render at other quality levels with TTF_RenderUTF8_Solid,
- * TTF_RenderUTF8_Shaded, and TTF_RenderUTF8_LCD.
- *
  * \param font the font to render with.
  * \param text text to render, in UTF-8 encoding.
+ * \param length the length of the text, in bytes, or 0 for null terminated
+ *               text.
  * \param fg the foreground color for the text.
  * \returns a new 32-bit, ARGB surface, or NULL if there was an error.
  *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_RenderUNICODE_Blended
- */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderUTF8_Blended(TTF_Font *font,
-                const char *text, SDL_Color fg);
-
-/**
- * Render UCS-2 text at high quality to a new ARGB surface.
- *
- * This function will allocate a new 32-bit, ARGB surface, using alpha
- * blending to dither the font with the given color. This function returns the
- * new surface, or NULL if there was an error.
- *
- * This will not word-wrap the string; you'll get a surface with a single line
- * of text, as long as the string requires. You can use
- * TTF_RenderUNICODE_Blended_Wrapped() instead if you need to wrap the output
- * to multiple lines.
- *
- * This will not wrap on newline characters.
- *
- * Please note that this function is named "Unicode" but currently expects
- * UCS-2 encoding (16 bits per codepoint). This does not give you access to
- * large Unicode values, such as emoji glyphs. These codepoints are accessible
- * through the UTF-8 version of this function.
- *
- * You can render at other quality levels with TTF_RenderUNICODE_Solid,
- * TTF_RenderUNICODE_Shaded, and TTF_RenderUNICODE_LCD.
- *
- * \param font the font to render with.
- * \param text text to render, in UCS-2 encoding.
- * \param fg the foreground color for the text.
- * \returns a new 32-bit, ARGB surface, or NULL if there was an error.
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
  *
- * \sa TTF_RenderUTF8_Blended
+ * \sa TTF_RenderText_Blended_Wrapped
+ * \sa TTF_RenderText_LCD
+ * \sa TTF_RenderText_Shaded
  */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderUNICODE_Blended(TTF_Font *font,
-                const Uint16 *text, SDL_Color fg);
-
-/**
- * Render word-wrapped Latin1 text at high quality to a new ARGB surface.
- *
- * This function will allocate a new 32-bit, ARGB surface, using alpha
- * blending to dither the font with the given color. This function returns the
- * new surface, or NULL if there was an error.
- *
- * Text is wrapped to multiple lines on line endings and on word boundaries if
- * it extends beyond `wrapLength` in pixels.
- *
- * If wrapLength is 0, this function will only wrap on newline characters.
- *
- * You almost certainly want TTF_RenderUTF8_Blended_Wrapped() unless you're
- * sure you have a 1-byte Latin1 encoding. US ASCII characters will work with
- * either function, but most other Unicode characters packed into a `const
- * char *` will need UTF-8.
- *
- * You can render at other quality levels with TTF_RenderText_Solid_Wrapped,
- * TTF_RenderText_Shaded_Wrapped, and TTF_RenderText_LCD_Wrapped.
- *
- * \param font the font to render with.
- * \param text text to render, in Latin1 encoding.
- * \param fg the foreground color for the text.
- * \returns a new 32-bit, ARGB surface, or NULL if there was an error.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_RenderUTF8_Blended_Wrapped
- * \sa TTF_RenderUNICODE_Blended_Wrapped
- */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderText_Blended_Wrapped(TTF_Font *font,
-                const char *text, SDL_Color fg, Uint32 wrapLength);
+extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderText_Blended(TTF_Font *font, const char *text, size_t length, SDL_Color fg);
 
 /**
  * Render word-wrapped UTF-8 text at high quality to a new ARGB surface.
@@ -1617,58 +1184,28 @@ extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderText_Blended_Wrapped(TTF_Fon
  *
  * If wrapLength is 0, this function will only wrap on newline characters.
  *
- * You can render at other quality levels with TTF_RenderUTF8_Solid_Wrapped,
- * TTF_RenderUTF8_Shaded_Wrapped, and TTF_RenderUTF8_LCD_Wrapped.
- *
  * \param font the font to render with.
  * \param text text to render, in UTF-8 encoding.
+ * \param length the length of the text, in bytes, or 0 for null terminated
+ *               text.
  * \param fg the foreground color for the text.
+ * \param wrapLength the maximum width of the text surface or 0 to wrap on
+ *                   newline characters.
  * \returns a new 32-bit, ARGB surface, or NULL if there was an error.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
  *
- * \sa TTF_RenderUTF8_Solid_Wrapped
- * \sa TTF_RenderUTF8_Shaded_Wrapped
- * \sa TTF_RenderUTF8_LCD_Wrapped
+ * \sa TTF_RenderText_Blended
+ * \sa TTF_RenderText_LCD_Wrapped
+ * \sa TTF_RenderText_Shaded_Wrapped
  */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderUTF8_Blended_Wrapped(TTF_Font *font,
-                const char *text, SDL_Color fg, Uint32 wrapLength);
+extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderText_Blended_Wrapped(TTF_Font *font, const char *text, size_t length, SDL_Color fg, int wrapLength);
 
 /**
- * Render word-wrapped UCS-2 text at high quality to a new ARGB surface.
- *
- * This function will allocate a new 32-bit, ARGB surface, using alpha
- * blending to dither the font with the given color. This function returns the
- * new surface, or NULL if there was an error.
- *
- * Text is wrapped to multiple lines on line endings and on word boundaries if
- * it extends beyond `wrapLength` in pixels.
- *
- * If wrapLength is 0, this function will only wrap on newline characters.
- *
- * Please note that this function is named "Unicode" but currently expects
- * UCS-2 encoding (16 bits per codepoint). This does not give you access to
- * large Unicode values, such as emoji glyphs. These codepoints are accessible
- * through the UTF-8 version of this function.
- *
- * You can render at other quality levels with
- * TTF_RenderUNICODE_Solid_Wrapped, TTF_RenderUNICODE_Shaded_Wrapped, and
- * TTF_RenderUNICODE_LCD_Wrapped.
- *
- * \param font the font to render with.
- * \param text text to render, in UCS-2 encoding.
- * \param fg the foreground color for the text.
- * \returns a new 32-bit, ARGB surface, or NULL if there was an error.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_RenderUTF8_Blended_Wrapped
- */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderUNICODE_Blended_Wrapped(TTF_Font *font,
-                const Uint16 *text, SDL_Color fg, Uint32 wrapLength);
-
-/**
- * Render a single 16-bit glyph at high quality to a new ARGB surface.
+ * Render a single UNICODE codepoint at high quality to a new ARGB surface.
  *
  * This function will allocate a new 32-bit, ARGB surface, using alpha
  * blending to dither the font with the given color. This function returns the
@@ -1677,64 +1214,23 @@ extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderUNICODE_Blended_Wrapped(TTF_
  * The glyph is rendered without any padding or centering in the X direction,
  * and aligned normally in the Y direction.
  *
- * Note that this version of the function takes a 16-bit character code, which
- * covers the Basic Multilingual Plane, but is insufficient to cover the
- * entire set of possible Unicode values, including emoji glyphs. You should
- * use TTF_RenderGlyph32_Blended() instead, which offers the same
- * functionality but takes a 32-bit codepoint instead.
- *
- * The only reason to use this function is that it was available since the
- * beginning of time, more or less.
- *
- * You can render at other quality levels with TTF_RenderGlyph_Solid,
- * TTF_RenderGlyph_Shaded, and TTF_RenderGlyph_LCD.
- *
  * \param font the font to render with.
- * \param ch the character to render.
+ * \param ch the codepoint to render.
  * \param fg the foreground color for the text.
  * \returns a new 32-bit, ARGB surface, or NULL if there was an error.
  *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_RenderGlyph32_Blended
- */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderGlyph_Blended(TTF_Font *font,
-                Uint16 ch, SDL_Color fg);
-
-/**
- * Render a single 32-bit glyph at high quality to a new ARGB surface.
- *
- * This function will allocate a new 32-bit, ARGB surface, using alpha
- * blending to dither the font with the given color. This function returns the
- * new surface, or NULL if there was an error.
- *
- * The glyph is rendered without any padding or centering in the X direction,
- * and aligned normally in the Y direction.
- *
- * This is the same as TTF_RenderGlyph_Blended(), but takes a 32-bit character
- * instead of 16-bit, and thus can render a larger range. If you are sure
- * you'll have an SDL_ttf that's version 2.0.18 or newer, there's no reason
- * not to use this function exclusively.
- *
- * You can render at other quality levels with TTF_RenderGlyph32_Solid,
- * TTF_RenderGlyph32_Shaded, and TTF_RenderGlyph32_LCD.
- *
- * \param font the font to render with.
- * \param ch the character to render.
- * \param fg the foreground color for the text.
- * \returns a new 32-bit, ARGB surface, or NULL if there was an error.
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
  *
- * \sa TTF_RenderGlyph32_Solid
- * \sa TTF_RenderGlyph32_Shaded
- * \sa TTF_RenderGlyph32_LCD
+ * \sa TTF_RenderGlyph_LCD
+ * \sa TTF_RenderGlyph_Shaded
  */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderGlyph32_Blended(TTF_Font *font,
-                Uint32 ch, SDL_Color fg);
+extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderGlyph_Blended(TTF_Font *font, Uint32 ch, SDL_Color fg);
 
 /**
- * Render Latin1 text at LCD subpixel quality to a new ARGB surface.
+ * Render UTF-8 text at LCD subpixel quality to a new ARGB surface.
  *
  * This function will allocate a new 32-bit, ARGB surface, and render
  * alpha-blended text using FreeType's LCD subpixel rendering. This function
@@ -1747,127 +1243,24 @@ extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderGlyph32_Blended(TTF_Font *fo
  *
  * This will not wrap on newline characters.
  *
- * You almost certainly want TTF_RenderUTF8_LCD() unless you're sure you have
- * a 1-byte Latin1 encoding. US ASCII characters will work with either
- * function, but most other Unicode characters packed into a `const char *`
- * will need UTF-8.
- *
- * You can render at other quality levels with TTF_RenderText_Solid,
- * TTF_RenderText_Shaded, and TTF_RenderText_Blended.
- *
- * \param font the font to render with.
- * \param text text to render, in Latin1 encoding.
- * \param fg the foreground color for the text.
- * \param bg the background color for the text.
- * \returns a new 32-bit, ARGB surface, or NULL if there was an error.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_RenderUTF8_LCD
- * \sa TTF_RenderUNICODE_LCD
- */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderText_LCD(TTF_Font *font,
-                const char *text, SDL_Color fg, SDL_Color bg);
-
-/**
- * Render UTF-8 text at LCD subpixel quality to a new ARGB surface.
- *
- * This function will allocate a new 32-bit, ARGB surface, and render
- * alpha-blended text using FreeType's LCD subpixel rendering. This function
- * returns the new surface, or NULL if there was an error.
- *
- * This will not word-wrap the string; you'll get a surface with a single line
- * of text, as long as the string requires. You can use
- * TTF_RenderUTF8_LCD_Wrapped() instead if you need to wrap the output to
- * multiple lines.
- *
- * This will not wrap on newline characters.
- *
- * You can render at other quality levels with TTF_RenderUTF8_Solid,
- * TTF_RenderUTF8_Shaded, and TTF_RenderUTF8_Blended.
- *
  * \param font the font to render with.
  * \param text text to render, in UTF-8 encoding.
+ * \param length the length of the text, in bytes, or 0 for null terminated
+ *               text.
  * \param fg the foreground color for the text.
  * \param bg the background color for the text.
  * \returns a new 32-bit, ARGB surface, or NULL if there was an error.
  *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_RenderUNICODE_LCD
- */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderUTF8_LCD(TTF_Font *font,
-                const char *text, SDL_Color fg, SDL_Color bg);
-
-/**
- * Render UCS-2 text at LCD subpixel quality to a new ARGB surface.
- *
- * This function will allocate a new 32-bit, ARGB surface, and render
- * alpha-blended text using FreeType's LCD subpixel rendering. This function
- * returns the new surface, or NULL if there was an error.
- *
- * This will not word-wrap the string; you'll get a surface with a single line
- * of text, as long as the string requires. You can use
- * TTF_RenderUNICODE_LCD_Wrapped() instead if you need to wrap the output to
- * multiple lines.
- *
- * This will not wrap on newline characters.
- *
- * Please note that this function is named "Unicode" but currently expects
- * UCS-2 encoding (16 bits per codepoint). This does not give you access to
- * large Unicode values, such as emoji glyphs. These codepoints are accessible
- * through the UTF-8 version of this function.
- *
- * You can render at other quality levels with TTF_RenderUNICODE_Solid,
- * TTF_RenderUNICODE_Shaded, and TTF_RenderUNICODE_Blended.
- *
- * \param font the font to render with.
- * \param text text to render, in UCS-2 encoding.
- * \param fg the foreground color for the text.
- * \param bg the background color for the text.
- * \returns a new 32-bit, ARGB surface, or NULL if there was an error.
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
  *
- * \sa TTF_RenderUTF8_LCD
+ * \sa TTF_RenderText_Blended
+ * \sa TTF_RenderText_LCD_Wrapped
+ * \sa TTF_RenderText_Shaded
  */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderUNICODE_LCD(TTF_Font *font,
-                const Uint16 *text, SDL_Color fg, SDL_Color bg);
-
-/**
- * Render word-wrapped Latin1 text at LCD subpixel quality to a new ARGB
- * surface.
- *
- * This function will allocate a new 32-bit, ARGB surface, and render
- * alpha-blended text using FreeType's LCD subpixel rendering. This function
- * returns the new surface, or NULL if there was an error.
- *
- * Text is wrapped to multiple lines on line endings and on word boundaries if
- * it extends beyond `wrapLength` in pixels.
- *
- * If wrapLength is 0, this function will only wrap on newline characters.
- *
- * You almost certainly want TTF_RenderUTF8_LCD_Wrapped() unless you're sure
- * you have a 1-byte Latin1 encoding. US ASCII characters will work with
- * either function, but most other Unicode characters packed into a `const
- * char *` will need UTF-8.
- *
- * You can render at other quality levels with TTF_RenderText_Solid_Wrapped,
- * TTF_RenderText_Shaded_Wrapped, and TTF_RenderText_Blended_Wrapped.
- *
- * \param font the font to render with.
- * \param text text to render, in Latin1 encoding.
- * \param fg the foreground color for the text.
- * \param bg the background color for the text.
- * \returns a new 32-bit, ARGB surface, or NULL if there was an error.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_RenderUTF8_LCD_Wrapped
- * \sa TTF_RenderUNICODE_LCD_Wrapped
- */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderText_LCD_Wrapped(TTF_Font *font,
-                const char *text, SDL_Color fg, SDL_Color bg, Uint32 wrapLength);
+extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderText_LCD(TTF_Font *font, const char *text, size_t length, SDL_Color fg, SDL_Color bg);
 
 /**
  * Render word-wrapped UTF-8 text at LCD subpixel quality to a new ARGB
@@ -1882,134 +1275,570 @@ extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderText_LCD_Wrapped(TTF_Font *f
  *
  * If wrapLength is 0, this function will only wrap on newline characters.
  *
- * You can render at other quality levels with TTF_RenderUTF8_Solid_Wrapped,
- * TTF_RenderUTF8_Shaded_Wrapped, and TTF_RenderUTF8_Blended_Wrapped.
- *
  * \param font the font to render with.
  * \param text text to render, in UTF-8 encoding.
+ * \param length the length of the text, in bytes, or 0 for null terminated
+ *               text.
  * \param fg the foreground color for the text.
  * \param bg the background color for the text.
+ * \param wrapLength the maximum width of the text surface or 0 to wrap on
+ *                   newline characters.
  * \returns a new 32-bit, ARGB surface, or NULL if there was an error.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
  *
- * \sa TTF_RenderUTF8_Solid_Wrapped
- * \sa TTF_RenderUTF8_Shaded_Wrapped
- * \sa TTF_RenderUTF8_Blended_Wrapped
+ * \sa TTF_RenderText_Blended_Wrapped
+ * \sa TTF_RenderText_LCD
+ * \sa TTF_RenderText_Shaded_Wrapped
  */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderUTF8_LCD_Wrapped(TTF_Font *font,
-                const char *text, SDL_Color fg, SDL_Color bg, Uint32 wrapLength);
+extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderText_LCD_Wrapped(TTF_Font *font, const char *text, size_t length, SDL_Color fg, SDL_Color bg, int wrapLength);
 
 /**
- * Render word-wrapped UCS-2 text at LCD subpixel quality to a new ARGB
+ * Render a single UNICODE codepoint at LCD subpixel quality to a new ARGB
  * surface.
  *
  * This function will allocate a new 32-bit, ARGB surface, and render
  * alpha-blended text using FreeType's LCD subpixel rendering. This function
  * returns the new surface, or NULL if there was an error.
  *
+ * The glyph is rendered without any padding or centering in the X direction,
+ * and aligned normally in the Y direction.
+ *
+ * \param font the font to render with.
+ * \param ch the codepoint to render.
+ * \param fg the foreground color for the text.
+ * \param bg the background color for the text.
+ * \returns a new 32-bit, ARGB surface, or NULL if there was an error.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
+ *
+ * \since This function is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_RenderGlyph_Blended
+ * \sa TTF_RenderGlyph_Shaded
+ */
+extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderGlyph_LCD(TTF_Font *font, Uint32 ch, SDL_Color fg, SDL_Color bg);
+
+
+/* A text engine used to create text objects
+ *
+ * This is a public interface that can be used by applications and libraries. See <SDL3_ttf/SDL_textengine.h> for details.
+ */
+typedef struct TTF_TextEngine TTF_TextEngine;
+
+/* Internal data for TTF_Text */
+typedef struct TTF_TextData TTF_TextData;
+
+/**
+ * Text created with TTF_CreateText()
+ *
+ * \since This struct is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_CreateText
+ * \sa TTF_CreateText_Wrapped
+ * \sa TTF_GetTextProperties
+ * \sa TTF_DestroyText
+ */
+typedef struct TTF_Text
+{
+    char *text;             /**< A copy of the text used to create this text object, useful for layout and debugging. This will be freed automatically when the object is destroyed. */
+    SDL_FColor color;       /**< The color of the text, read-write. You can change this anytime. */
+    int num_lines;          /**< The number of lines in the text, 0 if it's empty */
+
+    int refcount;           /**< Application reference count, used when freeing surface */
+
+    TTF_TextData *internal; /**< Private */
+
+} TTF_Text;
+
+/**
+ * Create a text engine for drawing text on SDL surfaces.
+ *
+ * \returns a TTF_TextEngine object or NULL on failure; call SDL_GetError()
+ *          for more information.
+ *
+ * \threadsafety It is safe to call this function from any thread.
+ *
+ * \since This function is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_DestroySurfaceTextEngine
+ * \sa TTF_DrawSurfaceText
+ */
+extern SDL_DECLSPEC TTF_TextEngine * SDLCALL TTF_CreateSurfaceTextEngine(void);
+
+/**
+ * Draw text to an SDL surface.
+ *
+ * `text` must have been created using a TTF_TextEngine from
+ * TTF_CreateSurfaceTextEngine().
+ *
+ * \param text the text to draw.
+ * \param x the x coordinate in pixels, positive from the left edge towards
+ *          the right.
+ * \param y the y coordinate in pixels, positive from the top edge towards the
+ *          bottom.
+ * \param surface the surface to draw on.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               text.
+ *
+ * \since This function is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_CreateSurfaceTextEngine
+ * \sa TTF_CreateText
+ * \sa TTF_CreateText_Wrapped
+ */
+extern SDL_DECLSPEC bool SDLCALL TTF_DrawSurfaceText(TTF_Text *text, int x, int y, SDL_Surface *surface);
+
+/**
+ * Destroy a text engine created for drawing text on SDL surfaces.
+ *
+ * All text created by this engine should be destroyed before calling this
+ * function.
+ *
+ * \param engine a TTF_TextEngine object created with
+ *               TTF_CreateSurfaceTextEngine().
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               engine.
+ *
+ * \since This function is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_CreateSurfaceTextEngine
+ */
+extern SDL_DECLSPEC void SDLCALL TTF_DestroySurfaceTextEngine(TTF_TextEngine *engine);
+
+/**
+ * Create a text engine for drawing text on an SDL renderer.
+ *
+ * \param renderer the renderer to use for creating textures and drawing text.
+ * \returns a TTF_TextEngine object or NULL on failure; call SDL_GetError()
+ *          for more information.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               renderer.
+ *
+ * \since This function is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_DestroyRendererTextEngine
+ */
+extern SDL_DECLSPEC TTF_TextEngine * SDLCALL TTF_CreateRendererTextEngine(SDL_Renderer *renderer);
+
+/**
+ * Draw text to an SDL renderer.
+ *
+ * `text` must have been created using a TTF_TextEngine from
+ * TTF_CreateRendererTextEngine(), and will draw using the renderer passed to
+ * that function.
+ *
+ * \param text the text to draw.
+ * \param x the x coordinate in pixels, positive from the left edge towards
+ *          the right.
+ * \param y the y coordinate in pixels, positive from the top edge towards the
+ *          bottom.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               text.
+ *
+ * \since This function is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_CreateRendererTextEngine
+ * \sa TTF_CreateText
+ * \sa TTF_CreateText_Wrapped
+ */
+extern SDL_DECLSPEC bool SDLCALL TTF_DrawRendererText(TTF_Text *text, float x, float y);
+
+/**
+ * Destroy a text engine created for drawing text on an SDL renderer.
+ *
+ * All text created by this engine should be destroyed before calling this
+ * function.
+ *
+ * \param engine a TTF_TextEngine object created with
+ *               TTF_CreateRendererTextEngine().
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               engine.
+ *
+ * \since This function is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_CreateRendererTextEngine
+ */
+extern SDL_DECLSPEC void SDLCALL TTF_DestroyRendererTextEngine(TTF_TextEngine *engine);
+
+/**
+ * Create a text object from UTF-8 text and a text engine.
+ *
+ * This will not word-wrap the string; you'll get a surface with a single line
+ * of text, as long as the string requires. You can use
+ * TTF_CreateText_Wrapped() instead if you need to wrap the output to multiple
+ * lines.
+ *
+ * This will not wrap on newline characters.
+ *
+ * \param engine the text engine to use when creating the text object, may be
+ *               NULL.
+ * \param font the font to render with.
+ * \param text the text to use, in UTF-8 encoding.
+ * \param length the length of the text, in bytes, or 0 for null terminated
+ *               text.
+ * \returns a TTF_Text object or NULL on failure; call SDL_GetError() for more
+ *          information.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font and text engine.
+ *
+ * \since This function is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_CreateText_Wrapped
+ * \sa TTF_DestroyText
+ */
+extern SDL_DECLSPEC TTF_Text * SDLCALL TTF_CreateText(TTF_TextEngine *engine, TTF_Font *font, const char *text, size_t length);
+
+/**
+ * Create a text object from word-wrapped UTF-8 text and a text engine.
+ *
  * Text is wrapped to multiple lines on line endings and on word boundaries if
  * it extends beyond `wrapLength` in pixels.
  *
  * If wrapLength is 0, this function will only wrap on newline characters.
  *
- * Please note that this function is named "Unicode" but currently expects
- * UCS-2 encoding (16 bits per codepoint). This does not give you access to
- * large Unicode values, such as emoji glyphs. These codepoints are accessible
- * through the UTF-8 version of this function.
- *
- * You can render at other quality levels with
- * TTF_RenderUNICODE_Solid_Wrapped, TTF_RenderUNICODE_Shaded_Wrapped, and
- * TTF_RenderUNICODE_Blended_Wrapped.
- *
+ * \param engine the text engine to use when creating the text object, may be
+ *               NULL.
  * \param font the font to render with.
- * \param text text to render, in UCS-2 encoding.
- * \param fg the foreground color for the text.
- * \param bg the background color for the text.
- * \returns a new 32-bit, ARGB surface, or NULL if there was an error.
+ * \param text the text to use, in UTF-8 encoding.
+ * \param length the length of the text, in bytes, or 0 for null terminated
+ *               text.
+ * \param wrapLength the maximum width of the text surface or 0 to wrap on
+ *                   newline characters.
+ * \returns a TTF_Text object or NULL on failure; call SDL_GetError() for more
+ *          information.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
  *
- * \sa TTF_RenderUTF8_LCD_Wrapped
+ * \sa TTF_CreateText
+ * \sa TTF_DestroyText
  */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderUNICODE_LCD_Wrapped(TTF_Font *font,
-                const Uint16 *text, SDL_Color fg, SDL_Color bg, Uint32 wrapLength);
+extern SDL_DECLSPEC TTF_Text * SDLCALL TTF_CreateText_Wrapped(TTF_TextEngine *engine, TTF_Font *font, const char *text, size_t length, int wrapLength);
 
 /**
- * Render a single 16-bit glyph at LCD subpixel quality to a new ARGB surface.
+ * Get the properties associated with a text object.
  *
- * This function will allocate a new 32-bit, ARGB surface, and render
- * alpha-blended text using FreeType's LCD subpixel rendering. This function
- * returns the new surface, or NULL if there was an error.
+ * \param text the TTF_Text to query.
+ * \returns a valid property ID on success or 0 on failure; call
+ *          SDL_GetError() for more information.
  *
- * The glyph is rendered without any padding or centering in the X direction,
- * and aligned normally in the Y direction.
- *
- * Note that this version of the function takes a 16-bit character code, which
- * covers the Basic Multilingual Plane, but is insufficient to cover the
- * entire set of possible Unicode values, including emoji glyphs. You should
- * use TTF_RenderGlyph32_LCD() instead, which offers the same functionality
- * but takes a 32-bit codepoint instead.
- *
- * This function only exists for consistency with the existing API at the time
- * of its addition.
- *
- * You can render at other quality levels with TTF_RenderGlyph_Solid,
- * TTF_RenderGlyph_Shaded, and TTF_RenderGlyph_Blended.
- *
- * \param font the font to render with.
- * \param ch the character to render.
- * \param fg the foreground color for the text.
- * \param bg the background color for the text.
- * \returns a new 32-bit, ARGB surface, or NULL if there was an error.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_RenderGlyph32_LCD
+ * \since This function is available since SDL 3.0.0.
  */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderGlyph_LCD(TTF_Font *font,
-                Uint16 ch, SDL_Color fg, SDL_Color bg);
+extern SDL_DECLSPEC SDL_PropertiesID SDLCALL TTF_GetTextProperties(TTF_Text *text);
 
 /**
- * Render a single 32-bit glyph at LCD subpixel quality to a new ARGB surface.
+ * Set the text engine used by a text object.
  *
- * This function will allocate a new 32-bit, ARGB surface, and render
- * alpha-blended text using FreeType's LCD subpixel rendering. This function
- * returns the new surface, or NULL if there was an error.
+ * \param text the TTF_Text to modify.
+ * \param engine the text engine to use for drawing.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ */
+extern SDL_DECLSPEC bool SDLCALL TTF_SetTextEngine(TTF_Text *text, TTF_TextEngine *engine);
+
+/**
+ * Get the text engine used by a text object.
  *
- * The glyph is rendered without any padding or centering in the X direction,
- * and aligned normally in the Y direction.
+ * \param text the TTF_Text to query.
+ * \returns the TTF_TextEngine used by the text on success or NULL on failure;
+ *          call SDL_GetError() for more information.
+ */
+extern SDL_DECLSPEC TTF_TextEngine * SDLCALL TTF_GetTextEngine(TTF_Text *text);
+
+/**
+ * Set the font used by a text object.
  *
- * This is the same as TTF_RenderGlyph_LCD(), but takes a 32-bit character
- * instead of 16-bit, and thus can render a larger range. Between the two, you
- * should always use this function.
+ * When a text object has a font, any changes to the font will automatically
+ * regenerate the text. If you set the font to NULL, the text will continue to
+ * render but changes to the font will no longer affect the text.
  *
- * You can render at other quality levels with TTF_RenderGlyph32_Solid,
- * TTF_RenderGlyph32_Shaded, and TTF_RenderGlyph32_Blended.
+ * \param text the TTF_Text to modify.
+ * \param font the font to use, may be NULL.
+ */
+extern SDL_DECLSPEC bool SDLCALL TTF_SetTextFont(TTF_Text *text, TTF_Font *font);
+
+/**
+ * Get the font used by a text object.
  *
- * \param font the font to render with.
- * \param ch the character to render.
- * \param fg the foreground color for the text.
- * \param bg the background color for the text.
- * \returns a new 32-bit, ARGB surface, or NULL if there was an error.
+ * \param text the TTF_Text to query.
+ * \returns the TTF_Font used by the text on success or NULL on failure; call
+ *          SDL_GetError() for more information.
+ */
+extern SDL_DECLSPEC TTF_Font * SDLCALL TTF_GetTextFont(TTF_Text *text);
+
+/**
+ * Set the UTF-8 text used by a text object.
+ *
+ * \param text the TTF_Text to modify.
+ * \param string the UTF-8 text to use, may be NULL.
+ * \param length the length of the text, in bytes, or 0 for null terminated
+ *               text.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ */
+extern SDL_DECLSPEC bool SDLCALL TTF_SetTextString(TTF_Text *text, const char *string, size_t length);
+
+/**
+ * Insert UTF-8 text into a text object.
+ *
+ * \param text the TTF_Text to modify.
+ * \param offset the offset, in bytes, from the beginning of the string if >=
+ *               0, the offset from the end of the string if < 0. Note that
+ *               this does not do UTF-8 validation, so you should only insert
+ *               at UTF-8 sequence boundaries.
+ * \param string the UTF-8 text to insert.
+ * \param length the length of the text, in bytes, or 0 for null terminated
+ *               text.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ */
+extern SDL_DECLSPEC bool SDLCALL TTF_InsertTextString(TTF_Text *text, int offset, const char *string, size_t length);
+
+/**
+ * Append UTF-8 text to a text object.
+ *
+ * \param text the TTF_Text to modify.
+ * \param string the UTF-8 text to insert.
+ * \param length the length of the text, in bytes, or 0 for null terminated
+ *               text.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ */
+extern SDL_DECLSPEC bool SDLCALL TTF_AppendTextString(TTF_Text *text, const char *string, size_t length);
+
+/**
+ * Delete UTF-8 text from a text object.
+ *
+ * \param text the TTF_Text to modify.
+ * \param offset the offset, in bytes, from the beginning of the string if >=
+ *               0, the offset from the end of the string if < 0. Note that
+ *               this does not do UTF-8 validation, so you should only delete
+ *               at UTF-8 sequence boundaries.
+ * \param length the length of text to delete, in bytes, or -1 for the
+ *               remainder of the string.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ */
+extern SDL_DECLSPEC bool SDLCALL TTF_DeleteTextString(TTF_Text *text, int offset, int length);
+
+/**
+ * Set whether wrapping is enabled on a text object.
+ *
+ * \param text the TTF_Text to modify.
+ * \param wrap true if wrapping should be enabled, false if it should be
+ *             disabled.
+ * \param wrapLength the maximum width in pixels, 0 to wrap on newline
+ *                   characters, or -1 to leave wrapLength unchanged.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ */
+extern SDL_DECLSPEC bool SDLCALL TTF_SetTextWrapping(TTF_Text *text, bool wrap, int wrapLength);
+
+/**
+ * Get whether wrapping is enabled on a text object.
+ *
+ * \param text the TTF_Text to query.
+ * \param wrap a pointer filled in with true if wrapping is enabled, false if
+ *             it is disabled, may be NULL.
+ * \param wrapLength a pointer filled in with the maximum width in pixels or 0
+ *                   if the text is being wrapped on newline characters, may
+ *                   be NULL.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ */
+extern SDL_DECLSPEC bool SDLCALL TTF_GetTextWrapping(TTF_Text *text, bool *wrap, int *wrapLength);
+
+/**
+ * Get the size of a text object.
+ *
+ * The size of the text may change when the font or font style and size
+ * change.
+ *
+ * \param text the TTF_Text to query.
+ * \param w a pointer filled in with the width of the text, in pixels, may be
+ *          NULL.
+ * \param h a pointer filled in with the height of the text, in pixels, may be
+ *          NULL.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ */
+extern SDL_DECLSPEC bool SDLCALL TTF_GetTextSize(TTF_Text *text, int *w, int *h);
+
+/**
+ * Flags for TTF_SubString
+ *
+ * \since This datatype is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_SubString
+ */
+typedef Uint32 TTF_SubStringFlags;
+
+#define TTF_SUBSTRING_TEXT_START    0x00000001  /**< This substring contains the beginning of the text */
+#define TTF_SUBSTRING_LINE_START    0x00000002  /**< This substring contains the beginning of line `line_index` */
+#define TTF_SUBSTRING_LINE_END      0x00000004  /**< This substring contains the end of line `line_index` */
+#define TTF_SUBSTRING_TEXT_END      0x00000008  /**< This substring contains the end of the text */
+
+/**
+ * The representation of a substring within text.
+ *
+ * \since This struct is available since SDL_ttf 3.0.0.
+ *
+ * \sa TTF_GetNextTextSubString
+ * \sa TTF_GetPreviousTextSubString
+ * \sa TTF_GetTextSubString
+ * \sa TTF_GetTextSubStringForLine
+ * \sa TTF_GetTextSubStringForPoint
+ * \sa TTF_GetTextSubStringsForRange
+ */
+typedef struct TTF_SubString
+{
+    TTF_SubStringFlags flags;   /**< The flags for this substring */
+    int offset;                 /**< The byte offset from the beginning of the text */
+    int length;                 /**< The byte length starting at the offset */
+    int line_index;             /**< The index of the line that contains this substring */
+    int cluster_index;          /**< The internal cluster index, used for quickly iterating */
+    SDL_Rect rect;              /**< The rectangle, relative to the top left of the text, containing the substring */
+} TTF_SubString;
+
+/**
+ * Get the substring of a text object that surrounds a text offset.
+ *
+ * If `offset` is less than 0, this will return a zero length substring at the
+ * beginning of the text with the TTF_SUBSTRING_TEXT_START flag set. If
+ * `offset` is greater than or equal to the length of the text string, this
+ * will return a zero length substring at the end of the text with the
+ * TTF_SUBSTRING_TEXT_END flag set.
+ *
+ * \param text the TTF_Text to query.
+ * \param offset a byte offset into the text string.
+ * \param substring a pointer filled in with the substring containing the
+ *                  offset.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ */
+extern SDL_DECLSPEC bool SDLCALL TTF_GetTextSubString(TTF_Text *text, int offset, TTF_SubString *substring);
+
+/**
+ * Get the substring of a text object that contains the given line.
+ *
+ * If `line` is less than 0, this will return a zero length substring at the
+ * beginning of the text with the TTF_SUBSTRING_TEXT_START flag set. If `line`
+ * is greater than or equal to `text->num_lines` this will return a zero
+ * length substring at the end of the text with the TTF_SUBSTRING_TEXT_END
+ * flag set.
+ *
+ * \param text the TTF_Text to query.
+ * \param line a zero-based line index, in the range [0 .. text->num_lines-1].
+ * \param substring a pointer filled in with the substring containing the
+ *                  offset.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ */
+extern SDL_DECLSPEC bool SDLCALL TTF_GetTextSubStringForLine(TTF_Text *text, int line, TTF_SubString *substring);
+
+/**
+ * Get the substrings of a text object that contain a range of text.
+ *
+ * \param text the TTF_Text to query.
+ * \param offset a byte offset into the text string.
+ * \param length the length of the range being queried, in bytes, or -1 for
+ *               the remainder of the string.
+ * \param count a pointer filled in with the number of substrings returned,
+ *              may be NULL.
+ * \returns a NULL terminated array of substring pointers or NULL on failure;
+ *          call SDL_GetError() for more information. This is a single
+ *          allocation that should be freed with SDL_free() when it is no
+ *          longer needed.
+ */
+extern SDL_DECLSPEC TTF_SubString ** SDLCALL TTF_GetTextSubStringsForRange(TTF_Text *text, int offset, int length, int *count);
+
+/**
+ * Get the portion of a text string that is closest to a point.
+ *
+ * This will return the closest substring of text to the given point.
+ *
+ * \param text the TTF_Text to query.
+ * \param x the x coordinate relative to the left side of the text, may be
+ *          outside the bounds of the text area.
+ * \param y the y coordinate relative to the top side of the text, may be
+ *          outside the bounds of the text area.
+ * \param substring a pointer filled in with the closest substring of text to
+ *                  the given point.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ */
+extern SDL_DECLSPEC bool SDLCALL TTF_GetTextSubStringForPoint(TTF_Text *text, int x, int y, TTF_SubString *substring);
+
+/**
+ * Get the previous substring in a text object
+ *
+ * If called at the start of the text, this will return a zero length
+ * substring with the TTF_SUBSTRING_TEXT_START flag set.
+ *
+ * \param text the TTF_Text to query.
+ * \param substring the TTF_SubString to query.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ */
+extern SDL_DECLSPEC bool SDLCALL TTF_GetPreviousTextSubString(TTF_Text *text, const TTF_SubString *substring, TTF_SubString *previous);
+
+/**
+ * Get the next substring in a text object
+ *
+ * If called at the end of the text, this will return a zero length substring
+ * with the TTF_SUBSTRING_TEXT_END flag set.
+ *
+ * \param text the TTF_Text to query.
+ * \param substring the TTF_SubString to query.
+ * \param next a pointer filled in with the next substring.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ */
+extern SDL_DECLSPEC bool SDLCALL TTF_GetNextTextSubString(TTF_Text *text, const TTF_SubString *substring, TTF_SubString *next);
+
+/**
+ * Update the layout of a text object.
+ *
+ * This is automatically done when the layout is requested or the text is
+ * rendered, but you can call this if you need more control over the timing of
+ * when the layout and text engine representation are updated.
+ *
+ * \param text the TTF_Text to update.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
+ */
+extern SDL_DECLSPEC bool SDLCALL TTF_UpdateText(TTF_Text *text);
+
+/**
+ * Destroy a text object created by a text engine.
+ *
+ * \param text the text to destroy.
+ *
+ * \threadsafety This function should be called on the thread that created the
+ *               text.
  *
  * \since This function is available since SDL_ttf 3.0.0.
  *
- * \sa TTF_RenderGlyph32_Solid
- * \sa TTF_RenderGlyph32_Shaded
- * \sa TTF_RenderGlyph32_Blended
+ * \sa TTF_CreateText
  */
-extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderGlyph32_LCD(TTF_Font *font,
-                Uint32 ch, SDL_Color fg, SDL_Color bg);
-
-
-/* For compatibility with previous versions, here are the old functions */
-#define TTF_RenderText(font, text, fg, bg)  \
-    TTF_RenderText_Shaded(font, text, fg, bg)
-#define TTF_RenderUTF8(font, text, fg, bg)  \
-    TTF_RenderUTF8_Shaded(font, text, fg, bg)
-#define TTF_RenderUNICODE(font, text, fg, bg)   \
-    TTF_RenderUNICODE_Shaded(font, text, fg, bg)
+extern SDL_DECLSPEC void SDLCALL TTF_DestroyText(TTF_Text *text);
 
 /**
  * Dispose of a previously-created font.
@@ -2020,10 +1849,13 @@ extern SDL_DECLSPEC SDL_Surface * SDLCALL TTF_RenderGlyph32_LCD(TTF_Font *font,
  *
  * The font is not valid after being passed to this function. String pointers
  * from functions that return information on this font, such as
- * TTF_FontFaceFamilyName() and TTF_FontFaceStyleName(), are no longer valid
+ * TTF_GetFontFamilyName() and TTF_GetFontStyleName(), are no longer valid
  * after this call, as well.
  *
  * \param font the font to dispose of.
+ *
+ * \threadsafety This function should not be called while any other thread is
+ *               using the font.
  *
  * \since This function is available since SDL_ttf 3.0.0.
  *
@@ -2055,6 +1887,8 @@ extern SDL_DECLSPEC void SDLCALL TTF_CloseFont(TTF_Font *font);
  * deal with it. A well-written program should call TTF_CloseFont() on any
  * open fonts before calling this function!
  *
+ * \threadsafety It is safe to call this function from any thread.
+ *
  * \since This function is available since SDL_ttf 3.0.0.
  */
 extern SDL_DECLSPEC void SDLCALL TTF_Quit(void);
@@ -2074,164 +1908,14 @@ extern SDL_DECLSPEC void SDLCALL TTF_Quit(void);
  * \returns the current number of initialization calls, that need to
  *          eventually be paired with this many calls to TTF_Quit().
  *
+ * \threadsafety It is safe to call this function from any thread.
+ *
  * \since This function is available since SDL_ttf 3.0.0.
  *
  * \sa TTF_Init
  * \sa TTF_Quit
  */
 extern SDL_DECLSPEC int SDLCALL TTF_WasInit(void);
-
-/**
- * Query the kerning size of two 16-bit glyphs.
- *
- * Note that this version of the function takes 16-bit character
- * codes, which covers the Basic Multilingual Plane, but is insufficient
- * to cover the entire set of possible Unicode values, including emoji
- * glyphs. You should use TTF_GetFontKerningSizeGlyphs32() instead, which
- * offers the same functionality but takes a 32-bit codepoints instead.
- *
- * The only reason to use this function is that it was available since
- * the beginning of time, more or less.
- *
- * \param font the font to query.
- * \param previous_ch the previous character's code, 16 bits.
- * \param ch the current character's code, 16 bits.
- * \returns The kerning size between the two specified characters, in pixels, or -1 on error.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_GetFontKerningSizeGlyphs32
- */
-extern SDL_DECLSPEC int TTF_GetFontKerningSizeGlyphs(TTF_Font *font, Uint16 previous_ch, Uint16 ch);
-
-/**
- * Query the kerning size of two 32-bit glyphs.
- *
- * This is the same as TTF_GetFontKerningSizeGlyphs(), but takes 32-bit
- * characters instead of 16-bit, and thus can manage a larger range. If
- * you are sure you'll have an SDL_ttf that's version 2.0.18 or newer,
- * there's no reason not to use this function exclusively.
- *
- * \param font the font to query.
- * \param previous_ch the previous character's code, 32 bits.
- * \param ch the current character's code, 32 bits.
- * \returns The kerning size between the two specified characters, in pixels, or -1 on error.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- */
-extern SDL_DECLSPEC int TTF_GetFontKerningSizeGlyphs32(TTF_Font *font, Uint32 previous_ch, Uint32 ch);
-
-/**
- * Enable Signed Distance Field rendering for a font.
- *
- * This works with the Blended APIs. SDF is a technique that
- * helps fonts look sharp even when scaling and rotating.
- *
- * This clears already-generated glyphs, if any, from the cache.
- *
- * \param font the font to set SDF support on.
- * \param enabled SDL_TRUE to enable SDF, SDL_FALSE to disable.
- * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
- *          for more information.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_GetFontSDF
- */
-extern SDL_DECLSPEC SDL_bool TTF_SetFontSDF(TTF_Font *font, SDL_bool enabled);
-
-/**
- * Query whether Signed Distance Field rendering is enabled for a font.
- *
- * \param font the font to query
- *
- * \returns SDL_TRUE if enabled, SDL_FALSE otherwise.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_SetFontSDF
- */
-extern SDL_DECLSPEC SDL_bool TTF_GetFontSDF(const TTF_Font *font);
-
-/**
- * Direction flags
- *
- * \sa TTF_SetFontDirection
- */
-typedef enum TTF_Direction
-{
-  TTF_DIRECTION_LTR = 0,    /* Left to Right */
-  TTF_DIRECTION_RTL,        /* Right to Left */
-  TTF_DIRECTION_TTB,        /* Top to Bottom */
-  TTF_DIRECTION_BTT         /* Bottom to Top */
-} TTF_Direction;
-
-/**
- * Set direction to be used for text shaping by a font.
- *
- * Possible direction values are:
- *
- * - `TTF_DIRECTION_LTR` (Left to Right)
- * - `TTF_DIRECTION_RTL` (Right to Left)
- * - `TTF_DIRECTION_TTB` (Top to Bottom)
- * - `TTF_DIRECTION_BTT` (Bottom to Top)
- *
- * If SDL_ttf was not built with HarfBuzz support, this function returns -1.
- *
- * \param font the font to specify a direction for.
- * \param direction the new direction for text to flow.
- * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
- *          for more information.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- */
-extern SDL_DECLSPEC SDL_bool SDLCALL TTF_SetFontDirection(TTF_Font *font, TTF_Direction direction);
-
-/**
- * Set script to be used for text shaping by a font.
- *
- * The supplied script value must be a null-terminated string of exactly four
- * characters.
- *
- * If SDL_ttf was not built with HarfBuzz support, this function returns -1.
- *
- * \param font the font to specify a script name for.
- * \param script null-terminated string of exactly 4 characters.
- * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
- *          for more information.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- */
-extern SDL_DECLSPEC SDL_bool SDLCALL TTF_SetFontScriptName(TTF_Font *font, const char *script);
-
-/**
- * Set language to be used for text shaping by a font.
- *
- * If SDL_ttf was not built with HarfBuzz support, this function returns -1.
- *
- * \param font the font to specify a language for.
- * \param language_bcp47 a null-terminated string containing the desired language's BCP47 code. Or null to reset the value.
- * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
- *          for more information.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- */
-extern SDL_DECLSPEC SDL_bool TTF_SetFontLanguage(TTF_Font *font, const char *language_bcp47);
-
-/**
- * Query whether a font is scalable or not.
- *
- * Scalability lets us distinguish between outline and bitmap fonts.
- *
- * \param font the font to query
- *
- * \returns SDL_TRUE if the font is scalable, SDL_FALSE otherwise.
- *
- * \since This function is available since SDL_ttf 3.0.0.
- *
- * \sa TTF_SetFontSDF
- */
-extern SDL_DECLSPEC SDL_bool TTF_IsFontScalable(const TTF_Font *font);
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus
@@ -2241,4 +1925,3 @@ extern SDL_DECLSPEC SDL_bool TTF_IsFontScalable(const TTF_Font *font);
 
 #endif /* SDL_TTF_H_ */
 
-/* vi: set ts=4 sw=4 expandtab: */

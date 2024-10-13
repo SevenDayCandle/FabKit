@@ -22,9 +22,29 @@
 /**
  * # CategoryInit
  *
- * SDL subsystem init and quit functions.
+ * All SDL programs need to initialize the library before starting to work
+ * with it.
+ *
+ * Almost everything can simply call SDL_Init() near startup, with a handful
+ * of flags to specify subsystems to touch. These are here to make sure SDL
+ * does not even attempt to touch low-level pieces of the operating system
+ * that you don't intend to use. For example, you might be using SDL for video
+ * and input but chose an external library for audio, and in this case you
+ * would just need to leave off the `SDL_INIT_AUDIO` flag to make sure that
+ * external library has complete control.
+ *
+ * Most apps, when terminating, should call SDL_Quit(). This will clean up
+ * (nearly) everything that SDL might have allocated, and crucially, it'll
+ * make sure that the display's resolution is back to what the user expects if
+ * you had previously changed it for your game.
+ *
+ * SDL3 apps are strongly encouraged to call SDL_SetAppMetadata() at startup
+ * to fill in details about the program. This is completely optional, but it
+ * helps in small ways (we can provide an About dialog box for the macOS menu,
+ * we can name the app in the system's audio mixer, etc). Those that want to
+ * provide a _lot_ of information should look at the more-detailed
+ * SDL_SetAppMetadataProperty().
  */
-
 
 #ifndef SDL_init_h_
 #define SDL_init_h_
@@ -57,7 +77,6 @@ extern "C" {
  */
 typedef Uint32 SDL_InitFlags;
 
-#define SDL_INIT_TIMER      0x00000001u
 #define SDL_INIT_AUDIO      0x00000010u /**< `SDL_INIT_AUDIO` implies `SDL_INIT_EVENTS` */
 #define SDL_INIT_VIDEO      0x00000020u /**< `SDL_INIT_VIDEO` implies `SDL_INIT_EVENTS` */
 #define SDL_INIT_JOYSTICK   0x00000200u /**< `SDL_INIT_JOYSTICK` implies `SDL_INIT_EVENTS`, should be initialized on the same thread as SDL_INIT_VIDEO on Windows if you don't set SDL_HINT_JOYSTICK_THREAD */
@@ -97,7 +116,7 @@ typedef enum SDL_AppResult
 typedef SDL_AppResult (SDLCALL *SDL_AppInit_func)(void **appstate, int argc, char *argv[]);
 typedef SDL_AppResult (SDLCALL *SDL_AppIterate_func)(void *appstate);
 typedef SDL_AppResult (SDLCALL *SDL_AppEvent_func)(void *appstate, SDL_Event *event);
-typedef void (SDLCALL *SDL_AppQuit_func)(void *appstate);
+typedef void (SDLCALL *SDL_AppQuit_func)(void *appstate, SDL_AppResult result);
 
 /**
  * Initialize the SDL library.
@@ -117,7 +136,6 @@ typedef void (SDLCALL *SDL_AppQuit_func)(void *appstate);
  *
  * `flags` may be any of the following OR'd together:
  *
- * - `SDL_INIT_TIMER`: timer subsystem
  * - `SDL_INIT_AUDIO`: audio subsystem; automatically initializes the events
  *   subsystem
  * - `SDL_INIT_VIDEO`: video subsystem; automatically initializes the events
@@ -143,8 +161,8 @@ typedef void (SDLCALL *SDL_AppQuit_func)(void *appstate);
  * SDL_SetAppMetadataProperty().
  *
  * \param flags subsystem initialization flags.
- * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
- *          for more information.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
  *
  * \since This function is available since SDL 3.0.0.
  *
@@ -155,7 +173,7 @@ typedef void (SDLCALL *SDL_AppQuit_func)(void *appstate);
  * \sa SDL_SetMainReady
  * \sa SDL_WasInit
  */
-extern SDL_DECLSPEC SDL_bool SDLCALL SDL_Init(SDL_InitFlags flags);
+extern SDL_DECLSPEC bool SDLCALL SDL_Init(SDL_InitFlags flags);
 
 /**
  * Compatibility function to initialize the SDL library.
@@ -163,8 +181,8 @@ extern SDL_DECLSPEC SDL_bool SDLCALL SDL_Init(SDL_InitFlags flags);
  * This function and SDL_Init() are interchangeable.
  *
  * \param flags any of the flags used by SDL_Init(); see SDL_Init for details.
- * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
- *          for more information.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
  *
  * \since This function is available since SDL 3.0.0.
  *
@@ -172,7 +190,7 @@ extern SDL_DECLSPEC SDL_bool SDLCALL SDL_Init(SDL_InitFlags flags);
  * \sa SDL_Quit
  * \sa SDL_QuitSubSystem
  */
-extern SDL_DECLSPEC SDL_bool SDLCALL SDL_InitSubSystem(SDL_InitFlags flags);
+extern SDL_DECLSPEC bool SDLCALL SDL_InitSubSystem(SDL_InitFlags flags);
 
 /**
  * Shut down specific SDL subsystems.
@@ -248,8 +266,8 @@ extern SDL_DECLSPEC void SDLCALL SDL_Quit(void);
  *                   hash, or whatever makes sense).
  * \param appidentifier A unique string in reverse-domain format that
  *                      identifies this app ("com.example.mygame2").
- * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
- *          for more information.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
  *
  * \threadsafety It is safe to call this function from any thread.
  *
@@ -257,7 +275,7 @@ extern SDL_DECLSPEC void SDLCALL SDL_Quit(void);
  *
  * \sa SDL_SetAppMetadataProperty
  */
-extern SDL_DECLSPEC SDL_bool SDLCALL SDL_SetAppMetadata(const char *appname, const char *appversion, const char *appidentifier);
+extern SDL_DECLSPEC bool SDLCALL SDL_SetAppMetadata(const char *appname, const char *appversion, const char *appidentifier);
 
 /**
  * Specify metadata about your app through a set of properties.
@@ -310,8 +328,8 @@ extern SDL_DECLSPEC SDL_bool SDLCALL SDL_SetAppMetadata(const char *appname, con
  *
  * \param name the name of the metadata property to set.
  * \param value the value of the property, or NULL to remove that property.
- * \returns SDL_TRUE on success or SDL_FALSE on failure; call SDL_GetError()
- *          for more information.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
  *
  * \threadsafety It is safe to call this function from any thread.
  *
@@ -320,7 +338,7 @@ extern SDL_DECLSPEC SDL_bool SDLCALL SDL_SetAppMetadata(const char *appname, con
  * \sa SDL_GetAppMetadataProperty
  * \sa SDL_SetAppMetadata
  */
-extern SDL_DECLSPEC SDL_bool SDLCALL SDL_SetAppMetadataProperty(const char *name, const char *value);
+extern SDL_DECLSPEC bool SDLCALL SDL_SetAppMetadataProperty(const char *name, const char *value);
 
 #define SDL_PROP_APP_METADATA_NAME_STRING         "SDL.app.metadata.name"
 #define SDL_PROP_APP_METADATA_VERSION_STRING      "SDL.app.metadata.version"

@@ -112,13 +112,13 @@ namespace fab {
     sdl::Surface* FFont::makeSurface(strv text, uint32 w, const sdl::Color& color, const sdl::Color& outlineColor, const sdl::Color& shadowColor)
     {
         const char* texDat = text.data();
-        sdl::Surface* targetSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, sdl::toTextColor(color), w);
+        sdl::Surface* targetSurf = sdl::textRenderBlendedWrapped(font, texDat, sdl::toTextColor(color), w);
 
         if (targetSurf) {
             if (outlineSize > 0) {
                 int res = globalScale * (outlineSize);
                 sdl::fontOutlineSet(font, res);
-                sdl::Surface* outlineSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, sdl::toTextColor(outlineColor), w);
+                sdl::Surface* outlineSurf = sdl::textRenderBlendedWrapped(font, texDat, sdl::toTextColor(outlineColor), w);
                 sdl::fontOutlineSet(font, 0);
                 sdl::RectI targetRect = { res, res, targetSurf->w, targetSurf->h };
                 sdl::surfaceBlitScaled(targetSurf, nullptr, outlineSurf, &targetRect, sdl::ScaleMode::SDL_SCALEMODE_LINEAR);
@@ -128,7 +128,7 @@ namespace fab {
 
             if (shadowSize > 0) {
                 int res = globalScale * (shadowSize);
-                sdl::Surface* shadowSurf = sdl::textRenderUTF8BlendedWrapped(font, texDat, sdl::toTextColor(shadowColor), w);
+                sdl::Surface* shadowSurf = sdl::textRenderBlendedWrapped(font, texDat, sdl::toTextColor(shadowColor), w);
                 sdl::Surface* newTargetSurf = sdl::surfaceCreate(targetSurf->w + res, targetSurf->h + res, targetSurf->format);
                 sdl::RectI shadowRect = { res, res, shadowSurf->w, shadowSurf->h };
                 sdl::RectI clipRect;
