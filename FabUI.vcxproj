@@ -325,7 +325,7 @@
       <AdditionalDependencies>winmm.lib;SDL3.lib;SDL3_image.lib;SDL3_mixer.lib;SDL3_ttf.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(SolutionDir)Dependencies\SDL\lib\*.dll" "$(OutDir)"
+      <Command>xcopy /Y /D "$(ProjectDir)Dependencies\SDL\lib\*.dll" "$(OutDir)"
 xcopy /E /I /Y /D "$(ProjectDir)Shader\Compiled" "$(TargetDir)Shader"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
