@@ -88,9 +88,9 @@ namespace sdl {
 			float sinZ = std::sin(rotZ);
 
 			MATRIX_UNIFORM.m11 = 2 * sX * cosZ;
-			MATRIX_UNIFORM.m12 = 2 * sX * sinZ;
-			MATRIX_UNIFORM.m21 = -sY * sinZ;
-			MATRIX_UNIFORM.m22 = sY * cosZ;
+			MATRIX_UNIFORM.m12 = 2 * -sY * sinZ;
+			MATRIX_UNIFORM.m21 = 2 * sX * sinZ;
+			MATRIX_UNIFORM.m22 = 2 * sY * cosZ;
 		}
 		else {
 			MATRIX_UNIFORM.m11 = 2 * sX;
