@@ -90,6 +90,10 @@
     <ClCompile Include="Source\Base\VFX\CallbackVFX.ixx" />
     <ClCompile Include="Source\Base\VFX\ContinuousVFX.ixx" />
     <ClCompile Include="Source\Base\VFX\MultiVFX.ixx" />
+    <ClCompile Include="Source\Base\VFX\SequentialVFX.ixx">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Base\VFX\UI\UIDisposeVFX.ixx" />
     <ClCompile Include="Source\Base\VFX\UI\UIRecolorHSVVFX.ixx" />
     <ClCompile Include="Source\Base\VFX\UI\UIRecolorVFX.ixx" />

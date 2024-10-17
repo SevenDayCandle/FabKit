@@ -237,6 +237,7 @@
       <Filter>SDL</Filter>
     </ClCompile>
     <ClCompile Include="Source\Base\UI\BasicWindowProps.ixx" />
+    <ClCompile Include="Source\Base\VFX\SequentialVFX.ixx" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Base">
