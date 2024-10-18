@@ -14,11 +14,13 @@ import std;
 namespace fab {
 	export class UITransformVFX : public CallbackVFX {
 	public:
-		UITransformVFX(FWindow& window, UIImage& image, float duration = DEFAULT_DURATION * 0.5f) : UITransformVFX(window, image, duration, image.color.a) {}
+		UITransformVFX(FWindow& window, UIImage& image, float duration = 0.5f) : UITransformVFX(window, image, duration, image.color.a) {}
 		virtual ~UITransformVFX() = default;
 
 		UIImage& image;
-
+		
+		inline UITransformVFX& setLerpCubic() { return this->lerpFunc = VFX::cubic, *this; }
+		inline UITransformVFX& setLerpFunc(const func<float(float, float)>& lerpFunc) { return this->lerpFunc = lerpFunc, *this; }
 		inline UITransformVFX& setMoveRelative(float tOffX, float tOffY) { 
 			return setMove(image.hb->getOffPosX() + tOffX, image.hb->getOffPosY() + tOffY);
 		}
@@ -61,6 +63,7 @@ namespace fab {
 		float scaleXEnd;
 		float scaleYBegin;
 		float scaleYEnd;
+		func<float(float, float)> lerpFunc = VFX::linear;
 	private:
 		Hoverable::Token token;
 	};
@@ -140,7 +143,7 @@ namespace fab {
 	}
 
 	void UITransformVFX::update() {
-		float rate = 1 - std::pow(1 - ticks / duration, 3);
+		float rate = lerpFunc(ticks, duration);
 		if (alphaBegin != alphaEnd) {
 			image.color.a = futil::fastLerp(alphaBegin, alphaEnd, rate);
 		}

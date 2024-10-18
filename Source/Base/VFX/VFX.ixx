@@ -18,6 +18,9 @@ namespace fab {
 		float ticks = 0;
 
 		virtual bool tickUpdate();
+
+		inline static float cubic(float ticks, float duration) { return 1 - std::pow(1 - ticks / duration, 3); };
+		inline static float linear(float ticks, float duration) { return ticks / duration; };
 	};
 
 	// Update the VFX and dispose when the duration is completed
