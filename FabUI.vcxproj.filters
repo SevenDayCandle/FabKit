@@ -215,7 +215,7 @@
     <ClCompile Include="Source\Base\VFX\UI\UIRecolorHSVVFX.ixx">
       <Filter>Base\VFX\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Base\VFX\UI\UIDisposeVFX.ixx">
+    <ClCompile Include="Source\Base\VFX\Render\ImageRenderVFX.ixx">
       <Filter>Base\VFX\UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\SDL\SDLRunner.ixx">
@@ -238,6 +238,8 @@
     </ClCompile>
     <ClCompile Include="Source\Base\UI\BasicWindowProps.ixx" />
     <ClCompile Include="Source\Base\VFX\SequentialVFX.ixx" />
+    <ClCompile Include="Source\Base\VFX\Render\SequentialRenderVFX.ixx" />
+    <ClCompile Include="Source\Base\VFX\UI\UITranslateVFX.ixx" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Base">

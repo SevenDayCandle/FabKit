@@ -14,16 +14,33 @@ namespace fab {
 		CallbackVFX(FWindow& window, float duration = DEFAULT_DURATION): VFX(window, duration) {}
 		virtual ~CallbackVFX() = default;
 
-		func<void(CallbackVFX&)> onComplete;
+		CallbackVFX& addOnComplete(const func<void(CallbackVFX&)>& onComplete);
 
-		inline VFX& setOnComplete(const func<void(CallbackVFX&)>& onComplete) { return this->onComplete = onComplete, *this; }
+		inline void render(sdl::SDLBatchRenderPass& rp) override {}
+		inline void update() override {}
 
 		virtual void dispose() override;
 
 		inline static float defaultRate(float duration) { return 15 / (sdl::NANOS_PER_SECOND * duration); }
+	protected:
+		func<void(CallbackVFX&)> onComplete;
 	};
 
-	 void CallbackVFX::dispose()
+	CallbackVFX& CallbackVFX::addOnComplete(const func<void(CallbackVFX&)>& onComplete) {
+		auto prev = this->onComplete;
+		if (prev) {
+			this->onComplete = [prev, onComplete](CallbackVFX& val) {
+				prev(val);
+				onComplete(val);
+			};
+		}
+		else {
+			this->onComplete = onComplete;
+		}
+		return *this;
+	}
+
+	void CallbackVFX::dispose()
 	{
 		if (onComplete) {
 			onComplete(*this);

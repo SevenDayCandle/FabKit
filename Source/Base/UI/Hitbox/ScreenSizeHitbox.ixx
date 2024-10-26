@@ -14,10 +14,14 @@ namespace fab {
 		}
 		~ScreenSizeHitbox() override {}
 
-		inline virtual float getScaleOffPosX() const override { return win.getW() * offPosX / win.renderScale(); }
-		inline virtual float getScaleOffPosY() const override { return win.getH() * offPosY / win.renderScale(); }
-		inline virtual float getScaleOffSizeX() const override { return win.getW() * offSizeX / win.renderScale(); }
-		inline virtual float getScaleOffSizeY() const override { return win.getH() * offSizeY / win.renderScale(); }
+		inline float getScaledOffPosX() const override { return win.getW() * offPosX / win.renderScale(); }
+		inline float getScaledOffPosY() const override { return win.getH() * offPosY / win.renderScale(); }
+		inline float getScaledOffSizeX() const override { return win.getW() * offSizeX / win.renderScale(); }
+		inline float getScaledOffSizeY() const override { return win.getH() * offSizeY / win.renderScale(); }
+		inline float toOffPosX(float rX) const override { return (rX) / win.getW(); }
+		inline float toOffPosY(float rY) const override { return (rY) / win.getH(); }
+		inline float toRealPosX(float offX) const override { return win.getW() * offX; }
+		inline float toRealPosY(float offY) const override { return win.getH() * offY; }
 	protected:
 		inline void refreshOffPosX() override { offPosX = x / win.getW(); }
 		inline void refreshOffPosY() override { offPosY = y / win.getH(); }

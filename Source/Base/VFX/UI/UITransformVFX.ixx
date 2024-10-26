@@ -19,10 +19,15 @@ namespace fab {
 
 		UIImage& image;
 		
-		inline UITransformVFX& setLerpCubic() { return this->lerpFunc = VFX::cubic, *this; }
-		inline UITransformVFX& setLerpFunc(const func<float(float, float)>& lerpFunc) { return this->lerpFunc = lerpFunc, *this; }
-		inline UITransformVFX& setMoveRelative(float tOffX, float tOffY) { 
-			return setMove(image.hb->getOffPosX() + tOffX, image.hb->getOffPosY() + tOffY);
+		inline UITransformVFX& setInterpClampExp(float ratio, float n) { return this->interpFunc = [n, ratio](float t, float d) {return VFX::clampExp(t, d * ratio, n); }, *this; }
+		inline UITransformVFX& setInterpCubic() { return this->interpFunc = [](float t, float d) {return VFX::exp(t, d, 3); }, *this; }
+		inline UITransformVFX& setInterpExp(float n) { return this->interpFunc = [n](float t, float d) {return VFX::exp(t, d, n); }, *this; }
+		inline UITransformVFX& setInterpFunc(const func<float(float, float)>& lerpFunc) { return this->interpFunc = lerpFunc, *this; }
+		inline UITransformVFX& setMoveByOffset(float tOffX, float tOffY) {
+			return setMove(image.hb->toRealPosX(tOffX), image.hb->toRealPosY(tOffY));
+		}
+		inline UITransformVFX& setMoveRelative(float x, float y) { 
+			return setMove(image.hb->x + x, image.hb->y + y);
 		}
 		inline UITransformVFX& setScale(float sEnd) {
 			setScaleX(sEnd);
@@ -36,7 +41,7 @@ namespace fab {
 
 		UITransformVFX& setFade(float aEnd);
 		UITransformVFX& setFade(float aStart, float aEnd);
-		UITransformVFX& setMove(float tOffX, float tOffY);
+		UITransformVFX& setMove(float x, float y);
 		UITransformVFX& setRotate(float rEnd);
 		UITransformVFX& setRotate(float rStart, float rEnd);
 		UITransformVFX& setScaleX(float sEnd);
@@ -48,8 +53,8 @@ namespace fab {
 		virtual void update() override;
 	protected:
 		UITransformVFX(FWindow& window, UIImage& image, float duration, float alphaEnd) : CallbackVFX(window, duration),
-			image(image), token(image.makeToken()), alphaBegin(image.color.a), alphaEnd(alphaEnd), posXBegin(image.hb->getOffPosX()), posXEnd(image.hb->getOffPosX()),
-			posYBegin(image.hb->getOffPosY()), posYEnd(image.hb->getOffPosY()), rotBegin(image.rotation), rotEnd(image.rotation), scaleXBegin(image.scaleX), scaleXEnd(image.scaleX), scaleYBegin(image.scaleY), scaleYEnd(image.scaleY) {}
+			image(image), token(image.makeToken()), alphaBegin(image.color.a), alphaEnd(alphaEnd), posXBegin(image.hb->x), posXEnd(image.hb->x),
+			posYBegin(image.hb->y), posYEnd(image.hb->y), rotBegin(image.rotation), rotEnd(image.rotation), scaleXBegin(image.scaleX), scaleXEnd(image.scaleX), scaleYBegin(image.scaleY), scaleYEnd(image.scaleY) {}
 
 		float alphaBegin;
 		float alphaEnd;
@@ -63,7 +68,7 @@ namespace fab {
 		float scaleXEnd;
 		float scaleYBegin;
 		float scaleYEnd;
-		func<float(float, float)> lerpFunc = VFX::linear;
+		func<float(float, float)> interpFunc = VFX::linear;
 	private:
 		Hoverable::Token token;
 	};
@@ -78,9 +83,10 @@ namespace fab {
 		return setFade(aEnd);
 	}
 
-	UITransformVFX& UITransformVFX::setMove(float tOffX, float tOffY) {
-		posXEnd = tOffX;
-		posYEnd = tOffY;
+	// Set the target position to move the UI to. x/y are given as real coordinates
+	UITransformVFX& UITransformVFX::setMove(float x, float y) {
+		posXEnd = x;
+		posYEnd = y;
 		return *this;
 	}
 
@@ -129,21 +135,21 @@ namespace fab {
 			image.scaleY = scaleYEnd;
 		}
 		if (posXBegin != posXEnd || posYBegin != posYEnd) {
-			image.hb->setOffPos(posXEnd, posYEnd);
+			image.hb->setRealPos(posXEnd, posYEnd);
 		}
 		CallbackVFX::dispose();
 	}
 
 	bool UITransformVFX::tickUpdate() {
 		if (!token) {
-			dispose();
+			CallbackVFX::dispose();
 			return true;
 		}
 		return CallbackVFX::tickUpdate();
 	}
 
 	void UITransformVFX::update() {
-		float rate = lerpFunc(ticks, duration);
+		float rate = interpFunc(ticks, duration);
 		if (alphaBegin != alphaEnd) {
 			image.color.a = futil::fastLerp(alphaBegin, alphaEnd, rate);
 		}
@@ -157,7 +163,7 @@ namespace fab {
 			image.rotation = futil::fastLerp(rotBegin, rotEnd, rate);
 		}
 		if (posXBegin != posXEnd || posYBegin != posYEnd) {
-			image.hb->setOffPos(futil::fastLerp(posXBegin, posXEnd, rate), futil::fastLerp(posYBegin, posYEnd, rate));
+			image.hb->setRealPos(futil::fastLerp(posXBegin, posXEnd, rate), futil::fastLerp(posYBegin, posYEnd, rate));
 		}
 	}
 }

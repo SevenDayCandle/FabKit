@@ -19,7 +19,9 @@ namespace fab {
 
 		virtual bool tickUpdate();
 
-		inline static float cubic(float ticks, float duration) { return 1 - std::pow(1 - ticks / duration, 3); };
+		inline static float clamp(float ticks, float duration) { return ticks < duration ? ticks / duration : 1; }
+		inline static float clampExp(float ticks, float duration, float n) { return ticks < duration ? 1 - std::pow(1 - ticks / duration, n) : 1; }
+		inline static float exp(float ticks, float duration, float n) { return 1 - std::pow(1 - ticks / duration, n); };
 		inline static float linear(float ticks, float duration) { return ticks / duration; };
 	};
 

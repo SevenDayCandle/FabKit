@@ -14,9 +14,12 @@ namespace fab {
 		}
 		~ScreenPosHitbox() override {}
 
-
-		inline virtual float getScaleOffPosX() const override { return win.getW() * offPosX / win.renderScale(); }
-		inline virtual float getScaleOffPosY() const override { return win.getH() * offPosY / win.renderScale(); }
+		inline float getScaledOffPosX() const override { return win.getW() * offPosX / win.renderScale(); }
+		inline float getScaledOffPosY() const override { return win.getH() * offPosY / win.renderScale(); }
+		inline float toOffPosX(float rX) const override { return (rX) / win.getW(); }
+		inline float toOffPosY(float rY) const override { return (rY) / win.getH(); }
+		inline float toRealPosX(float offX) const override { return win.renderScale() * offX; }
+		inline float toRealPosY(float offY) const override { return win.renderScale() * offY; }
 	protected:
 		inline void refreshOffPosX() override { offPosX = x / win.getW(); }
 		inline void refreshOffPosY() override { offPosY = y / win.getH(); }

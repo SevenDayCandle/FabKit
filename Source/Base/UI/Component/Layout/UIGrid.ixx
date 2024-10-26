@@ -134,7 +134,7 @@ namespace fab {
 	template<c_ext<Hoverable> T> UIGrid<T>& UIGrid<T>::autosetInterval(float spacingX, float spacingY) {
 		if (this->items.size() > 0) {
 			Hitbox& firsth = *this->items[0]->getHb();
-			setInterval(firsth.getScaleOffSizeX() + spacingX, firsth.getScaleOffSizeY() + spacingY);
+			setInterval(firsth.getScaledOffSizeX() + spacingX, firsth.getScaledOffSizeY() + spacingY);
 		}
 		return *this;
 	}

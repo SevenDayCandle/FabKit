@@ -14,6 +14,11 @@ namespace fab {
 		}
 		~RelativeHitbox() override {}
 
+		inline float toOffPosX(float rX) const override { return (rX - parent.x) / win.renderScale(); }
+		inline float toOffPosY(float rY) const override { return (rY - parent.y) / win.renderScale(); }
+		inline float toRealPosX(float offX) const override { return parent.x + win.renderScale() * offX; }
+		inline float toRealPosY(float offY) const override { return parent.y + win.renderScale() * offY; }
+
 		inline static uptr<RelativeHitbox> make(FWindow& win, Hitbox& parent) { return make_unique<RelativeHitbox>(win, parent); }
 		inline static uptr<RelativeHitbox> make(FWindow& win, Hitbox& parent, float offsetWidth, float offsetHeight) { return make_unique<RelativeHitbox>(win, parent, offsetWidth, offsetHeight); }
 		inline static uptr<RelativeHitbox> make(FWindow& win, Hitbox& parent, float parentOffsetX, float parentOffsetY, float offsetWidth, float offsetHeight) { return make_unique<RelativeHitbox>(win, parent, parentOffsetX, parentOffsetY, offsetWidth, offsetHeight); }

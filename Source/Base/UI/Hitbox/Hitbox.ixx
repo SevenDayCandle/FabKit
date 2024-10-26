@@ -31,14 +31,14 @@ namespace fab {
 		inline float getOffSizeX(float mult) const { return offSizeX * mult; }
 		inline float getOffSizeY() const { return offSizeY; } // Get the offset height. How this translates into an actual height depends on the hitbox
 		inline float getOffSizeY(float mult) const { return offSizeY * mult; }
-		inline float getScaleOffPosX(float mult) const { return getScaleOffPosX() * mult; }
-		inline float getScaleOffPosY(float mult) const { return getScaleOffPosY() * mult; }
-		inline float getScaleOffSizeX(float mult) const { return getScaleOffSizeX() * mult; }
-		inline float getScaleOffSizeY(float mult) const { return getScaleOffSizeY() * mult; }
-		inline virtual float getScaleOffPosX() const { return offPosX; } // Get a x screen position scaled by the screen size
-		inline virtual float getScaleOffPosY() const { return offPosY; } // Get a y screen position scaled by the screen size
-		inline virtual float getScaleOffSizeX() const { return offSizeX; } // Get a width scaled by the screen size
-		inline virtual float getScaleOffSizeY() const { return offSizeY; } // Get a height scaled by the screen size
+		inline float getScaledOffPosX(float mult) const { return getScaledOffPosX() * mult; }
+		inline float getScaledOffPosY(float mult) const { return getScaledOffPosY() * mult; }
+		inline float getScaledOffSizeX(float mult) const { return getScaledOffSizeX() * mult; }
+		inline float getScaledOffSizeY(float mult) const { return getScaledOffSizeY() * mult; }
+		inline virtual float getScaledOffPosX() const { return offPosX; } // Get the offset x position as it would look for scaled hitboxes. This is identical to getOffPosX for relative/scale hitboxes and is multiplied by the screen size for screenpos/screensize hitboxes 
+		inline virtual float getScaledOffPosY() const { return offPosY; } // Get the offset y position as it would look for scaled hitboxes. This is identical to getOffPosY for relative/scale hitboxes and is multiplied by the screen size for screenpos/screensize hitboxes 
+		inline virtual float getScaledOffSizeX() const { return offSizeX; } // Get the offset x scale as it would look for scaled hitboxes. This is identical to getOffSizeX for relative/scale/screenpos hitboxes and is multiplied by the screen size for screensize hitboxes 
+		inline virtual float getScaledOffSizeY() const { return offSizeY; } // Get the offset y scale as it would look for scaled hitboxes. This is identical to getOffSizeY for relative/scale/screenpos hitboxes and is multiplied by the screen size for screensize hitboxes 
 
 		Hitbox& setOffPos(const float x, const float y);
 		Hitbox& setOffPosX(const float x);
@@ -54,6 +54,11 @@ namespace fab {
 		Hitbox& setRealSizeY(const float y);
 		void refresh();
 		virtual void update();
+
+		virtual float toOffPosX(float x) const = 0; // Get the offset position x for this hitbox that corresponds with the real coordinate x
+		virtual float toOffPosY(float y) const = 0; // Get the offset position y for this hitbox that corresponds with the real coordinate x
+		virtual float toRealPosX(float offX) const = 0; // Get the real position x for this hitbox that corresponds with the offset x
+		virtual float toRealPosY(float offY) const = 0; // Get the real position y for this hitbox that corresponds with the offset y
 	protected:
 		bool hovered = false;
 		bool just = false;

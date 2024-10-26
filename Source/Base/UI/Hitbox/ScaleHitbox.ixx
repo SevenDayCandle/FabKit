@@ -13,6 +13,11 @@ namespace fab {
 		}
 		~ScaleHitbox() override {}
 
+		inline float toOffPosX(float rX) const override { return (rX) / win.renderScale(); }
+		inline float toOffPosY(float rY) const override { return (rY) / win.renderScale(); }
+		inline float toRealPosX(float offX) const override { return win.renderScale() * offX; }
+		inline float toRealPosY(float offY) const override { return win.renderScale() * offY; }
+
 	protected:
 		inline void refreshOffPosX() override { offPosX = x / win.renderScale(); }
 		inline void refreshOffPosY() override { offPosY = y / win.renderScale(); }
