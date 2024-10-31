@@ -19,7 +19,12 @@ namespace fab {
 		}
 		virtual ~SequentialVFX() = default;
 
-		inline SequentialVFX& addEffect(uptr<VFX>&& act) { return effects.push_back(move(act)), * this; }
+		template <c_ext<VFX> T> inline T& addEffect(uptr<T>&& act) {
+			T& ref = *act;
+			effects.push_back(move(act));
+			return ref;
+		}
+		template <c_ext<VFX> T, typename... Args> requires std::constructible_from<T, FWindow&, Args&&...> inline T& addNew(Args&&... args) { return addEffect(create<T>(forward<Args>(args)...)); }
 		template <c_varg<uptr<VFX>&&>... Args> inline SequentialVFX& addEffects(Args&&... items) { return (effects.push_back(move(items)), ...), * this; }
 
 		virtual bool tickUpdate() override;
@@ -44,7 +49,9 @@ namespace fab {
 	}
 
 	void SequentialVFX::render(sdl::SDLBatchRenderPass& rp) {
-		effects[executeIndex]->render(rp);
+		if (executeIndex < effects.size()) {
+			effects[executeIndex]->render(rp);
+		}
 	}
 
 	void SequentialVFX::update() {

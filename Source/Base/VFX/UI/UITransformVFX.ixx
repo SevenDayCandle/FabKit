@@ -15,6 +15,7 @@ namespace fab {
 	export class UITransformVFX : public CallbackVFX {
 	public:
 		UITransformVFX(FWindow& window, UIImage& image, float duration = 0.5f) : UITransformVFX(window, image, duration, image.color.a) {}
+		UITransformVFX(UIImage& image, float duration = 0.5f) : UITransformVFX(image.win, image, duration, image.color.a) {}
 		virtual ~UITransformVFX() = default;
 
 		UIImage& image;

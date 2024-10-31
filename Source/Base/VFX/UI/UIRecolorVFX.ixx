@@ -17,6 +17,8 @@ namespace fab {
 		UIRecolorVFX(FWindow& window, UIImage& image, float srcR, float srcG, float srcB, float targR, float targG, float targB, float duration = DEFAULT_DURATION * 0.25f) : CallbackVFX(window, duration), image(image), targR(targR), targG(targG), targB(targB), srcR(srcR), srcG(srcG), srcB(srcB), token(image.makeToken()) {}
 		UIRecolorVFX(FWindow& window, UIImage& image, const sdl::Color& srcColor, const sdl::Color& targColor, float duration = DEFAULT_DURATION * 0.25f) : UIRecolorVFX(window, image, srcColor.r, srcColor.g, srcColor.b, targColor.r, targColor.g, targColor.b, duration) {}
 		UIRecolorVFX(FWindow& window, UIImage& image, const sdl::Color& color, float duration = DEFAULT_DURATION * 0.25f) : UIRecolorVFX(window, image, image.color.r, image.color.g, image.color.b, color.r, color.g, color.b, duration) {}
+		UIRecolorVFX(UIImage& image, const sdl::Color& srcColor, const sdl::Color& targColor, float duration = DEFAULT_DURATION * 0.25f) : UIRecolorVFX(image.win, image, srcColor.r, srcColor.g, srcColor.b, targColor.r, targColor.g, targColor.b, duration) {}
+		UIRecolorVFX(UIImage& image, const sdl::Color& color, float duration = DEFAULT_DURATION * 0.25f) : UIRecolorVFX(image.win, image, image.color.r, image.color.g, image.color.b, color.r, color.g, color.b, duration) {}
 		virtual ~UIRecolorVFX() = default;
 
 		UIImage& image;

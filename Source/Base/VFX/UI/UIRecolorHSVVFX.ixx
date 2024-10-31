@@ -19,6 +19,7 @@ namespace fab {
 			refreshInterpHue();
 		}
 		UIRecolorHSVVFX(FWindow& window, UIImage& image, const sdl::Color& color, float duration = DEFAULT_DURATION * 0.25f) : UIRecolorHSVVFX(window, image, color.r, color.g, color.b, duration) {}
+		UIRecolorHSVVFX(UIImage& image, const sdl::Color& color, float duration = DEFAULT_DURATION * 0.25f) : UIRecolorHSVVFX(image.win, image, color.r, color.g, color.b, duration) {}
 		virtual ~UIRecolorHSVVFX() = default;
 
 		UIImage& image;

@@ -14,7 +14,8 @@ import std;
 namespace fab {
 	export class ImageRenderVFX : public UITransformVFX {
 	public:
-		ImageRenderVFX(FWindow& window, uptr<UIImage>&& image, float duration = DEFAULT_DURATION * 0.5f): UITransformVFX(window, *image, duration, 0), image(move(image)) {}
+		ImageRenderVFX(FWindow& window, uptr<UIImage>&& image, float duration = DEFAULT_DURATION * 0.5f, float alphaEnd = 0): UITransformVFX(window, *image, duration, alphaEnd), image(move(image)) {}
+		ImageRenderVFX(uptr<UIImage>&& image, float duration = DEFAULT_DURATION * 0.5f, float alphaEnd = 0) : UITransformVFX(image->win, *image, duration, alphaEnd), image(move(image)) {}
 
 		uptr<UIImage> image;
 

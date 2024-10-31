@@ -14,6 +14,7 @@ namespace fab {
 	export class UITranslateVFX : public CallbackVFX {
 	public:
 		UITranslateVFX(FWindow& window, Hoverable& image, float duration = 0.5f) : CallbackVFX(window, duration), ui(image), token(image.makeToken()), posXBegin(image.getHb()->x), posXEnd(image.getHb()->x), posYBegin(image.getHb()->y), posYEnd(image.getHb()->y) {}
+		UITranslateVFX(Hoverable& image, float duration = 0.5f) : CallbackVFX(image.win, duration), ui(image), token(image.makeToken()), posXBegin(image.getHb()->x), posXEnd(image.getHb()->x), posYBegin(image.getHb()->y), posYEnd(image.getHb()->y) {}
 		virtual ~UITranslateVFX() = default;
 
 		Hoverable& ui;

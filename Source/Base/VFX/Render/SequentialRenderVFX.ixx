@@ -14,7 +14,9 @@ namespace fab {
 	export class SequentialRenderVFX : public SequentialVFX {
 	public:
 		SequentialRenderVFX(FWindow& window, uptr<UIImage>&& item): SequentialVFX(window), item(move(item)) {}
+		SequentialRenderVFX(uptr<UIImage>&& item) : SequentialVFX(item->win), item(move(item)) {}
 		template <c_varg<uptr<VFX>>... Args> SequentialRenderVFX(FWindow& window, uptr<UIImage>&& item, Args&&... items) : SequentialVFX(window, move(items)), item(move(item)) {}
+		template <c_varg<uptr<VFX>>... Args> SequentialRenderVFX(uptr<UIImage>&& item, Args&&... items) : SequentialVFX(item->win, move(items)), item(move(item)) {}
 		virtual ~SequentialRenderVFX() = default;
 
 		uptr<UIImage> item;
