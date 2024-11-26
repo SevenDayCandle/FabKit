@@ -33,7 +33,7 @@ namespace fab {
 
 		~UISelectorList() override {}
 
-		inline auto getSelectedItems() { return std::views::transform(currentIndices, [this](int i) { return &(this->rows[i]->item); }); }
+		inline auto getSelectedItems() const { return std::views::transform(currentIndices, [this](int i) { return &(this->rows[i]->item); }); }
 		inline bool isOpen() const { return proxy != nullptr; }
 		inline UISelectorList& setFilterFunc(const func<bool(const UIEntry<T>*)>& filterFunc) { return this->filterFunc = filterFunc, *this; }
 		inline UISelectorList& setFilterFunc(func<bool(const UIEntry<T>*)>&& filterFunc) { return this->filterFunc = move(filterFunc), *this; }
@@ -55,7 +55,7 @@ namespace fab {
 
 		UISelectorList& setSelectionLimit(int rows);
 		UISelectorList& setSelectionMin(int rows);
-		vec<const T*> getSelectedItemsAsList();
+		vec<const T*> getSelectedItemsAsList() const;
 		void clearSelection();
 		void forceClosePopup();
 		void openPopup();
@@ -283,7 +283,7 @@ namespace fab {
 	}
 
 	// Returns the entries corresponding with the currently selected indices
-	template <typename T> vec<const T*> UISelectorList<T>::getSelectedItemsAsList() {
+	template <typename T> vec<const T*> UISelectorList<T>::getSelectedItemsAsList() const {
 		vec<const T*> items(currentIndices.size());
 		for (int i : currentIndices) { items.push_back(&(this->rows[i]->item)); }
 		return items;

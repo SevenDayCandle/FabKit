@@ -12,9 +12,11 @@ import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
+/* Represents an application window. A wrapper around SDL's window that manages the rendering and lifecycle of screens to be rendered in that window */
 namespace fab {
 	export class FWindow {
 	public:
+		/* An element that can be placed into a FWindow */
 		class Element {
 		public:
 			Element(FWindow& window): win(window) {}
@@ -33,6 +35,7 @@ namespace fab {
 			virtual void update() = 0;
 		};
 
+		/* Props that dictate how this window should be set up */
 		struct IProps {
 			IProps() {}
 			virtual ~IProps() = default;

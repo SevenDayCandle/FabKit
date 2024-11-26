@@ -15,6 +15,6 @@ namespace fab {
 		virtual ~ILoadable() = default;
 
 		virtual void dispose() = 0;
-		virtual void reload () const = 0;
+		virtual void reload() const = 0;
 	};
 }

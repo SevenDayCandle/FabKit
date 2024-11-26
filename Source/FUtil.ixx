@@ -97,6 +97,7 @@ namespace fab {
 	export using std::ranges::transform_view;
 	export using std::set;
 	export using std::span;
+	export using std::type_index;
 	export using std::type_info;
 
 	export using std::forward;
@@ -130,6 +131,7 @@ namespace fab::futil {
 	export str& toUpperCaseInPlace(str& input);
 	export strv getView(strv input, size_t& pos);
 	export template <c_itr<strv> SCo> str joinStr(strv delimiter, SCo items);
+	export template <typename T, c_itr<uptr<T>> TCo> vec<uptr<T>> vecCopy(const TCo& container);
 	export template <typename T, c_itr<T> TCo> bool has(const TCo& container, const T& value);
 	export template <typename T, c_itr<T> TCo> const T* find(const TCo& container, const T& value);
 	export template <typename T, typename U, c_itr<T> TCo, c_invc<T, U> Func> vec<U> transform(const TCo& container, Func mapFunc);
@@ -243,6 +245,13 @@ namespace fab::futil {
 		for (; iter != items.end(); ++iter) {
 			res += delimiter + *iter;
 		}
+		return res;
+	}
+
+	// Create a deep copy of an iterable of unique pointers
+	template<typename T, c_itr<uptr<T>> TCo> vec<uptr<T>> vecCopy(const TCo& container) {
+		vec<T> res(container.size());
+		std::transform(container.begin(), container.end(), res.begin(), [](const uptr<T>& ptr) { return make_unique<T>(*ptr); });
 		return res;
 	}
 
