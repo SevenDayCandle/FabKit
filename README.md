@@ -13,10 +13,9 @@ FabKit is an object-oriented UI library for C++ made with SDL3 using its SDL_GPU
 
 ## Requirements
 
-- C++ 23
+- C++ 23 or higher
+- Windows 10 or higher
 - Only MSVC is supported as a build system at this time
-
-While this should work with Linux/Mac, I've only tested this with Windows
 
 ## Credits
 
