@@ -42,10 +42,12 @@ namespace fab {
 	};
 	export template<typename T> concept c_num = std::is_arithmetic_v<T>;
 	export template<typename T> concept c_pair = is_specialization_v<T, std::pair>;
+	export template<typename T> concept c_ptr = std::is_pointer_v<T>;
 	export template<typename T> concept c_push = requires(T t, typename T::value_type v) {
 		{ t.push_back(v) } -> std::same_as<void>;
 	};
-	export template<typename T> concept c_ref = is_specialization_v<T, std::reference_wrapper>;
+	export template<typename T> concept c_ref = std::is_reference_v<T>;
+	export template<typename T> concept c_refw = is_specialization_v<T, std::reference_wrapper>;
 	export template<typename It, typename T> concept c_set = c_itr<T, It>&& requires(It a, T v) {
 		{ a.find(v) } -> std::convertible_to<typename It::iterator>;
 	};
@@ -289,6 +291,9 @@ namespace fab::futil {
 		else if constexpr (c_str<T>) {
 			return str(strv(obj));
 		}
+		else if constexpr (c_ptr<T>) {
+			return obj ? toString(*obj) : "";
+		}
 		else if constexpr (c_pair<T>) {
 			return "[" + toStringWrapped(obj.first) + ", " + toStringWrapped(obj.second) + "]";
 		}
@@ -305,7 +310,7 @@ namespace fab::futil {
 			result += "}";
 			return result;
 		}
-		else if constexpr (c_ref<T>) {
+		else if constexpr (c_refw<T>) {
 			return toString(obj.get());
 		}
 		else if constexpr (std::ranges::range<T>) {
@@ -351,7 +356,7 @@ namespace fab::futil {
 		if constexpr (c_str<T>) {
 			return '"' + obj + '"';
 		}
-		if constexpr (c_ref<T>) {
+		if constexpr (c_refw<T>) {
 			return toStringWrapped(obj.get());
 		}
 		return toString(obj);
@@ -462,7 +467,7 @@ namespace fab::futil {
 					++pos;
 					return res; // End of array
 				default:
-					res.push_back(fromString<auto>(input, pos));
+					res.push_back(fromString<typename T::value_type>(input, pos));
 					break;
 				}
 			}
@@ -540,8 +545,11 @@ namespace fab::futil {
 				int ind = std::stoi(substr.data());
 				return static_cast<T>(ind);
 			}
-			else if constexpr (c_keyed<T>) {
-				return T::forceGet(substr);
+			else if constexpr (c_ref<T> && c_keyed<std::remove_reference_t<T>>) {
+				return std::remove_reference_t<T>::forceGet(substr);
+			}
+			else if constexpr (c_ptr<T> && c_keyed<std::remove_pointer_t<T>>) {
+				return std::remove_pointer_t<T>::get(substr);
 			}
 		}
 		return T();
