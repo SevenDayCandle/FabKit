@@ -57,7 +57,7 @@ namespace fab {
 	void Hotkey::commit()
 	{
 		map<strv, Hotkey*>& regist = registered();
-		map<strv, pair<int, int>> output = futil::transformMap<strv, Hotkey*, pair<int, int>>(regist, [](const Hotkey* row) { return pair<int,int>(row->key, row->pad); });
+		map<strv, pair<int, int>> output = futil::transformMap(regist, [](const Hotkey* row) { return pair<int,int>(row->key, row->pad); });
 		str configPath = Hotkey::configPath();
 		auto error = glz::write_file_json(output, configPath, str{});
 		if (error) {

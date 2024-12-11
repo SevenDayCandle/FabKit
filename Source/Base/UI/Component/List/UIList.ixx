@@ -60,7 +60,7 @@ namespace fab {
 		inline Iterator begin() { return Iterator(rows.begin()); }
 		inline Iterator end() { return Iterator(rows.end()); }
 		inline size_t size() const { return rows.size(); }
-		inline vec<const T*> toVec() const { return futil::transform<uptr<UIEntry<T>>, T*>(rows, [](uptr<UIEntry<T>>& row) { return &(row->item); }); }
+		inline vec<const T*> toVec() const { return futil::transform(rows, [](uptr<UIEntry<T>>& row) { return &(row->item); }); }
 		inline void clearItems() { setItems(); }
 
 		template <c_itr<T> Iterable> UIList& addItems(Iterable& items);

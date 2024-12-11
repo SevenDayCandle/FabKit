@@ -93,8 +93,10 @@ namespace fab {
 	export using std::deque;
 	export using std::exception;
 	export using std::hash;
+	export using std::invoke_result_t;
 	export using std::list;
 	export using std::queue;
+	export using std::ranges::range_value_t;
 	export using std::ranges::ref_view;
 	export using std::ranges::transform_view;
 	export using std::set;
@@ -136,14 +138,14 @@ namespace fab::futil {
 	export template <typename T, c_itr<uptr<T>> TCo> vec<uptr<T>> vecCopy(const TCo& container);
 	export template <typename T, c_itr<T> TCo> bool has(const TCo& container, const T& value);
 	export template <typename T, c_itr<T> TCo> const T* find(const TCo& container, const T& value);
-	export template <typename T, typename U, c_itr<T> TCo, c_invc<T, U> Func> vec<U> transform(const TCo& container, Func mapFunc);
-	export template <typename T, typename U, typename V, c_map_of<T, U> TCo, c_invc<U, V> Func> map<T, V> transformMap(const TCo& src, Func mapFunc);
-	export template <typename T, typename U, typename V, c_map_of<T, U> TCo, c_invc<U, V> Func> umap<T, V> transformUmap(const TCo& src, Func mapFunc);
 	export template <typename T> str toString(const T& obj);
 	export template <typename T> str toStringWrapped(const T& obj);
 	export template <typename T> T fromString(strv input);
 	export template <typename T> T fromString(strv input, size_t& pos);
-	export template <typename TCo, typename Func> str joinStrMap(strv delimiter, const TCo& items, Func strFunc) requires std::ranges::range<TCo>&& c_invc<Func, std::ranges::range_value_t<TCo>, strv>;
+	export template <typename TCo, typename Func> requires std::ranges::range<TCo> && c_invc<Func, range_value_t<TCo>, strv> str joinStrMap(strv delimiter, const TCo& items, Func strFunc);
+	export template <typename TCo, typename Func> requires c_itr<TCo, typename TCo::value_type> && c_invc<Func, typename TCo::value_type, invoke_result_t<Func, typename TCo::value_type>> vec<invoke_result_t<Func, typename TCo::value_type>> transform(const TCo& container, Func mapFunc);
+	export template<typename TCo, typename Func> requires c_map_of<TCo, typename TCo::key_type, typename TCo::mapped_type> && c_invc<Func, typename TCo::mapped_type, invoke_result_t<Func, typename TCo::mapped_type>> map<typename TCo::key_type, invoke_result_t<Func, typename TCo::mapped_type>> transformMap(const TCo& src, Func mapFunc);
+	export template<typename TCo, typename Func> requires c_map_of<TCo, typename TCo::key_type, typename TCo::mapped_type>&& c_invc<Func, typename TCo::mapped_type, invoke_result_t<Func, typename TCo::mapped_type>> umap<typename TCo::key_type, invoke_result_t<Func, typename TCo::mapped_type>> transformUmap(const TCo& src, Func mapFunc);
 }
 
 /*
@@ -258,8 +260,7 @@ namespace fab::futil {
 	}
 
 	// Represent a collection of objects as a joined string with a delimiter
-	template<typename TCo, typename Func> str joinStrMap(strv delimiter, const TCo& items, Func strFunc)
-		requires std::ranges::range<TCo>&& c_invc<Func, std::ranges::range_value_t<TCo>, strv>
+	template<typename TCo, typename Func> requires std::ranges::range<TCo>&& c_invc<Func, range_value_t<TCo>, strv> str joinStrMap(strv delimiter, const TCo& items, Func strFunc)
 	{
 		str res;
 		auto iter = items.begin();
@@ -270,6 +271,31 @@ namespace fab::futil {
 		for (; iter != items.end(); ++iter) {
 			res += delimiter;
 			res += strFunc(*iter);
+		}
+		return res;
+	}
+
+	// Transform each of the values in the container into a new value and store the results in a list
+	template <typename TCo, typename Func> requires c_itr<TCo, typename TCo::value_type>&& c_invc<Func, typename TCo::value_type, invoke_result_t<Func, typename TCo::value_type>> vec<invoke_result_t<Func, typename TCo::value_type>> transform(const TCo& container, Func mapFunc) {
+		vec<invoke_result_t<Func, typename TCo::value_type>> res(container.size());
+		std::transform(container.begin(), container.end(), res.begin(), mapFunc);
+		return res;
+	}
+
+	// Transform each of the values in the map into a new map
+	template<typename TCo, typename Func> requires c_map_of<TCo, typename TCo::key_type, typename TCo::mapped_type>&& c_invc<Func, typename TCo::mapped_type, invoke_result_t<Func, typename TCo::mapped_type>> map<typename TCo::key_type, invoke_result_t<Func, typename TCo::mapped_type>> transformMap(const TCo& src, Func mapFunc) {
+		map<typename TCo::key_type, invoke_result_t<Func, typename TCo::mapped_type>> res;
+		for (const auto& p : src) {
+			res[p.first] = mapFunc(p.second);
+		}
+		return res;
+	}
+
+	// Transform each of the values in the map into a new unordered map
+	export template<typename TCo, typename Func> requires c_map_of<TCo, typename TCo::key_type, typename TCo::mapped_type>&& c_invc<Func, typename TCo::mapped_type, invoke_result_t<Func, typename TCo::mapped_type>> umap<typename TCo::key_type, invoke_result_t<Func, typename TCo::mapped_type>> transformUmap(const TCo& src, Func mapFunc) {
+		umap<typename TCo::key_type, invoke_result_t<Func, typename TCo::mapped_type>> res;
+		for (const auto& p : src) {
+			res[p.first] = mapFunc(p.second);
 		}
 		return res;
 	}
@@ -360,31 +386,6 @@ namespace fab::futil {
 			return toStringWrapped(obj.get());
 		}
 		return toString(obj);
-	}
-
-	// Transform each of the values in the container into a new value and store the results in a list
-	template<typename T, typename U, c_itr<T> TCo, c_invc<T, U> Func> vec<U> transform(const TCo& container, Func mapFunc) {
-		vec<U> res(container.size());
-		std::transform(container.begin(), container.end(), res.begin(), mapFunc);
-		return res;
-	}
-
-	// Transform each of the values in the map into a new map
-	template<typename T, typename U, typename V, c_map_of<T,U> TCo, c_invc<U, V> Func> map<T, V> transformMap(const TCo& src, Func mapFunc) {
-		map<T, V> res;
-		for (const auto& p : src) {
-			res[p.first] = mapFunc(p.second);
-		}
-		return res;
-	}
-
-	// Transform each of the values in the map into a new unordered map
-	template<typename T, typename U, typename V, c_map_of<T, U> TCo, c_invc<U, V> Func> umap<T, V> transformUmap(const TCo& src, Func mapFunc) {
-		umap<T, V> res;
-		for (const auto& p : src) {
-			res[p.first] = mapFunc(p.second);
-		}
-		return res;
 	}
 
 	// For types that do not use syntax characters, we can safely treat everything in between this pos and the next syntax character as being part of the object to be deserialized
