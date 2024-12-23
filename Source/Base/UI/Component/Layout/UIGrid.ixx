@@ -12,6 +12,33 @@ import std;
 namespace fab {
 	export template <c_ext<Hoverable> T> class UIGrid : public UIBase {
 	public:
+		class ConstIterator {
+		public:
+			using iterator_category = std::forward_iterator_tag;
+			using value_type = const T;
+			using difference_type = std::ptrdiff_t;
+			using pointer = const T*;
+			using reference = const T&;
+
+			ConstIterator(typename vec<uptr<T>>::const_iterator it) : it(it) {}
+
+			reference operator*() const { return *(*it); }
+			pointer operator->() const { return it->get(); }
+
+			ConstIterator& operator++() { return ++it, * this; }
+			ConstIterator operator++(int) {
+				ConstIterator tmp = *this;
+				++it;
+				return tmp;
+			}
+
+			friend bool operator==(const ConstIterator& a, const ConstIterator& b) { return a.it == b.it; }
+			friend bool operator!=(const ConstIterator& a, const ConstIterator& b) { return a.it != b.it; }
+
+		private:
+			typename vec<uptr<T>>::const_iterator it;
+		};
+
 		class Iterator {
 		public:
 			using iterator_category = std::forward_iterator_tag;
@@ -23,7 +50,7 @@ namespace fab {
 			Iterator(typename vec<uptr<T>>::iterator it) : it(it) {}
 
 			reference operator*() const { return *(*it); }
-			pointer operator->() const { return (*it).get(); }
+			pointer operator->() const { return it->get(); }
 
 			Iterator& operator++() { return ++it, * this; }
 			Iterator operator++(int) {
@@ -42,6 +69,8 @@ namespace fab {
 		UIGrid(FWindow& window, uptr<Hitbox>&& hb, float spacingX = 1, float spacingY = 1) : UIBase(window, move(hb)), intervalX(spacingX), intervalY(spacingY) {}
 		UIGrid(UIGrid&& other) noexcept : UIBase(other.win, move(other.hb)), intervalX(other.intervalX), intervalY(other.intervalY), items(move(other.items)) {}
 
+		inline ConstIterator begin() const { return ConstIterator(items.cbegin()); }
+		inline ConstIterator end() const { return ConstIterator(items.cend()); }
 		inline float getIntervalX() const { return intervalX; }
 		inline float getIntervalY() const { return intervalY; }
 		inline float updateItemOffsets() { return updateItemOffsets(0, items.size()); }

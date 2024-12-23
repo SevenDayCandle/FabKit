@@ -4,6 +4,8 @@ import fab.KeyedItem;
 import std;
 
 namespace fab {
+	constexpr std::string_view VOID_TYPESTR = "void";
+
 	// Hasing structure for string_view lookup on str containers
 	export struct str_hash
 	{
@@ -108,6 +110,18 @@ namespace fab {
 	export using std::make_shared;
 	export using std::make_unique;
 	export using std::move;
+
+	// Adapted from https://stackoverflow.com/questions/81870/is-it-possible-to-print-a-variables-type-in-standard-c/64490578#64490578
+	template <typename T> constexpr strv _funcsigimpl() { return std::source_location::current().function_name(); }
+	export template <typename T> constexpr strv nameof() {
+		constexpr strv fname = _funcsigimpl<T>();
+		constexpr strv vname = _funcsigimpl<void>();
+		constexpr size_t prefix_length = vname.find(VOID_TYPESTR);
+		constexpr size_t suffix_length = vname.length() - prefix_length - VOID_TYPESTR.length();
+		constexpr strv clname = fname.substr(prefix_length, fname.length() - prefix_length - suffix_length);
+		size_t pos = clname.rfind(' ');
+		return pos == strv::npos ? clname : clname.substr(pos + 1);
+	}
 }
 
 // Utility functions
@@ -144,8 +158,8 @@ namespace fab::futil {
 	export template <typename T> T fromString(strv input, size_t& pos);
 	export template <typename TCo, typename Func> requires std::ranges::range<TCo> && c_invc<Func, range_value_t<TCo>, strv> str joinStrMap(strv delimiter, const TCo& items, Func strFunc);
 	export template <typename TCo, typename Func> requires c_itr<TCo, typename TCo::value_type> && c_invc<Func, typename TCo::value_type, invoke_result_t<Func, typename TCo::value_type>> vec<invoke_result_t<Func, typename TCo::value_type>> transform(const TCo& container, Func mapFunc);
-	export template<typename TCo, typename Func> requires c_map_of<TCo, typename TCo::key_type, typename TCo::mapped_type> && c_invc<Func, typename TCo::mapped_type, invoke_result_t<Func, typename TCo::mapped_type>> map<typename TCo::key_type, invoke_result_t<Func, typename TCo::mapped_type>> transformMap(const TCo& src, Func mapFunc);
-	export template<typename TCo, typename Func> requires c_map_of<TCo, typename TCo::key_type, typename TCo::mapped_type>&& c_invc<Func, typename TCo::mapped_type, invoke_result_t<Func, typename TCo::mapped_type>> umap<typename TCo::key_type, invoke_result_t<Func, typename TCo::mapped_type>> transformUmap(const TCo& src, Func mapFunc);
+	export template <typename TCo, typename Func> requires c_map_of<TCo, typename TCo::key_type, typename TCo::mapped_type> && c_invc<Func, typename TCo::mapped_type, invoke_result_t<Func, typename TCo::mapped_type>> map<typename TCo::key_type, invoke_result_t<Func, typename TCo::mapped_type>> transformMap(const TCo& src, Func mapFunc);
+	export template <typename TCo, typename Func> requires c_map_of<TCo, typename TCo::key_type, typename TCo::mapped_type>&& c_invc<Func, typename TCo::mapped_type, invoke_result_t<Func, typename TCo::mapped_type>> umap<typename TCo::key_type, invoke_result_t<Func, typename TCo::mapped_type>> transformUmap(const TCo& src, Func mapFunc);
 }
 
 /*
@@ -276,7 +290,7 @@ namespace fab::futil {
 	}
 
 	// Transform each of the values in the container into a new value and store the results in a list
-	template <typename TCo, typename Func> requires c_itr<TCo, typename TCo::value_type>&& c_invc<Func, typename TCo::value_type, invoke_result_t<Func, typename TCo::value_type>> vec<invoke_result_t<Func, typename TCo::value_type>> transform(const TCo& container, Func mapFunc) {
+	template <typename TCo, typename Func> requires c_itr<TCo, typename TCo::value_type> && c_invc<Func, typename TCo::value_type, invoke_result_t<Func, typename TCo::value_type>> vec<invoke_result_t<Func, typename TCo::value_type>> transform(const TCo& container, Func mapFunc) {
 		vec<invoke_result_t<Func, typename TCo::value_type>> res(container.size());
 		std::transform(container.begin(), container.end(), res.begin(), mapFunc);
 		return res;

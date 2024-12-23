@@ -20,6 +20,33 @@ namespace fab {
 
 	export template <typename T> class UIList : public UIBase {
 	public:
+		class ConstIterator {
+		public:
+			using iterator_category = std::forward_iterator_tag;
+			using value_type = const UIEntry<T>;
+			using difference_type = std::ptrdiff_t;
+			using pointer = const UIEntry<T>*;
+			using reference = const UIEntry<T>&;
+
+			ConstIterator(typename vec<uptr<UIEntry<T>>>::const_iterator it) : it(it) {}
+
+			reference operator*() const { return *(*it); }
+			pointer operator->() const { return (*it).get(); }
+
+			ConstIterator& operator++() { return ++it, * this; }
+			ConstIterator operator++(int) {
+				ConstIterator tmp = *this;
+				++it;
+				return tmp;
+			}
+
+			friend bool operator==(const ConstIterator& a, const ConstIterator& b) { return a.it == b.it; }
+			friend bool operator!=(const ConstIterator& a, const ConstIterator& b) { return a.it != b.it; }
+
+		private:
+			typename vec<uptr<UIEntry<T>>>::const_iterator it;
+		};
+
 		class Iterator {
 		public:
 			using iterator_category = std::forward_iterator_tag;
@@ -56,6 +83,8 @@ namespace fab {
 		~UIList() override {}
 
 		inline bool empty() { return rows.empty(); }
+		inline ConstIterator begin() const { return ConstIterator(rows.cbegin()); }
+		inline ConstIterator end() const { return ConstIterator(rows.cend()); }
 		inline FFont& getItemFont() const { return itemFont; }
 		inline Iterator begin() { return Iterator(rows.begin()); }
 		inline Iterator end() { return Iterator(rows.end()); }

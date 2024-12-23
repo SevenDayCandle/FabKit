@@ -11,6 +11,33 @@ import std;
 namespace fab {
 	export template<c_ext<Hoverable> T = Hoverable> class UICanvas : public UIBase {
 	public:
+		class ConstIterator {
+		public:
+			using iterator_category = std::forward_iterator_tag;
+			using value_type = const T;
+			using difference_type = std::ptrdiff_t;
+			using pointer = const T*;
+			using reference = const T&;
+
+			ConstIterator(typename vec<uptr<T>>::const_iterator it) : it(it) {}
+
+			reference operator*() const { return *(*it); }
+			pointer operator->() const { return it->get(); }
+
+			ConstIterator& operator++() { return ++it, * this; }
+			ConstIterator operator++(int) {
+				ConstIterator tmp = *this;
+				++it;
+				return tmp;
+			}
+
+			friend bool operator==(const ConstIterator& a, const ConstIterator& b) { return a.it == b.it; }
+			friend bool operator!=(const ConstIterator& a, const ConstIterator& b) { return a.it != b.it; }
+
+		private:
+			typename vec<uptr<T>>::const_iterator it;
+		};
+
 		class Iterator {
 		public:
 			using iterator_category = std::forward_iterator_tag;
@@ -42,6 +69,8 @@ namespace fab {
 		~UICanvas() override {}
 
 		inline bool empty() { return elements.empty(); }
+		inline ConstIterator begin() const { return ConstIterator(elements.cbegin()); }
+		inline ConstIterator end() const { return ConstIterator(elements.cend()); }
 		inline Iterator begin() { return Iterator(elements.begin()); }
 		inline Iterator end() { return Iterator(elements.end()); }
 		inline size_t size() const { return elements.size(); }

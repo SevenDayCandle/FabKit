@@ -6,6 +6,7 @@ import std;
  * A struct intended to mimic Java enums that can be expanded.
  * Every instance of a derivative class of KeyedItem must have a unique id
  */
+// TODO use template parameter instead of string constant for storing id of item, once we have reflection of variable names
 namespace fab {
 	export template <typename C> struct KeyedItem {
 	public:
