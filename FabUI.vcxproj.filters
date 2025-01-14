@@ -185,15 +185,6 @@
     <ClCompile Include="Source\Base\Utilities\Config\ConfigNumeric.ixx">
       <Filter>Base\Utilities\Config</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Base\Utilities\Localization\ObjectStrings.ixx">
-      <Filter>Base\Utilities\Localization</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Base\Utilities\Localization\Language.ixx">
-      <Filter>Base\Utilities\Localization</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Base\Utilities\Localization\KeywordStrings.ixx">
-      <Filter>Base\Utilities\Localization</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Base\VFX\VFX.ixx">
       <Filter>Base\VFX</Filter>
     </ClCompile>

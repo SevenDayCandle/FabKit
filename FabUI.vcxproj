@@ -84,9 +84,6 @@
     <ClCompile Include="Source\Base\Utilities\Config\WindowMode.ixx" />
     <ClCompile Include="Source\Base\Utilities\ILoadable.ixx" />
     <ClCompile Include="Source\Base\Utilities\KeyedItem.ixx" />
-    <ClCompile Include="Source\Base\Utilities\Localization\KeywordStrings.ixx" />
-    <ClCompile Include="Source\Base\Utilities\Localization\Language.ixx" />
-    <ClCompile Include="Source\Base\Utilities\Localization\ObjectStrings.ixx" />
     <ClCompile Include="Source\Base\VFX\CallbackVFX.ixx" />
     <ClCompile Include="Source\Base\VFX\ContinuousVFX.ixx" />
     <ClCompile Include="Source\Base\VFX\MultiVFX.ixx" />
