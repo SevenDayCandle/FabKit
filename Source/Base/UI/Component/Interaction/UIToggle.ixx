@@ -16,7 +16,7 @@ namespace fab {
 	export class UIToggle : public UIInteractable {
 	public:
 		UIToggle(FWindow& window, uptr<Hitbox>&& hb, strv text, IDrawable& image, IDrawable& checkImage, FFont& f, float xOff, float yOff) :
-			UIInteractable(window, move(hb), image), checkImage(checkImage), text(f, text), offX(xOff), offY(yOff) {
+			UIInteractable(window, move(hb), image), checkImage(&checkImage), text(f, text), offX(xOff), offY(yOff) {
 			UIToggle::onSizeUpdated();
 		}
 		UIToggle(FWindow& window, uptr<Hitbox>&& hb, strv text, IDrawable& image, IDrawable& checkImage, FFont& f, float xOff) :
@@ -30,10 +30,12 @@ namespace fab {
 			UIToggle(window, move(hb), text, window.props.defaultCheckboxEmpty(), window.props.defaultCheckboxFilled(), window.props.fontRegular()) {}
 
 		bool toggled = false;
-		IDrawable& checkImage;
+		IDrawable* checkImage;
 
 		inline float getBeginX() override { return std::min(hb->x, hb->x + posX); }
 		inline float getBeginY() override { return std::min(hb->y, hb->y + posY); }
+		inline UIToggle& setCheckImage(IDrawable& checkImage) { return this->checkImage = &checkImage, *this; }
+		inline UIToggle& setCheckImage(IDrawable* checkImage) { return this->checkImage = checkImage, *this; }
 		inline UIToggle& setOnClick(const func<void(UIToggle&)>& onClick) { return this->onClick = onClick, *this; }
 		inline UIToggle& setOnClick(func<void(UIToggle&)>&& onClick) { return this->onClick = move(onClick), *this; }
 		inline UIToggle& setToggleState(bool val) { return this->toggled = val, *this; }
@@ -75,10 +77,10 @@ namespace fab {
 
 	void UIToggle::renderImpl(sdl::SDLBatchRenderPass& rp) {
 		if (toggled) {
-			checkImage.draw(rp, *hb.get(), win.getW(), win.getH(), scaleX, scaleY, rotation, hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color);
+			checkImage->draw(rp, *hb.get(), win.getW(), win.getH(), scaleX, scaleY, rotation, hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color);
 		}
 		else {
-			image.draw(rp, *hb.get(), win.getW(), win.getH(), scaleX, scaleY, rotation, hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color);
+			image->draw(rp, *hb.get(), win.getW(), win.getH(), scaleX, scaleY, rotation, hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color);
 		}
 
 		text.draw(rp, hb->x + posX, hb->y + posY, win.getW(), win.getH());

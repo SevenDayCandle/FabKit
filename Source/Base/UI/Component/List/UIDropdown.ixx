@@ -32,7 +32,7 @@ namespace fab {
 			UIDropdown(window, move(hb), move(menu),
 				window.props.defaultPanel(), window.props.defaultArrowSmall(), window.props.defaultClear(),
 				window.props.fontRegular(), buttonLabelFunc) {}
-		UIDropdown(UIDropdown&& other) noexcept : UIInteractable(other.win, move(other.hb), other.image), text(move(other.text)), menu(move(other.menu)), buttonLabelFunc(move(other.buttonLabelFunc)), arrow(other.arrow), clear(other.clear) {
+		UIDropdown(UIDropdown&& other) noexcept : UIInteractable(other.win, move(other.hb), *other.image), text(move(other.text)), menu(move(other.menu)), buttonLabelFunc(move(other.buttonLabelFunc)), arrow(other.arrow), clear(other.clear) {
 			init();
 		};
 

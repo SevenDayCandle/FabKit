@@ -13,7 +13,7 @@ import sdl.SDLRunner;
 namespace fab {
 	export class UIImage : public UIBase {
 	public:
-		UIImage(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image) : UIBase(window, move(hb)), image(image) {}
+		UIImage(FWindow& window, uptr<Hitbox>&& hb, IDrawable& image) : UIBase(window, move(hb)), image(&image) {}
 		UIImage(UIImage&& other) noexcept = default;
 		~UIImage() override {}
 
@@ -21,10 +21,11 @@ namespace fab {
 		float rotation = 0;
 		float scaleX = 1;
 		float scaleY = 1;
-		IDrawable& image;
+		IDrawable* image;
 
 		inline virtual UIImage& setColor(sdl::Color color) { return this->color = color, *this; }
-		inline virtual UIImage& setImage(IDrawable& image) { return this->image = image, *this;}
+		inline virtual UIImage& setImage(IDrawable& image) { return this->image = &image, *this;}
+		inline virtual UIImage& setImage(IDrawable* image) { return this->image = image, *this; }
 		inline virtual UIImage& setRotation(const float rotation) { return this->rotation = rotation, *this; }
 		inline virtual UIImage& setRotationDeg(const float rotation) { return this->rotation = sdl::rads(rotation), *this; }
 		inline virtual UIImage& setScaleX(const float scaleX) { return this->scaleX = scaleX, *this; }
@@ -33,6 +34,6 @@ namespace fab {
 	};
 
 	void UIImage::renderImpl(sdl::SDLBatchRenderPass& rp) {
-		image.draw(rp, *hb.get(), win.getW(), win.getH(), scaleX, scaleY, rotation, &color);
+		image->draw(rp, *hb.get(), win.getW(), win.getH(), scaleX, scaleY, rotation, &color);
 	}
 }

@@ -30,7 +30,7 @@ namespace fab {
 	};
 
 	void UIButton::renderImpl(sdl::SDLBatchRenderPass& rp) {
-		image.draw(rp, *hb.get(), win.getW(), win.getH(), scaleX, scaleY, rotation, hb->isHovered() && interactable ? &sdl::COLOR_WHITE : &color);
+		image->draw(rp, *hb.get(), win.getW(), win.getH(), scaleX, scaleY, rotation, hb->isHovered() && interactable ? &sdl::COLOR_WHITE : &color);
 	}
 
 	void UIButton::clickLeftEvent()
