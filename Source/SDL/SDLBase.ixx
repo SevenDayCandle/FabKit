@@ -191,7 +191,7 @@ namespace sdl {
 	export inline int fontHasGlyph(TTF_Font* font, Uint16 ch) { return TTF_FontHasGlyph(font, ch); }
 	export inline int fontHeight(TTF_Font* font) { return TTF_GetFontHeight(font); }
 	export inline int fontHintingGet(TTF_Font* font) { return TTF_GetFontHinting(font); }
-	export inline void fontHintingSet(TTF_Font* font, int hinting) { TTF_SetFontHinting(font, hinting); }
+	export inline void fontHintingSet(TTF_Font* font, TTF_HintingFlags hinting) { TTF_SetFontHinting(font, hinting); }
 	export inline int fontKerningGet(TTF_Font* font) { return TTF_GetFontKerning(font); }
 	export inline void fontKerningSet(TTF_Font* font, int allowed) { TTF_SetFontKerning(font, allowed); }
 	export inline int fontLineSkipGet(TTF_Font* font) { return TTF_GetFontLineSkip(font); }

@@ -217,7 +217,7 @@ namespace sdl::runner {
 	export inline void setFPSLimit(int fps) { fpsLimit = fps > 0 ? NANOS_PER_SECOND / fps : 0; }
 	export inline void* deviceMapTransferBuffer(SDL_GPUTransferBuffer* transferBuffer, bool cycle) { return SDL_MapGPUTransferBuffer(device, transferBuffer, cycle); }
 
-	export bool init(IMG_InitFlags imgFormats = IMG_INIT_PNG, const char* renderer = RENDERER_VULKAN, const char* normalFrag = SHADER_NORMAL_FRAG, const char* normalVert = SHADER_NORMAL_VERT, const char* fillFrag = SHADER_FILL_FRAG, const char* fillVert = SHADER_FILL_VERT);
+	export bool init(const char* renderer = RENDERER_VULKAN, const char* normalFrag = SHADER_NORMAL_FRAG, const char* normalVert = SHADER_NORMAL_VERT, const char* fillFrag = SHADER_FILL_FRAG, const char* fillVert = SHADER_FILL_VERT);
 	export bool poll();
 	export GPUGraphicsPipeline* createPipeline(GPUShader* vertexShader, GPUShader* fragmentShader, GPUTextureFormat textureFormat = GPUTextureFormat::SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM, GPUBlendFactor srcColor = GPUBlendFactor::SDL_GPU_BLENDFACTOR_SRC_ALPHA, GPUBlendFactor dstColor = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, GPUBlendFactor srcAlpha = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE, GPUBlendFactor dstAlpha = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA);
 	export GPUGraphicsPipeline* createShapePipeline(GPUShader* vertexShader, GPUShader* fragmentShader, GPUTextureFormat textureFormat = GPUTextureFormat::SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM, GPUBlendFactor srcColor = GPUBlendFactor::SDL_GPU_BLENDFACTOR_SRC_ALPHA, GPUBlendFactor dstColor = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, GPUBlendFactor srcAlpha = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE, GPUBlendFactor dstAlpha = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA);
@@ -239,16 +239,10 @@ namespace sdl::runner {
 namespace sdl::runner {
 
 	// Set up SDL. Returns true if SDL setup succeeds
-	bool init(IMG_InitFlags imgFormats, const char* renderer, const char* normalFrag, const char* normalVert, const char* fillFrag, const char* fillVert) {
+	bool init(const char* renderer, const char* normalFrag, const char* normalVert, const char* fillFrag, const char* fillVert) {
 		int val = SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_GAMEPAD);
 		if (val < 0) {
 			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "SDL_INIT failed with value %d", val);
-			return false;
-		}
-
-		val = IMG_Init(imgFormats);
-		if (val == 0) {
-			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "IMG_Init failed with value %d", val);
 			return false;
 		}
 
@@ -698,7 +692,6 @@ namespace sdl::runner {
 		SDL_DestroyGPUDevice(device);
 		device = nullptr;
 		TTF_Quit();
-		IMG_Quit();
 		Mix_CloseAudio();
 		Mix_Quit();
 		SDL_Quit();

@@ -1,6 +1,6 @@
 /*
   SDL_image:  An example image loading library for use with SDL
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,13 +19,16 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+/* WIKI CATEGORY: SDLImage */
+
 /**
- *  \file SDL_image.h
+ * # CategorySDLImage
  *
- *  Header file for SDL_image library
+ * Header file for SDL_image library
  *
  * A simple library to load images of various formats as SDL surfaces
  */
+
 #ifndef SDL_IMAGE_H_
 #define SDL_IMAGE_H_
 
@@ -41,7 +44,7 @@ extern "C" {
  * Printable format: "%d.%d.%d", MAJOR, MINOR, MICRO
  */
 #define SDL_IMAGE_MAJOR_VERSION 3
-#define SDL_IMAGE_MINOR_VERSION 0
+#define SDL_IMAGE_MINOR_VERSION 1
 #define SDL_IMAGE_MICRO_VERSION 0
 
 /**
@@ -66,107 +69,6 @@ extern "C" {
  * \since This function is available since SDL_image 3.0.0.
  */
 extern SDL_DECLSPEC int SDLCALL IMG_Version(void);
-
-/**
- * Initialization flags
- */
-typedef Uint32 IMG_InitFlags;
-
-#define IMG_INIT_JPG    0x00000001
-#define IMG_INIT_PNG    0x00000002
-#define IMG_INIT_TIF    0x00000004
-#define IMG_INIT_WEBP   0x00000008
-#define IMG_INIT_JXL    0x00000010
-#define IMG_INIT_AVIF   0x00000020
-
-/**
- * Initialize SDL_image.
- *
- * This function loads dynamic libraries that SDL_image needs, and prepares
- * them for use. This must be the first function you call in SDL_image, and if
- * it fails you should not continue with the library.
- *
- * Flags should be one or more flags from IMG_InitFlags OR'd together. It
- * returns the flags successfully initialized, or 0 on failure.
- *
- * Currently, these flags are:
- *
- * - `IMG_INIT_JPG`
- * - `IMG_INIT_PNG`
- * - `IMG_INIT_TIF`
- * - `IMG_INIT_WEBP`
- * - `IMG_INIT_JXL`
- * - `IMG_INIT_AVIF`
- *
- * More flags may be added in a future SDL_image release.
- *
- * This function may need to load external shared libraries to support various
- * codecs, which means this function can fail to initialize that support on an
- * otherwise-reasonable system if the library isn't available; this is not
- * just a question of exceptional circumstances like running out of memory at
- * startup!
- *
- * Note that you may call this function more than once to initialize with
- * additional flags. The return value will reflect both new flags that
- * successfully initialized, and also include flags that had previously been
- * initialized as well.
- *
- * As this will return previously-initialized flags, it's legal to call this
- * with zero (no flags set). This is a safe no-op that can be used to query
- * the current initialization state without changing it at all.
- *
- * Since this returns previously-initialized flags as well as new ones, and
- * you can call this with zero, you should not check for a zero return value
- * to determine an error condition. Instead, you should check to make sure all
- * the flags you require are set in the return value. If you have a game with
- * data in a specific format, this might be a fatal error. If you're a generic
- * image displaying app, perhaps you are fine with only having JPG and PNG
- * support and can live without WEBP, even if you request support for
- * everything.
- *
- * Unlike other SDL satellite libraries, calls to IMG_Init do not stack; a
- * single call to IMG_Quit() will deinitialize everything and does not have to
- * be paired with a matching IMG_Init call. For that reason, it's considered
- * best practices to have a single IMG_Init and IMG_Quit call in your program.
- * While this isn't required, be aware of the risks of deviating from that
- * behavior.
- *
- * After initializing SDL_image, the app may begin to load images into
- * SDL_Surfaces or SDL_Textures.
- *
- * \param flags initialization flags, OR'd together.
- * \returns all currently initialized flags.
- *
- * \since This function is available since SDL_image 3.0.0.
- *
- * \sa IMG_Quit
- */
-extern SDL_DECLSPEC IMG_InitFlags SDLCALL IMG_Init(IMG_InitFlags flags);
-
-/**
- * Deinitialize SDL_image.
- *
- * This should be the last function you call in SDL_image, after freeing all
- * other resources. This will unload any shared libraries it is using for
- * various codecs.
- *
- * After this call, a call to IMG_Init(0) will return 0 (no codecs loaded).
- *
- * You can safely call IMG_Init() to reload various codec support after this
- * call.
- *
- * Unlike other SDL satellite libraries, calls to IMG_Init do not stack; a
- * single call to IMG_Quit() will deinitialize everything and does not have to
- * be paired with a matching IMG_Init call. For that reason, it's considered
- * best practices to have a single IMG_Init and IMG_Quit call in your program.
- * While this isn't required, be aware of the risks of deviating from that
- * behavior.
- *
- * \since This function is available since SDL_image 3.0.0.
- *
- * \sa IMG_Init
- */
-extern SDL_DECLSPEC void SDLCALL IMG_Quit(void);
 
 /**
  * Load an image from an SDL data source into a software surface.
@@ -329,8 +231,6 @@ extern SDL_DECLSPEC SDL_Surface * SDLCALL IMG_Load(const char *file);
  */
 extern SDL_DECLSPEC SDL_Surface * SDLCALL IMG_Load_IO(SDL_IOStream *src, bool closeio);
 
-#if SDL_VERSION_ATLEAST(2,0,0)
-
 /**
  * Load an image from a filesystem path into a GPU texture.
  *
@@ -467,7 +367,6 @@ extern SDL_DECLSPEC SDL_Texture * SDLCALL IMG_LoadTexture_IO(SDL_Renderer *rende
  * \sa SDL_DestroyTexture
  */
 extern SDL_DECLSPEC SDL_Texture * SDLCALL IMG_LoadTextureTyped_IO(SDL_Renderer *renderer, SDL_IOStream *src, bool closeio, const char *type);
-#endif /* SDL 2.0 */
 
 /**
  * Detect AVIF image data on a readable/seekable SDL_IOStream.
@@ -1958,7 +1857,8 @@ extern SDL_DECLSPEC SDL_Surface * SDLCALL IMG_ReadXPMFromArrayToRGB888(char **xp
  * \param file path on the filesystem to write new file to.
  * \param quality the desired quality, ranging between 0 (lowest) and 100
  *                (highest).
- * \returns 0 if successful, -1 on error.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
  *
  * \since This function is available since SDL_image 3.0.0.
  *
@@ -1980,13 +1880,14 @@ extern SDL_DECLSPEC bool SDLCALL IMG_SaveAVIF(SDL_Surface *surface, const char *
  *                to leave it open.
  * \param quality the desired quality, ranging between 0 (lowest) and 100
  *                (highest).
- * \returns 0 if successful, -1 on error.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
  *
  * \since This function is available since SDL_image 3.0.0.
  *
  * \sa IMG_SaveAVIF
  */
-extern SDL_DECLSPEC bool SDLCALL IMG_SaveAVIF_IO(SDL_Surface *surface, SDL_IOStream *dst, int closeio, int quality);
+extern SDL_DECLSPEC bool SDLCALL IMG_SaveAVIF_IO(SDL_Surface *surface, SDL_IOStream *dst, bool closeio, int quality);
 
 /**
  * Save an SDL_Surface into a PNG image file.
@@ -1995,7 +1896,8 @@ extern SDL_DECLSPEC bool SDLCALL IMG_SaveAVIF_IO(SDL_Surface *surface, SDL_IOStr
  *
  * \param surface the SDL surface to save.
  * \param file path on the filesystem to write new file to.
- * \returns 0 if successful, -1 on error.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
  *
  * \since This function is available since SDL_image 3.0.0.
  *
@@ -2015,13 +1917,14 @@ extern SDL_DECLSPEC bool SDLCALL IMG_SavePNG(SDL_Surface *surface, const char *f
  * \param dst the SDL_IOStream to save the image data to.
  * \param closeio true to close/free the SDL_IOStream before returning, false
  *                to leave it open.
- * \returns 0 if successful, -1 on error.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
  *
  * \since This function is available since SDL_image 3.0.0.
  *
  * \sa IMG_SavePNG
  */
-extern SDL_DECLSPEC bool SDLCALL IMG_SavePNG_IO(SDL_Surface *surface, SDL_IOStream *dst, int closeio);
+extern SDL_DECLSPEC bool SDLCALL IMG_SavePNG_IO(SDL_Surface *surface, SDL_IOStream *dst, bool closeio);
 
 /**
  * Save an SDL_Surface into a JPEG image file.
@@ -2032,7 +1935,8 @@ extern SDL_DECLSPEC bool SDLCALL IMG_SavePNG_IO(SDL_Surface *surface, SDL_IOStre
  * \param file path on the filesystem to write new file to.
  * \param quality [0; 33] is Lowest quality, [34; 66] is Middle quality, [67;
  *                100] is Highest quality.
- * \returns 0 if successful, -1 on error.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
  *
  * \since This function is available since SDL_image 3.0.0.
  *
@@ -2054,16 +1958,19 @@ extern SDL_DECLSPEC bool SDLCALL IMG_SaveJPG(SDL_Surface *surface, const char *f
  *                to leave it open.
  * \param quality [0; 33] is Lowest quality, [34; 66] is Middle quality, [67;
  *                100] is Highest quality.
- * \returns 0 if successful, -1 on error.
+ * \returns true on success or false on failure; call SDL_GetError() for more
+ *          information.
  *
  * \since This function is available since SDL_image 3.0.0.
  *
  * \sa IMG_SaveJPG
  */
-extern SDL_DECLSPEC bool SDLCALL IMG_SaveJPG_IO(SDL_Surface *surface, SDL_IOStream *dst, int closeio, int quality);
+extern SDL_DECLSPEC bool SDLCALL IMG_SaveJPG_IO(SDL_Surface *surface, SDL_IOStream *dst, bool closeio, int quality);
 
 /**
- * Animated image support Currently only animated GIFs are supported.
+ * Animated image support
+ *
+ * Currently only animated GIFs and WEBP images are supported.
  */
 typedef struct IMG_Animation
 {

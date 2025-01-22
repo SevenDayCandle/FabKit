@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,10 +19,12 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+/* WIKI CATEGORY: SDLMixer */
+
 /**
- *  \file SDL_mixer.h
+ * # CategorySDLMixer
  *
- *  Header file for SDL_mixer library
+ * Header file for SDL_mixer library
  *
  * A simple library to play and mix sounds and musics
  */
@@ -262,7 +264,7 @@ typedef struct Mix_Music Mix_Music;
  * with the `devid` parameter. If you specify 0, SDL_mixer will choose the
  * best default it can on your behalf (which, in many cases, is exactly what
  * you want anyhow). This is equivalent to specifying
- * `SDL_AUDIO_DEVICE_DEFAULT_OUTPUT`, but is less wordy. SDL_mixer does not
+ * `SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK`, but is less wordy. SDL_mixer does not
  * offer a mechanism to determine device IDs to open, but you can use
  * SDL_GetAudioOutputDevices() to get a list of available devices. If you do
  * this, be sure to call `SDL_Init(SDL_INIT_AUDIO)` first to initialize SDL's
@@ -310,7 +312,7 @@ extern SDL_DECLSPEC void SDLCALL Mix_PauseAudio(int pause_on);
  * \param format On return, will be filled with the audio device's format.
  * \param channels On return, will be filled with the audio device's channel
  *                 count.
- * \returns true if the audio device has been opened, true otherwise.
+ * \returns true if the audio device has been opened, false otherwise.
  *
  * \since This function is available since SDL_mixer 3.0.0.
  *
@@ -1031,10 +1033,6 @@ typedef void (SDLCALL *Mix_MusicFinishedCallback)(void);
  * restart the one that just stopped). If the music finished normally, this
  * can be used to loop the music without a gap in the audio playback.
  *
- * Do not call SDL_LockAudio() from this callback; you will either be inside
- * the audio callback, or SDL_mixer will explicitly lock the audio before
- * calling your callback.
- *
  * A NULL pointer will disable the callback.
  *
  * \param music_finished the callback function to become the new notification
@@ -1067,10 +1065,6 @@ typedef void (SDLCALL *Mix_ChannelFinishedCallback)(int channel);
  * The callback has a single parameter, `channel`, which says what mixer
  * channel has just stopped.
  *
- * Do not call SDL_LockAudio() from this callback; you will either be inside
- * the audio callback, or SDL_mixer will explicitly lock the audio before
- * calling your callback.
- *
  * A NULL pointer will disable the callback.
  *
  * \param channel_finished the callback function to become the new
@@ -1099,8 +1093,6 @@ extern SDL_DECLSPEC void SDLCALL Mix_ChannelFinished(Mix_ChannelFinishedCallback
  * like to the buffer, though, and it will continue in its changed state down
  * the mixing pipeline, through any other effect functions, then finally to be
  * mixed with the rest of the channels and music for the final output stream.
- *
- * DO NOT EVER call SDL_LockAudio() from your callback function!
  */
 typedef void (SDLCALL *Mix_EffectFunc_t)(int chan, void *stream, int len, void *udata);
 
@@ -1111,8 +1103,6 @@ typedef void (SDLCALL *Mix_EffectFunc_t)(int chan, void *stream, int len, void *
  * This gets called if the buffer plays out normally, or if you call
  * Mix_HaltChannel(), implicitly stop a channel via Mix_AllocateChannels(), or
  * unregister a callback while it's still playing.
- *
- * DO NOT EVER call SDL_LockAudio() from your callback function!
  */
 typedef void (SDLCALL *Mix_EffectDone_t)(int chan, void *udata);
 
@@ -1163,13 +1153,6 @@ typedef void (SDLCALL *Mix_EffectDone_t)(int chan, void *udata);
  * through Mix_SetPostMix() runs, and then the stream goes to the audio
  * device.
  *
- * DO NOT EVER call SDL_LockAudio() from your callback function! You are
- * already running in the audio thread and the lock is already held!
- *
- * Note that unlike most SDL and SDL_mixer functions, this function returns
- * zero if there's an error, not on success. We apologize for the API design
- * inconsistency here.
- *
  * \param chan the channel to register an effect to, or MIX_CHANNEL_POST.
  * \param f effect the callback to run when more of this channel is to be
  *          mixed.
@@ -1194,10 +1177,6 @@ extern SDL_DECLSPEC bool SDLCALL Mix_RegisterEffect(int chan, Mix_EffectFunc_t f
  * unregistered through this function by specifying MIX_CHANNEL_POST for a
  * channel.
  *
- * Note that unlike most SDL and SDL_mixer functions, this function returns
- * zero if there's an error, not on success. We apologize for the API design
- * inconsistency here.
- *
  * \param channel the channel to unregister an effect on, or MIX_CHANNEL_POST.
  * \param f effect the callback stop calling in future mixing iterations.
  * \returns true on success or false on failure; call SDL_GetError() for more
@@ -1219,10 +1198,6 @@ extern SDL_DECLSPEC bool SDLCALL Mix_UnregisterEffect(int channel, Mix_EffectFun
  * implicitly unregistered as they are for channels, but they may be
  * explicitly unregistered through this function by specifying
  * MIX_CHANNEL_POST for a channel.
- *
- * Note that unlike most SDL and SDL_mixer functions, this function returns
- * zero if there's an error, not on success. We apologize for the API design
- * inconsistency here.
  *
  * \param channel the channel to unregister all effects on, or
  *                MIX_CHANNEL_POST.
@@ -1276,10 +1251,6 @@ extern SDL_DECLSPEC bool SDLCALL Mix_UnregisterAllEffects(int channel);
  * return successful in that case. Error messages can be retrieved from
  * Mix_GetError().
  *
- * Note that unlike most SDL and SDL_mixer functions, this function returns
- * zero if there's an error, not on success. We apologize for the API design
- * inconsistency here.
- *
  * \param channel The mixer channel to pan or MIX_CHANNEL_POST.
  * \param left Volume of stereo left channel, 0 is silence, 255 is full
  *             volume.
@@ -1331,10 +1302,6 @@ extern SDL_DECLSPEC bool SDLCALL Mix_SetPanning(int channel, Uint8 left, Uint8 r
  *
  * This is a convenience wrapper over Mix_SetDistance() and Mix_SetPanning().
  *
- * Note that unlike most SDL and SDL_mixer functions, this function returns
- * zero if there's an error, not on success. We apologize for the API design
- * inconsistency here.
- *
  * \param channel The mixer channel to position, or MIX_CHANNEL_POST.
  * \param angle angle, in degrees. North is 0, and goes clockwise.
  * \param distance distance; 0 is the listener, 255 is maxiumum distance away.
@@ -1369,10 +1336,6 @@ extern SDL_DECLSPEC bool SDLCALL Mix_SetPosition(int channel, Sint16 angle, Uint
  *
  * This uses the Mix_RegisterEffect() API internally.
  *
- * Note that unlike most SDL and SDL_mixer functions, this function returns
- * zero if there's an error, not on success. We apologize for the API design
- * inconsistency here.
- *
  * \param channel The mixer channel to attenuate, or MIX_CHANNEL_POST.
  * \param distance distance; 0 is the listener, 255 is maxiumum distance away.
  * \returns true on success or false on failure; call SDL_GetError() for more
@@ -1400,10 +1363,6 @@ extern SDL_DECLSPEC bool SDLCALL Mix_SetDistance(int channel, Uint8 distance);
  * If you specify MIX_CHANNEL_POST for `channel`, then this effect is used on
  * the final mixed stream before sending it on to the audio device (a
  * posteffect).
- *
- * Note that unlike most SDL and SDL_mixer functions, this function returns
- * zero if there's an error, not on success. We apologize for the API design
- * inconsistency here.
  *
  * \param channel The mixer channel to reverse, or MIX_CHANNEL_POST.
  * \param flip non-zero to reverse stereo, zero to disable this effect.
@@ -1906,7 +1865,7 @@ extern SDL_DECLSPEC int SDLCALL Mix_GetMusicVolume(Mix_Music *music);
  * this function returns the previous (in this case, still-current) value.
  *
  * Note that the master volume does not affect any playing music; it is only
- * applied when mixing chunks. Use Mix_VolumeMusic() for that.\
+ * applied when mixing chunks. Use Mix_VolumeMusic() for that.
  *
  * \param volume the new volume, between 0 and MIX_MAX_VOLUME, or -1 to query.
  * \returns the previous volume. If the specified volume is -1, this returns
@@ -2449,10 +2408,6 @@ extern SDL_DECLSPEC bool SDLCALL Mix_PlayingMusic(void);
  *
  * Passing a NULL path will remove any previously-specified paths.
  *
- * Note that unlike most SDL and SDL_mixer functions, this function returns
- * zero if there's an error, not on success. We apologize for the API design
- * inconsistency here.
- *
  * \param paths Paths on the filesystem where SoundFonts are available,
  *              separated by semicolons.
  * \returns true on success or false on failure; call SDL_GetError() for more
@@ -2471,7 +2426,7 @@ extern SDL_DECLSPEC bool SDLCALL Mix_SetSoundFonts(const char *paths);
  * - If the boolean _SDL hint_ `"SDL_FORCE_SOUNDFONTS"` is set, AND the
  *   `"SDL_SOUNDFONTS"` _environment variable_ is also set, this function will
  *   return that environment variable regardless of whether
- *   Mix_SetSoundFounts() was ever called.
+ *   Mix_SetSoundFonts() was ever called.
  * - Otherwise, if Mix_SetSoundFonts() was successfully called with a non-NULL
  *   path, this function will return the string passed to that function.
  * - Otherwise, if the `"SDL_SOUNDFONTS"` variable is set, this function will
@@ -2609,7 +2564,6 @@ extern SDL_DECLSPEC void SDLCALL Mix_CloseAudio(void);
 #ifdef __cplusplus
 }
 #endif
-
 #include <SDL3/SDL_close_code.h>
 
 #endif /* SDL_MIXER_H_ */
