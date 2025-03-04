@@ -7,6 +7,7 @@ import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
+/* A dummy drawable, to be used in place of a drawable when nothing should be drawn */
 namespace fab {
 	export class EmptyDrawable : public IDrawable {
 	public:

@@ -2,11 +2,13 @@ export module fab.TextDrawable;
 
 import fab.FFont;
 import fab.FUtil;
+import fab.Hitbox;
 import fab.ImageDrawable;
 import sdl.SDLBase; 
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 
+/* Represents text to be rendered on the screen */
 namespace fab {
 	export class TextDrawable : public ImageDrawable {
 	public:
@@ -32,6 +34,12 @@ namespace fab {
 			if (texture) {
 				ImageDrawable::drawCentered(rp, x, y, texW, texH, winW, winH, scX, scY, rotZ, tint, pipeline);
 			}
+		}
+		inline void drawOffsetExact(sdl::SDLBatchRenderPass& rp, Hitbox& hb, float xOff, float yOff, float scX = 1, float scY = 1, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) {
+			draw(rp, hb.x + xOff, hb.y + yOff, hb.win.getW(), hb.win.getH(), scX, scY, rotZ, tint, pipeline);
+		}
+		inline void drawOffsetScaled(sdl::SDLBatchRenderPass& rp, Hitbox& hb, float xOff, float yOff, float scX = 1, float scY = 1, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) {
+			draw(rp, hb.x + hb.win.renderScale(xOff), hb.y + hb.win.renderScale(yOff), hb.win.getW(), hb.win.getH(), scX, scY, rotZ, tint, pipeline);
 		}
 
 		void reload() const override;

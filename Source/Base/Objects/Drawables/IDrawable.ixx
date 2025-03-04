@@ -7,6 +7,7 @@ import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
+/* An interface for an object that can be rendered to a window */
 namespace fab {
 	export struct IDrawable : public ILoadable {
 	public:

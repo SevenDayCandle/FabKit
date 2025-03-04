@@ -7,6 +7,7 @@ import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
+/* A wrapper around SDL's GPUTexture that handles disposal as well as basic rendering logic */
 namespace fab {
 	export class ImageDrawable : public IDrawable {
 	public:

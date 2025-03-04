@@ -10,6 +10,7 @@ import sdl.SDLBase;
 import sdl.SDLBatchRenderPass;
 import std;
 
+/* Decorator around a Hoverable to give it a title */
 namespace fab {
 	export template <c_ext<Hoverable> T> class UITitle : public Hoverable {
 	public:
@@ -54,7 +55,6 @@ namespace fab {
 		inline static uptr<UITitle<T>> make(T&& item) {
 			return make_unique<UITitle<T>>(move(item), item.win.cct.fontBold(), "", 0, 0, 0, sdl::COLOR_STANDARD, sdl::COLOR_BLACK);
 		}
-
 	private:
 		float offX = 0;
 		float offY = 0;

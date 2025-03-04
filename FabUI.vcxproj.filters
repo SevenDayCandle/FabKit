@@ -137,10 +137,10 @@
     <ClCompile Include="Source\Base\UI\Tooltip\GenericTip.ixx">
       <Filter>Base\UI\Tooltip</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Base\UI\Mixin\UITitle.ixx">
+    <ClCompile Include="Source\Base\UI\Decorator\UITitle.ixx">
       <Filter>Base\UI\Mixin</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Base\UI\Mixin\UITipHost.ixx">
+    <ClCompile Include="Source\Base\UI\Decorator\UITipHost.ixx">
       <Filter>Base\UI\Mixin</Filter>
     </ClCompile>
     <ClCompile Include="Source\Base\UI\Mixin\TextSupplier.ixx">

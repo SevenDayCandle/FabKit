@@ -71,8 +71,8 @@
     <ClCompile Include="Source\Base\UI\Hitbox\ScreenSizeHitbox.ixx" />
     <ClCompile Include="Source\Base\UI\Hoverable.ixx" />
     <ClCompile Include="Source\Base\UI\Mixin\TextSupplier.ixx" />
-    <ClCompile Include="Source\Base\UI\Mixin\UITipHost.ixx" />
-    <ClCompile Include="Source\Base\UI\Mixin\UITitle.ixx" />
+    <ClCompile Include="Source\Base\UI\Decorator\UITipHost.ixx" />
+    <ClCompile Include="Source\Base\UI\Decorator\UITitle.ixx" />
     <ClCompile Include="Source\Base\UI\Tooltip\GenericTip.ixx" />
     <ClCompile Include="Source\Base\UI\Tooltip\TitleTooltip.ixx" />
     <ClCompile Include="Source\Base\UI\Tooltip\Tooltip.ixx" />

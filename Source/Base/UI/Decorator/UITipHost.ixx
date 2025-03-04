@@ -7,6 +7,7 @@ import fab.Hitbox;
 import fab.Hoverable;
 import fab.Tooltip;
 
+/* Decorator around a Hoverable to give it a tooltip */
 namespace fab {
 	export template <c_ext<Hoverable> T> class UITipHost : public Hoverable {
 	public:

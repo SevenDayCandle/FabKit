@@ -7,6 +7,7 @@ import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
+/* Represents a solid rectangle to be rendered on screen */
 namespace fab {
 	export class RectDrawable : public IDrawable {
 	public:

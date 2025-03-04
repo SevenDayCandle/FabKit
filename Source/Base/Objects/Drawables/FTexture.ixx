@@ -7,6 +7,7 @@ import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
+/* Represents an image loaded from a file */
 namespace fab {
 	export class FTexture : public ImageDrawable {
     public:

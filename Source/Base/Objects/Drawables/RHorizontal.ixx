@@ -6,6 +6,7 @@ import sdl.SDLBase;
 import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 
+/* An image whose horizontal borders can be stretched indefinitely */
 namespace fab {
 	export class RHorizontal : public FTexture {
 	public:

@@ -7,6 +7,7 @@ import sdl.SDLBatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
+/* An image whose horizontal and vertical borders can be stretched indefinitely */
 namespace fab {
 	export class RBordered : public FTexture {
 	public:
