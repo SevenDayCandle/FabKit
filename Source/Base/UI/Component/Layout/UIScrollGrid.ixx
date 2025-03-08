@@ -13,8 +13,8 @@ import std;
 namespace fab {
 	export template <c_ext<UIBase> T> class UIScrollGrid : public UIGrid<T> {
 	public:
-		UIScrollGrid(FWindow& window, uptr<Hitbox>&& hb, float spacingX = 0, float spacingY = 0, float scrollSpeed = 1): UIGrid<T>(window, hb, spacingX, spacingY), scrollSpeed(scrollSpeed),
-			scrollbar{ window, make_unique<ScaleHitbox>(window, hb->w * 0.93f / window.renderScale(), hb->y + hb->h * 0.05f / window.renderScale(), 48, hb->h * 0.9f / window.renderScale()) } {
+		UIScrollGrid(FWindow& window, uptr<Hitbox>&& hb, float spacingX = 0, float spacingY = 0, float scrollSpeed = 1): UIGrid<T>(window, move(hb), spacingX, spacingY), scrollSpeed(scrollSpeed),
+			scrollbar{ window, make_unique<ScaleHitbox>(window, this->hb->w * 0.93f / window.renderScale(), this->hb->y + this->hb->h * 0.05f / window.renderScale(), 48, this->hb->h * 0.9f / window.renderScale()) } {
 			scrollbar.enabled = false;
 		}
 		UIScrollGrid(UIScrollGrid&& other) noexcept : UIGrid<T>(move(other.hb)), scrollSpeed(other.scrollSpeed), scrollbar(move(other.scrollbar)) {}

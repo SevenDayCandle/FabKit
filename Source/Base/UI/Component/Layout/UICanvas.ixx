@@ -101,7 +101,8 @@ namespace fab {
 	}
 
 	// Get the item at the given index if it exists
-	template<c_ext<Hoverable> T> T* UICanvas<T>::at(int index) const {
+	template<c_ext<Hoverable> T> T* UICanvas<T>::at(int index) const
+	{
 		if (elements.size() > index) {
 			return elements[index].get();
 		}

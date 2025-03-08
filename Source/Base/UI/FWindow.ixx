@@ -89,19 +89,23 @@ namespace fab {
 		inline sdl::Window* sdlWindow() const noexcept { return window; }
 		inline void keyboardInputStopRequest(sdl::IKeyInputListener* listener) { sdl::runner::keyboardInputStopRequest(window, listener); }
 		inline void keyboardInputStart(sdl::IKeyInputListener* listener) { sdl::runner::keyboardInputStart(window, listener); }
+		template <c_ext<FWindow::Element> T, typename... Args> requires std::constructible_from<T, FWindow&, Args&&...> inline T& openNewOverlay(Args&&... args) { return openOverlay(make_unique<T>(*this, forward<Args>(args)...)); };
+		template <c_ext<FWindow::Element> T, typename... Args> requires std::constructible_from<T, FWindow&, Args&&...> inline T& openNewScreen(Args&&... args) { return openScreen(make_unique<T>(*this, forward<Args>(args)...)); };
+		template <c_ext<FWindow::Element> T, typename... Args> requires std::constructible_from<T, FWindow&, Args&&...> inline T& swapNewScreen(Args&&... args) { return swapScreen(make_unique<T>(*this, forward<Args>(args)...)); };
+		template <c_ext<FWindow::Element> T, typename... Args> requires std::constructible_from<T, FWindow&, Args&&...> uptr<T> inline create(Args&&... args) { return make_unique<T>(*this, forward<Args>(args)...); }   // Generate a component using this window
 
 		bool hasOverlay(Element* target);
-		Element* getActiveOverlay();
-		Element* currentScreen();
+		FWindow::Element* getActiveOverlay();
+		FWindow::Element* currentScreen();
+		template<c_ext<FWindow::Element> T> T& openOverlay(uptr<T>&& target);
+		template<c_ext<FWindow::Element> T> T& openScreen(uptr<T>&& screen);
+		template<c_ext<FWindow::Element> T> T& swapScreen(uptr<T>&& screen);
 		void closeCurrentScreen();
 		void closeOverlay(Element* target);
 		void dispose();
-		void openOverlay(uptr<Element>&& target);
-		void openScreen(uptr<Element>&& screen);
 		void queueTip(Element* tip);
 		void refreshSize(int winW, int winH);
 		void render();
-		void swapScreen(uptr<Element>&& screen);
 		void update();
 	private:
 		bool enabled;
@@ -111,12 +115,6 @@ namespace fab {
 		Element* queuedCloseOverlay;
 		Element* tipBatch;
 		FWindow* parent;
-		sdl::Matrix4x4 matrixUniform = {
-		1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 0,
-			0, 0, 0, 1
-		};
 		sdl::Window* window;
 		int winH;
 		int winW;
@@ -190,12 +188,15 @@ namespace fab {
 	}
 
 	// Add an overlay to the top of the screen. The screen manager will take ownership of this overlay.
-	void FWindow::openOverlay(uptr<FWindow::Element>&& target) {
+	template<c_ext<FWindow::Element> T> T& FWindow::openOverlay(uptr<T>&& target) {
+		T& ret = *target;
 		overlays.push_back(std::move(target));
+		return ret;
 	}
 
 	// Add a screen to the history of opened screens and open that screen. The screen manager will take ownership of this screen. Also dispose all overlays and tooltips.
-	void FWindow::openScreen(uptr<FWindow::Element>&& screen) {
+	template<c_ext<FWindow::Element> T> T& FWindow::openScreen(uptr<T>&& screen) {
+		T& ret = *screen;
 		screens.push_back(std::move(screen));
 		screens.back()->open();
 		if (!overlays.empty()) {
@@ -203,6 +204,32 @@ namespace fab {
 		}
 		activeElement = nullptr;
 		sdl::runner::keyboardInputStop(window);
+		return ret;
+	}
+
+	// Close the current screen and switch the specified screen. Also dispose all overlays
+	template<c_ext<FWindow::Element> T> T& FWindow::swapScreen(uptr<T>&& screen) {
+		T& ret = *screen;
+		// Place the screen to be swapped to right behind the last screen and then queue a dispose, ensuring proper disposal of screens. This also handles opening of the next screen
+		if (screens.size() >= 2) {
+			queuedCloseScreen = true;
+			screens.insert(screens.end() - 2, std::move(screen));
+		}
+		else if (!screens.empty()) {
+			queuedCloseScreen = true;
+			screens.push_front(std::move(screen));
+		}
+		else {
+			screens.push_back(std::move(screen));
+			screens.back()->open();
+			if (!overlays.empty()) {
+				closeOverlay(overlays.front().get());
+			}
+		}
+
+		activeElement = nullptr;
+		sdl::runner::keyboardInputStop(window);
+		return ret;
 	}
 
 	// Add a tooltip batch to be shown. Only one tooltip batch can be shown at a time
@@ -261,29 +288,6 @@ namespace fab {
 			sdl::gpuSubmit(cd);
 		}
 
-	}
-
-	// Close the current screen and switch the specified screen. Also dispose all overlays
-	void FWindow::swapScreen(uptr<FWindow::Element>&& screen) {
-		// Place the screen to be swapped to right behind the last screen and then queue a dispose, ensuring proper disposal of screens. This also handles opening of the next screen
-		if (screens.size() >= 2) {
-			queuedCloseScreen = true;
-			screens.insert(screens.end() - 2, std::move(screen));
-		}
-		else if (!screens.empty()) {
-			queuedCloseScreen = true;
-			screens.push_front(std::move(screen));
-		}
-		else {
-			screens.push_back(std::move(screen));
-			screens.back()->open();
-			if (!overlays.empty()) {
-				closeOverlay(overlays.front().get());
-			}
-		}
-
-		activeElement = nullptr;
-		sdl::runner::keyboardInputStop(window);
 	}
 
 	// Update the last opened overlay if it exists, otherwise update the last opened screen

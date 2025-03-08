@@ -76,7 +76,8 @@ namespace fab {
 		inline float updateItemOffsets() { return updateItemOffsets(0, items.size()); }
 		inline Iterator begin() { return Iterator(items.begin()); }
 		inline Iterator end() { return Iterator(items.end()); }
-		inline size_t size() { return items.size(); }
+		inline size_t size() const { return items.size(); }
+		inline void clear() { items.clear(); }
 		template<typename... Args> requires std::constructible_from<T, FWindow&, Args&&...> inline T& addNew(Args&&... args) { return add(create<T>(forward<Args>(args)...)); };
 		template<c_ext<T> U, typename... Args> requires std::constructible_from<U, FWindow&, Args&&...> inline U& addNew(Args&&... args) { return add(create<U>(forward<Args>(args)...)); };
 
@@ -88,6 +89,8 @@ namespace fab {
 		UIGrid& setIntervalX(float spacingX);
 		UIGrid& setIntervalY(float spacingY);
 		uptr<T> extract(T* item);
+		T* at(int index) const;
+		T* back() const;
 		virtual bool isHovered() override;
 		virtual void refreshDimensions() override;
 		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
@@ -198,6 +201,22 @@ namespace fab {
 				items.erase(it);
 				return extracted;
 			}
+		}
+		return nullptr;
+	}
+
+	// Get the item at the given index if it exists
+	template<c_ext<Hoverable> T> T* UIGrid<T>::at(int index) const {
+		if (items.size() > index) {
+			return items[index].get();
+		}
+		return nullptr;
+	}
+
+	// Get the last item added into the list if it exists
+	template<c_ext<Hoverable> T> T* UIGrid<T>::back() const {
+		if (items.size() > 0) {
+			return items[items.size() - 1].get();
 		}
 		return nullptr;
 	}
