@@ -38,6 +38,6 @@ namespace fab {
 
 	void UITextButton::renderImpl(sdl::SDLBatchRenderPass& rp) {
 		UIButton::renderImpl(rp);
-		text.drawCentered(rp, hb->cX(), hb->cY(), win.getW(), win.getH());
+		text.drawCenteredFull(rp, hb->cX(), hb->cY(), win.getW(), win.getH());
 	}
 }

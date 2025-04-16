@@ -72,7 +72,7 @@ namespace fab {
 	void UITextInput::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
 		UIInteractable::renderImpl(rp);
-		buffer.draw(rp, hb->x + win.renderScale(24), hb->y + hb->h * 0.25f, win.getW(), win.getH());
+		buffer.drawFull(rp, hb->x + win.renderScale(24), hb->y + hb->h * 0.25f, win.getW(), win.getH());
 		if (sdl::runner::keyboardInputActive(this)) {
 			renderCaret(rp);
 		}

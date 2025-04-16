@@ -99,7 +99,7 @@ namespace fab {
 	void UINumberInput::renderImpl(sdl::SDLBatchRenderPass& rp)
 	{
 		UIInteractable::renderImpl(rp);
-		buffer.draw(rp, hb->x + win.renderScale(24), hb->y + hb->h * 0.25f, win.getW(), win.getH());
+		buffer.drawFull(rp, hb->x + win.renderScale(24), hb->y + hb->h * 0.25f, win.getW(), win.getH());
 		arrow.draw(rp, lessRect, win.getW(), win.getH());
 		arrow.draw(rp, moreRect, win.getW(), win.getH(), 1, -1);
 		if (sdl::runner::keyboardInputActive(this)) {

@@ -83,7 +83,7 @@ namespace fab {
 			image->draw(rp, *hb.get(), win.getW(), win.getH(), scaleX, scaleY, rotation, hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color);
 		}
 
-		text.draw(rp, hb->x + posX, hb->y + posY, win.getW(), win.getH());
+		text.drawFull(rp, hb->x + posX, hb->y + posY, win.getW(), win.getH());
 	}
 
 	void UIToggle::toggle(bool val)

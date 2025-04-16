@@ -34,6 +34,6 @@ namespace fab {
 	}
 
 	void UILabel::renderImpl(sdl::SDLBatchRenderPass& rp) {
-		text.draw(rp, hb->x, hb->y, win.getW(), win.getH());
+		text.drawFull(rp, hb->x, hb->y, win.getW(), win.getH());
 	}
 }

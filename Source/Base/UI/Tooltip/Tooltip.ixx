@@ -59,7 +59,7 @@ namespace fab {
 	{
 		float off = win.renderScale(PADDING);
 		background.draw(rp, x, y, w, h, win.getW(), win.getH());
-		text.draw(rp, x + off, y + off, win.getW(), win.getH());
+		text.drawFull(rp, x + off, y + off, win.getW(), win.getH());
 	}
 
 	// Stretch the box background to fit the words in the tooltip

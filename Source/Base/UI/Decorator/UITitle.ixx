@@ -23,7 +23,7 @@ namespace fab {
 			UITitle::onSizeUpdated();
 		}
 		UITitle(T&& item) :
-			UITitle(std::move(item), item.win.cct.fontBold(), "", 0, 0, 0, sdl::COLOR_STANDARD, sdl::COLOR_BLACK) {}
+			UITitle(std::move(item), item.win.props.fontBold(), "", 0, 0, 0, sdl::COLOR_STANDARD, sdl::COLOR_BLACK) {}
 
 		UITitle(UITitle&& other) noexcept : Hoverable(other.win), ui(move(other.ui)), text(move(other.text)) {}
 
@@ -53,7 +53,7 @@ namespace fab {
 			return make_unique<UITitle<T>>(move(item), font, text, xOff, yOff, w, color, colorOutline);
 		}
 		inline static uptr<UITitle<T>> make(T&& item) {
-			return make_unique<UITitle<T>>(move(item), item.win.cct.fontBold(), "", 0, 0, 0, sdl::COLOR_STANDARD, sdl::COLOR_BLACK);
+			return make_unique<UITitle<T>>(move(item), item.win.props.fontBold(), "", 0, 0, 0, sdl::COLOR_STANDARD, sdl::COLOR_BLACK);
 		}
 	private:
 		float offX = 0;
@@ -84,13 +84,13 @@ namespace fab {
 		ui.render(rp);
 		if (ui.enabled) {
 			Hitbox& h = *ui.getHb();
-			text.draw(rp, h.x + posX, h.y + posY, win.getW(), win.getH());
+			text.drawFull(rp, h.x + posX, h.y + posY, win.getW(), win.getH());
 		}
 	}
 
 	template<c_ext<Hoverable> T> void UITitle<T>::renderImpl(sdl::SDLBatchRenderPass& rp) {
 		ui.renderImpl(rp);
 		Hitbox& h = *ui.getHb();
-		text.draw(rp, h.x + posX, h.y + posY, win.getW(), win.getH());
+		text.drawFull(rp, h.x + posX, h.y + posY, win.getW(), win.getH());
 	}
 }

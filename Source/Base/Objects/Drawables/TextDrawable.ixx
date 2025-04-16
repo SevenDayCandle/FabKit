@@ -25,21 +25,21 @@ namespace fab {
 		inline str::const_iterator getTextEnd() const { return text.end(); }
 		inline size_t getTextLen() const { return text.size(); }
 		inline strv getText() const { return text; }
-		inline void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float winW, float winH, float scX = 1, float scY = 1, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) { 
+		inline void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) override {
 			if (texture) {
-				ImageDrawable::draw(rp, x, y, texW, texH, winW, winH, scX, scY, rotZ, tint, pipeline);
+				ImageDrawable::draw(rp, x, y, w, h, winW, winH, scX, scY, rotZ, tint, pipeline);
 			}
 		}
-		inline void drawCentered(sdl::SDLBatchRenderPass& rp, float x, float y, float winW, float winH, float scX = 1, float scY = 1, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) {
+		inline void drawCentered(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX = 1, float scY = 1, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) override {
 			if (texture) {
-				ImageDrawable::drawCentered(rp, x, y, texW, texH, winW, winH, scX, scY, rotZ, tint, pipeline);
+				ImageDrawable::drawCentered(rp, x, y, w, h, winW, winH, scX, scY, rotZ, tint, pipeline);
 			}
 		}
 		inline void drawOffsetExact(sdl::SDLBatchRenderPass& rp, Hitbox& hb, float xOff, float yOff, float scX = 1, float scY = 1, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) {
-			draw(rp, hb.x + xOff, hb.y + yOff, hb.win.getW(), hb.win.getH(), scX, scY, rotZ, tint, pipeline);
+			drawFull(rp, hb.x + xOff, hb.y + yOff, hb.win.getW(), hb.win.getH(), scX, scY, rotZ, tint, pipeline);
 		}
 		inline void drawOffsetScaled(sdl::SDLBatchRenderPass& rp, Hitbox& hb, float xOff, float yOff, float scX = 1, float scY = 1, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) {
-			draw(rp, hb.x + hb.win.renderScale(xOff), hb.y + hb.win.renderScale(yOff), hb.win.getW(), hb.win.getH(), scX, scY, rotZ, tint, pipeline);
+			drawFull(rp, hb.x + hb.win.renderScale(xOff), hb.y + hb.win.renderScale(yOff), hb.win.getW(), hb.win.getH(), scX, scY, rotZ, tint, pipeline);
 		}
 
 		void reload() const override;

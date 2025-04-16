@@ -87,6 +87,6 @@ namespace fab {
 			}
 		}
 
-		text.draw(rp, h.x + scaleY * h.h * 1.25f, h.y, win.getW(), win.getH());
+		text.drawFull(rp, h.x + scaleY * h.h * 1.25f, h.y, win.getW(), win.getH());
 	}
 }

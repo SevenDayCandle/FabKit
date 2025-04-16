@@ -34,10 +34,15 @@ namespace fab {
             sdl::runner::deviceReleaseTexture(texture);
         }
         sdl::Surface* surface = sdl::surfaceLoad(path.data());
-        texH = surface->h;
-        texW = surface->w;
-        texture = sdl::runner::uploadTexture(copyPass, surface);
-
-        sdl::surfaceDestroy(surface);
+        if (surface) {
+            texH = surface->h;
+            texW = surface->w;
+            texture = sdl::runner::uploadTexture(copyPass, surface);
+            sdl::surfaceDestroy(surface);
+        }
+        else {
+            texture = nullptr;
+            sdl::logError("Failed to load texture %s: %s", path.c_str(), sdl::getError());
+        }
     }
 }
