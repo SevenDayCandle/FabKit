@@ -276,6 +276,9 @@
     <OutDir>$(SolutionDir)Builds\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\Builds\Intermediate\$(Configuration)\</IntDir>
   </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnableManifest>false</VcpkgEnableManifest>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -316,9 +319,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;GRAPHICS_API_OPENGL_33;PLATFORM_DESKTOP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)Dependencies\Glaze\include;$(ProjectDir)Dependencies\SDL\include;$(ProjectDir)Dependencies\SDL_gpu_shadercross</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Dependencies\Glaze\include;$(ProjectDir)Dependencies\SDL\include;$(ProjectDir)Dependencies\SDL_shadercross\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp23</LanguageStandard>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -335,6 +338,7 @@
     </Link>
     <PostBuildEvent>
       <Command>xcopy /Y /D "$(ProjectDir)Dependencies\SDL\lib\*.dll" "$(OutDir)"
+xcopy /Y /D "$(ProjectDir)Dependencies\SDL_shadercross\lib\*.dll" "$(OutDir)"
 xcopy /E /I /Y /D "$(ProjectDir)Shader\Compiled" "$(TargetDir)Shader"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

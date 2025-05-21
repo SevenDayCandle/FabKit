@@ -219,9 +219,7 @@ typedef enum Mix_MusicType {
     MUS_MID,
     MUS_OGG,
     MUS_MP3,
-    MUS_MP3_MAD_UNUSED,
     MUS_FLAC,
-    MUS_MODPLUG_UNUSED,
     MUS_OPUS,
     MUS_WAVPACK,
     MUS_GME
@@ -2280,7 +2278,7 @@ extern SDL_DECLSPEC int SDLCALL Mix_GetNumTracks(Mix_Music *music);
  * To convert from milliseconds, divide by 1000.0.
  *
  * This function is only implemented for MOD music formats (set pattern order
- * number) and for WAV, OGG, FLAC, MP3, and MODPLUG music at the moment.
+ * number) and for WAV, OGG, FLAC, MP3, and MOD music at the moment.
  *
  * \param position the new position, in seconds (as a double).
  * \returns true on success or false on failure; call SDL_GetError() for more

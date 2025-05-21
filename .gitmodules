@@ -1,6 +1,3 @@
 [submodule "Dependencies/Glaze"]
 	path = Dependencies/Glaze
 	url = https://github.com/stephenberry/glaze.git
-[submodule "Dependencies/SDL_shadercross"]
-	path = Dependencies/SDL_shadercross
-	url = https://github.com/libsdl-org/SDL_shadercross.git

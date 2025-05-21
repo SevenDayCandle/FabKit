@@ -1,7 +1,6 @@
 module;
 
-#define SDL_GPU_SHADERCROSS_IMPLEMENTATION
-#include "SDL_gpu_shadercross.h"
+#include "SDL3_shadercross/SDL_shadercross.h"
 #include "SDL3/SDL.h"
 #include "SDL3_image/SDL_image.h"
 #include "SDL3_mixer/SDL_mixer.h"
@@ -104,6 +103,10 @@ namespace sdl {
 	export using RectI = ::SDL_Rect;
 	export using ScaleMode = ::SDL_ScaleMode;
 	export using Scancode = ::SDL_Scancode;
+	export using ShadercrossComputeMetadata = ::SDL_ShaderCross_ComputePipelineMetadata;
+	export using ShadercrossGraphicsMetadata = ::SDL_ShaderCross_GraphicsShaderMetadata;
+	export using ShadercrossShaderStage = ::SDL_ShaderCross_ShaderStage;
+	export using ShadercrossSPIRVInfo = ::SDL_ShaderCross_SPIRV_Info;
 	export using Sound = ::Mix_Chunk;
 	export using Surface = ::SDL_Surface;
 	export using Window = ::SDL_Window;
@@ -158,6 +161,10 @@ namespace sdl {
 	export constexpr Scancode SCAN_RETURN = SDL_SCANCODE_RETURN;
 	export constexpr Scancode SCAN_RIGHT = SDL_SCANCODE_RIGHT;
 	export constexpr Scancode SCAN_UP = SDL_SCANCODE_UP;
+
+	/* Shader Stage */
+	export constexpr ShadercrossShaderStage STAGE_FRAGMENT = SDL_SHADERCROSS_SHADERSTAGE_FRAGMENT;
+	export constexpr ShadercrossShaderStage STAGE_VERTEX = SDL_SHADERCROSS_SHADERSTAGE_VERTEX;
 
 	/* Key constants (used for input listeners) */
 	export constexpr Sint32 KEY_BACKSPACE = SDLK_BACKSPACE;
@@ -219,7 +226,7 @@ namespace sdl {
 	export inline SDL_GPUCommandBuffer* gpuAcquireCommandBuffer(SDL_GPUDevice* device) { return SDL_AcquireGPUCommandBuffer(device); }
 	export inline SDL_GPUComputePass* gpuBeginComputePass(SDL_GPUCommandBuffer* commandBuffer, SDL_GPUStorageTextureReadWriteBinding* storageTextureBindings, Uint32 storageTextureBindingCount, SDL_GPUStorageBufferReadWriteBinding* storageBufferBindings, Uint32 storageBufferBindingCount) { return SDL_BeginGPUComputePass(commandBuffer, storageTextureBindings, storageTextureBindingCount, storageBufferBindings, storageBufferBindingCount); }
 	export inline SDL_GPUComputePipeline* gpuCreateComputePipeline(SDL_GPUDevice* device, SDL_GPUComputePipelineCreateInfo* computePipelineCreateInfo) { return SDL_CreateGPUComputePipeline(device, computePipelineCreateInfo); }
-	export inline SDL_GPUComputePipeline* gpuCompileSpirvCompute(SDL_GPUDevice* device, SDL_GPUComputePipelineCreateInfo* shaderCreateInfo) { return SDL_ShaderCross_CompileComputePipelineFromSPIRV(device, shaderCreateInfo); }
+	export inline SDL_GPUComputePipeline* gpuCompileSpirvCompute(SDL_GPUDevice* device, const SDL_ShaderCross_SPIRV_Info* info, SDL_ShaderCross_ComputePipelineMetadata* metadata) { return SDL_ShaderCross_CompileComputePipelineFromSPIRV(device, info, metadata); }
 	export inline SDL_GPUCopyPass* gpuBeginCopyPass(SDL_GPUCommandBuffer* commandBuffer) { return SDL_BeginGPUCopyPass(commandBuffer); }
 	export inline SDL_GPUDevice* gpuCreateDevice(SDL_GPUShaderFormat format_flags, bool debug_mode, const char* name) { return SDL_CreateGPUDevice(format_flags, debug_mode, name); }
 	export inline SDL_GPUDevice* gpuCreateDeviceWithProperties(SDL_PropertiesID props) { return SDL_CreateGPUDeviceWithProperties(props); }
@@ -227,7 +234,7 @@ namespace sdl {
 	export inline SDL_GPUGraphicsPipeline* gpuCreateGraphicsPipeline(SDL_GPUDevice* device, SDL_GPUGraphicsPipelineCreateInfo* pipelineCreateInfo) { return SDL_CreateGPUGraphicsPipeline(device, pipelineCreateInfo); }
 	export inline SDL_GPURenderPass* gpuBeginRenderPass(SDL_GPUCommandBuffer* commandBuffer, SDL_GPUColorTargetInfo* colorAttachmentInfos, Uint32 colorAttachmentCount, SDL_GPUDepthStencilTargetInfo* depthStencilAttachmentInfo) { return SDL_BeginGPURenderPass(commandBuffer, colorAttachmentInfos, colorAttachmentCount, depthStencilAttachmentInfo); }
 	export inline SDL_GPUSampler* gpuCreateSampler(SDL_GPUDevice* device, SDL_GPUSamplerCreateInfo* samplerCreateInfo) { return SDL_CreateGPUSampler(device, samplerCreateInfo); }
-	export inline SDL_GPUShader* gpuCompileSpirvShader(SDL_GPUDevice* device, SDL_GPUShaderCreateInfo* shaderCreateInfo) { return SDL_ShaderCross_CompileGraphicsShaderFromSPIRV(device, shaderCreateInfo); }
+	export inline SDL_GPUShader* gpuCompileSpirvShader(SDL_GPUDevice* device, const SDL_ShaderCross_SPIRV_Info* info, SDL_ShaderCross_GraphicsShaderMetadata* metadata) { return SDL_ShaderCross_CompileGraphicsShaderFromSPIRV(device, info, metadata); }
 	export inline SDL_GPUShader* gpuCreateShader(SDL_GPUDevice* device, SDL_GPUShaderCreateInfo* shaderCreateInfo) { return SDL_CreateGPUShader(device, shaderCreateInfo); }
 	export inline SDL_GPUShaderFormat gpuSpirvShaderFormats() { return SDL_ShaderCross_GetSPIRVShaderFormats(); }
 	export inline SDL_GPUTexture* gpuAcquireSwapchainTexture(SDL_GPUCommandBuffer* commandBuffer, SDL_Window* window, Uint32* pWidth, Uint32* pHeight) { 

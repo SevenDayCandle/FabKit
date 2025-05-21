@@ -1,7 +1,6 @@
 module;
 
 #include "SDL3/SDL.h"
-#include "SDL3_image/SDL_image.h"
 #include "SDL3_mixer/SDL_mixer.h"
 #include "SDL3_ttf/SDL_ttf.h"
 #include <cstring>
@@ -13,7 +12,6 @@ import sdl.SDLBase;
 import std;
 
 namespace sdl {
-	constexpr auto RENDERER_VULKAN = "VULKAN";
 	constexpr auto SHADER_FILL_FRAG = "Shader/Fill.frag.spv";
 	constexpr auto SHADER_FILL_VERT = "Shader/Fill.vert.spv";
 	constexpr auto SHADER_NORMAL_FRAG = "Shader/Normal.frag.spv";
@@ -217,13 +215,13 @@ namespace sdl::runner {
 	export inline void setFPSLimit(int fps) { fpsLimit = fps > 0 ? NANOS_PER_SECOND / fps : 0; }
 	export inline void* deviceMapTransferBuffer(SDL_GPUTransferBuffer* transferBuffer, bool cycle) { return SDL_MapGPUTransferBuffer(device, transferBuffer, cycle); }
 
-	export bool init(const char* renderer = RENDERER_VULKAN, const char* normalFrag = SHADER_NORMAL_FRAG, const char* normalVert = SHADER_NORMAL_VERT, const char* fillFrag = SHADER_FILL_FRAG, const char* fillVert = SHADER_FILL_VERT);
+	export bool init(const char* renderer = NULL, const char* normalFrag = SHADER_NORMAL_FRAG, const char* normalVert = SHADER_NORMAL_VERT, const char* fillFrag = SHADER_FILL_FRAG, const char* fillVert = SHADER_FILL_VERT);
 	export bool poll();
 	export GPUGraphicsPipeline* createPipeline(GPUShader* vertexShader, GPUShader* fragmentShader, GPUTextureFormat textureFormat = GPUTextureFormat::SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM, GPUBlendFactor srcColor = GPUBlendFactor::SDL_GPU_BLENDFACTOR_SRC_ALPHA, GPUBlendFactor dstColor = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, GPUBlendFactor srcAlpha = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE, GPUBlendFactor dstAlpha = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA);
 	export GPUGraphicsPipeline* createShapePipeline(GPUShader* vertexShader, GPUShader* fragmentShader, GPUTextureFormat textureFormat = GPUTextureFormat::SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM, GPUBlendFactor srcColor = GPUBlendFactor::SDL_GPU_BLENDFACTOR_SRC_ALPHA, GPUBlendFactor dstColor = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, GPUBlendFactor srcAlpha = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE, GPUBlendFactor dstAlpha = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA);
 	export GPUGraphicsPipeline* pipelineForMode(RenderMode mode);
 	export GPUGraphicsPipeline* shapePipelineForMode(RenderMode mode);
-	export GPUShader* loadShader(const char* shaderFilename, GPUShaderStage stage, Uint32 samplerCount, Uint32 uniformBufferCount, Uint32 storageBufferCount = 0, Uint32 storageTextureCount = 0);
+	export GPUShader* loadShader(const char* shaderFilename, ShadercrossShaderStage stage, Uint32 samplerCount, Uint32 uniformBufferCount, Uint32 storageBufferCount = 0, Uint32 storageTextureCount = 0);
 	export GPUTexture* uploadTexture(GPUCopyPass* copyPass, Surface* surface);
 	export GPUTexture* uploadTexture(GPUCopyPass* copyPass, Surface* surface, GPUTransferBuffer* textureTransferBuffer);
 	export GPUTexture* uploadTextureForArray(GPUCopyPass* copyPass, Surface* surface, GPUTexture* texture, GPUTransferBuffer* textureTransferBuffer, Uint32 layer);
@@ -350,12 +348,12 @@ namespace sdl::runner {
 		SAMPLER = gpuCreateSampler(device, &samplerInfo);
 
 		// Set up pipelines
-		GPUShader* shaderFragment = loadShader(normalFrag, SDL_GPU_SHADERSTAGE_FRAGMENT, 1, 1);
-		GPUShader* shaderVertex = loadShader(normalVert, SDL_GPU_SHADERSTAGE_VERTEX, 0, 1);
+		GPUShader* shaderFragment = loadShader(normalFrag, STAGE_FRAGMENT, 1, 1);
+		GPUShader* shaderVertex = loadShader(normalVert, STAGE_VERTEX, 0, 1);
 		RENDER_STANDARD = createPipeline(shaderVertex, shaderFragment);
 
-		GPUShader* shaderFillFragment = loadShader(fillFrag, SDL_GPU_SHADERSTAGE_FRAGMENT, 1, 1);
-		GPUShader* shaderFillVertex = loadShader(fillVert, SDL_GPU_SHADERSTAGE_VERTEX, 0, 1);
+		GPUShader* shaderFillFragment = loadShader(fillFrag, STAGE_FRAGMENT, 1, 1);
+		GPUShader* shaderFillVertex = loadShader(fillVert, STAGE_VERTEX, 0, 1);
 		RENDER_FILL = createPipeline(shaderFillVertex, shaderFillFragment);
 		// TODO more shaders/blending modes
 
@@ -536,7 +534,7 @@ namespace sdl::runner {
 	}
 
 	// Generates a shader to be used for this window
-	GPUShader* loadShader(const char* shaderFilename, GPUShaderStage stage, Uint32 samplerCount, Uint32 uniformBufferCount, Uint32 storageBufferCount, Uint32 storageTextureCount)
+	GPUShader* loadShader(const char* shaderFilename, ShadercrossShaderStage stage, Uint32 samplerCount, Uint32 uniformBufferCount, Uint32 storageBufferCount, Uint32 storageTextureCount)
 	{
 		size_t codeSize;
 		std::filesystem::path name = sdl::dirBase();
@@ -548,18 +546,20 @@ namespace sdl::runner {
 			return nullptr;
 		}
 
-		GPUShaderCreateInfo shaderInfo = {
-			.code_size = codeSize,
-			.code = static_cast<const Uint8*>(code),
+		ShadercrossSPIRVInfo info = {
+			.bytecode = static_cast<const Uint8*>(code),
+			.bytecode_size = codeSize,
 			.entrypoint = "main",
-			.format = SDL_GPU_SHADERFORMAT_SPIRV,
-			.stage = stage,
+			.shader_stage = stage
+		};
+
+		ShadercrossGraphicsMetadata metadata = {
 			.num_samplers = samplerCount,
 			.num_storage_textures = storageTextureCount,
 			.num_storage_buffers = storageBufferCount,
 			.num_uniform_buffers = uniformBufferCount,
 		};
-		GPUShader* shader = gpuCompileSpirvShader(device, &shaderInfo);
+		GPUShader* shader = gpuCompileSpirvShader(device, &info, &metadata);
 		free(code);
 		return shader;
 	}
