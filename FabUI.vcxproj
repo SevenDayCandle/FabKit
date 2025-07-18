@@ -20,15 +20,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Base\Objects\Drawables\EmptyDrawable.ixx" />
-    <ClCompile Include="Source\Base\Objects\Drawables\FTexture.ixx" />
     <ClCompile Include="Source\Base\Objects\Drawables\IDrawable.ixx" />
-    <ClCompile Include="Source\Base\Objects\Drawables\ImageDrawable.ixx" />
+    <ClCompile Include="Source\Base\Objects\Drawables\FTexture.ixx" />
     <ClCompile Include="Source\Base\Objects\Drawables\RBordered.ixx" />
     <ClCompile Include="Source\Base\Objects\Drawables\RectDrawable.ixx" />
     <ClCompile Include="Source\Base\Objects\Drawables\RHorizontal.ixx" />
     <ClCompile Include="Source\Base\Objects\Drawables\RVertical.ixx" />
     <ClCompile Include="Source\Base\Objects\Drawables\TextDrawable.ixx" />
     <ClCompile Include="Source\Base\Objects\FFont.ixx" />
+    <ClCompile Include="Source\Base\Objects\FTextureBlock.ixx" />
     <ClCompile Include="Source\Base\Objects\Sounds\FMusic.ixx" />
     <ClCompile Include="Source\Base\Objects\Sounds\FSound.ixx" />
     <ClCompile Include="Source\Base\UI\BasicWindowProps.ixx">
@@ -108,7 +108,7 @@
     <ClCompile Include="Source\SDL\HSVTuple.ixx" />
     <ClCompile Include="Source\SDL\IKeyInputListener.ixx" />
     <ClCompile Include="Source\SDL\SDLBase.ixx" />
-    <ClCompile Include="Source\SDL\SDLBatchRenderPass.ixx" />
+    <ClCompile Include="Source\Base\UI\BatchRenderPass.ixx" />
     <ClCompile Include="Source\SDL\SDLProps.ixx" />
     <ClCompile Include="Source\SDL\SDLRunner.ixx" />
   </ItemGroup>
@@ -339,7 +339,7 @@
     <PostBuildEvent>
       <Command>xcopy /Y /D "$(ProjectDir)Dependencies\SDL\lib\*.dll" "$(OutDir)"
 xcopy /Y /D "$(ProjectDir)Dependencies\SDL_shadercross\lib\*.dll" "$(OutDir)"
-xcopy /E /I /Y /D "$(ProjectDir)Shader\Compiled" "$(TargetDir)Shader"</Command>
+xcopy /E /I /Y /D "$(ProjectDir)Shader" "$(TargetDir)Shader"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

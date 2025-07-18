@@ -7,7 +7,7 @@ import fab.Hoverable;
 import fab.ScaleHitbox;
 import fab.UICanvas;
 import fab.UIVerticalScrollbar;
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 
 namespace fab {
 	export template<c_ext<Hoverable> T = Hoverable> class UIVerticalCanvas : public UICanvas<T> {
@@ -24,7 +24,7 @@ namespace fab {
 
 		UIVerticalCanvas& setScrollSpeed(float scrollSpeed);
 		void refreshDimensions() override;
-		void renderImpl(sdl::SDLBatchRenderPass& rp) override;
+		void renderImpl(BatchRenderPass& rp) override;
 		void updateImpl() override;
 	protected:
 		float scrollSpeed;
@@ -48,7 +48,7 @@ namespace fab {
 		scrollbar.refreshDimensions();
 	}
 
-	template<c_ext<Hoverable> T> void UIVerticalCanvas<T>::renderImpl(sdl::SDLBatchRenderPass& rp)
+	template<c_ext<Hoverable> T> void UIVerticalCanvas<T>::renderImpl(BatchRenderPass& rp)
 	{
 		UICanvas<T>::renderImpl(rp);
 		scrollbar.renderImpl(rp);

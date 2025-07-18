@@ -14,7 +14,7 @@ import fab.UIEntry;
 import fab.UIInteractable;
 import fab.UISelectorList;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -46,7 +46,7 @@ namespace fab {
 		virtual void onChangeItems() override;
 		virtual void onSizeUpdated() override;
 		virtual void openPopup() override;
-		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
+		virtual void renderImpl(BatchRenderPass& rp) override;
 		virtual void unsetProxy() override;
 
 		inline static UISearchableDropdown multiSearch(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>) {
@@ -87,14 +87,14 @@ namespace fab {
 		this->start();
 	}
 
-	template<typename T>void UISearchableDropdown<T>::renderImpl(sdl::SDLBatchRenderPass& rp)
+	template<typename T>void UISearchableDropdown<T>::renderImpl(BatchRenderPass& rp)
 	{
 		if (sdl::runner::keyboardInputActive(this)) {
 			UIInteractable::renderImpl(rp);
-			this->buffer.draw(rp, this->hb->x, this->hb->y, this->win.getW(), this->win.getH());
+			this->buffer.draw(rp, this->hb->x, this->hb->y);
 			renderCaret(rp);
 			if (this->selectedSize() > 0) {
-				this->clear.draw(rp, this->arrowRect, this->win.getW(), this->win.getH(), this->scaleX, this->scaleY, this->rotation, this->UIImage::color);
+				this->clear.draw(rp, this->arrowRect, this->rotation, this->UIImage::color);
 			}
 		}
 		else {

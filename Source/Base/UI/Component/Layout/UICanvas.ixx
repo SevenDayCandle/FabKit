@@ -5,7 +5,7 @@ import fab.FWindow;
 import fab.Hitbox;
 import fab.Hoverable;
 import fab.UIBase;
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import std;
 
 namespace fab {
@@ -86,7 +86,7 @@ namespace fab {
 		virtual bool isHovered() override;
 		virtual bool remove(Hoverable* item);
 		virtual void refreshDimensions() override;
-		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
+		virtual void renderImpl(BatchRenderPass& rp) override;
 		virtual void updateImpl() override;
 	protected:
 		vec<uptr<T>> elements;
@@ -144,7 +144,7 @@ namespace fab {
 		return false;
 	}
 
-	template<c_ext<Hoverable> T> void UICanvas<T>::renderImpl(sdl::SDLBatchRenderPass& rp)
+	template<c_ext<Hoverable> T> void UICanvas<T>::renderImpl(BatchRenderPass& rp)
 	{
 		for (const uptr<T>& element : elements) {
 			element->render(rp);

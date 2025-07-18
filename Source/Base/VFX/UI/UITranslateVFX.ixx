@@ -6,7 +6,7 @@ import fab.FWindow;
 import fab.Hoverable;
 import fab.VFX;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -29,7 +29,7 @@ namespace fab {
 		inline UITranslateVFX& setMoveRelative(float x, float y) {
 			return setMove(ui.getHb()->x + x, ui.getHb()->y + y);
 		}
-		inline virtual void render(sdl::SDLBatchRenderPass& rp) override {}
+		inline virtual void render(BatchRenderPass& rp) override {}
 
 		UITranslateVFX& setMove(float x, float y);
 		virtual void dispose() override;

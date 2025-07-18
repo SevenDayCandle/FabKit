@@ -7,7 +7,7 @@ import fab.IDrawable;
 import fab.TextDrawable;
 import fab.Tooltip;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
+import fab.BatchRenderPass; 
 import std;
 
 namespace fab {
@@ -20,7 +20,7 @@ namespace fab {
 
 
 		TitleTooltip& setTitle(strv text, sdl::Color color, sdl::Color colorOutline, const FFont& font);
-		virtual void render(sdl::SDLBatchRenderPass& rp) override;
+		virtual void render(BatchRenderPass& rp) override;
 	protected:
 		TextDrawable title;
 

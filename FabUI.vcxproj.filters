@@ -23,13 +23,10 @@
     <ClCompile Include="Source\Base\Objects\Drawables\RBordered.ixx">
       <Filter>Base\Objects\Drawables</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Base\Objects\Drawables\ImageDrawable.ixx">
+    <ClCompile Include="Source\Base\Objects\Drawables\FTexture.ixx">
       <Filter>Base\Objects\Drawables</Filter>
     </ClCompile>
     <ClCompile Include="Source\Base\Objects\Drawables\IDrawable.ixx">
-      <Filter>Base\Objects\Drawables</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Base\Objects\Drawables\FTexture.ixx">
       <Filter>Base\Objects\Drawables</Filter>
     </ClCompile>
     <ClCompile Include="Source\Base\Objects\Sounds\FMusic.ixx">
@@ -215,7 +212,7 @@
     <ClCompile Include="Source\SDL\SDLProps.ixx">
       <Filter>SDL</Filter>
     </ClCompile>
-    <ClCompile Include="Source\SDL\SDLBatchRenderPass.ixx">
+    <ClCompile Include="Source\Base\UI\BatchRenderPass.ixx">
       <Filter>SDL</Filter>
     </ClCompile>
     <ClCompile Include="Source\SDL\SDLBase.ixx">
@@ -231,6 +228,7 @@
     <ClCompile Include="Source\Base\VFX\SequentialVFX.ixx" />
     <ClCompile Include="Source\Base\VFX\Render\SequentialRenderVFX.ixx" />
     <ClCompile Include="Source\Base\VFX\UI\UITranslateVFX.ixx" />
+    <ClCompile Include="Source\Base\Objects\FTextureBlock.ixx" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Base">

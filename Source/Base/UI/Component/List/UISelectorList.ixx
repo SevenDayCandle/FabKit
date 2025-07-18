@@ -12,8 +12,8 @@ import fab.UIBase;
 import fab.UIEntry;
 import fab.UIList;
 import fab.UIVerticalScrollbar;
-import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass;
+import sdl.SDLBase;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -27,8 +27,10 @@ namespace fab {
 			scrollbar(window, make_unique<RelativeHitbox>(window, *this->hb, 0, 0, 48, 48)) {
 			scrollbar.setOnScroll([this](float f) { onScroll(f); });
 		}
+
 		UISelectorList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>, bool canAutosize = false) :
 			UISelectorList(window, move(hb), move(labelFunc), window.props.fontSmall(), window.props.defaultPanel(), canAutosize) {}
+
 		UISelectorList(UISelectorList&& other) noexcept = default;
 
 		~UISelectorList() override {}
@@ -37,9 +39,9 @@ namespace fab {
 		inline bool isOpen() const { return proxy != nullptr; }
 		inline UISelectorList& setFilterFunc(const func<bool(const UIEntry<T>*)>& filterFunc) { return this->filterFunc = filterFunc, *this; }
 		inline UISelectorList& setFilterFunc(func<bool(const UIEntry<T>*)>&& filterFunc) { return this->filterFunc = move(filterFunc), *this; }
-		inline UISelectorList& setItemFont(const FFont& itemFont) { return UIList<T>::setItemFont(itemFont), * this; }
-		inline UISelectorList& setLabelFunc(const func<str(const T&)>& labelFunc) { return UIList<T>::setLabelFunc(labelFunc), * this; }
-		inline UISelectorList& setLabelFunc(func<str(const T&)>&& labelFunc) { return UIList<T>::setLabelFunc(move(labelFunc)), * this; }
+		inline UISelectorList& setItemFont(const FFont& itemFont) { return UIList<T>::setItemFont(itemFont), *this; }
+		inline UISelectorList& setLabelFunc(const func<str(const T&)>& labelFunc) { return UIList<T>::setLabelFunc(labelFunc), *this; }
+		inline UISelectorList& setLabelFunc(func<str(const T&)>&& labelFunc) { return UIList<T>::setLabelFunc(move(labelFunc)), *this; }
 		inline UISelectorList& setMaxRows(int rows) { return UIList<T>::setMaxRows(rows), *this; }
 		inline UISelectorList& setOnChange(const func<void(EntryView<T>&)>& onChange) { return this->onChange = onChange, *this; }
 		inline UISelectorList& setOnChange(func<void(EntryView<T>&)>&& onChange) { return this->onChange = move(onChange), *this; }
@@ -47,7 +49,7 @@ namespace fab {
 		inline UISelectorList& setOnClose(func<void()>&& onClose) { return this->onClose = move(onClose), *this; }
 		inline UISelectorList& setOnOpen(const func<void()>& onOpen) { return this->onOpen = onOpen, *this; }
 		inline UISelectorList& setOnOpen(func<void()>&& onOpen) { return this->onOpen = move(onOpen), *this; }
-		inline UISelectorList& setOnSelectionUpdate(const func<void(EntryView<T>&)>& onSelectionUpdate) {return this->onSelectionUpdate = onSelectionUpdate, *this;}
+		inline UISelectorList& setOnSelectionUpdate(const func<void(EntryView<T>&)>& onSelectionUpdate) { return this->onSelectionUpdate = onSelectionUpdate, *this; }
 		inline UISelectorList& setOnSelectionUpdate(func<void(EntryView<T>&)>&& onSelectionUpdate) { return this->onSelectionUpdate = move(onSelectionUpdate), *this; }
 
 		inline int getMinSelections() const { return selectionMin; }
@@ -61,7 +63,7 @@ namespace fab {
 		void openPopup();
 		void refilterRows();
 		void refreshDimensions() override;
-		void renderImpl(sdl::SDLBatchRenderPass& rp) override;
+		void renderImpl(BatchRenderPass& rp) override;
 		template <c_itr<int> Iterable> void selectIndices(Iterable& indices);
 		template <c_itr<T> Iterable> void selectSelection(Iterable& items);
 		template <c_itr<T*> Iterable> void selectSelection(Iterable& items);
@@ -83,6 +85,7 @@ namespace fab {
 		inline static uptr<UISelectorList> multiList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>, bool canAutosize = false) {
 			return multiList(window, std::move(hb), labelFunc, window.props.fontSmall(), window.props.defaultBackground(), canAutosize);
 		}
+
 		inline static uptr<UISelectorList> singleList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc = futil::toString<T>, bool canAutosize = false) {
 			return singleList(window, std::move(hb), labelFunc, window.props.fontSmall(), window.props.defaultBackground(), canAutosize);
 		}
@@ -93,9 +96,9 @@ namespace fab {
 		set<int> currentIndices;
 		vec<UIEntry<T>*> rowsForRender;
 
-		inline int getVisibleRowCount() const { return std::min(static_cast<int>(rowsForRender.size()), this->maxRows); }
+		inline int getVisibleRowCount() const override { return std::min(static_cast<int>(rowsForRender.size()), this->maxRows); }
 
-		virtual void updateTopVisibleRowIndex(int value) override;
+		void updateTopVisibleRowIndex(int value) override;
 	private:
 		int selectionLimit = std::numeric_limits<int>::max();
 		int selectionMin = 0;
@@ -108,7 +111,7 @@ namespace fab {
 		FWindow::Element* proxy;
 
 		inline EntryView<T> selectView() { return EntryView<T>(currentIndices, this->rows); }
-		inline float rMargin() { return this->win.renderScale(MARGIN); }
+		inline float rMargin() override { return this->win.renderScale(MARGIN); }
 
 		void autosize() override;
 		void changeEvent();
@@ -116,7 +119,7 @@ namespace fab {
 		void refreshRows() override;
 		void syncRowsForRender();
 		void updateForSelection();
-		void updateRowPositions();
+		void updateRowPositions() override;
 	};
 
 	export template <typename T> class UIMenuProxy : public FWindow::Element {
@@ -124,7 +127,7 @@ namespace fab {
 		UIMenuProxy(FWindow& window, UISelectorList<T>& menu) : Element(window), menu(menu) {}
 		UISelectorList<T>& menu;
 
-		inline void render(sdl::SDLBatchRenderPass& rp) override { menu.renderImpl(&rp); };
+		inline void render(BatchRenderPass& rp) override { menu.renderImpl(&rp); };
 
 		void dispose() override;
 		void update() override;
@@ -150,25 +153,25 @@ namespace fab {
 	}
 
 	// Updates the selected indexes based on the given items. DOES invoke the change callback. Note that this does not enforce selection limits.
-	template<typename T> template<c_varg<T> ...Args> void UISelectorList<T>::selectSelection(Args&&... items) {
+	template <typename T> template <c_varg<T> ...Args> void UISelectorList<T>::selectSelection(Args&&... items) {
 		updateSelection(items);
 		changeEvent();
 	}
 
 	// Updates the selected indexes based on the given items. DOES invoke the change callback. Note that this does not enforce selection limits.
-	template<typename T> template<c_varg<T*> ...Args> void UISelectorList<T>::selectSelection(Args&&... items) {
+	template <typename T> template <c_varg<T*> ...Args> void UISelectorList<T>::selectSelection(Args&&... items) {
 		updateSelection(items);
 		changeEvent();
 	}
 
 	// Updates the selected indexes based on the given item. DOES invoke the change callback. Note that this does not enforce selection limits.
-	template<typename T> void UISelectorList<T>::selectSingle(T item) {
+	template <typename T> void UISelectorList<T>::selectSingle(T item) {
 		updateSingle(item);
 		changeEvent();
 	}
 
 	// Updates the selected indexes based on the given item. DOES invoke the change callback. Note that this does not enforce selection limits.
-	template<typename T> void UISelectorList<T>::selectSingle(T* item) {
+	template <typename T> void UISelectorList<T>::selectSingle(T* item) {
 		updateSingle(item);
 		changeEvent();
 	}
@@ -202,22 +205,19 @@ namespace fab {
 	}
 
 	// Updates the selected indexes based on the given items (varargs version). Does NOT invoke the change callback. Note that this does not enforce selection limits.
-	template<typename T> template<c_varg<T> ...Args> void UISelectorList<T>::updateSelection(Args&&... items)
-	{
-		uset<T*> set{ std::forward<Args>(items)... };
+	template <typename T> template <c_varg<T> ...Args> void UISelectorList<T>::updateSelection(Args&&... items) {
+		uset<T*> set{std::forward<Args>(items)...};
 		updateSelection(set);
 	}
 
 	// Updates the selected indexes based on the given items (varargs version). Does NOT invoke the change callback. Note that this does not enforce selection limits.
-	template<typename T> template<c_varg<T*> ...Args> void UISelectorList<T>::updateSelection(Args&&... items)
-	{
-		uset<T*> set{ std::forward<Args>(items)... };
+	template <typename T> template <c_varg<T*> ...Args> void UISelectorList<T>::updateSelection(Args&&... items) {
+		uset<T*> set{std::forward<Args>(items)...};
 		updateSelection(set);
 	}
 
 	// Updates the selected indexes based on the given single item. Does NOT invoke the change callback. Note that this does not enforce selection limits.
-	template<typename T> void UISelectorList<T>::updateSingle(T item)
-	{
+	template <typename T> void UISelectorList<T>::updateSingle(T item) {
 		currentIndices.clear();
 		for (const uptr<UIEntry<T>>& row : this->rows) {
 			if (item == row->item) {
@@ -229,8 +229,7 @@ namespace fab {
 	}
 
 	// Updates the selected indexes based on the given single item. Does NOT invoke the change callback. Note that this does not enforce selection limits.
-	template<typename T> void UISelectorList<T>::updateSingle(T* item)
-	{
+	template <typename T> void UISelectorList<T>::updateSingle(T* item) {
 		currentIndices.clear();
 		for (const uptr<UIEntry<T>>& row : this->rows) {
 			if (item == &row->item) {
@@ -242,8 +241,7 @@ namespace fab {
 	}
 
 	// Change the maximum number of rows that can be selected. If there were previously more selected rows than this limit, prunes off rows to meet the selection limit
-	template<typename T> UISelectorList<T>& UISelectorList<T>::setSelectionLimit(int rows)
-	{
+	template <typename T> UISelectorList<T>& UISelectorList<T>::setSelectionLimit(int rows) {
 		this->selectionLimit = std::clamp(rows, 0, std::numeric_limits<int>::max());
 		int ind = 0;
 		while (this->selectedSize() > this->selectionLimit && ind < this->size()) {
@@ -256,8 +254,7 @@ namespace fab {
 	}
 
 	// Enforce a minimum number of rows to be selected. If the current selection is below the minimum, select rows from top to bottom until the requirements are met
-	template<typename T> UISelectorList<T>& UISelectorList<T>::setSelectionMin(int rows)
-	{
+	template <typename T> UISelectorList<T>& UISelectorList<T>::setSelectionMin(int rows) {
 		this->selectionMin = rows;
 		int ind = 0;
 		while (this->selectedSize() < this->selectionMin && ind < this->size()) {
@@ -301,21 +298,20 @@ namespace fab {
 	}
 
 	// Forcibly apply the filter function on the rows and update their positions
-	template<typename T> void UISelectorList<T>::refilterRows()
-	{
+	template <typename T> void UISelectorList<T>::refilterRows() {
 		syncRowsForRender();
 		updateRowPositions();
 	}
 
 	// Updates the dimensions of all children too
-	template<typename T> void UISelectorList<T>::refreshDimensions() {
+	template <typename T> void UISelectorList<T>::refreshDimensions() {
 		UIList<T>::refreshDimensions();
 		scrollbar.refreshDimensions();
 	}
 
 	// Render all visible rows and the scrollbar if it is shown
-	template <typename T> void UISelectorList<T>::renderImpl(sdl::SDLBatchRenderPass& rp) {
-		this->background.draw(rp, *this->hb.get(), this->win.getW(), this->win.getH(), 1, 1, 0, &this->backgroundColor);
+	template <typename T> void UISelectorList<T>::renderImpl(BatchRenderPass& rp) {
+		this->background.draw(rp, *this->hb.get(), 1, 1, 0, &this->backgroundColor);
 		int rowCount = getVisibleRowCount();
 		for (int i = this->topVisibleRowIndex; i < this->topVisibleRowIndex + rowCount; ++i) {
 			rowsForRender[i]->renderImpl(rp);
@@ -389,8 +385,7 @@ namespace fab {
 	}
 
 	// Detach the popup proxy and call the dispose callback
-	template<typename T>
-	void UISelectorList<T>::unsetProxy() {
+	template <typename T> void UISelectorList<T>::unsetProxy() {
 		proxy = nullptr;
 		if (onClose) {
 			onClose();
@@ -413,7 +408,7 @@ namespace fab {
 		else {
 			rowsForRender.resize(this->rows.size());
 			std::transform(this->rows.begin(), this->rows.end(), rowsForRender.begin(),
-				[](const uptr<UIEntry<T>>& entry) { return entry.get(); });
+			               [](const uptr<UIEntry<T>>& entry) { return entry.get(); });
 		}
 
 		scrollbar.enabled = rowsForRender.size() > this->maxRows;
@@ -422,8 +417,7 @@ namespace fab {
 	// When the items are changed, the rows should be expanded to match the width of the longest projected row if autosizing is enabled. Otherwise, they should match the existing hitbox width minus the scrollbar width
 	// The scrollbar should be placed immediately to the right of the items, and it should be expanded vertically to cover all the rows
 	// The menu should be expanded to cover the rows as well as the scrollbar
-	template <typename T>
-	void UISelectorList<T>::autosize() {
+	template <typename T> void UISelectorList<T>::autosize() {
 		int rowCount = getVisibleRowCount();
 		float rMarg = rMargin();
 		float sizeY = rowCount * (this->rows.size() > 0 ? this->rows[0]->hb->h : 0.0);
@@ -453,7 +447,7 @@ namespace fab {
 		updateRowPositions();
 	}
 
-	template<typename T> void UISelectorList<T>::changeEvent() {
+	template <typename T> void UISelectorList<T>::changeEvent() {
 		if (onChange) {
 			SelectView view = this->selectView();
 			onChange(view);
@@ -471,7 +465,7 @@ namespace fab {
 	}
 
 	// When the rows are changed, reposition the rows and sort them, and clear out your current selection because it will likely no longer be valid
-	template<typename T> void UISelectorList<T>::refreshRows() {
+	template <typename T> void UISelectorList<T>::refreshRows() {
 		currentIndices.clear();
 		syncRowsForRender();
 		autosize();
@@ -502,22 +496,21 @@ namespace fab {
 	 * Statics
 	 */
 
-	template<typename T> uptr<UISelectorList<T>> UISelectorList<T>::multiList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize) {
+	template <typename T> uptr<UISelectorList<T>> UISelectorList<T>::multiList(FWindow& window, uptr<Hitbox>&& hb, func<str(const T&)> labelFunc, FFont& itemFont, IDrawable& background, bool canAutosize) {
 		return std::make_unique<UISelectorList<T>>(window, move(hb), labelFunc, itemFont, background, canAutosize);
 	}
 
-	template<typename T> uptr<UISelectorList<T>> UISelectorList<T>::singleList(FWindow& window, uptr<Hitbox>&& hb,
-		func<str(const T&)> labelFunc,
-		FFont& itemFont,
-		IDrawable& background, 
-		bool canAutosize) {
+	template <typename T> uptr<UISelectorList<T>> UISelectorList<T>::singleList(FWindow& window, uptr<Hitbox>&& hb,
+	                                                                            func<str(const T&)> labelFunc,
+	                                                                            FFont& itemFont,
+	                                                                            IDrawable& background,
+	                                                                            bool canAutosize) {
 		uptr<UISelectorList<T>> res = std::make_unique<UISelectorList<T>>(window, move(hb), labelFunc, itemFont, background, canAutosize);
 		res->setSelectionLimit(1);
 		return res;
 	}
 
-	template<typename T> void UISelectorList<T>::updateTopVisibleRowIndex(int value)
-	{
+	template <typename T> void UISelectorList<T>::updateTopVisibleRowIndex(int value) {
 		UIList<T>::updateTopVisibleRowIndex(value);
 		int count = static_cast<int>(rowsForRender.size()) - getVisibleRowCount();
 		scrollbar.setScrollPos(count > 0 ? value / static_cast<float>(count) : 0);

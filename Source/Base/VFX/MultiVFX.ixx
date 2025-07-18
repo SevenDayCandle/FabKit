@@ -5,7 +5,7 @@ import fab.FUtil;
 import fab.FWindow;
 import fab.VFX;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;
 namespace fab {
@@ -22,7 +22,7 @@ namespace fab {
 		template <c_varg<uptr<VFX>&&>... Args> inline MultiVFX& addEffects(Args&&... items) { return (effects.push_back(move(items)), ...), * this; }
 
 		virtual bool tickUpdate() override;
-		virtual void render(sdl::SDLBatchRenderPass& rp) override;
+		virtual void render(BatchRenderPass& rp) override;
 		virtual void update() override;
 	protected:
 		vec<uptr<VFX>> effects;
@@ -45,7 +45,7 @@ namespace fab {
 		return false;
 	}
 
-	void MultiVFX::render(sdl::SDLBatchRenderPass& rp) {
+	void MultiVFX::render(BatchRenderPass& rp) {
 		for (uptr<VFX>& effect : effects) {
 			effect->render(rp);
 		}

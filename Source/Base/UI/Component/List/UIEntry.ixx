@@ -9,7 +9,7 @@ import fab.UIInteractable;
 import fab.UILabel;
 import fab.FUtil;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
+import fab.BatchRenderPass; 
 import sdl.SDLRunner;
 import std;
 
@@ -41,7 +41,7 @@ namespace fab {
 		virtual void onHbHover();
 		virtual void onHbUnhover();
 		virtual void refreshDimensions() override;
-		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
+		virtual void renderImpl(BatchRenderPass& rp) override;
 	protected:
 		sdl::Color baseColor;
 		sdl::Color hoverColor;
@@ -68,25 +68,25 @@ namespace fab {
 		text.reload();
 	}
 
-	template<typename T> void UIEntry<T>::renderImpl(sdl::SDLBatchRenderPass& rp) {
+	template<typename T> void UIEntry<T>::renderImpl(BatchRenderPass& rp) {
 		Hitbox& h = *this->hb.get();
 		if (active) {
 			if (toggled) {
-				checkImage->draw(rp, h.x, h.y, h.h, h.h, win.getW(), win.getH(), scaleX, scaleY, rotation, &sdl::COLOR_WHITE);
+				checkImage->draw(rp, h.x, h.y, h.h, h.h, scaleX, scaleY, rotation, &sdl::COLOR_WHITE);
 			}
 			else {
-				image->draw(rp, h.x, h.y, h.h, h.h, win.getW(), win.getH(), scaleX, scaleY, rotation, &sdl::COLOR_WHITE);
+				image->draw(rp, h.x, h.y, h.h, h.h, scaleX, scaleY, rotation, &sdl::COLOR_WHITE);
 			}
 		}
 		else {
 			if (toggled) {
-				checkImage->draw(rp, h.x, h.y, h.h, h.h, win.getW(), win.getH(), scaleX, scaleY, rotation);
+				checkImage->draw(rp, h.x, h.y, h.h, h.h, scaleX, scaleY, rotation);
 			}
 			else {
-				image->draw(rp, h.x, h.y, h.h, h.h, win.getW(), win.getH(), scaleX, scaleY, rotation);
+				image->draw(rp, h.x, h.y, h.h, h.h, scaleX, scaleY, rotation);
 			}
 		}
 
-		text.drawFull(rp, h.x + scaleY * h.h * 1.25f, h.y, win.getW(), win.getH());
+		text.drawFull(rp, h.x + scaleY * h.h * 1.25f, h.y);
 	}
 }

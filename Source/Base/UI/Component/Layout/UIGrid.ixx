@@ -6,7 +6,7 @@ import fab.Hoverable;
 import fab.FUtil;
 import fab.ScaleHitbox;
 import fab.UIBase;
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import std;
 
 namespace fab {
@@ -93,7 +93,7 @@ namespace fab {
 		T* back() const;
 		virtual bool isHovered() override;
 		virtual void refreshDimensions() override;
-		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
+		virtual void renderImpl(BatchRenderPass& rp) override;
 		virtual void updateImpl() override;
 	protected:
 		float intervalX = 0;
@@ -117,7 +117,7 @@ namespace fab {
 		}
 	}
 
-	template<c_ext<Hoverable> T> void UIGrid<T>::renderImpl(sdl::SDLBatchRenderPass& rp)
+	template<c_ext<Hoverable> T> void UIGrid<T>::renderImpl(BatchRenderPass& rp)
 	{
 		for (const uptr<T>& item : items) {
 			item->render(rp);

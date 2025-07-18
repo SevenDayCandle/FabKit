@@ -6,7 +6,7 @@ import fab.Hitbox;
 import fab.IDrawable;
 import fab.UIInteractable;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 
 namespace fab {
@@ -20,7 +20,7 @@ namespace fab {
 		inline UIButton& setOnRightClick(const func<void(UIButton&)>& onRightClick) { return this->onRightClick = onRightClick, *this; }
 		inline UIButton& setOnRightClick(func<void(UIButton&)>&& onRightClick) { return this->onRightClick = move(onRightClick), *this; }
 
-		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
+		virtual void renderImpl(BatchRenderPass& rp) override;
 	private:
 		func<void(UIButton&)> onLeftClick;
 		func<void(UIButton&)> onRightClick;
@@ -29,8 +29,8 @@ namespace fab {
 		virtual void clickRightEvent() override;
 	};
 
-	void UIButton::renderImpl(sdl::SDLBatchRenderPass& rp) {
-		image->draw(rp, *hb.get(), win.getW(), win.getH(), scaleX, scaleY, rotation, hb->isHovered() && interactable ? &sdl::COLOR_WHITE : &color);
+	void UIButton::renderImpl(BatchRenderPass& rp) {
+		image->draw(rp, *hb.get(), scaleX, scaleY, rotation, hb->isHovered() && interactable ? &sdl::COLOR_WHITE : &color);
 	}
 
 	void UIButton::clickLeftEvent()

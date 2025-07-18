@@ -5,7 +5,7 @@ import fab.FUtil;
 import fab.FWindow;
 import fab.VFX;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -28,7 +28,7 @@ namespace fab {
 		template <c_varg<uptr<VFX>&&>... Args> inline SequentialVFX& addEffects(Args&&... items) { return (effects.push_back(move(items)), ...), * this; }
 
 		virtual bool tickUpdate() override;
-		virtual void render(sdl::SDLBatchRenderPass& rp) override;
+		virtual void render(BatchRenderPass& rp) override;
 		virtual void update() override;
 	protected:
 		vec<uptr<VFX>> effects;
@@ -48,7 +48,7 @@ namespace fab {
 		return true;
 	}
 
-	void SequentialVFX::render(sdl::SDLBatchRenderPass& rp) {
+	void SequentialVFX::render(BatchRenderPass& rp) {
 		if (executeIndex < effects.size()) {
 			effects[executeIndex]->render(rp);
 		}

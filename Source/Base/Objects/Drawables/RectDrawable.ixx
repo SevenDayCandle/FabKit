@@ -3,7 +3,7 @@ export module fab.RectDrawable;
 import fab.FUtil;
 import fab.IDrawable;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -14,19 +14,18 @@ namespace fab {
 		RectDrawable() {}
 		virtual ~RectDrawable() = default;
 
-		void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) override;
+		void drawCentered(BatchRenderPass& rp, float tX, float tY, float w, float h, float scX, float scY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) override;
 	};
 
-	void RectDrawable::draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline)
+	void RectDrawable::drawCentered(BatchRenderPass& rp, float tX, float tY, float w, float h, float scX, float scY, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline)
 	{
 		// Assume origin is at the center of the drawable
-		float sX = scX * w / winW;
-		float sY = scY * h / winH;
+		float sX = scX * w;
+		float sY = scY * h;
 		rp.bindPipeline(sdl::runner::shapePipelineForMode(pipeline));
-		rp.bindBufferVertex(sdl::runner::BUFFER_VERTEX);
-		rp.bindBufferIndex(sdl::runner::BUFFER_INDEX);
-		rp.setupVertexUniform((x / winW) + 0.5 * sX, (y / winH) + 0.5 * sY, sX, sY, rotZ);
-		rp.pushFragmentUniform(tint, sizeof(sdl::Color));
-		rp.drawIndexedPrimitives(0);
+		rp.pushVertexData({
+			.color = *tint,
+			.transform = BatchRenderPass::makeTransform(tX, tY, sX, sY, rotZ)
+		});
 	}
 }

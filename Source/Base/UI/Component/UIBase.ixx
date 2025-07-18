@@ -6,7 +6,7 @@ import fab.Hitbox;
 import fab.Hoverable;
 import fab.RelativeHitbox;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -44,7 +44,7 @@ namespace fab {
 		virtual UIBase& setHbOffsetSizeX(const float x);
 		virtual UIBase& setHbOffsetSizeY(const float y);
 		virtual void refreshDimensions() override;
-		virtual void render(sdl::SDLBatchRenderPass& rp) final override;
+		virtual void render(BatchRenderPass& rp) final override;
 		virtual void update() final override;
 	};
 
@@ -104,7 +104,7 @@ namespace fab {
 	}
 
 	// If enabled, render the component for a single frame
-	void UIBase::render(sdl::SDLBatchRenderPass& rp) {
+	void UIBase::render(BatchRenderPass& rp) {
 		if (enabled) {
 			renderImpl(rp);
 		}

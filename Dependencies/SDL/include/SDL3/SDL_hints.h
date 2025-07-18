@@ -1747,6 +1747,32 @@ extern "C" {
 #define SDL_HINT_JOYSTICK_HIDAPI_8BITDO "SDL_JOYSTICK_HIDAPI_8BITDO"
 
 /**
+ * A variable controlling whether the HIDAPI driver for SInput controllers
+ * should be used.
+ *
+ * More info - https://github.com/HandHeldLegend/SInput-HID
+ *
+ * This variable can be set to the following values:
+ *
+ * "0" - HIDAPI driver is not used. "1" - HIDAPI driver is used.
+ *
+ * The default is the value of SDL_HINT_JOYSTICK_HIDAPI
+ */
+#define SDL_HINT_JOYSTICK_HIDAPI_SINPUT "SDL_JOYSTICK_HIDAPI_SINPUT"
+
+/**
+ * A variable controlling whether the HIDAPI driver for Flydigi controllers
+ * should be used.
+ *
+ * This variable can be set to the following values:
+ *
+ * "0" - HIDAPI driver is not used. "1" - HIDAPI driver is used.
+ *
+ * The default is the value of SDL_HINT_JOYSTICK_HIDAPI
+ */
+#define SDL_HINT_JOYSTICK_HIDAPI_FLYDIGI "SDL_JOYSTICK_HIDAPI_FLYDIGI"
+
+/**
  * A variable controlling whether the HIDAPI driver for Nintendo Switch
  * controllers should be used.
  *
@@ -2084,8 +2110,8 @@ extern "C" {
  *
  * The variable can be set to the following values:
  *
- * - "0": RAWINPUT drivers are not used.
- * - "1": RAWINPUT drivers are used. (default)
+ * - "0": RAWINPUT drivers are not used. (default)
+ * - "1": RAWINPUT drivers are used.
  *
  * This hint should be set before SDL is initialized.
  *
@@ -2487,6 +2513,10 @@ extern "C" {
  *
  * This defaults to 0, and specifying NULL for the hint's value will restore
  * the default.
+ *
+ * This doesn't have to be an integer value. For example, "59.94" won't be
+ * rounded to an integer rate; the digits after the decimal are actually
+ * respected.
  *
  * This hint can be set anytime.
  *
@@ -4365,6 +4395,27 @@ extern "C" {
  */
 #define SDL_HINT_PEN_TOUCH_EVENTS "SDL_PEN_TOUCH_EVENTS"
 
+/**
+ * A variable controlling whether SDL backend information is logged.
+ *
+ * The variable can be set to the following values:
+ *
+ * - "0": Subsystem information will not be logged. (default)
+ * - "1": Subsystem information will be logged.
+ *
+ * This is generally meant to be used as an environment variable to let
+ * end-users report what subsystems were chosen on their system, to aid in
+ * debugging. Logged information is sent through SDL_Log(), which means by
+ * default they appear on stdout on most platforms or maybe
+ * OutputDebugString() on Windows, and can be funneled by the app with
+ * SDL_SetLogOutputFunction(), etc.
+ *
+ * This hint can be set anytime, but the specific logs are generated during
+ * subsystem init.
+ *
+ * \since This hint is available since SDL 3.4.0.
+ */
+#define SDL_HINT_LOG_BACKENDS "SDL_LOG_BACKENDS"
 
 /**
  * An enumeration of hint priorities.

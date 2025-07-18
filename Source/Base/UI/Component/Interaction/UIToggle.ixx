@@ -8,7 +8,7 @@ import fab.IDrawable;
 import fab.TextDrawable;
 import fab.UIInteractable;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -43,7 +43,7 @@ namespace fab {
 		UIToggle& setTextOffset(float xOff, float yOff);
 		void onSizeUpdated() override;
 		void refreshDimensions() override;
-		void renderImpl(sdl::SDLBatchRenderPass& rp) override;
+		void renderImpl(BatchRenderPass& rp) override;
 		void toggle(bool val);
 	protected:
 		TextDrawable text;
@@ -75,15 +75,15 @@ namespace fab {
 		text.reload();
 	}
 
-	void UIToggle::renderImpl(sdl::SDLBatchRenderPass& rp) {
+	void UIToggle::renderImpl(BatchRenderPass& rp) {
 		if (toggled) {
-			checkImage->draw(rp, *hb.get(), win.getW(), win.getH(), scaleX, scaleY, rotation, hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color);
+			checkImage->draw(rp, *hb.get(), scaleX, scaleY, rotation, hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color);
 		}
 		else {
-			image->draw(rp, *hb.get(), win.getW(), win.getH(), scaleX, scaleY, rotation, hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color);
+			image->draw(rp, *hb.get(), scaleX, scaleY, rotation, hb->isHovered() ? &sdl::COLOR_WHITE : &this->UIImage::color);
 		}
 
-		text.drawFull(rp, hb->x + posX, hb->y + posY, win.getW(), win.getH());
+		text.drawFull(rp, hb->x + posX, hb->y + posY);
 	}
 
 	void UIToggle::toggle(bool val)

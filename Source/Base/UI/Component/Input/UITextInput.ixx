@@ -9,7 +9,7 @@ import fab.TextSupplier;
 import fab.TextDrawable;
 import fab.UIInteractable;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -32,7 +32,7 @@ namespace fab {
 		void commit(strv text);
 		virtual void onSizeUpdated() override;
 		virtual void refreshDimensions() override;
-		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
+		virtual void renderImpl(BatchRenderPass& rp) override;
 		virtual void updateImpl() override;
 	protected:
 		inline float getBasePosX() final override { return this->hb->x; }
@@ -69,10 +69,10 @@ namespace fab {
 		buffer.reload();
 	}
 
-	void UITextInput::renderImpl(sdl::SDLBatchRenderPass& rp)
+	void UITextInput::renderImpl(BatchRenderPass& rp)
 	{
 		UIInteractable::renderImpl(rp);
-		buffer.drawFull(rp, hb->x + win.renderScale(24), hb->y + hb->h * 0.25f, win.getW(), win.getH());
+		buffer.drawFull(rp, hb->x + win.renderScale(24), hb->y + hb->h * 0.25f);
 		if (sdl::runner::keyboardInputActive(this)) {
 			renderCaret(rp);
 		}

@@ -1,9 +1,10 @@
 module;
 
+#include <cstring>
+
 #include "SDL3/SDL.h"
 #include "SDL3_mixer/SDL_mixer.h"
 #include "SDL3_ttf/SDL_ttf.h"
-#include <cstring>
 
 export module sdl.SDLRunner;
 
@@ -12,111 +13,10 @@ import sdl.SDLBase;
 import std;
 
 namespace sdl {
-	constexpr auto SHADER_FILL_FRAG = "Shader/Fill.frag.spv";
-	constexpr auto SHADER_FILL_VERT = "Shader/Fill.vert.spv";
-	constexpr auto SHADER_NORMAL_FRAG = "Shader/Normal.frag.spv";
-	constexpr auto SHADER_NORMAL_VERT = "Shader/Normal.vert.spv";
-
-	constexpr std::initializer_list<TexPos> VERTICES = {
-		TexPos{ -0.5f, -0.5f, 0.0f, 0.0f, 1.0f },  // Bottom Left
-		TexPos{ 0.5f, -0.5f, 0.0f, 1.0f, 1.0f },   // Bottom Right
-		TexPos{ 0.5f,  0.5f, 0.0f, 1.0f, 0.0f },   // Top Right
-		TexPos{ -0.5f,  0.5f, 0.0f, 0.0f, 0.0f }   // Top Left
-	};
-	constexpr std::initializer_list<TexPos> VERTICES_BORDERED = {
-		// Top Left
-		TexPos{ -0.5f, -0.5f, 0.0f, 0.0f, 0.5f },  // Bottom Left
-		TexPos{ 0.5f, -0.5f, 0.0f, 0.5f, 0.5f },   // Bottom Right
-		TexPos{ 0.5f,  0.5f, 0.0f, 0.5f, 0.0f },   // Top Right
-		TexPos{ -0.5f,  0.5f, 0.0f, 0.0f, 0.0f },   // Top Left
-
-		// Top Center
-		TexPos{ -0.5f, -0.5f, 0.0f, 0.5f, 0.5f },  // Bottom Left
-		TexPos{ 0.5f, -0.5f, 0.0f, 0.5f, 0.5f },   // Bottom Right
-		TexPos{ 0.5f,  0.5f, 0.0f, 0.5f, 0.0f },   // Top Right
-		TexPos{ -0.5f,  0.5f, 0.0f, 0.5f, 0.0f },   // Top Left
-
-		// Top Right
-		TexPos{ -0.5f, -0.5f, 0.0f, 0.5f, 0.5f },  // Bottom Left
-		TexPos{ 0.5f, -0.5f, 0.0f, 1.0f, 0.5f },   // Bottom Right
-		TexPos{ 0.5f,  0.5f, 0.0f, 1.0f, 0.0f },   // Top Right
-		TexPos{ -0.5f,  0.5f, 0.0f, 0.5f, 0.0f },   // Top Left
-
-		// Left
-		TexPos{ -0.5f, -0.5f, 0.0f, 0.0f, 0.5f },  // Bottom Left
-		TexPos{ 0.5f, -0.5f, 0.0f, 0.5f, 0.5f },   // Bottom Right
-		TexPos{ 0.5f,  0.5f, 0.0f, 0.5f, 0.5f },   // Top Right
-		TexPos{ -0.5f,  0.5f, 0.0f, 0.0f, 0.5f },   // Top Left
-
-		// Center
-		TexPos{ -0.5f, -0.5f, 0.0f, 0.5f, 0.5f },  // Bottom Left
-		TexPos{ 0.5f, -0.5f, 0.0f, 0.5f, 0.5f },   // Bottom Right
-		TexPos{ 0.5f,  0.5f, 0.0f, 0.5f, 0.5f },   // Top Right
-		TexPos{ -0.5f,  0.5f, 0.0f, 0.5f, 0.5f },   // Top Left
-
-		// Right
-		TexPos{ -0.5f, -0.5f, 0.0f, 0.5f, 0.5f },  // Bottom Left
-		TexPos{ 0.5f, -0.5f, 0.0f, 1.0f, 0.5f },   // Bottom Right
-		TexPos{ 0.5f,  0.5f, 0.0f, 1.0f, 0.5f },   // Top Right
-		TexPos{ -0.5f,  0.5f, 0.0f, 0.5f, 0.5f },   // Top Left
-
-		// Bottom Left
-		TexPos{ -0.5f, -0.5f, 0.0f, 0.0f, 1.0f },  // Bottom Left
-		TexPos{ 0.5f, -0.5f, 0.0f, 0.5f, 1.0f },   // Bottom Right
-		TexPos{ 0.5f,  0.5f, 0.0f, 0.5f, 0.5f },   // Top Right
-		TexPos{ -0.5f,  0.5f, 0.0f, 0.0f, 0.5f },   // Top Left
-
-		// Bottom Center
-		TexPos{ -0.5f, -0.5f, 0.0f, 0.5f, 1.0f },  // Bottom Left
-		TexPos{ 0.5f, -0.5f, 0.0f, 0.5f, 1.0f },   // Bottom Right
-		TexPos{ 0.5f,  0.5f, 0.0f, 0.5f, 0.5f },   // Top Right
-		TexPos{ -0.5f,  0.5f, 0.0f, 0.5f, 0.5f },   // Top Left
-
-		// Bottom Right
-		TexPos{ -0.5f, -0.5f, 0.0f, 0.5f, 1.0f },  // Bottom Left
-		TexPos{ 0.5f, -0.5f, 0.0f, 1.0f, 1.0f },   // Bottom Right
-		TexPos{ 0.5f,  0.5f, 0.0f, 1.0f, 0.5f },   // Top Right
-		TexPos{ -0.5f,  0.5f, 0.0f, 0.5f, 0.5f },   // Top Left
-	};
-	constexpr std::initializer_list<TexPos> VERTICES_HORIZONTAL = {
-		// Left
-		TexPos{ -0.5f, -0.5f, 0.0f, 0.0f, 1.0f },  // Bottom Left
-		TexPos{ 0.5f, -0.5f, 0.0f, 0.5f, 1.0f },   // Bottom Right
-		TexPos{ 0.5f,  0.5f, 0.0f, 0.5f, 0.0f },   // Top Right
-		TexPos{ -0.5f,  0.5f, 0.0f, 0.0f, 0.0f },   // Top Left
-
-		// Center
-		TexPos{ -0.5f, -0.5f, 0.0f, 0.5f, 1.0f },  // Bottom Left
-		TexPos{ 0.5f, -0.5f, 0.0f, 0.5f, 1.0f },   // Bottom Right
-		TexPos{ 0.5f,  0.5f, 0.0f, 0.5f, 0.0f },   // Top Right
-		TexPos{ -0.5f,  0.5f, 0.0f, 0.5f, 0.0f },   // Top Left
-
-		// Right
-		TexPos{ -0.5f, -0.5f, 0.0f, 0.5f, 1.0f },  // Bottom Left
-		TexPos{ 0.5f, -0.5f, 0.0f, 1.0f, 1.0f },   // Bottom Right
-		TexPos{ 0.5f,  0.5f, 0.0f, 1.0f, 0.0f },   // Top Right
-		TexPos{ -0.5f,  0.5f, 0.0f, 0.5f, 0.0f },   // Top Left
-	};
-	constexpr std::initializer_list<TexPos> VERTICES_VERTICAL = {
-		// Top
-		TexPos{ -0.5f, -0.5f, 0.0f, 0.0f, 0.5f },  // Bottom Left
-		TexPos{ 0.5f, -0.5f, 0.0f, 1.0f, 0.5f },   // Bottom Right
-		TexPos{ 0.5f,  0.5f, 0.0f, 1.0f, 0.0f },   // Top Right
-		TexPos{ -0.5f,  0.5f, 0.0f, 0.0f, 0.0f },   // Top Left
-
-		// Center
-		TexPos{ -0.5f, -0.5f, 0.0f, 0.0f, 0.5f },  // Bottom Left
-		TexPos{ 0.5f, -0.5f, 0.0f, 1.0f, 0.5f },   // Bottom Right
-		TexPos{ 0.5f,  0.5f, 0.0f, 1.0f, 0.5f },   // Top Right
-		TexPos{ -0.5f,  0.5f, 0.0f, 0.0f, 0.5f },   // Top Left
-
-		// Bottom
-		TexPos{ -0.5f, -0.5f, 0.0f, 0.0f, 1.0f },  // Bottom Left
-		TexPos{ 0.5f, -0.5f, 0.0f, 1.0f, 1.0f },   // Bottom Right
-		TexPos{ 0.5f,  0.5f, 0.0f, 1.0f, 0.5f },   // Top Right
-		TexPos{ -0.5f,  0.5f, 0.0f, 0.0f, 0.5f },   // Top Left
-	};
-	constexpr std::initializer_list<Uint16> INDICES = { 0, 1, 2, 0, 2, 3 };
+	constexpr auto SHADER_FILL_FRAG = "Shader/Fill.frag.hlsl";
+	constexpr auto SHADER_FILL_VERT = "Shader/Fill.vert.hlsl";
+	constexpr auto SHADER_NORMAL_FRAG = "Shader/Normal.frag.hlsl";
+	constexpr auto SHADER_NORMAL_VERT = "Shader/Normal.vert.hlsl";
 
 	bool enabledInternal;
 	const bool* key;
@@ -133,8 +33,9 @@ namespace sdl {
 	Event e;
 	Gamepad* gamepad;
 	GPUDevice* device;
-	SDL_GPUGraphicsPipeline* RENDER_FILL;
-	SDL_GPUGraphicsPipeline* RENDER_STANDARD;
+	GPUGraphicsPipeline* RENDER_FILL;
+	GPUGraphicsPipeline* RENDER_STANDARD;
+	TTF_TextEngine* textEngine;
 	Uint64 delta;
 	Uint64 fpsLimit;
 	Uint64 timeCurrent;
@@ -144,12 +45,112 @@ namespace sdl {
 }
 
 namespace sdl::runner {
-	export SDL_GPUBuffer* BUFFER_INDEX;
-	export SDL_GPUBuffer* BUFFER_VERTEX;
-	export SDL_GPUBuffer* BUFFER_VERTEX_BORDERED;
-	export SDL_GPUBuffer* BUFFER_VERTEX_HORIZONTAL;
-	export SDL_GPUBuffer* BUFFER_VERTEX_VERTICAL;
-	export SDL_GPUSampler* SAMPLER;
+	export constexpr int MAX_SPRITES = 6000;
+
+	export constexpr std::initializer_list<TexCoord> VERTICES = {
+		TexCoord{-0.5f, -0.5f, 0.0f, 0.0f, 1.0f}, // Bottom Left
+		TexCoord{0.5f, -0.5f, 0.0f, 1.0f, 1.0f}, // Bottom Right
+		TexCoord{0.5f, 0.5f, 0.0f, 1.0f, 0.0f}, // Top Right
+		TexCoord{-0.5f, 0.5f, 0.0f, 0.0f, 0.0f} // Top Left
+	};
+	export constexpr std::initializer_list<TexCoord> VERTICES_BORDERED = {
+		// Top Left
+		TexCoord{-0.5f, -0.5f, 0.0f, 0.0f, 0.5f}, // Bottom Left
+		TexCoord{0.5f, -0.5f, 0.0f, 0.5f, 0.5f}, // Bottom Right
+		TexCoord{0.5f, 0.5f, 0.0f, 0.5f, 0.0f}, // Top Right
+		TexCoord{-0.5f, 0.5f, 0.0f, 0.0f, 0.0f}, // Top Left
+
+		// Top Center
+		TexCoord{-0.5f, -0.5f, 0.0f, 0.5f, 0.5f}, // Bottom Left
+		TexCoord{0.5f, -0.5f, 0.0f, 0.5f, 0.5f}, // Bottom Right
+		TexCoord{0.5f, 0.5f, 0.0f, 0.5f, 0.0f}, // Top Right
+		TexCoord{-0.5f, 0.5f, 0.0f, 0.5f, 0.0f}, // Top Left
+
+		// Top Right
+		TexCoord{-0.5f, -0.5f, 0.0f, 0.5f, 0.5f}, // Bottom Left
+		TexCoord{0.5f, -0.5f, 0.0f, 1.0f, 0.5f}, // Bottom Right
+		TexCoord{0.5f, 0.5f, 0.0f, 1.0f, 0.0f}, // Top Right
+		TexCoord{-0.5f, 0.5f, 0.0f, 0.5f, 0.0f}, // Top Left
+
+		// Left
+		TexCoord{-0.5f, -0.5f, 0.0f, 0.0f, 0.5f}, // Bottom Left
+		TexCoord{0.5f, -0.5f, 0.0f, 0.5f, 0.5f}, // Bottom Right
+		TexCoord{0.5f, 0.5f, 0.0f, 0.5f, 0.5f}, // Top Right
+		TexCoord{-0.5f, 0.5f, 0.0f, 0.0f, 0.5f}, // Top Left
+
+		// Center
+		TexCoord{-0.5f, -0.5f, 0.0f, 0.5f, 0.5f}, // Bottom Left
+		TexCoord{0.5f, -0.5f, 0.0f, 0.5f, 0.5f}, // Bottom Right
+		TexCoord{0.5f, 0.5f, 0.0f, 0.5f, 0.5f}, // Top Right
+		TexCoord{-0.5f, 0.5f, 0.0f, 0.5f, 0.5f}, // Top Left
+
+		// Right
+		TexCoord{-0.5f, -0.5f, 0.0f, 0.5f, 0.5f}, // Bottom Left
+		TexCoord{0.5f, -0.5f, 0.0f, 1.0f, 0.5f}, // Bottom Right
+		TexCoord{0.5f, 0.5f, 0.0f, 1.0f, 0.5f}, // Top Right
+		TexCoord{-0.5f, 0.5f, 0.0f, 0.5f, 0.5f}, // Top Left
+
+		// Bottom Left
+		TexCoord{-0.5f, -0.5f, 0.0f, 0.0f, 1.0f}, // Bottom Left
+		TexCoord{0.5f, -0.5f, 0.0f, 0.5f, 1.0f}, // Bottom Right
+		TexCoord{0.5f, 0.5f, 0.0f, 0.5f, 0.5f}, // Top Right
+		TexCoord{-0.5f, 0.5f, 0.0f, 0.0f, 0.5f}, // Top Left
+
+		// Bottom Center
+		TexCoord{-0.5f, -0.5f, 0.0f, 0.5f, 1.0f}, // Bottom Left
+		TexCoord{0.5f, -0.5f, 0.0f, 0.5f, 1.0f}, // Bottom Right
+		TexCoord{0.5f, 0.5f, 0.0f, 0.5f, 0.5f}, // Top Right
+		TexCoord{-0.5f, 0.5f, 0.0f, 0.5f, 0.5f}, // Top Left
+
+		// Bottom Right
+		TexCoord{-0.5f, -0.5f, 0.0f, 0.5f, 1.0f}, // Bottom Left
+		TexCoord{0.5f, -0.5f, 0.0f, 1.0f, 1.0f}, // Bottom Right
+		TexCoord{0.5f, 0.5f, 0.0f, 1.0f, 0.5f}, // Top Right
+		TexCoord{-0.5f, 0.5f, 0.0f, 0.5f, 0.5f}, // Top Left
+	};
+	export constexpr std::initializer_list<TexCoord> VERTICES_HORIZONTAL = {
+		// Left
+		TexCoord{-0.5f, -0.5f, 0.0f, 0.0f, 1.0f}, // Bottom Left
+		TexCoord{0.5f, -0.5f, 0.0f, 0.5f, 1.0f}, // Bottom Right
+		TexCoord{0.5f, 0.5f, 0.0f, 0.5f, 0.0f}, // Top Right
+		TexCoord{-0.5f, 0.5f, 0.0f, 0.0f, 0.0f}, // Top Left
+
+		// Center
+		TexCoord{-0.5f, -0.5f, 0.0f, 0.5f, 1.0f}, // Bottom Left
+		TexCoord{0.5f, -0.5f, 0.0f, 0.5f, 1.0f}, // Bottom Right
+		TexCoord{0.5f, 0.5f, 0.0f, 0.5f, 0.0f}, // Top Right
+		TexCoord{-0.5f, 0.5f, 0.0f, 0.5f, 0.0f}, // Top Left
+
+		// Right
+		TexCoord{-0.5f, -0.5f, 0.0f, 0.5f, 1.0f}, // Bottom Left
+		TexCoord{0.5f, -0.5f, 0.0f, 1.0f, 1.0f}, // Bottom Right
+		TexCoord{0.5f, 0.5f, 0.0f, 1.0f, 0.0f}, // Top Right
+		TexCoord{-0.5f, 0.5f, 0.0f, 0.5f, 0.0f}, // Top Left
+	};
+	export constexpr std::initializer_list<TexCoord> VERTICES_VERTICAL = {
+		// Top
+		TexCoord{-0.5f, -0.5f, 0.0f, 0.0f, 0.5f}, // Bottom Left
+		TexCoord{0.5f, -0.5f, 0.0f, 1.0f, 0.5f}, // Bottom Right
+		TexCoord{0.5f, 0.5f, 0.0f, 1.0f, 0.0f}, // Top Right
+		TexCoord{-0.5f, 0.5f, 0.0f, 0.0f, 0.0f}, // Top Left
+
+		// Center
+		TexCoord{-0.5f, -0.5f, 0.0f, 0.0f, 0.5f}, // Bottom Left
+		TexCoord{0.5f, -0.5f, 0.0f, 1.0f, 0.5f}, // Bottom Right
+		TexCoord{0.5f, 0.5f, 0.0f, 1.0f, 0.5f}, // Top Right
+		TexCoord{-0.5f, 0.5f, 0.0f, 0.0f, 0.5f}, // Top Left
+
+		// Bottom
+		TexCoord{-0.5f, -0.5f, 0.0f, 0.0f, 1.0f}, // Bottom Left
+		TexCoord{0.5f, -0.5f, 0.0f, 1.0f, 1.0f}, // Bottom Right
+		TexCoord{0.5f, 0.5f, 0.0f, 1.0f, 0.5f}, // Top Right
+		TexCoord{-0.5f, 0.5f, 0.0f, 0.0f, 0.5f}, // Top Left
+	};
+	export constexpr std::initializer_list<Uint16> INDICES = {0, 1, 2, 0, 2, 3};
+
+	export GPUBuffer* STORAGE_BUFFER;
+	export GPUSampler* SAMPLER;
+	export GPUTransferBuffer* TRANSFER_BUFFER;
 
 	export inline bool deviceClaimWindow(SDL_Window* window) { return SDL_ClaimWindowForGPUDevice(device, window); }
 	export inline bool deviceIsTextureFormatSupported(SDL_GPUTextureFormat format, SDL_GPUTextureType type, SDL_GPUTextureUsageFlags usage) { return SDL_GPUTextureSupportsFormat(device, format, type, usage); }
@@ -162,12 +163,12 @@ namespace sdl::runner {
 	export inline bool gamepadHasJustPressed(int pressed) { return pad[pressed] && !padLast[pressed]; }
 	export inline bool keyboardInputActive() { return kListener != nullptr; }
 	export inline bool keyboardInputActive(IKeyInputListener* listener) { return kListener == listener; }
-	export inline bool keyboardJustPressed(int pressed) {return key[pressed] && keyJust[pressed] && kListener == nullptr;} // Keyboard listeners should block regular keyboard input
+	export inline bool keyboardJustPressed(int pressed) { return key[pressed] && keyJust[pressed] && kListener == nullptr; } // Keyboard listeners should block regular keyboard input
 	export inline bool keyboardJustPressedEnter() { return keyboardJustPressed(SDLK_KP_ENTER) || keyboardJustPressed(SDLK_RETURN); }
 	export inline bool keyboardJustPressedEsc() { return keyboardJustPressed(SDLK_ESCAPE); }
 	export inline bool keyboardPressed(int pressed) { return key[pressed] && kListener == nullptr; }
-	export inline bool mouseIsHovering(const RectF& rect) {return mousePosX >= rect.x && mousePosY >= rect.y && mousePosX < rect.x + rect.w && mousePosY < rect.y + rect.h;}
-	export inline bool mouseIsHovering(const RectI rect) {return mousePosX >= rect.x && mousePosY >= rect.y && mousePosX < rect.x + rect.w && mousePosY < rect.y + rect.h;}
+	export inline bool mouseIsHovering(const RectF& rect) { return mousePosX >= rect.x && mousePosY >= rect.y && mousePosX < rect.x + rect.w && mousePosY < rect.y + rect.h; }
+	export inline bool mouseIsHovering(const RectI rect) { return mousePosX >= rect.x && mousePosY >= rect.y && mousePosX < rect.x + rect.w && mousePosY < rect.y + rect.h; }
 	export inline bool mouseIsLeftClicked() noexcept { return mouse == SDL_BUTTON_LEFT; }
 	export inline bool mouseIsLeftJustClicked() noexcept { return mouse == SDL_BUTTON_LEFT && mouseLast != SDL_BUTTON_LEFT; }
 	export inline bool mouseIsLeftJustReleased() noexcept { return mouse != SDL_BUTTON_LEFT && mouseLast == SDL_BUTTON_LEFT; }
@@ -180,10 +181,14 @@ namespace sdl::runner {
 	export inline int mouseGetWheelY() noexcept { return mouseWheelY; }
 	export inline int mouseGetX() noexcept { return mousePosX; }
 	export inline int mouseGetY() noexcept { return mousePosY; }
-	export inline SDL_GPUBuffer* deviceCreateBuffer(Uint32 usageFlags, Uint32 sizeInBytes) { 
-		SDL_GPUBufferCreateInfo info = { usageFlags, sizeInBytes };
+
+	export inline SDL_GPUBuffer* deviceCreateBuffer(Uint32 usageFlags, Uint32 sizeInBytes) {
+		SDL_GPUBufferCreateInfo info = {usageFlags, sizeInBytes};
 		return SDL_CreateGPUBuffer(device, &info);
 	}
+
+	export inline SDL_GPUBuffer* deviceCreateBufferIndex(Uint32 sizeInBytes) { return deviceCreateBuffer(SDL_GPU_BUFFERUSAGE_INDEX, sizeInBytes); }
+	export inline SDL_GPUBuffer* deviceCreateBufferVertex(Uint32 sizeInBytes) { return deviceCreateBuffer(SDL_GPU_BUFFERUSAGE_VERTEX, sizeInBytes); }
 	export inline SDL_GPUCommandBuffer* deviceAcquireCommandBuffer() { return SDL_AcquireGPUCommandBuffer(device); }
 	export inline SDL_GPUComputePipeline* deviceCreateComputePipeline(SDL_GPUComputePipelineCreateInfo* computePipelineCreateInfo) { return SDL_CreateGPUComputePipeline(device, computePipelineCreateInfo); }
 	export inline SDL_GPUCopyPass* deviceBeginCopyPass(SDL_GPUCommandBuffer* commandBuffer) { return SDL_BeginGPUCopyPass(commandBuffer); }
@@ -192,10 +197,14 @@ namespace sdl::runner {
 	export inline SDL_GPUShader* deviceCreateShader(SDL_GPUShaderCreateInfo* shaderCreateInfo) { return SDL_CreateGPUShader(device, shaderCreateInfo); }
 	export inline SDL_GPUTexture* deviceCreateTexture(SDL_GPUTextureCreateInfo* textureCreateInfo) { return SDL_CreateGPUTexture(device, textureCreateInfo); }
 	export inline SDL_GPUTextureFormat deviceGetSwapchainTextureFormat(SDL_Window* window) { return SDL_GetGPUSwapchainTextureFormat(device, window); }
-	export inline SDL_GPUTransferBuffer* deviceCreateTransferBuffer(SDL_GPUTransferBufferUsage usage, Uint32 sizeInBytes) { 
+
+	export inline SDL_GPUTransferBuffer* deviceCreateTransferBuffer(SDL_GPUTransferBufferUsage usage, Uint32 sizeInBytes) {
 		SDL_GPUTransferBufferCreateInfo info = {usage, sizeInBytes};
 		return SDL_CreateGPUTransferBuffer(device, &info);
 	}
+
+	export inline TexProps* deviceMapTexTransferBuffer(bool cycle) { return static_cast<TexProps*>(SDL_MapGPUTransferBuffer(device, TRANSFER_BUFFER, cycle)); }
+	export inline TTF_Text* textCreate(TTF_Font* font, std::string_view text) { return TTF_CreateText(textEngine, font, text.data(), text.length()); };
 	export inline Uint64 timeDelta() { return delta; }
 	export inline Uint64 timeTotal() { return timeCurrent; }
 	export inline void deviceReleaseBuffer(SDL_GPUBuffer* buffer) { SDL_ReleaseGPUBuffer(device, buffer); }
@@ -209,6 +218,7 @@ namespace sdl::runner {
 	export inline void deviceSetBufferName(SDL_GPUBuffer* buffer, const char* text) { SDL_SetGPUBufferName(device, buffer, text); }
 	export inline void deviceSetTextureName(SDL_GPUTexture* texture, const char* text) { SDL_SetGPUTextureName(device, texture, text); }
 	export inline void deviceUnclaimWindow(SDL_Window* window) { SDL_ReleaseWindowFromGPUDevice(device, window); }
+	export inline void deviceUnmapTexTransferBuffer() { SDL_UnmapGPUTransferBuffer(device, TRANSFER_BUFFER); }
 	export inline void deviceUnmapTransferBuffer(SDL_GPUTransferBuffer* transferBuffer) { SDL_UnmapGPUTransferBuffer(device, transferBuffer); }
 	export inline void deviceWait() { SDL_WaitForGPUIdle(device); }
 	export inline void deviceWaitForFences(bool waitAll, SDL_GPUFence** pFences, Uint32 fenceCount) { SDL_WaitForGPUFences(device, waitAll, pFences, fenceCount); }
@@ -217,13 +227,17 @@ namespace sdl::runner {
 
 	export bool init(const char* renderer = NULL, const char* normalFrag = SHADER_NORMAL_FRAG, const char* normalVert = SHADER_NORMAL_VERT, const char* fillFrag = SHADER_FILL_FRAG, const char* fillVert = SHADER_FILL_VERT);
 	export bool poll();
-	export GPUGraphicsPipeline* createPipeline(GPUShader* vertexShader, GPUShader* fragmentShader, GPUTextureFormat textureFormat = GPUTextureFormat::SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM, GPUBlendFactor srcColor = GPUBlendFactor::SDL_GPU_BLENDFACTOR_SRC_ALPHA, GPUBlendFactor dstColor = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, GPUBlendFactor srcAlpha = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE, GPUBlendFactor dstAlpha = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA);
-	export GPUGraphicsPipeline* createShapePipeline(GPUShader* vertexShader, GPUShader* fragmentShader, GPUTextureFormat textureFormat = GPUTextureFormat::SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM, GPUBlendFactor srcColor = GPUBlendFactor::SDL_GPU_BLENDFACTOR_SRC_ALPHA, GPUBlendFactor dstColor = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, GPUBlendFactor srcAlpha = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE, GPUBlendFactor dstAlpha = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA);
+	export bool uploadVertexes(GPUCommandBuffer* cmd, GPUCopyPass* copyPass);
+	export GPUGraphicsPipeline* createPipeline(GPUShader* vertexShader, GPUShader* fragmentShader, GPUTextureFormat textureFormat = GPUTextureFormat::SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM, GPUBlendFactor srcColor = GPUBlendFactor::SDL_GPU_BLENDFACTOR_SRC_ALPHA, GPUBlendFactor dstColor = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
+	                                           GPUBlendFactor srcAlpha = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE, GPUBlendFactor dstAlpha = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA);
+	export GPUGraphicsPipeline* createShapePipeline(GPUShader* vertexShader, GPUShader* fragmentShader, GPUTextureFormat textureFormat = GPUTextureFormat::SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM, GPUBlendFactor srcColor = GPUBlendFactor::SDL_GPU_BLENDFACTOR_SRC_ALPHA, GPUBlendFactor dstColor = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
+	                                                GPUBlendFactor srcAlpha = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE, GPUBlendFactor dstAlpha = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA);
 	export GPUGraphicsPipeline* pipelineForMode(RenderMode mode);
 	export GPUGraphicsPipeline* shapePipelineForMode(RenderMode mode);
 	export GPUShader* loadShader(const char* shaderFilename, ShadercrossShaderStage stage, Uint32 samplerCount, Uint32 uniformBufferCount, Uint32 storageBufferCount = 0, Uint32 storageTextureCount = 0);
-	export GPUTexture* uploadTexture(GPUCopyPass* copyPass, Surface* surface);
-	export GPUTexture* uploadTexture(GPUCopyPass* copyPass, Surface* surface, GPUTransferBuffer* textureTransferBuffer);
+	export GPUTexture* createTextureArray(Uint32 w, Uint32 h, Uint32 maxLayers = 1024);
+	export GPUTexture* uploadSingleTexture(GPUCopyPass* copyPass, Surface* surface);
+	export GPUTexture* uploadSingleTexture(GPUCopyPass* copyPass, Surface* surface, GPUTransferBuffer* textureTransferBuffer);
 	export GPUTexture* uploadTextureForArray(GPUCopyPass* copyPass, Surface* surface, GPUTexture* texture, GPUTransferBuffer* textureTransferBuffer, Uint32 layer);
 	export void capFrame();
 	export void keyboardInputStart(Window* window, IKeyInputListener* listener);
@@ -235,7 +249,6 @@ namespace sdl::runner {
 /* IMPLEMENTATIONS */
 
 namespace sdl::runner {
-
 	// Set up SDL. Returns true if SDL setup succeeds
 	bool init(const char* renderer, const char* normalFrag, const char* normalVert, const char* fillFrag, const char* fillVert) {
 		int val = SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_GAMEPAD);
@@ -256,7 +269,7 @@ namespace sdl::runner {
 		}
 
 		// Initialize driver
-		device = SDL_CreateGPUDevice(gpuSpirvShaderFormats(), false, renderer);
+		device = SDL_CreateGPUDevice(gpuGetHLSLShaderFormats(), false, renderer);
 		if (!device) {
 			SDL_LogCritical(SDL_LOG_CATEGORY_VIDEO, "Device went derp: %s", getError());
 			return false;
@@ -267,74 +280,14 @@ namespace sdl::runner {
 		keyJust = new Uint8[numKeys];
 		memcpy(keyJust, key, numKeys);
 
-		// Initialize basic vertex and indices
-		constexpr size_t size = sizeof(TexPos);
-		constexpr Uint32 sizeVert = size * VERTICES.size();
-		constexpr Uint32 sizeVertBordered = size * VERTICES_BORDERED.size();
-		constexpr Uint32 sizeVertHorizontal = size * VERTICES_HORIZONTAL.size();
-		constexpr Uint32 sizeVertVertical = size * VERTICES_VERTICAL.size();
-		constexpr Uint32 sizeIndices = size * INDICES.size();
-		BUFFER_VERTEX = deviceCreateBuffer(SDL_GPU_BUFFERUSAGE_VERTEX, sizeVert);
-		BUFFER_VERTEX_BORDERED = deviceCreateBuffer(SDL_GPU_BUFFERUSAGE_VERTEX, sizeVertBordered);
-		BUFFER_VERTEX_HORIZONTAL = deviceCreateBuffer(SDL_GPU_BUFFERUSAGE_VERTEX, sizeVertHorizontal);
-		BUFFER_VERTEX_VERTICAL = deviceCreateBuffer(SDL_GPU_BUFFERUSAGE_VERTEX, sizeVertVertical);
-		BUFFER_INDEX = deviceCreateBuffer(SDL_GPU_BUFFERUSAGE_INDEX, sizeIndices);
-
-		GPUTransferBuffer* bufferTransferBuffer = deviceCreateTransferBuffer(
+		// Initialize vertex storage and transfer buffers
+		constexpr size_t size = sizeof(TexProps);
+		constexpr Uint32 sizeVert = size * MAX_SPRITES;
+		STORAGE_BUFFER = deviceCreateBuffer(SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, sizeVert);
+		TRANSFER_BUFFER = deviceCreateTransferBuffer(
 			GPUTransferBufferUsage::SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
-			(sizeVert + sizeVertBordered + sizeVertHorizontal + sizeVertVertical + sizeIndices)
+			(sizeVert)
 		);
-		void* transferData = deviceMapTransferBuffer(bufferTransferBuffer,false);
-
-		TexPos* vertexData = reinterpret_cast<TexPos*>(transferData);
-		int i = 0;
-		for (const TexPos& pos : VERTICES) {
-			vertexData[i++] = pos;
-		}
-		for (const TexPos& pos : VERTICES_BORDERED) {
-			vertexData[i++] = pos;
-		}
-		for (const TexPos& pos : VERTICES_HORIZONTAL) {
-			vertexData[i++] = pos;
-		}
-		for (const TexPos& pos : VERTICES_VERTICAL) {
-			vertexData[i++] = pos;
-		}
-
-		Uint16* indexData = reinterpret_cast<Uint16*>(&vertexData[i]);
-		i = 0;
-		for (const Uint16& pos : INDICES) {
-			indexData[i++] = pos;
-		}
-
-		deviceUnmapTransferBuffer(bufferTransferBuffer);
-
-		GPUCommandBuffer* uploadCmdBuf = gpuAcquireCommandBuffer(device);
-		GPUCopyPass* copyPass = gpuBeginCopyPass(uploadCmdBuf);
-
-		GPUTransferBufferLocation t1 = { bufferTransferBuffer , 0 };
-		GPUBufferRegion r1 = { BUFFER_VERTEX, 0, sizeVert };
-		gpuUploadToBuffer(copyPass, &t1, &r1, false);
-
-		GPUTransferBufferLocation t2 = { bufferTransferBuffer , sizeVert };
-		GPUBufferRegion r2 = { BUFFER_VERTEX_BORDERED, 0, sizeVertBordered };
-		gpuUploadToBuffer(copyPass, &t2, &r2, false);
-
-		GPUTransferBufferLocation t3 = { bufferTransferBuffer ,sizeVert + sizeVertBordered };
-		GPUBufferRegion r3 = { BUFFER_VERTEX_HORIZONTAL, 0, sizeVertHorizontal };
-		gpuUploadToBuffer(copyPass, &t3, &r3, false);
-
-		GPUTransferBufferLocation t4 = { bufferTransferBuffer , sizeVert + sizeVertBordered + sizeVertHorizontal };
-		GPUBufferRegion r4 = { BUFFER_VERTEX_VERTICAL, 0, sizeVertVertical };
-		gpuUploadToBuffer(copyPass, &t4, &r4, false);
-
-		GPUTransferBufferLocation t5 = { bufferTransferBuffer , sizeVert + sizeVertBordered + sizeVertHorizontal + sizeVertVertical };
-		GPUBufferRegion r5 = { BUFFER_INDEX, 0, sizeIndices };
-		gpuUploadToBuffer(copyPass, &t5, &r5, false);
-
-		gpuEndCopyPass(copyPass);
-		gpuSubmit(uploadCmdBuf);
-		gpuReleaseTransferBuffer(device, bufferTransferBuffer);
 
 		// Initialize samplers
 		GPUSamplerCreateInfo samplerInfo = {
@@ -359,6 +312,9 @@ namespace sdl::runner {
 
 		gpuReleaseShader(device, shaderFragment);
 		gpuReleaseShader(device, shaderVertex);
+
+		// Text engine
+		textEngine = TTF_CreateGPUTextEngine(device);
 
 		// TODO initialize pad
 
@@ -403,7 +359,7 @@ namespace sdl::runner {
 				mouseWheelX = e.wheel.x;
 				mouseWheelY = e.wheel.y;
 				break;
-				// Key down: If a listener is present, special keys will trigger listeners. These keys are independent of hotkey settings
+			// Key down: If a listener is present, special keys will trigger listeners. These keys are independent of hotkey settings
 			case SDL_EVENT_KEY_DOWN:
 				if (kListener) {
 					kListener->onKeyPress(e.key.key);
@@ -418,7 +374,7 @@ namespace sdl::runner {
 					kListener->onTextInput(e.text.text);
 				}
 				break;
-				// TODO file dialog
+			// TODO file dialog
 			case SDL_EVENT_DROP_FILE:
 				break;
 			}
@@ -428,38 +384,44 @@ namespace sdl::runner {
 	}
 
 	// Generates a graphics pipeline to be used for this window
-	GPUGraphicsPipeline* createPipeline(GPUShader* vertexShader, GPUShader* fragmentShader, GPUTextureFormat textureFormat, GPUBlendFactor srcColor, GPUBlendFactor dstColor, GPUBlendFactor srcAlpha, GPUBlendFactor dstAlpha)
-	{
-		GPUVertexBufferDescription vertexBindings[] = { {
-					.slot = 0,
-					.pitch = sizeof(TexPos),
-					.input_rate = GPUVertexInputRate::SDL_GPU_VERTEXINPUTRATE_VERTEX,
-					.instance_step_rate = 0
-		} };
-		GPUVertexAttribute vertexAttributes[] = { {
-					.location = 0,
-					.buffer_slot = 0,
-					.format = GPUVertexElementFormat::SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3,
-					.offset = 0
-				}, {
-					.location = 1,
-					.buffer_slot = 0,
-					.format = GPUVertexElementFormat::SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2,
-					.offset = sizeof(float) * 3
-				} };
-		GPUColorTargetDescription colorAttachmentDescriptions[] = { {
-					.format = textureFormat,
-					.blend_state = {
-						.src_color_blendfactor = srcColor,
-						.dst_color_blendfactor = dstColor,
-						.color_blend_op = GPUBlendOp::SDL_GPU_BLENDOP_ADD,
-						.src_alpha_blendfactor = srcAlpha,
-						.dst_alpha_blendfactor = dstAlpha,
-						.alpha_blend_op = GPUBlendOp::SDL_GPU_BLENDOP_ADD,
-						.color_write_mask = 0xF,
-						.enable_blend = true
-					}
-				} };
+	GPUGraphicsPipeline* createPipeline(GPUShader* vertexShader, GPUShader* fragmentShader, GPUTextureFormat textureFormat, GPUBlendFactor srcColor, GPUBlendFactor dstColor, GPUBlendFactor srcAlpha, GPUBlendFactor dstAlpha) {
+		GPUVertexBufferDescription vertexBindings[] = {
+			{
+				.slot = 0,
+				.pitch = sizeof(TexCoord),
+				.input_rate = GPUVertexInputRate::SDL_GPU_VERTEXINPUTRATE_VERTEX,
+				.instance_step_rate = 0
+			}
+		};
+		GPUVertexAttribute vertexAttributes[] = {
+			{
+				.location = 0,
+				.buffer_slot = 0,
+				.format = GPUVertexElementFormat::SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3,
+				.offset = 0
+			},
+			{
+				.location = 1,
+				.buffer_slot = 0,
+				.format = GPUVertexElementFormat::SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2,
+				.offset = sizeof(float) * 3
+			}
+		};
+		GPUColorTargetDescription colorAttachmentDescriptions[] = {
+			{
+				.format = textureFormat,
+				.blend_state = {
+					.src_color_blendfactor = srcColor,
+					.dst_color_blendfactor = dstColor,
+					.color_blend_op = GPUBlendOp::SDL_GPU_BLENDOP_ADD,
+					.src_alpha_blendfactor = srcAlpha,
+					.dst_alpha_blendfactor = dstAlpha,
+					.alpha_blend_op = GPUBlendOp::SDL_GPU_BLENDOP_ADD,
+					.color_write_mask = 0xF,
+					.enable_blend = true
+				}
+			}
+		};
 		GPUGraphicsPipelineCreateInfo pipelineCreateInfo = {
 			.vertex_shader = vertexShader,
 			.fragment_shader = fragmentShader,
@@ -485,21 +447,22 @@ namespace sdl::runner {
 	}
 
 	// Generates a non-texture graphics pipeline to be used for this window
-	GPUGraphicsPipeline* createShapePipeline(GPUShader* vertexShader, GPUShader* fragmentShader, GPUTextureFormat textureFormat, GPUBlendFactor srcColor, GPUBlendFactor dstColor, GPUBlendFactor srcAlpha, GPUBlendFactor dstAlpha)
-	{
-		GPUColorTargetDescription colorAttachmentDescriptions[] = { {
-			.format = textureFormat,
-			.blend_state = {
-				.src_color_blendfactor = srcColor,
-				.dst_color_blendfactor = dstColor,
-				.color_blend_op = GPUBlendOp::SDL_GPU_BLENDOP_ADD,
-				.src_alpha_blendfactor = srcAlpha,
-				.dst_alpha_blendfactor = dstAlpha,
-				.alpha_blend_op = GPUBlendOp::SDL_GPU_BLENDOP_ADD,
-				.color_write_mask = 0xF,
-				.enable_blend = true
+	GPUGraphicsPipeline* createShapePipeline(GPUShader* vertexShader, GPUShader* fragmentShader, GPUTextureFormat textureFormat, GPUBlendFactor srcColor, GPUBlendFactor dstColor, GPUBlendFactor srcAlpha, GPUBlendFactor dstAlpha) {
+		GPUColorTargetDescription colorAttachmentDescriptions[] = {
+			{
+				.format = textureFormat,
+				.blend_state = {
+					.src_color_blendfactor = srcColor,
+					.dst_color_blendfactor = dstColor,
+					.color_blend_op = GPUBlendOp::SDL_GPU_BLENDOP_ADD,
+					.src_alpha_blendfactor = srcAlpha,
+					.dst_alpha_blendfactor = dstAlpha,
+					.alpha_blend_op = GPUBlendOp::SDL_GPU_BLENDOP_ADD,
+					.color_write_mask = 0xF,
+					.enable_blend = true
+				}
 			}
-		} };
+		};
 		GPUGraphicsPipelineCreateInfo pipelineCreateInfo = {
 			.vertex_shader = vertexShader,
 			.fragment_shader = fragmentShader,
@@ -523,32 +486,28 @@ namespace sdl::runner {
 	}
 
 	// TODO more pipelines
-	GPUGraphicsPipeline* pipelineForMode(RenderMode mode)
-	{
+	GPUGraphicsPipeline* pipelineForMode(RenderMode mode) {
 		return RENDER_STANDARD;
 	}
 
-	GPUGraphicsPipeline* shapePipelineForMode(RenderMode mode)
-	{
+	GPUGraphicsPipeline* shapePipelineForMode(RenderMode mode) {
 		return RENDER_FILL;
 	}
 
 	// Generates a shader to be used for this window
-	GPUShader* loadShader(const char* shaderFilename, ShadercrossShaderStage stage, Uint32 samplerCount, Uint32 uniformBufferCount, Uint32 storageBufferCount, Uint32 storageTextureCount)
-	{
+	// TODO option to cache built shader
+	GPUShader* loadShader(const char* shaderFilename, ShadercrossShaderStage stage, Uint32 samplerCount, Uint32 uniformBufferCount, Uint32 storageBufferCount, Uint32 storageTextureCount) {
 		size_t codeSize;
 		std::filesystem::path name = sdl::dirBase();
 		name /= shaderFilename;
 		void* code = fileLoad(name.string().data(), &codeSize);
-		if (code == nullptr)
-		{
+		if (code == nullptr) {
 			logError("Failed to load shader from disk: %s, %s", name.string().data(), getError());
 			return nullptr;
 		}
 
-		ShadercrossSPIRVInfo info = {
-			.bytecode = static_cast<const Uint8*>(code),
-			.bytecode_size = codeSize,
+		ShadercrossHLSLInfo info = {
+			.source = static_cast<const char*>(code),
 			.entrypoint = "main",
 			.shader_stage = stage
 		};
@@ -559,26 +518,40 @@ namespace sdl::runner {
 			.num_storage_buffers = storageBufferCount,
 			.num_uniform_buffers = uniformBufferCount,
 		};
-		GPUShader* shader = gpuCompileSpirvShader(device, &info, &metadata);
+		GPUShader* shader = gpuCompileHLSLShader(device, &info, &metadata);
 		free(code);
 		return shader;
 	}
 
+	// Create an empty texture array with the specified width and height, accepting a maximum number of layers
+	GPUTexture* createTextureArray(Uint32 w, Uint32 h, Uint32 maxLayers) {
+		GPUTextureCreateInfo info = {
+			.type = SDL_GPU_TEXTURETYPE_2D_ARRAY,
+			.format = GPUTextureFormat::SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM,
+			.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER,
+			.width = w,
+			.height = h,
+			.layer_count_or_depth = maxLayers,
+			.num_levels = 1,
+			.sample_count = GPUSampleCount::SDL_GPU_SAMPLECOUNT_1,
+		};
+		GPUTexture* tex = runner::deviceCreateTexture(&info);
+		return tex;
+	}
+
 	// Convert a surface into a texture to be used for rendering
-	GPUTexture* uploadTexture(GPUCopyPass* copyPass, Surface* surface)
-	{
+	GPUTexture* uploadSingleTexture(GPUCopyPass* copyPass, Surface* surface) {
 		GPUTransferBuffer* textureTransferBuffer = runner::deviceCreateTransferBuffer(
 			GPUTransferBufferUsage::SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
 			surface->w * surface->h * 4
 		);
-		GPUTexture* tex = uploadTexture(copyPass, surface, textureTransferBuffer);
+		GPUTexture* tex = uploadSingleTexture(copyPass, surface, textureTransferBuffer);
 		runner::deviceReleaseTransferBuffer(textureTransferBuffer);
 		return tex;
 	}
 
 	// Convert a surface into a texture to be used for rendering
-	GPUTexture* uploadTexture(GPUCopyPass* copyPass, Surface* surface, GPUTransferBuffer* textureTransferBuffer)
-	{
+	GPUTexture* uploadSingleTexture(GPUCopyPass* copyPass, Surface* surface, GPUTransferBuffer* textureTransferBuffer) {
 		Uint32 w = surface->w;
 		Uint32 h = surface->h;
 		const Uint32 imageSizeInBytes = w * h * 4;
@@ -588,14 +561,14 @@ namespace sdl::runner {
 		runner::deviceUnmapTransferBuffer(textureTransferBuffer);
 
 		GPUTextureCreateInfo info = {
-				.type = SDL_GPU_TEXTURETYPE_2D,
-				.format = GPUTextureFormat::SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM,
-				.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER,
-				.width = w,
-				.height = h,
-				.layer_count_or_depth = 1,
-				.num_levels = 1,
-				.sample_count = GPUSampleCount::SDL_GPU_SAMPLECOUNT_1,
+			.type = SDL_GPU_TEXTURETYPE_2D,
+			.format = GPUTextureFormat::SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM,
+			.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER,
+			.width = w,
+			.height = h,
+			.layer_count_or_depth = 1,
+			.num_levels = 1,
+			.sample_count = GPUSampleCount::SDL_GPU_SAMPLECOUNT_1,
 		};
 		GPUTexture* texture = runner::deviceCreateTexture(&info);
 
@@ -607,9 +580,9 @@ namespace sdl::runner {
 			.texture = {texture},
 			.mip_level = 0,
 			.layer = 0,
-				.w = w,
-				.h = h,
-				.d = 1
+			.w = w,
+			.h = h,
+			.d = 1
 		};
 
 		gpuUploadToTexture(copyPass, &tInfo, &tRegion, false);
@@ -617,8 +590,7 @@ namespace sdl::runner {
 	}
 
 	// Add a surface into a texture array to be used for rendering
-	GPUTexture* uploadTextureForArray(GPUCopyPass* copyPass, Surface* surface, GPUTexture* texture, GPUTransferBuffer* textureTransferBuffer, Uint32 layer)
-	{
+	GPUTexture* uploadTextureForArray(GPUCopyPass* copyPass, Surface* surface, GPUTexture* texture, GPUTransferBuffer* textureTransferBuffer, Uint32 layer) {
 		Uint32 w = surface->w;
 		Uint32 h = surface->h;
 		const Uint32 imageSizeInBytes = w * h * 4;
@@ -675,19 +647,14 @@ namespace sdl::runner {
 
 	// Clean up SDL
 	export void quit() {
-		gpuReleaseBuffer(device, BUFFER_VERTEX_BORDERED);
-		gpuReleaseBuffer(device, BUFFER_VERTEX_HORIZONTAL);
-		gpuReleaseBuffer(device, BUFFER_VERTEX_VERTICAL);
-		gpuReleaseBuffer(device, BUFFER_INDEX);
+		gpuReleaseBuffer(device, STORAGE_BUFFER);
 		gpuReleaseGraphicsPipeline(device, RENDER_STANDARD);
 		gpuReleaseSampler(device, SAMPLER);
-		BUFFER_VERTEX = nullptr;
-		BUFFER_VERTEX_BORDERED = nullptr;
-		BUFFER_VERTEX_HORIZONTAL = nullptr;
-		BUFFER_VERTEX_VERTICAL = nullptr;
-		BUFFER_INDEX = nullptr;
+		gpuReleaseTransferBuffer(device, TRANSFER_BUFFER);
+		STORAGE_BUFFER = nullptr;
 		RENDER_STANDARD = nullptr;
 		SAMPLER = nullptr;
+		TRANSFER_BUFFER = nullptr;
 
 		SDL_DestroyGPUDevice(device);
 		device = nullptr;

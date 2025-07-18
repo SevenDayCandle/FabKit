@@ -4,7 +4,7 @@ import fab.FUtil;
 import fab.FWindow;
 import fab.VFX;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -16,7 +16,7 @@ namespace fab {
 
 		CallbackVFX& addOnComplete(const func<void(CallbackVFX&)>& onComplete);
 
-		inline void render(sdl::SDLBatchRenderPass& rp) override {}
+		inline void render(BatchRenderPass& rp) override {}
 		inline void update() override {}
 
 		virtual void dispose() override;

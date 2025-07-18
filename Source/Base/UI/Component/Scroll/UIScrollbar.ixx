@@ -7,7 +7,7 @@ import fab.IDrawable;
 
 import fab.UIBase;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
+import fab.BatchRenderPass; 
 import sdl.SDLRunner;
 import std;
 
@@ -21,7 +21,7 @@ namespace fab {
 		inline UIScrollbar& setOnScroll(func<void(float)>&& onScroll) { return this->onScroll = move(onScroll), *this; }
 
 		virtual void onSizeUpdated() override;
-		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
+		virtual void renderImpl(BatchRenderPass& rp) override;
 		virtual void updateImpl() override;
 		void processMouseScroll();
 		void scroll(float percent);
@@ -55,9 +55,9 @@ namespace fab {
 		}
 	}
 
-	void UIScrollbar::renderImpl(sdl::SDLBatchRenderPass& rp) {
-		imageBar.draw(rp, *hb.get(), win.getW(), win.getH());
-		imageButton.draw(rp, dropzone, win.getW(), win.getH());
+	void UIScrollbar::renderImpl(BatchRenderPass& rp) {
+		imageBar.draw(rp, *hb.get());
+		imageButton.draw(rp, dropzone);
 	}
 
 	// Updates the scrollbar button position and triggers the scroll event at the new position

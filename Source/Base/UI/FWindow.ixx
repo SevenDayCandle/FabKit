@@ -1,5 +1,6 @@
 export module fab.FWindow;
 
+import fab.BatchRenderPass;
 import fab.EmptyDrawable;
 import fab.FFont;
 import fab.FSound;
@@ -7,8 +8,7 @@ import fab.FUtil;
 import fab.IDrawable;
 import fab.WindowMode;
 import sdl.IKeyInputListener;
-import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
+import sdl.SDLBase;
 import sdl.SDLRunner;
 import std;
 
@@ -26,19 +26,21 @@ namespace fab {
 
 			inline virtual void dispose() {} // Should be called when this element is destroyed
 			inline virtual void open() {} // Should be called when this element is added to a window
-			inline virtual void renderImpl(sdl::SDLBatchRenderPass& rp) { render(rp); } // 
-			inline virtual void refreshDimensions() {}  // Force resizing of hitboxes when the screen size changes
+			inline virtual void renderImpl(BatchRenderPass& rp) { render(rp); } // 
+			inline virtual void refreshDimensions() {} // Force resizing of hitboxes when the screen size changes
 			inline virtual void updateImpl() { update(); }
-			template <c_ext<Element> T, typename... Args> requires std::constructible_from<T, FWindow&, Args&&...> uptr<T> inline create(Args&&... args) { return make_unique<T>(win, forward<Args>(args)...); }  // Generate a component using this element's window
 
-			virtual void render(sdl::SDLBatchRenderPass& rp) = 0;
+			template <c_ext<Element> T, typename... Args> requires std::constructible_from<T, FWindow&, Args&&...>
+			uptr<T> inline create(Args&&... args) { return make_unique<T>(win, forward<Args>(args)...); } // Generate a component using this element's window
+
+			virtual void render(BatchRenderPass& rp) = 0;
 			virtual void update() = 0;
 		};
 
-		/* Props that dictate how this window should be set up */
-		struct IProps {
-			IProps() {}
-			virtual ~IProps() = default;
+		/* Properties that dictate how this window should be set up */
+		struct IController {
+			IController() {}
+			virtual ~IController() = default;
 
 			virtual inline bool getVsync() { return true; }
 			virtual inline bool hasPressedClose() { return false; }
@@ -71,13 +73,14 @@ namespace fab {
 			virtual int getResolutionY() const noexcept = 0;
 		};
 
-		FWindow(IProps& props) : props(props) {
+		FWindow(IController& props) : props(props) {
 			initialize(props.getResolutionX(), props.getResolutionY(), props.getTitle(), props.getWindowMode());
 		}
+
 		virtual ~FWindow() = default;
 
 		Element* activeElement;
-		IProps& props;
+		IController& props;
 
 		inline float fontScale() const noexcept { return props.fontScale(); }
 		inline float fontScale(float mult) const noexcept { return fontScale() * mult; }
@@ -89,17 +92,25 @@ namespace fab {
 		inline sdl::Window* sdlWindow() const noexcept { return window; }
 		inline void keyboardInputStopRequest(sdl::IKeyInputListener* listener) { sdl::runner::keyboardInputStopRequest(window, listener); }
 		inline void keyboardInputStart(sdl::IKeyInputListener* listener) { sdl::runner::keyboardInputStart(window, listener); }
-		template <c_ext<FWindow::Element> T, typename... Args> requires std::constructible_from<T, FWindow&, Args&&...> inline T& openNewOverlay(Args&&... args) { return openOverlay(make_unique<T>(*this, forward<Args>(args)...)); };
-		template <c_ext<FWindow::Element> T, typename... Args> requires std::constructible_from<T, FWindow&, Args&&...> inline T& openNewScreen(Args&&... args) { return openScreen(make_unique<T>(*this, forward<Args>(args)...)); };
-		template <c_ext<FWindow::Element> T, typename... Args> requires std::constructible_from<T, FWindow&, Args&&...> inline T& swapNewScreen(Args&&... args) { return swapScreen(make_unique<T>(*this, forward<Args>(args)...)); };
-		template <c_ext<FWindow::Element> T, typename... Args> requires std::constructible_from<T, FWindow&, Args&&...> uptr<T> inline create(Args&&... args) { return make_unique<T>(*this, forward<Args>(args)...); }   // Generate a component using this window
+
+		template <c_ext<FWindow::Element> T, typename... Args> requires std::constructible_from<T, FWindow&, Args&&...>
+		inline T& openNewOverlay(Args&&... args) { return openOverlay(make_unique<T>(*this, forward<Args>(args)...)); };
+
+		template <c_ext<FWindow::Element> T, typename... Args> requires std::constructible_from<T, FWindow&, Args&&...>
+		inline T& openNewScreen(Args&&... args) { return openScreen(make_unique<T>(*this, forward<Args>(args)...)); };
+
+		template <c_ext<FWindow::Element> T, typename... Args> requires std::constructible_from<T, FWindow&, Args&&...>
+		inline T& swapNewScreen(Args&&... args) { return swapScreen(make_unique<T>(*this, forward<Args>(args)...)); };
+
+		template <c_ext<FWindow::Element> T, typename... Args> requires std::constructible_from<T, FWindow&, Args&&...>
+		uptr<T> inline create(Args&&... args) { return make_unique<T>(*this, forward<Args>(args)...); } // Generate a component using this window
 
 		bool hasOverlay(Element* target);
 		FWindow::Element* getActiveOverlay();
 		FWindow::Element* currentScreen();
-		template<c_ext<FWindow::Element> T> T& openOverlay(uptr<T>&& target);
-		template<c_ext<FWindow::Element> T> T& openScreen(uptr<T>&& screen);
-		template<c_ext<FWindow::Element> T> T& swapScreen(uptr<T>&& screen);
+		template <c_ext<FWindow::Element> T> T& openOverlay(uptr<T>&& target);
+		template <c_ext<FWindow::Element> T> T& openScreen(uptr<T>&& screen);
+		template <c_ext<FWindow::Element> T> T& swapScreen(uptr<T>&& screen);
 		void closeCurrentScreen();
 		void closeOverlay(Element* target);
 		void dispose();
@@ -115,18 +126,21 @@ namespace fab {
 		Element* queuedCloseOverlay;
 		Element* tipBatch;
 		FWindow* parent;
+		sdl::Matrix4x4 projection;
 		sdl::Window* window;
 		int winH;
 		int winW;
 
 		bool initialize(int w, int h, const char* title, uint32 windowFlags = 0);
+		static sdl::Matrix4x4 makeProjection(int w, int h);
 	};
 
 	// Set up window and its rendering device. Returns true if set up successfully
-	bool FWindow::initialize(int w, int h, const char* title, uint32 windowFlags)
-	{
+	bool FWindow::initialize(int w, int h, const char* title, uint32 windowFlags) {
 		this->winH = h;
 		this->winW = w;
+		projection = makeProjection(w, h);
+		// TODO setup projection
 		window = sdl::windowCreate(title, w, h, windowFlags);
 		if (!window) {
 			sdl::logCritical("Window went derp: %s", sdl::getError());
@@ -134,8 +148,7 @@ namespace fab {
 		}
 
 		// Setup device for this window
-		if (!sdl::runner::deviceClaimWindow(window))
-		{
+		if (!sdl::runner::deviceClaimWindow(window)) {
 			sdl::logCritical("GPUClaimWindow went derp: %s", sdl::getError());
 			return false;
 		}
@@ -143,6 +156,16 @@ namespace fab {
 		props.onWindowInitialize(*this);
 
 		return true;
+	}
+
+	// left = 0, right = w, bottom = h, top = 0
+	sdl::Matrix4x4 FWindow::makeProjection(int w, int h) {
+		return {
+			2.0f / w, 0, 0, 0,
+			0, 2.0f / -h, 0, 0,
+			0, 0, 1.0f, 0,
+			-1, 1, 0, 1
+		};
 	}
 
 	// Close the currently opened screen and reopen the last screen opened.
@@ -174,9 +197,8 @@ namespace fab {
 	}
 
 	// Check if a given overlay is present
-	bool FWindow::hasOverlay(Element* target)
-	{
-		return std::ranges::any_of(overlays, [target](uptr<Element>& o) {return o.get() == target; });
+	bool FWindow::hasOverlay(Element* target) {
+		return std::ranges::any_of(overlays, [target](uptr<Element>& o) { return o.get() == target; });
 	}
 
 	// Get the active overlay
@@ -188,14 +210,14 @@ namespace fab {
 	}
 
 	// Add an overlay to the top of the screen. The screen manager will take ownership of this overlay.
-	template<c_ext<FWindow::Element> T> T& FWindow::openOverlay(uptr<T>&& target) {
+	template <c_ext<FWindow::Element> T> T& FWindow::openOverlay(uptr<T>&& target) {
 		T& ret = *target;
 		overlays.push_back(std::move(target));
 		return ret;
 	}
 
 	// Add a screen to the history of opened screens and open that screen. The screen manager will take ownership of this screen. Also dispose all overlays and tooltips.
-	template<c_ext<FWindow::Element> T> T& FWindow::openScreen(uptr<T>&& screen) {
+	template <c_ext<FWindow::Element> T> T& FWindow::openScreen(uptr<T>&& screen) {
 		T& ret = *screen;
 		screens.push_back(std::move(screen));
 		screens.back()->open();
@@ -208,7 +230,7 @@ namespace fab {
 	}
 
 	// Close the current screen and switch the specified screen. Also dispose all overlays
-	template<c_ext<FWindow::Element> T> T& FWindow::swapScreen(uptr<T>&& screen) {
+	template <c_ext<FWindow::Element> T> T& FWindow::swapScreen(uptr<T>&& screen) {
 		T& ret = *screen;
 		// Place the screen to be swapped to right behind the last screen and then queue a dispose, ensuring proper disposal of screens. This also handles opening of the next screen
 		if (screens.size() >= 2) {
@@ -244,6 +266,7 @@ namespace fab {
 	void FWindow::refreshSize(int winW, int winH) {
 		this->winH = winH;
 		this->winW = winW;
+		projection = makeProjection(winW, winH);
 		sdl::windowSetSize(window, winW, winH);
 		for (const uptr<FWindow::Element>& screen : screens) {
 			screen->refreshDimensions();
@@ -264,13 +287,15 @@ namespace fab {
 					.texture = swapchain,
 					.mip_level = 0,
 					.layer_or_depth_plane = 0,
-					.clear_color = { 0.0f, 0.0f, 0.0f, 1.0f },
+					.clear_color = {0.0f, 0.0f, 0.0f, 1.0f},
 					.load_op = sdl::GPULoadOp::SDL_GPU_LOADOP_CLEAR,
 					.store_op = sdl::GPUStoreOp::SDL_GPU_STOREOP_STORE
 				};
 
 				sdl::GPURenderPass* r = sdl::gpuBeginRenderPass(cd, &colorAttachmentInfo, 1, nullptr);
-				sdl::SDLBatchRenderPass rp = sdl::SDLBatchRenderPass(cd, r);
+				BatchRenderPass rp = BatchRenderPass(cd, r);
+				rp.pushVertexUniform(&projection, sizeof(sdl::Matrix4x4));
+				rp.reset();
 				// Render screen elements
 				// TODO pass in z index
 				if (!screens.empty()) {
@@ -283,11 +308,11 @@ namespace fab {
 					tipBatch->render(rp);
 				}
 				tipBatch = nullptr;
+				rp.draw();
 			}
 
 			sdl::gpuSubmit(cd);
 		}
-
 	}
 
 	// Update the last opened overlay if it exists, otherwise update the last opened screen

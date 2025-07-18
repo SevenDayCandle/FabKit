@@ -7,7 +7,7 @@ import fab.GenericTip;
 import fab.IDrawable;
 import fab.TextDrawable;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import std;
 
 namespace fab {
@@ -27,7 +27,7 @@ namespace fab {
 
 		virtual void open() override;
 		virtual void refreshDimensions() override;
-		virtual void render(sdl::SDLBatchRenderPass& rp) override;
+		virtual void render(BatchRenderPass& rp) override;
 	protected:
 		float h;
 		float w;
@@ -55,11 +55,11 @@ namespace fab {
 		updateBounds();
 	}
 
-	void Tooltip::render(sdl::SDLBatchRenderPass& rp)
+	void Tooltip::render(BatchRenderPass& rp)
 	{
 		float off = win.renderScale(PADDING);
-		background.draw(rp, x, y, w, h, win.getW(), win.getH());
-		text.drawFull(rp, x + off, y + off, win.getW(), win.getH());
+		background.draw(rp, x, y, w, h);
+		text.drawFull(rp, x + off, y + off);
 	}
 
 	// Stretch the box background to fit the words in the tooltip

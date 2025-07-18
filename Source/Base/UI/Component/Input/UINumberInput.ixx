@@ -10,7 +10,7 @@ import fab.TextDrawable;
 import fab.UIButton;
 import fab.UIInteractable;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -38,7 +38,7 @@ namespace fab {
 		virtual UINumberInput& setValue(int num);
 		virtual void onSizeUpdated() override;
 		virtual void refreshDimensions() override;
-		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
+		virtual void renderImpl(BatchRenderPass& rp) override;
 		virtual void updateImpl() override;
 	protected:
 		int limMax = std::numeric_limits<int>::max();
@@ -96,12 +96,12 @@ namespace fab {
 		buffer.reload();
 	}
 
-	void UINumberInput::renderImpl(sdl::SDLBatchRenderPass& rp)
+	void UINumberInput::renderImpl(BatchRenderPass& rp)
 	{
 		UIInteractable::renderImpl(rp);
-		buffer.drawFull(rp, hb->x + win.renderScale(24), hb->y + hb->h * 0.25f, win.getW(), win.getH());
-		arrow.draw(rp, lessRect, win.getW(), win.getH());
-		arrow.draw(rp, moreRect, win.getW(), win.getH(), 1, -1);
+		buffer.drawFull(rp, hb->x + win.renderScale(24), hb->y + hb->h * 0.25f);
+		arrow.draw(rp, lessRect);
+		arrow.draw(rp, moreRect, 1, -1);
 		if (sdl::runner::keyboardInputActive(this)) {
 			renderCaret(rp);
 		}

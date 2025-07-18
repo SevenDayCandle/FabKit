@@ -6,7 +6,7 @@ import fab.Hitbox;
 import fab.IDrawable;
 import fab.UIScrollbar;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
+import fab.BatchRenderPass; 
 import sdl.SDLRunner;
 
 namespace fab {

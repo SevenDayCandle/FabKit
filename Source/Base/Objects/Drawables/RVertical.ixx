@@ -1,46 +1,48 @@
 export module fab.RVertical;
 
 import fab.FTexture;
+import fab.FTextureBlock;
 import fab.FUtil;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 
 /* An image whose vertical borders can be stretched indefinitely */
 namespace fab {
 	export class RVertical : public FTexture {
 	public:
-		RVertical(strv path) : FTexture(path) {}
+		RVertical(FTextureBlock& source, strv path) : FTexture(source, path) {}
 		RVertical(const RVertical&) = delete;
 
-		inline void draw(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) override {
-			drawPatches(rp, (x + 0.5f * w) / winW, (y + 0.5f * h) / winH, w, h, winW, winH, scX, scY, rotZ, tint, pipeline);
-		}
-		inline void drawCentered(sdl::SDLBatchRenderPass& rp, float x, float y, float w, float h, float winW, float winH, float scX, float scY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) override {
-			drawPatches(rp, x / winW, y / winH, w, h, winW, winH, scX, scY, rotZ, tint, pipeline);
-		}
-	private:
-		void drawPatches(sdl::SDLBatchRenderPass& rp, float centerX, float centerY, float w, float h, float winW, float winH, float scX, float scY, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL);
+		void drawCentered(BatchRenderPass& rp, float tX, float tY, float w, float h, float scX, float scY, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline) override;
 	};
 
-	void RVertical::drawPatches(sdl::SDLBatchRenderPass& rp, float centerX, float centerY, float w, float h, float winW, float winH, float scX, float scY, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline) {
-		const float sX = scX * w / winW;
-		const float cornerSY = scY * texH / (2 * winH);
-		const float edgeSY = scY * (h - texH) / winH;
-
+	void RVertical::drawCentered(BatchRenderPass& rp, float tX, float tY, float w, float h, float scX, float scY, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline) {
+		const float sX = scX * w;
+		const float cornerSY = scY * getHeight() / 2;
+		const float edgeSY = scY * (h - getHeight());
 		const float distY = (edgeSY + cornerSY) / 2;
 
 		rp.bindPipeline(sdl::runner::pipelineForMode(pipeline));
-		rp.bindBufferVertex(sdl::runner::BUFFER_VERTEX_VERTICAL);
-		rp.bindBufferIndex(sdl::runner::BUFFER_INDEX);
-		rp.bindTexture(texture, sdl::runner::SAMPLER);
-		rp.pushFragmentUniform(tint, sizeof(sdl::Color));
+		rp.bindTexture(source, sdl::runner::SAMPLER);
 
-		rp.setupVertexUniform(centerX, centerY - distY, sX, cornerSY, rotZ); // Top
-		rp.drawIndexedPrimitives(0);
-		rp.setupVertexUniform(centerX, centerY, sX, edgeSY, rotZ); // Center
-		rp.drawIndexedPrimitives(4);
-		rp.setupVertexUniform(centerX, centerY + distY, sX, cornerSY, rotZ); // Bottom
-		rp.drawIndexedPrimitives(8);
+		rp.pushVertexData({
+			.texInd = index,
+			.coord = BatchRenderPass::makeCoord(0, 0, 1, 0.5),
+			.color = *tint,
+			.transform = BatchRenderPass::makeTransform(tX, tY - distY, sX, cornerSY, rotZ)
+		}); // Top
+		rp.pushVertexData({
+			.texInd = index,
+			.coord = BatchRenderPass::makeCoord(0, 0.5, 1, 0),
+			.color = *tint,
+			.transform = BatchRenderPass::makeTransform(tX, tY, sX, edgeSY, rotZ)
+		}); // Center
+		rp.pushVertexData({
+			.texInd = index,
+			.coord = BatchRenderPass::makeCoord(0, 0.5, 1, 0.5),
+			.color = *tint,
+			.transform = BatchRenderPass::makeTransform(tX, tY + distY, sX, cornerSY, rotZ)
+		}); // Bottom
 	}
 }

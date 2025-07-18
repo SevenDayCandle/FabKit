@@ -8,7 +8,7 @@ import fab.UIImage;
 import fab.VFX;
 import sdl.HSVTuple;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -24,7 +24,7 @@ namespace fab {
 
 		UIImage& image;
 
-		inline virtual void render(sdl::SDLBatchRenderPass& rp) override {}
+		inline virtual void render(BatchRenderPass& rp) override {}
 
 		virtual void dispose() override;
 		virtual bool tickUpdate() override;

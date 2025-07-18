@@ -7,7 +7,7 @@ import fab.Hitbox;
 import fab.Hoverable;
 import fab.TextDrawable;
 import sdl.SDLBase;
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import std;
 
 /* Decorator around a Hoverable to give it a title */
@@ -43,8 +43,8 @@ namespace fab {
 		UITitle<T>& setPos(float xOff, float yOff);
 		virtual void onSizeUpdated();
 		virtual void refreshDimensions() override;
-		virtual void render(sdl::SDLBatchRenderPass& rp) override;
-		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
+		virtual void render(BatchRenderPass& rp) override;
+		virtual void renderImpl(BatchRenderPass& rp) override;
 
 		inline static uptr<UITitle<T>> make(T&& item, TextDrawable&& text) { 
 			return make_unique<UITitle<T>>(forward<T>(item), move(text));
@@ -80,17 +80,17 @@ namespace fab {
 		onSizeUpdated();
 	}
 
-	template<c_ext<Hoverable> T> void UITitle<T>::render(sdl::SDLBatchRenderPass& rp) {
+	template<c_ext<Hoverable> T> void UITitle<T>::render(BatchRenderPass& rp) {
 		ui.render(rp);
 		if (ui.enabled) {
 			Hitbox& h = *ui.getHb();
-			text.drawFull(rp, h.x + posX, h.y + posY, win.getW(), win.getH());
+			text.drawFull(rp, h.x + posX, h.y + posY);
 		}
 	}
 
-	template<c_ext<Hoverable> T> void UITitle<T>::renderImpl(sdl::SDLBatchRenderPass& rp) {
+	template<c_ext<Hoverable> T> void UITitle<T>::renderImpl(BatchRenderPass& rp) {
 		ui.renderImpl(rp);
 		Hitbox& h = *ui.getHb();
-		text.drawFull(rp, h.x + posX, h.y + posY, win.getW(), win.getH());
+		text.drawFull(rp, h.x + posX, h.y + posY);
 	}
 }

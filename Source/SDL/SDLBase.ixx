@@ -23,6 +23,7 @@ namespace sdl {
 	export using Font = ::TTF_Font;
 	export using Gamepad = ::SDL_Gamepad;
 	export using GamepadButton = ::SDL_GamepadButton;
+	export using GPUAtlasDrawSequence = ::TTF_GPUAtlasDrawSequence;
 	export using GPUBlendFactor = ::SDL_GPUBlendFactor;
 	export using GPUBlendOp = ::SDL_GPUBlendOp;
 	export using GPUBuffer = ::SDL_GPUBuffer;
@@ -105,10 +106,12 @@ namespace sdl {
 	export using Scancode = ::SDL_Scancode;
 	export using ShadercrossComputeMetadata = ::SDL_ShaderCross_ComputePipelineMetadata;
 	export using ShadercrossGraphicsMetadata = ::SDL_ShaderCross_GraphicsShaderMetadata;
+	export using ShadercrossHLSLInfo = ::SDL_ShaderCross_HLSL_Info;
 	export using ShadercrossShaderStage = ::SDL_ShaderCross_ShaderStage;
 	export using ShadercrossSPIRVInfo = ::SDL_ShaderCross_SPIRV_Info;
 	export using Sound = ::Mix_Chunk;
 	export using Surface = ::SDL_Surface;
+	export using Text = ::TTF_Text;
 	export using Window = ::SDL_Window;
 	export using ::Sint32;
 	export using ::Sint64;
@@ -131,9 +134,18 @@ namespace sdl {
 		float m41, m42, m43, m44;
 	};
 
-	export struct TexPos {
-		float x, y, z;
-		float u, v;
+	export struct TexCoord {
+		float x1, x2;
+		float y1, y2;
+		float w1, w2;
+		float h1, h2;
+	};
+
+	export struct TexProps {
+		int texInd;
+		TexCoord coord;
+		Color color;
+		Matrix4x4 transform;
 	};
 
 	/* Color constants. RGB can be higher than 1 to make the image brighter */
@@ -226,7 +238,8 @@ namespace sdl {
 	export inline SDL_GPUCommandBuffer* gpuAcquireCommandBuffer(SDL_GPUDevice* device) { return SDL_AcquireGPUCommandBuffer(device); }
 	export inline SDL_GPUComputePass* gpuBeginComputePass(SDL_GPUCommandBuffer* commandBuffer, SDL_GPUStorageTextureReadWriteBinding* storageTextureBindings, Uint32 storageTextureBindingCount, SDL_GPUStorageBufferReadWriteBinding* storageBufferBindings, Uint32 storageBufferBindingCount) { return SDL_BeginGPUComputePass(commandBuffer, storageTextureBindings, storageTextureBindingCount, storageBufferBindings, storageBufferBindingCount); }
 	export inline SDL_GPUComputePipeline* gpuCreateComputePipeline(SDL_GPUDevice* device, SDL_GPUComputePipelineCreateInfo* computePipelineCreateInfo) { return SDL_CreateGPUComputePipeline(device, computePipelineCreateInfo); }
-	export inline SDL_GPUComputePipeline* gpuCompileSpirvCompute(SDL_GPUDevice* device, const SDL_ShaderCross_SPIRV_Info* info, SDL_ShaderCross_ComputePipelineMetadata* metadata) { return SDL_ShaderCross_CompileComputePipelineFromSPIRV(device, info, metadata); }
+	export inline SDL_GPUComputePipeline* gpuCompileHLSLCompute(SDL_GPUDevice* device, const SDL_ShaderCross_HLSL_Info* info, SDL_ShaderCross_ComputePipelineMetadata* metadata) { return SDL_ShaderCross_CompileComputePipelineFromHLSL(device, info, metadata); }
+	export inline SDL_GPUComputePipeline* gpuCompileSPIRVCompute(SDL_GPUDevice* device, const SDL_ShaderCross_SPIRV_Info* info, SDL_ShaderCross_ComputePipelineMetadata* metadata) { return SDL_ShaderCross_CompileComputePipelineFromSPIRV(device, info, metadata); }
 	export inline SDL_GPUCopyPass* gpuBeginCopyPass(SDL_GPUCommandBuffer* commandBuffer) { return SDL_BeginGPUCopyPass(commandBuffer); }
 	export inline SDL_GPUDevice* gpuCreateDevice(SDL_GPUShaderFormat format_flags, bool debug_mode, const char* name) { return SDL_CreateGPUDevice(format_flags, debug_mode, name); }
 	export inline SDL_GPUDevice* gpuCreateDeviceWithProperties(SDL_PropertiesID props) { return SDL_CreateGPUDeviceWithProperties(props); }
@@ -234,9 +247,11 @@ namespace sdl {
 	export inline SDL_GPUGraphicsPipeline* gpuCreateGraphicsPipeline(SDL_GPUDevice* device, SDL_GPUGraphicsPipelineCreateInfo* pipelineCreateInfo) { return SDL_CreateGPUGraphicsPipeline(device, pipelineCreateInfo); }
 	export inline SDL_GPURenderPass* gpuBeginRenderPass(SDL_GPUCommandBuffer* commandBuffer, SDL_GPUColorTargetInfo* colorAttachmentInfos, Uint32 colorAttachmentCount, SDL_GPUDepthStencilTargetInfo* depthStencilAttachmentInfo) { return SDL_BeginGPURenderPass(commandBuffer, colorAttachmentInfos, colorAttachmentCount, depthStencilAttachmentInfo); }
 	export inline SDL_GPUSampler* gpuCreateSampler(SDL_GPUDevice* device, SDL_GPUSamplerCreateInfo* samplerCreateInfo) { return SDL_CreateGPUSampler(device, samplerCreateInfo); }
-	export inline SDL_GPUShader* gpuCompileSpirvShader(SDL_GPUDevice* device, const SDL_ShaderCross_SPIRV_Info* info, SDL_ShaderCross_GraphicsShaderMetadata* metadata) { return SDL_ShaderCross_CompileGraphicsShaderFromSPIRV(device, info, metadata); }
+	export inline SDL_GPUShader* gpuCompileHLSLShader(SDL_GPUDevice* device, const SDL_ShaderCross_HLSL_Info* info, SDL_ShaderCross_GraphicsShaderMetadata* metadata) { return SDL_ShaderCross_CompileGraphicsShaderFromHLSL(device, info, metadata); }
+	export inline SDL_GPUShader* gpuCompileSPIRVShader(SDL_GPUDevice* device, const SDL_ShaderCross_SPIRV_Info* info, SDL_ShaderCross_GraphicsShaderMetadata* metadata) { return SDL_ShaderCross_CompileGraphicsShaderFromSPIRV(device, info, metadata); }
 	export inline SDL_GPUShader* gpuCreateShader(SDL_GPUDevice* device, SDL_GPUShaderCreateInfo* shaderCreateInfo) { return SDL_CreateGPUShader(device, shaderCreateInfo); }
-	export inline SDL_GPUShaderFormat gpuSpirvShaderFormats() { return SDL_ShaderCross_GetSPIRVShaderFormats(); }
+	export inline SDL_GPUShaderFormat gpuGetHLSLShaderFormats() { return SDL_ShaderCross_GetHLSLShaderFormats(); }
+	export inline SDL_GPUShaderFormat gpuGetSPIRVShaderFormats() { return SDL_ShaderCross_GetSPIRVShaderFormats(); }
 	export inline SDL_GPUTexture* gpuAcquireSwapchainTexture(SDL_GPUCommandBuffer* commandBuffer, SDL_Window* window, Uint32* pWidth, Uint32* pHeight) { 
 		SDL_GPUTexture* texture;
 		SDL_AcquireGPUSwapchainTexture(commandBuffer, window, &texture, pWidth, pHeight);
@@ -268,6 +283,7 @@ namespace sdl {
 	export inline void gpuDispatchComputeIndirect(SDL_GPUComputePass* computePass, SDL_GPUBuffer* buffer, Uint32 offsetInBytes) { SDL_DispatchGPUComputeIndirect(computePass, buffer, offsetInBytes); }
 	export inline void gpuDownloadFromBuffer(SDL_GPUCopyPass* copyPass, SDL_GPUBufferRegion* source, SDL_GPUTransferBufferLocation* destination) { SDL_DownloadFromGPUBuffer(copyPass, source, destination); }
 	export inline void gpuDownloadFromTexture(SDL_GPUCopyPass* copyPass, SDL_GPUTextureRegion* source, SDL_GPUTextureTransferInfo* destination) { SDL_DownloadFromGPUTexture(copyPass, source, destination); }
+	export inline void gpuDrawGpuPrimitives(SDL_GPURenderPass* renderPass, Uint32 num_vertices, Uint32 num_instances, Uint32 first_vertex, Uint32 first_instance) { SDL_DrawGPUPrimitives(renderPass, num_vertices, num_instances, first_vertex, first_instance); }
 	export inline void gpuDrawIndexedPrimitives(SDL_GPURenderPass* renderPass, Uint32 num_indices, Uint32 num_instances, Uint32 first_index, Sint32 vertex_offset, Uint32 first_instance) { SDL_DrawGPUIndexedPrimitives(renderPass, num_indices, num_instances, first_index, vertex_offset, first_instance); }
 	export inline void gpuDrawIndexedPrimitivesIndirect(SDL_GPURenderPass* renderPass, SDL_GPUBuffer* buffer, Uint32 offsetInBytes, Uint32 drawCount) { SDL_DrawGPUIndexedPrimitivesIndirect(renderPass, buffer, offsetInBytes, drawCount); }
 	export inline void gpuDrawPrimitives(SDL_GPURenderPass* renderPass, Uint32 num_vertices, Uint32 num_instances, Uint32 first_vertex, Uint32 first_instance) { SDL_DrawGPUPrimitives(renderPass, num_vertices, num_instances, first_vertex, first_instance); }
@@ -336,6 +352,7 @@ namespace sdl {
 	export inline SDL_Surface* surfaceCreate(int width, int height, int depth, Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask) { return SDL_CreateSurface(width, height, SDL_GetPixelFormatForMasks(depth, Rmask, Gmask, Bmask, Amask)); }
 	export inline SDL_Surface* surfaceCreateFrom(void* pixels, int width, int height, int pitch, int depth, Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask) { return SDL_CreateSurfaceFrom(width, height, SDL_GetPixelFormatForMasks(depth, Rmask, Gmask, Bmask, Amask), pixels, pitch); }
 	export inline SDL_Surface* surfaceLoad(const char* file) { return IMG_Load(file); }
+	export inline SDL_Surface* surfaceLoad(std::string_view file) { return IMG_Load(file.data()); }
 	export inline void surfaceDestroy(SDL_Surface* surface) { SDL_DestroySurface(surface); }
 	export inline void surfaceUnlock(SDL_Surface* surface) { SDL_UnlockSurface(surface); }
 
@@ -361,9 +378,12 @@ namespace sdl {
 	}
 
 	/* Text rendering functions */
+	export inline SDL_Surface* textGetGlyph(TTF_Font* font, Uint32 glyph_index, TTF_ImageType* image_type) { return TTF_GetGlyphImageForIndex(font, glyph_index, image_type); }
 	export inline SDL_Surface* textRenderBlended(TTF_Font* font, const char* text, SDL_Color fg, size_t range = 0) { return TTF_RenderText_Blended(font, text, range, fg); }
 	export inline SDL_Surface* textRenderBlendedWrapped(TTF_Font* font, const char* text, SDL_Color fg, Uint32 wrapLength, size_t range = 0) { return TTF_RenderText_Blended_Wrapped(font, text, range, fg, wrapLength); }
 	export inline SDL_Surface* textRenderShaded(TTF_Font* font, const char* text, SDL_Color fg, SDL_Color bg, size_t range = 0) { return TTF_RenderText_Shaded(font, text, range, fg, bg); }
+	export inline TTF_GPUAtlasDrawSequence* textGetSequence(TTF_Text* text) { return TTF_GetGPUTextDrawData(text); }
+	export inline void textDestroy(TTF_Text* text) { TTF_DestroyText(text); }
 
 	/* Window functions */
 	export inline const char* windowGetTitle(Window* window) { return SDL_GetWindowTitle(window); }

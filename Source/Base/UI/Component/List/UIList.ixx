@@ -11,7 +11,7 @@ import fab.UIVerticalScrollbar;
 import fab.FUtil;
 import fab.FWindow;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -105,7 +105,7 @@ namespace fab {
 		UIList& setLabelFunc(func<str(const T&)>&& labelFunc);
 		UIList& setMaxRows(int rows);
 		void refreshDimensions() override;
-		void renderImpl(sdl::SDLBatchRenderPass& rp) override;
+		void renderImpl(BatchRenderPass& rp) override;
 		void updateImpl() override;
 
 		virtual void selectRow(UIEntry<T>& row) = 0;
@@ -243,8 +243,8 @@ namespace fab {
 	}
 
 	// Render all visible rows and the scrollbar if it is shown
-	template <typename T> void UIList<T>::renderImpl(sdl::SDLBatchRenderPass& rp) {
-		background.draw(rp, *hb.get(), win.getW(), win.getH(), 1, 1, 0, &backgroundColor);
+	template <typename T> void UIList<T>::renderImpl(BatchRenderPass& rp) {
+		background.draw(rp, *hb.get(), 1, 1, 0, &backgroundColor);
 		int rowCount = getVisibleRowCount();
 		for (int i = topVisibleRowIndex; i < topVisibleRowIndex + rowCount; ++i) {
 			rows[i]->renderImpl(rp);

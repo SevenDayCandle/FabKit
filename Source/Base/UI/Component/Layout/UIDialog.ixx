@@ -8,7 +8,7 @@ import fab.IDrawable;
 import fab.UICanvas;
 import fab.UIInteractable;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -20,7 +20,7 @@ namespace fab {
 		IDrawable& image;
 
 		virtual bool isHovered() override;
-		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
+		virtual void renderImpl(BatchRenderPass& rp) override;
 		virtual void updateImpl() override;
 	};
 
@@ -29,8 +29,8 @@ namespace fab {
 		return hb->isHovered();
 	}
 
-	void UIDialog::renderImpl(sdl::SDLBatchRenderPass& rp) {
-		image.draw(rp, *hb.get(), win.getW(), win.getH(), 1, 1);
+	void UIDialog::renderImpl(BatchRenderPass& rp) {
+		image.draw(rp, *hb.get(), 1, 1);
 		UICanvas::renderImpl(rp);
 	}
 

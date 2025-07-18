@@ -7,7 +7,7 @@ import fab.IDrawable;
 import fab.Tooltip;
 import fab.UIBase;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
+import fab.BatchRenderPass; 
 import sdl.SDLRunner;
 
 namespace fab {
@@ -30,10 +30,10 @@ namespace fab {
 		inline virtual UIImage& setRotationDeg(const float rotation) { return this->rotation = sdl::rads(rotation), *this; }
 		inline virtual UIImage& setScaleX(const float scaleX) { return this->scaleX = scaleX, *this; }
 		inline virtual UIImage& setScaleY(const float scaleY) { return this->scaleY = scaleY, *this; }
-		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
+		virtual void renderImpl(BatchRenderPass& rp) override;
 	};
 
-	void UIImage::renderImpl(sdl::SDLBatchRenderPass& rp) {
-		image->draw(rp, *hb.get(), win.getW(), win.getH(), scaleX, scaleY, rotation, &color);
+	void UIImage::renderImpl(BatchRenderPass& rp) {
+		image->draw(rp, *hb.get(), scaleX, scaleY, rotation, &color);
 	}
 }

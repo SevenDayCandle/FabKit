@@ -6,7 +6,7 @@ import fab.Hitbox;
 import fab.ScreenSizeHitbox;
 import fab.UICanvas;
 import fab.VFX;
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import std;
 
 namespace fab {
@@ -17,7 +17,7 @@ namespace fab {
 
 		template<c_ext<VFX> T, typename... Args> requires std::constructible_from<T, FWindow&, Args&&...> inline T& addVfxNew(Args&&... args) { return addVfx(create<T>(forward<Args>(args)...)); };
 		template<c_ext<VFX> T> T& addVfx(uptr<T>&& eff);
-		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
+		virtual void renderImpl(BatchRenderPass& rp) override;
 		virtual void updateImpl() override;
 	private:
 		vec<uptr<VFX>> vfx;
@@ -30,7 +30,7 @@ namespace fab {
 		return ref;
 	}
 
-	void UIScreen::renderImpl(sdl::SDLBatchRenderPass& rp)
+	void UIScreen::renderImpl(BatchRenderPass& rp)
 	{
 		UICanvas::renderImpl(rp);
 		for (uptr<VFX>& effect : vfx) {

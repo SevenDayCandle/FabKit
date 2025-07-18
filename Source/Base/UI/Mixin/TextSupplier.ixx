@@ -5,8 +5,8 @@ import fab.FWindow;
 import fab.FUtil;
 import fab.RectDrawable;
 import fab.TextDrawable;
-import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
+import sdl.SDLBase;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import sdl.IKeyInputListener;
 import std;
@@ -15,18 +15,18 @@ namespace fab {
 	export class TextSupplier : public sdl::IKeyInputListener {
 	public:
 		TextSupplier(FWindow& window, FFont& textFont) :
-			fwindow(window), buffer(textFont, "", getLimitWidth()) {}
+			buffer(textFont, "", getLimitWidth()), fwindow(window) {}
+
 		TextSupplier(FWindow& window) :
 			TextSupplier(window, window.props.fontRegular()) {}
 
 		TextSupplier(TextSupplier&& other) noexcept = default;
-		virtual ~TextSupplier() override = default;
+		~TextSupplier() override = default;
 
-		virtual void onKeyPress(int32 c) override;
-		virtual void onTextInput(const char* text) override;
+		void onKeyPress(int32 c) override;
+		void onTextInput(const char* text) override;
 		virtual void releaseBuffer();
 		virtual void start();
-
 	protected:
 		float caretPosX;
 		float caretPosY;
@@ -40,7 +40,7 @@ namespace fab {
 		inline virtual int getLimitWidth() { return 0; }
 
 		void initCaret(float x, float y, float w = 3, float h = 12);
-		void renderCaret(sdl::SDLBatchRenderPass& rp);
+		void renderCaret(BatchRenderPass& rp);
 		void updateCaretPos();
 
 		virtual float getBasePosX() = 0;
@@ -52,8 +52,7 @@ namespace fab {
 	};
 
 	// Resets buffer and releases text input
-	void TextSupplier::releaseBuffer()
-	{
+	void TextSupplier::releaseBuffer() {
 		buffer.set(getSourceText(), sdl::COLOR_WHITE);
 		fwindow.keyboardInputStopRequest(this);
 	}
@@ -65,40 +64,39 @@ namespace fab {
 		updateCaretPos();
 	}
 
-	void TextSupplier::onKeyPress(int32 c)
-	{
+	void TextSupplier::onKeyPress(int32 c) {
 		switch (c) {
-			// Moves the caret to the end
+		// Moves the caret to the end
 		case sdl::KEY_DOWN:
 			bufferPos = buffer.getTextLen();
 			updateCaretPos();
 			return;
-			// clears the buffer and releases text input
+		// clears the buffer and releases text input
 		case sdl::KEY_ENTER:
 		case sdl::KEY_ESC:
 		case sdl::KEY_RETURN:
 			releaseBuffer();
 			return;
-			// Moves the buffer back one position
+		// Moves the buffer back one position
 		case sdl::KEY_LEFT:
 			if (bufferPos > 0) {
 				bufferPos -= 1;
 				updateCaretPos();
 			}
 			return;
-			// Moves the buffer forward one position
+		// Moves the buffer forward one position
 		case sdl::KEY_RIGHT:
 			if (bufferPos < buffer.getTextLen()) {
 				bufferPos += 1;
 				updateCaretPos();
 			}
 			return;
-			// Moves the caret to the top
+		// Moves the caret to the top
 		case sdl::KEY_UP:
 			bufferPos = 0;
 			updateCaretPos();
 			return;
-			// Backspace removes the last element from the buffer
+		// Backspace removes the last element from the buffer
 		case sdl::KEY_BACKSPACE:
 			if (bufferPos <= buffer.getTextLen() && bufferPos > 0) {
 				buffer.textErase(bufferPos - 1, 1);
@@ -120,8 +118,7 @@ namespace fab {
 		}
 	}
 
-	void TextSupplier::initCaret(float x, float y, float w, float h)
-	{
+	void TextSupplier::initCaret(float x, float y, float w, float h) {
 		caretPosX = x;
 		caretPosY = y;
 		caretSizeX = w;
@@ -129,13 +126,13 @@ namespace fab {
 	}
 
 	// Renders the caret with a smooth fading "animation"
-	void TextSupplier::renderCaret(sdl::SDLBatchRenderPass& rp) {
+	void TextSupplier::renderCaret(BatchRenderPass& rp) {
 		caretColor.a = 0.5f + 0.5f * std::sin(sdl::runner::timeTotal() / 100000000.0f);
-		caret.draw(rp, caretPosX, caretPosY, caretSizeX, caretSizeY, fwindow.getW(), fwindow.getH(), 1, 1, 0, &caretColor);
+		caret.draw(rp, caretPosX, caretPosY, caretSizeX, caretSizeY, 1, 1, 0, &caretColor);
 	}
 
 	void TextSupplier::updateCaretPos() {
-		caretPosX = getBasePosX() + fwindow.renderScale(9) + buffer.getFont().measureW(buffer.getText().substr(0, bufferPos));
+		caretPosX = getBasePosX() + fwindow.renderScale(9) + buffer.getFont()->measureW(buffer.getText().substr(0, bufferPos));
 		caretPosY = getBasePosY();
 	}
 }

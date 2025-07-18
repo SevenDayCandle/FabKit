@@ -1469,7 +1469,7 @@ typedef struct SDL_GPUTextureRegion
  */
 typedef struct SDL_GPUBlitRegion
 {
-    SDL_GPUTexture *texture;  /**< The texture. */
+    SDL_GPUTexture *texture;      /**< The texture. */
     Uint32 mip_level;             /**< The mip level index of the region. */
     Uint32 layer_or_depth_plane;  /**< The layer index or depth plane of the region. This value is treated as a layer index on 2D array and cube textures, and as a depth plane on 3D textures. */
     Uint32 x;                     /**< The left offset of the region. */
@@ -1598,8 +1598,8 @@ typedef struct SDL_GPUSamplerCreateInfo
     SDL_GPUCompareOp compare_op;               /**< The comparison operator to apply to fetched data before filtering. */
     float min_lod;                             /**< Clamps the minimum of the computed LOD value. */
     float max_lod;                             /**< Clamps the maximum of the computed LOD value. */
-    bool enable_anisotropy;                /**< true to enable anisotropic filtering. */
-    bool enable_compare;                   /**< true to enable comparison against a reference value during lookups. */
+    bool enable_anisotropy;                    /**< true to enable anisotropic filtering. */
+    bool enable_compare;                       /**< true to enable comparison against a reference value during lookups. */
     Uint8 padding1;
     Uint8 padding2;
 
@@ -1704,8 +1704,8 @@ typedef struct SDL_GPUColorTargetBlendState
     SDL_GPUBlendFactor dst_alpha_blendfactor;     /**< The value to be multiplied by the destination alpha. */
     SDL_GPUBlendOp alpha_blend_op;                /**< The blend operation for the alpha component. */
     SDL_GPUColorComponentFlags color_write_mask;  /**< A bitmask specifying which of the RGBA components are enabled for writing. Writes to all channels if enable_color_write_mask is false. */
-    bool enable_blend;                        /**< Whether blending is enabled for the color target. */
-    bool enable_color_write_mask;             /**< Whether the color write mask is enabled. */
+    bool enable_blend;                            /**< Whether blending is enabled for the color target. */
+    bool enable_color_write_mask;                 /**< Whether the color write mask is enabled. */
     Uint8 padding1;
     Uint8 padding2;
 } SDL_GPUColorTargetBlendState;
@@ -1717,6 +1717,8 @@ typedef struct SDL_GPUColorTargetBlendState
  * \since This struct is available since SDL 3.2.0.
  *
  * \sa SDL_CreateGPUShader
+ * \sa SDL_GPUShaderFormat
+ * \sa SDL_GPUShaderStage
  */
 typedef struct SDL_GPUShaderCreateInfo
 {
@@ -1822,8 +1824,8 @@ typedef struct SDL_GPURasterizerState
     float depth_bias_constant_factor;  /**< A scalar factor controlling the depth value added to each fragment. */
     float depth_bias_clamp;            /**< The maximum depth bias of a fragment. */
     float depth_bias_slope_factor;     /**< A scalar factor applied to a fragment's slope in depth calculations. */
-    bool enable_depth_bias;        /**< true to bias fragment depth values. */
-    bool enable_depth_clip;        /**< true to enable depth clip, false to enable depth clamp. */
+    bool enable_depth_bias;            /**< true to bias fragment depth values. */
+    bool enable_depth_clip;            /**< true to enable depth clip, false to enable depth clamp. */
     Uint8 padding1;
     Uint8 padding2;
 } SDL_GPURasterizerState;
@@ -1840,7 +1842,7 @@ typedef struct SDL_GPUMultisampleState
 {
     SDL_GPUSampleCount sample_count;  /**< The number of samples to be used in rasterization. */
     Uint32 sample_mask;               /**< Reserved for future use. Must be set to 0. */
-    bool enable_mask;             /**< Reserved for future use. Must be set to false. */
+    bool enable_mask;                 /**< Reserved for future use. Must be set to false. */
     bool enable_alpha_to_coverage;    /**< true enables the alpha-to-coverage feature. */
     Uint8 padding2;
     Uint8 padding3;
@@ -1861,9 +1863,9 @@ typedef struct SDL_GPUDepthStencilState
     SDL_GPUStencilOpState front_stencil_state;  /**< The stencil op state for front-facing triangles. */
     Uint8 compare_mask;                         /**< Selects the bits of the stencil values participating in the stencil test. */
     Uint8 write_mask;                           /**< Selects the bits of the stencil values updated by the stencil test. */
-    bool enable_depth_test;                 /**< true enables the depth test. */
-    bool enable_depth_write;                /**< true enables depth writes. Depth writes are always disabled when enable_depth_test is false. */
-    bool enable_stencil_test;               /**< true enables the stencil test. */
+    bool enable_depth_test;                     /**< true enables the depth test. */
+    bool enable_depth_write;                    /**< true enables depth writes. Depth writes are always disabled when enable_depth_test is false. */
+    bool enable_stencil_test;                   /**< true enables the stencil test. */
     Uint8 padding1;
     Uint8 padding2;
     Uint8 padding3;
@@ -1898,7 +1900,7 @@ typedef struct SDL_GPUGraphicsPipelineTargetInfo
     const SDL_GPUColorTargetDescription *color_target_descriptions;  /**< A pointer to an array of color target descriptions. */
     Uint32 num_color_targets;                                        /**< The number of color target descriptions in the above array. */
     SDL_GPUTextureFormat depth_stencil_format;                       /**< The pixel format of the depth-stencil target. Ignored if has_depth_stencil_target is false. */
-    bool has_depth_stencil_target;                               /**< true specifies that the pipeline uses a depth-stencil target. */
+    bool has_depth_stencil_target;                                   /**< true specifies that the pipeline uses a depth-stencil target. */
     Uint8 padding1;
     Uint8 padding2;
     Uint8 padding3;
@@ -2005,8 +2007,8 @@ typedef struct SDL_GPUColorTargetInfo
     SDL_GPUTexture *resolve_texture; /**< The texture that will receive the results of a multisample resolve operation. Ignored if a RESOLVE* store_op is not used. */
     Uint32 resolve_mip_level;        /**< The mip level of the resolve texture to use for the resolve operation. Ignored if a RESOLVE* store_op is not used. */
     Uint32 resolve_layer;            /**< The layer index of the resolve texture to use for the resolve operation. Ignored if a RESOLVE* store_op is not used. */
-    bool cycle;                  /**< true cycles the texture if the texture is bound and load_op is not LOAD */
-    bool cycle_resolve_texture;  /**< true cycles the resolve texture if the resolve texture is bound. Ignored if a RESOLVE* store_op is not used. */
+    bool cycle;                      /**< true cycles the texture if the texture is bound and load_op is not LOAD */
+    bool cycle_resolve_texture;      /**< true cycles the resolve texture if the resolve texture is bound. Ignored if a RESOLVE* store_op is not used. */
     Uint8 padding1;
     Uint8 padding2;
 } SDL_GPUColorTargetInfo;
@@ -2063,7 +2065,7 @@ typedef struct SDL_GPUDepthStencilTargetInfo
     SDL_GPUStoreOp store_op;               /**< What is done with the depth results of the render pass. */
     SDL_GPULoadOp stencil_load_op;         /**< What is done with the stencil contents at the beginning of the render pass. */
     SDL_GPUStoreOp stencil_store_op;       /**< What is done with the stencil results of the render pass. */
-    bool cycle;                        /**< true cycles the texture if the texture is bound and any load ops are not LOAD */
+    bool cycle;                            /**< true cycles the texture if the texture is bound and any load ops are not LOAD */
     Uint8 clear_stencil;                   /**< The value to clear the stencil component to at the beginning of the render pass. Ignored if SDL_GPU_LOADOP_CLEAR is not used. */
     Uint8 padding1;
     Uint8 padding2;
@@ -2083,7 +2085,7 @@ typedef struct SDL_GPUBlitInfo {
     SDL_FColor clear_color;         /**< The color to clear the destination region to before the blit. Ignored if load_op is not SDL_GPU_LOADOP_CLEAR. */
     SDL_FlipMode flip_mode;         /**< The flip mode for the source region. */
     SDL_GPUFilter filter;           /**< The filter mode used when blitting. */
-    bool cycle;                 /**< true cycles the destination texture if it is already bound. */
+    bool cycle;                     /**< true cycles the destination texture if it is already bound. */
     Uint8 padding1;
     Uint8 padding2;
     Uint8 padding3;
@@ -2256,21 +2258,21 @@ extern SDL_DECLSPEC SDL_GPUDevice * SDLCALL SDL_CreateGPUDevice(
  *
  * With the Vulkan renderer:
  *
- * - `SDL_PROP_GPU_DEVICE_CREATE_VULKAN_SHADERCLIPDISTANCE_BOOL`: Enable
+ * - `SDL_PROP_GPU_DEVICE_CREATE_VULKAN_SHADERCLIPDISTANCE_BOOLEAN`: Enable
  *   device feature shaderClipDistance. If disabled, clip distances are not
  *   supported in shader code: gl_ClipDistance[] built-ins of GLSL,
  *   SV_ClipDistance0/1 semantics of HLSL and [[clip_distance]] attribute of
  *   Metal. Defaults to true.
- * - `SDL_PROP_GPU_DEVICE_CREATE_VULKAN_DEPTHCLAMP_BOOL`: Enable device
+ * - `SDL_PROP_GPU_DEVICE_CREATE_VULKAN_DEPTHCLAMP_BOOLEAN`: Enable device
  *   feature depthClamp. If disabled, there is no depth clamp support and
  *   enable_depth_clip in SDL_GPURasterizerState must always be set to true.
  *   Defaults to true.
- * - `SDL_PROP_GPU_DEVICE_CREATE_VULKAN_DRAWINDIRECTFIRST_BOOL`: Enable device
- *   feature drawIndirectFirstInstance. If disabled, the argument
+ * - `SDL_PROP_GPU_DEVICE_CREATE_VULKAN_DRAWINDIRECTFIRST_BOOLEAN`: Enable
+ *   device feature drawIndirectFirstInstance. If disabled, the argument
  *   first_instance of SDL_GPUIndirectDrawCommand must be set to zero.
  *   Defaults to true.
- * - `SDL_PROP_GPU_DEVICE_CREATE_VULKAN_SAMPLERANISOTROPY_BOOL`: Enable device
- *   feature samplerAnisotropy. If disabled, enable_anisotropy of
+ * - `SDL_PROP_GPU_DEVICE_CREATE_VULKAN_SAMPLERANISOTROPY_BOOLEAN`: Enable
+ *   device feature samplerAnisotropy. If disabled, enable_anisotropy of
  *   SDL_GPUSamplerCreateInfo must be set to false. Defaults to true.
  *
  * \param props the properties to use.

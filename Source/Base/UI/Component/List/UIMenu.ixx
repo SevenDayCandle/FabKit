@@ -10,7 +10,7 @@ import fab.RelativeHitbox;
 import fab.UIEntry;
 import fab.UIList;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
+import fab.BatchRenderPass; 
 import sdl.SDLRunner;
 import std;
 

@@ -7,9 +7,9 @@ import fab.FWindow;
 namespace fab {
 	constexpr float BASE_DENOMINATOR = 2160;
 
-	export class BasicWindowProps : public FWindow::IProps {
+	export class BasicWindowProps : public FWindow::IController {
 	public:
-		BasicWindowProps(const char* title, FFont& font, int resX, int resY): IProps(), title(title), font(font), resX(resX), resY(resY), scale(resY / BASE_DENOMINATOR) {}
+		BasicWindowProps(const char* title, FFont& font, int resX, int resY): IController(), title(title), font(font), resX(resX), resY(resY), scale(resY / BASE_DENOMINATOR) {}
 
 		const char* title;
 		FFont& font;

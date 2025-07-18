@@ -14,7 +14,7 @@ import fab.UIInteractable;
 import fab.UISelectorList;
 import fab.UIInteractable;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
+import fab.BatchRenderPass; 
 import sdl.SDLRunner;
 import std;
 
@@ -84,7 +84,7 @@ namespace fab {
 		virtual void onSizeUpdated() override;
 		virtual void openPopup();
 		virtual void refreshDimensions() override;
-		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
+		virtual void renderImpl(BatchRenderPass& rp) override;
 		virtual void updateImpl() override;
 		virtual void unsetProxy();
 
@@ -126,7 +126,7 @@ namespace fab {
 		UIDropdown<T>& dropdown;
 
 		void dispose() override;
-		void render(sdl::SDLBatchRenderPass& rp) override;
+		void render(BatchRenderPass& rp) override;
 		void update() override;
 	};
 
@@ -171,15 +171,15 @@ namespace fab {
 		}
 	}
 
-	template<typename T> void UIDropdown<T>::renderImpl(sdl::SDLBatchRenderPass& rp) {
+	template<typename T> void UIDropdown<T>::renderImpl(BatchRenderPass& rp) {
 		UIInteractable::renderImpl(rp);
 		if (this->selectedSize() > 0 && this->canClear()) {
-			clear.draw(rp, arrowRect, win.getW(), win.getH(), scaleX, scaleY, rotation, &this->UIImage::color);
+			clear.draw(rp, arrowRect, scaleX, scaleY, rotation, &this->UIImage::color);
 		}
 		else {
-			arrow.draw(rp, arrowRect, win.getW(), win.getH(), scaleX, menu->isOpen() ? -scaleY : scaleY, rotation, &this->UIImage::color);
+			arrow.draw(rp, arrowRect, scaleX, menu->isOpen() ? -scaleY : scaleY, rotation, &this->UIImage::color);
 		}
-		text.drawFull(rp, hb->x + win.renderScale(24), hb->y + hb->h * 0.25f, win.getW(), win.getH());
+		text.drawFull(rp, hb->x + win.renderScale(24), hb->y + hb->h * 0.25f);
 	}
 
 	template<typename T> void UIDropdown<T>::updateImpl() {
@@ -323,7 +323,7 @@ namespace fab {
 	// When closed, unlink this from its menu
 	template <typename T> void UIDropdownProxy<T>::dispose() { dropdown.unsetProxy(); }
 
-	template<typename T> void UIDropdownProxy<T>::render(sdl::SDLBatchRenderPass& rp) {
+	template<typename T> void UIDropdownProxy<T>::render(BatchRenderPass& rp) {
 		dropdown.menu->renderImpl(rp);
 	}
 

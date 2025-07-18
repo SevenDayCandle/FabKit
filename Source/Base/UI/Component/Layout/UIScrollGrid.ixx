@@ -7,7 +7,7 @@ import fab.UIGrid;
 import fab.UIVerticalScrollbar;
 import fab.FUtil;
 import fab.ScaleHitbox;
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import std;
 
 namespace fab {
@@ -22,7 +22,7 @@ namespace fab {
 
 		virtual bool isHovered() override;
 		virtual void refreshDimensions() override;
-		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
+		virtual void renderImpl(BatchRenderPass& rp) override;
 		virtual void updateImpl() override;
 	protected:
 		float scrollSpeed = 1;
@@ -40,7 +40,7 @@ namespace fab {
 		scrollbar.refreshDimensions();
 	}
 
-	template<c_ext<UIBase> T> void UIScrollGrid<T>::renderImpl(sdl::SDLBatchRenderPass& rp) {
+	template<c_ext<UIBase> T> void UIScrollGrid<T>::renderImpl(BatchRenderPass& rp) {
 		UIGrid<T>::renderImpl(rp);
 		scrollbar.render(rp);
 	}

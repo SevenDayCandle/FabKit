@@ -7,7 +7,7 @@ import fab.RelativeHitbox;
 import fab.UIHorizontalScrollbar;
 import fab.UINumberInput;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -37,7 +37,7 @@ namespace fab {
 		virtual UISlider& setValue(int num) override;
 		virtual void onSizeUpdated() override;
 		virtual void refreshDimensions() override;
-		virtual void renderImpl(sdl::SDLBatchRenderPass& rp) override;
+		virtual void renderImpl(BatchRenderPass& rp) override;
 		virtual void updateImpl() override;
 	protected:
 		UIHorizontalScrollbar scrollbar;
@@ -59,7 +59,7 @@ namespace fab {
 		scrollbar.refreshDimensions();
 	}
 
-	void UISlider::renderImpl(sdl::SDLBatchRenderPass& rp)
+	void UISlider::renderImpl(BatchRenderPass& rp)
 	{
 		UINumberInput::renderImpl(rp);
 		scrollbar.renderImpl(rp);

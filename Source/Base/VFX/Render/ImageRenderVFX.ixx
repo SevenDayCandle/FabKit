@@ -7,7 +7,7 @@ import fab.UIImage;
 import fab.UITransformVFX;
 import fab.VFX;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -19,10 +19,10 @@ namespace fab {
 
 		uptr<UIImage> image;
 
-		virtual void render(sdl::SDLBatchRenderPass& rp) override;
+		virtual void render(BatchRenderPass& rp) override;
 	};
 
-	void ImageRenderVFX::render(sdl::SDLBatchRenderPass& rp) {
+	void ImageRenderVFX::render(BatchRenderPass& rp) {
 		image->render(rp);
 	}
 }

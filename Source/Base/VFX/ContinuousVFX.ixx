@@ -5,7 +5,7 @@ import fab.FUtil;
 import fab.FWindow;
 import fab.VFX;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;
 

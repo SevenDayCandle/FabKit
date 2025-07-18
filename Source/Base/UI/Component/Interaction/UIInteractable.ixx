@@ -7,7 +7,7 @@ import fab.Hitbox;
 import fab.IDrawable;
 import fab.UIImage;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;
 

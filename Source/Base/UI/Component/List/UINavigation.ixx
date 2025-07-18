@@ -11,7 +11,7 @@ import fab.UIEntry;
 import fab.UIBase;
 import fab.UIList;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass; 
+import fab.BatchRenderPass; 
 import sdl.SDLRunner;
 import std;
 
@@ -31,7 +31,7 @@ namespace fab {
 
 		virtual bool isHovered() override;
 		void refreshDimensions() override;
-		void renderImpl(sdl::SDLBatchRenderPass& rp) override;
+		void renderImpl(BatchRenderPass& rp) override;
 		void select(int ind);
 		void select(T& item);
 		void selectRow(UIEntry<T>& entry) override;
@@ -58,7 +58,7 @@ namespace fab {
 	}
 
 	// Render the currently selected page
-	template<c_ext<UIBase> T> void UINavigation<T>::renderImpl(sdl::SDLBatchRenderPass& rp)
+	template<c_ext<UIBase> T> void UINavigation<T>::renderImpl(BatchRenderPass& rp)
 	{
 		UIList<T>::renderImpl(rp);
 		if (currentItem) {

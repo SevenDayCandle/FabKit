@@ -7,7 +7,7 @@ import fab.Hoverable;
 import fab.UIImage;
 import fab.VFX;
 import sdl.SDLBase; 
-import sdl.SDLBatchRenderPass;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -38,7 +38,7 @@ namespace fab {
 			setScaleX(sStart, sEnd);
 			return setScaleY(sStart, sEnd);
 		}
-		inline virtual void render(sdl::SDLBatchRenderPass& rp) override {}
+		inline virtual void render(BatchRenderPass& rp) override {}
 
 		UITransformVFX& setFade(float aEnd);
 		UITransformVFX& setFade(float aStart, float aEnd);
