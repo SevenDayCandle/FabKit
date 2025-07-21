@@ -1,9 +1,9 @@
 module;
 
-#include "SDL3_shadercross/SDL_shadercross.h"
 #include "SDL3/SDL.h"
 #include "SDL3_image/SDL_image.h"
 #include "SDL3_mixer/SDL_mixer.h"
+#include "SDL3_shadercross/SDL_shadercross.h"
 #include "SDL3_ttf/SDL_ttf.h"
 
 export module sdl.SDLBase;
@@ -12,7 +12,7 @@ import sdl.IKeyInputListener;
 import std;
 
 /* Operators */
-export bool operator==(const SDL_FColor& lhs, const SDL_FColor& rhs) { return lhs.r == rhs.r && lhs.g == rhs.g && lhs.b == rhs.b && lhs.a == rhs.a;}
+export bool operator==(const SDL_FColor& lhs, const SDL_FColor& rhs) { return lhs.r == rhs.r && lhs.g == rhs.g && lhs.b == rhs.b && lhs.a == rhs.a; }
 export bool operator!=(const SDL_FColor& lhs, const SDL_FColor& rhs) { return !(lhs == rhs); }
 
 namespace sdl {
@@ -126,8 +126,7 @@ namespace sdl {
 		GRAYSCALE
 	};
 
-	export struct Matrix4x4
-	{
+	export struct Matrix4x4 {
 		float m11, m12, m13, m14;
 		float m21, m22, m23, m24;
 		float m31, m32, m33, m34;
@@ -149,20 +148,20 @@ namespace sdl {
 	};
 
 	/* Color constants. RGB can be higher than 1 to make the image brighter */
-	export constexpr Color COLOR_BLACK = { 0, 0, 0, 1 };
-	export constexpr Color COLOR_BLACK_SHADOW = { 0, 0, 0, 0.4f };
-	export constexpr Color COLOR_GOLD = { 1.0, 0.843, 0, 1 };
-	export constexpr Color COLOR_GRAY = { 0.5f, 0.5f, 0.5f, 1 };
-	export constexpr Color COLOR_HIGHLIGHT_BLUE = { 0.5f, 0.66f, 1.5f, 1 };
-	export constexpr Color COLOR_HIGHLIGHT_BLUE_LIGHT = { 0.8f, 0.96f, 1.7f, 1 };
-	export constexpr Color COLOR_HIGHLIGHT_GREEN = { 0.66f, 1.5f, 0.5f, 1 };
-	export constexpr Color COLOR_HIGHLIGHT_GREEN_LIGHT = { 0.96f, 1.7f, 0.8f, 1 };
-	export constexpr Color COLOR_HIGHLIGHT_RED = { 1.5f, 0.5f, 0.6f, 1 };
-	export constexpr Color COLOR_HIGHLIGHT_RED_LIGHT = { 1.7f, 0.8f, 0.9f, 1 };
-	export constexpr Color COLOR_LIME = { 0.6f, 1.5f, 0.84f, 1 };
-	export constexpr Color COLOR_SKY = { 0.6f, 1.1, 1.5f, 1 };
-	export constexpr Color COLOR_STANDARD = { 1, 1, 1, 1 };
-	export constexpr Color COLOR_WHITE = { 2, 2, 2, 1 };
+	export constexpr Color COLOR_BLACK = {0, 0, 0, 1};
+	export constexpr Color COLOR_BLACK_SHADOW = {0, 0, 0, 0.4f};
+	export constexpr Color COLOR_GOLD = {1.0, 0.843, 0, 1};
+	export constexpr Color COLOR_GRAY = {0.5f, 0.5f, 0.5f, 1};
+	export constexpr Color COLOR_HIGHLIGHT_BLUE = {0.5f, 0.66f, 1.5f, 1};
+	export constexpr Color COLOR_HIGHLIGHT_BLUE_LIGHT = {0.8f, 0.96f, 1.7f, 1};
+	export constexpr Color COLOR_HIGHLIGHT_GREEN = {0.66f, 1.5f, 0.5f, 1};
+	export constexpr Color COLOR_HIGHLIGHT_GREEN_LIGHT = {0.96f, 1.7f, 0.8f, 1};
+	export constexpr Color COLOR_HIGHLIGHT_RED = {1.5f, 0.5f, 0.6f, 1};
+	export constexpr Color COLOR_HIGHLIGHT_RED_LIGHT = {1.7f, 0.8f, 0.9f, 1};
+	export constexpr Color COLOR_LIME = {0.6f, 1.5f, 0.84f, 1};
+	export constexpr Color COLOR_SKY = {0.6f, 1.1, 1.5f, 1};
+	export constexpr Color COLOR_STANDARD = {1, 1, 1, 1};
+	export constexpr Color COLOR_WHITE = {2, 2, 2, 1};
 
 	/* Scan constants (used for hotkeys) */
 	export constexpr Scancode SCAN_BACKSPACE = SDL_SCANCODE_BACKSPACE;
@@ -191,9 +190,12 @@ namespace sdl {
 	/* Other constants */
 	export constexpr Uint64 NANOS_PER_SECOND = 1000000000ULL;
 
+	// TODO get rid of SDL wrappers, this is not good form
+
 	/* Directory stuff */
 	export inline const char* dirBase() noexcept { return SDL_GetBasePath(); }
 	export inline char* dirPref(const char* org, const char* app) { return SDL_GetPrefPath(org, app); }
+
 	export inline void dirSelect() {
 		//return SDL_ShowOpenFolderDialog();
 	}
@@ -230,13 +232,19 @@ namespace sdl {
 	export inline bool gpuSupportsPresentMode(SDL_GPUDevice* device, SDL_Window* window, SDL_GPUPresentMode presentMode) { return SDL_WindowSupportsGPUPresentMode(device, window, presentMode); }
 	export inline bool gpuSupportsSwapchainComposition(SDL_GPUDevice* device, SDL_Window* window, SDL_GPUSwapchainComposition swapchainComposition) { return SDL_WindowSupportsGPUSwapchainComposition(device, window, swapchainComposition); }
 	export inline bool gpuTextureSupportsSampleCount(SDL_GPUDevice* device, SDL_GPUTextureFormat format, SDL_GPUSampleCount desiredSampleCount) { return SDL_GPUTextureSupportsSampleCount(device, format, desiredSampleCount); }
-	export inline SDL_GPUBuffer* gpuCreateBuffer(SDL_GPUDevice* device, SDL_GPUBufferUsageFlags usageFlags, Uint32 sizeInBytes) { 
-		SDL_GPUBufferCreateInfo info = { usageFlags, sizeInBytes };
+
+	export inline SDL_GPUBuffer* gpuCreateBuffer(SDL_GPUDevice* device, SDL_GPUBufferUsageFlags usageFlags, Uint32 sizeInBytes) {
+		SDL_GPUBufferCreateInfo info = {usageFlags, sizeInBytes};
 		return SDL_CreateGPUBuffer(device, &info);
 	}
+
 	export inline const char* gpuGetDriver(int index) { return SDL_GetGPUDriver(index); }
 	export inline SDL_GPUCommandBuffer* gpuAcquireCommandBuffer(SDL_GPUDevice* device) { return SDL_AcquireGPUCommandBuffer(device); }
-	export inline SDL_GPUComputePass* gpuBeginComputePass(SDL_GPUCommandBuffer* commandBuffer, SDL_GPUStorageTextureReadWriteBinding* storageTextureBindings, Uint32 storageTextureBindingCount, SDL_GPUStorageBufferReadWriteBinding* storageBufferBindings, Uint32 storageBufferBindingCount) { return SDL_BeginGPUComputePass(commandBuffer, storageTextureBindings, storageTextureBindingCount, storageBufferBindings, storageBufferBindingCount); }
+
+	export inline SDL_GPUComputePass* gpuBeginComputePass(SDL_GPUCommandBuffer* commandBuffer, SDL_GPUStorageTextureReadWriteBinding* storageTextureBindings, Uint32 storageTextureBindingCount, SDL_GPUStorageBufferReadWriteBinding* storageBufferBindings, Uint32 storageBufferBindingCount) {
+		return SDL_BeginGPUComputePass(commandBuffer, storageTextureBindings, storageTextureBindingCount, storageBufferBindings, storageBufferBindingCount);
+	}
+
 	export inline SDL_GPUComputePipeline* gpuCreateComputePipeline(SDL_GPUDevice* device, SDL_GPUComputePipelineCreateInfo* computePipelineCreateInfo) { return SDL_CreateGPUComputePipeline(device, computePipelineCreateInfo); }
 	export inline SDL_GPUComputePipeline* gpuCompileHLSLCompute(SDL_GPUDevice* device, const SDL_ShaderCross_HLSL_Info* info, SDL_ShaderCross_ComputePipelineMetadata* metadata) { return SDL_ShaderCross_CompileComputePipelineFromHLSL(device, info, metadata); }
 	export inline SDL_GPUComputePipeline* gpuCompileSPIRVCompute(SDL_GPUDevice* device, const SDL_ShaderCross_SPIRV_Info* info, SDL_ShaderCross_ComputePipelineMetadata* metadata) { return SDL_ShaderCross_CompileComputePipelineFromSPIRV(device, info, metadata); }
@@ -252,17 +260,23 @@ namespace sdl {
 	export inline SDL_GPUShader* gpuCreateShader(SDL_GPUDevice* device, SDL_GPUShaderCreateInfo* shaderCreateInfo) { return SDL_CreateGPUShader(device, shaderCreateInfo); }
 	export inline SDL_GPUShaderFormat gpuGetHLSLShaderFormats() { return SDL_ShaderCross_GetHLSLShaderFormats(); }
 	export inline SDL_GPUShaderFormat gpuGetSPIRVShaderFormats() { return SDL_ShaderCross_GetSPIRVShaderFormats(); }
-	export inline SDL_GPUTexture* gpuAcquireSwapchainTexture(SDL_GPUCommandBuffer* commandBuffer, SDL_Window* window, Uint32* pWidth, Uint32* pHeight) { 
+
+	export inline SDL_GPUTexture* gpuAcquireSwapchainTexture(SDL_GPUCommandBuffer* commandBuffer, SDL_Window* window, Uint32* pWidth, Uint32* pHeight) {
 		SDL_GPUTexture* texture;
-		SDL_AcquireGPUSwapchainTexture(commandBuffer, window, &texture, pWidth, pHeight);
+		if (!SDL_WaitAndAcquireGPUSwapchainTexture(commandBuffer, window, &texture, pWidth, pHeight)) {
+			SDL_Log("WaitAndAcquireGPUSwapchainTexture failed: %s", SDL_GetError());
+		}
 		return texture;
 	}
+
 	export inline SDL_GPUTexture* gpuCreateTexture(SDL_GPUDevice* device, SDL_GPUTextureCreateInfo* textureCreateInfo) { return SDL_CreateGPUTexture(device, textureCreateInfo); }
 	export inline SDL_GPUTextureFormat gpuGetSwapchainTextureFormat(SDL_GPUDevice* device, SDL_Window* window) { return SDL_GetGPUSwapchainTextureFormat(device, window); }
-	export inline SDL_GPUTransferBuffer* gpuCreateTransferBuffer(SDL_GPUDevice* device, SDL_GPUTransferBufferUsage usage, Uint32 sizeInBytes) { 
-		SDL_GPUTransferBufferCreateInfo info = { usage, sizeInBytes };
+
+	export inline SDL_GPUTransferBuffer* gpuCreateTransferBuffer(SDL_GPUDevice* device, SDL_GPUTransferBufferUsage usage, Uint32 sizeInBytes) {
+		SDL_GPUTransferBufferCreateInfo info = {usage, sizeInBytes};
 		return SDL_CreateGPUTransferBuffer(device, &info);
 	}
+
 	export inline Uint32 gpuTextureFormatTexelBlockSize(SDL_GPUTextureFormat textureFormat) { return SDL_GPUTextureFormatTexelBlockSize(textureFormat); }
 	export inline void gpuBindComputePipeline(SDL_GPUComputePass* computePass, SDL_GPUComputePipeline* computePipeline) { SDL_BindGPUComputePipeline(computePass, computePipeline); }
 	export inline void gpuBindComputeStorageBuffers(SDL_GPUComputePass* computePass, Uint32 firstSlot, SDL_GPUBuffer** storageBuffers, Uint32 bindingCount) { SDL_BindGPUComputeStorageBuffers(computePass, firstSlot, storageBuffers, bindingCount); }
@@ -371,6 +385,7 @@ namespace sdl {
 	export inline void soundHaltChannel(int channel) { return Mix_HaltChannel(channel); }
 	export inline void soundPauseChannel(int channel) { Mix_Pause(channel); }
 	export inline void soundResumeChannel(int channel) { Mix_Resume(channel); }
+
 	export inline void soundSetAllVolume(int volume) {
 		for (int i = 0; i < Mix_AllocateChannels(-1); ++i) {
 			Mix_Volume(i, volume);
@@ -408,13 +423,14 @@ namespace sdl {
 	export inline void windowSetMouseGrab(Window* window, bool grabbed) { SDL_SetWindowMouseGrab(window, grabbed); }
 	export inline void windowSetOpacity(Window* window, float opacity) { SDL_SetWindowOpacity(window, opacity); }
 	export inline void windowSetPosition(Window* window, int x, int y) { SDL_SetWindowPosition(window, x, y); }
-	export inline void windowSetSize(Window* window, int w, int h) {SDL_SetWindowSize(window, w, h);}
+	export inline void windowSetSize(Window* window, int w, int h) { SDL_SetWindowSize(window, w, h); }
 	export inline void windowSetTitle(Window* window, const char* title) { SDL_SetWindowTitle(window, title); }
 	export inline void windowShow(Window* window) { SDL_ShowWindow(window); }
 
 	/* Misc functions */
 	export inline const char* __cdecl getError() { return SDL_GetError(); }
 	export inline constexpr float rads(float deg) { return deg * std::numbers::pi_v<float> / 180; }
+
 	export inline SDL_Color toTextColor(const Color& c) {
 		return {
 			static_cast<Uint8>(255 * c.r),
@@ -423,6 +439,7 @@ namespace sdl {
 			static_cast<Uint8>(255 * c.a),
 		};
 	}
+
 	export inline void free(void* code) { SDL_free(code); }
 	export template <typename... Args> inline void log(SDL_LogPriority priority, const char* message, const Args&... args) { SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, priority, message, args...); }
 	export template <typename... Args> inline void log(SDL_LogPriority priority, std::string_view message, const Args&... args) { SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, priority, message.data(), args...); }

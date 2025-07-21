@@ -269,7 +269,7 @@ namespace sdl::runner {
 		}
 
 		// Initialize driver
-		device = SDL_CreateGPUDevice(gpuGetHLSLShaderFormats(), false, renderer);
+		device = SDL_CreateGPUDevice(gpuGetHLSLShaderFormats(), true, renderer);
 		if (!device) {
 			SDL_LogCritical(SDL_LOG_CATEGORY_VIDEO, "Device went derp: %s", getError());
 			return false;

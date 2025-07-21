@@ -57,8 +57,8 @@ namespace fab {
 	}
 
 	void BatchRenderPass::draw() {
-		sdl::runner::deviceUnmapTexTransferBuffer();
-		if (numInstances > 0) {
+		if (buffer && numInstances > 0) {
+			sdl::runner::deviceUnmapTexTransferBuffer();
 			sdl::GPUCopyPass* copyPass = sdl::gpuBeginCopyPass(cmd);
 			sdl::Uint32 sizeVert = numInstances * sizeof(sdl::TexProps);
 
@@ -69,6 +69,8 @@ namespace fab {
 			sdl::gpuEndCopyPass(copyPass);
 
 			sdl::gpuDrawGpuPrimitives(renderPass, numInstances * 6, 1, 0, 0);
+			buffer = nullptr;
+			numInstances = 0;
 		}
 	}
 
@@ -78,6 +80,9 @@ namespace fab {
 	}
 
 	void BatchRenderPass::reset() {
+		if (buffer) {
+			sdl::runner::deviceUnmapTexTransferBuffer();
+		}
 		buffer = sdl::runner::deviceMapTexTransferBuffer(true);
 		numInstances = 0;
 	}

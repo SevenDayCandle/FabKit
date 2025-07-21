@@ -72,6 +72,7 @@ namespace fab {
 	void TextDrawable::dispose() {
 		if (textObj) {
 			sdl::textDestroy(textObj);
+			textObj = nullptr;
 		}
 	}
 
