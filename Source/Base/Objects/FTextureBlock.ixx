@@ -192,6 +192,7 @@ namespace fab {
 			sdl::GPUTransferBufferUsage::SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
 			texW * texH * 4
 		);
+		sdl::logCritical("Create texture array of size %d x %d", texW * texH * 4);
 	}
 
 	template <c_ext<FTextureBlock::Item> T> T& FTextureBlock::create(const strv& key) {

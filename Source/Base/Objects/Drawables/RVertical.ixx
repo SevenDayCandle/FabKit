@@ -3,7 +3,7 @@ export module fab.RVertical;
 import fab.FTexture;
 import fab.FTextureBlock;
 import fab.FUtil;
-import sdl.SDLBase; 
+import sdl.SDLBase;
 import fab.BatchRenderPass;
 import sdl.SDLRunner;
 
@@ -24,7 +24,7 @@ namespace fab {
 		const float distY = (edgeSY + cornerSY) / 2;
 
 		rp.bindPipeline(sdl::runner::pipelineForMode(pipeline));
-		rp.bindTexture(source, sdl::runner::SAMPLER);
+		rp.bindTexture(source);
 
 		rp.pushVertexData({
 			.texInd = index,

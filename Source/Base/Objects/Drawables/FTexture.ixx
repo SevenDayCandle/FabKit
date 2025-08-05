@@ -34,7 +34,7 @@ namespace fab {
 		float sX = scX * w;
 		float sY = scY * h;
 		rp.bindPipeline(sdl::runner::pipelineForMode(pipeline));
-		rp.bindTexture(source, sdl::runner::SAMPLER);
+		rp.bindTexture(source);
 		rp.pushVertexData({
 			.texInd = index,
 			.coord = BatchRenderPass::makeCoord(0, 0, 1, 1),

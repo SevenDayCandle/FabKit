@@ -73,10 +73,7 @@ namespace fab {
 			virtual int getResolutionY() const noexcept = 0;
 		};
 
-		FWindow(IController& props) : props(props) {
-			initialize(props.getResolutionX(), props.getResolutionY(), props.getTitle(), props.getWindowMode());
-		}
-
+		FWindow(IController& props) : props(props) {}
 		virtual ~FWindow() = default;
 
 		Element* activeElement;
@@ -106,6 +103,7 @@ namespace fab {
 		uptr<T> inline create(Args&&... args) { return make_unique<T>(*this, forward<Args>(args)...); } // Generate a component using this window
 
 		bool hasOverlay(Element* target);
+		bool initialize();
 		FWindow::Element* getActiveOverlay();
 		FWindow::Element* currentScreen();
 		template <c_ext<FWindow::Element> T> T& openOverlay(uptr<T>&& target);
@@ -119,7 +117,6 @@ namespace fab {
 		void render();
 		void update();
 	private:
-		bool enabled;
 		bool queuedCloseScreen;
 		deque<uptr<Element>> screens;
 		deque<uptr<Element>> overlays;
@@ -131,17 +128,16 @@ namespace fab {
 		int winH;
 		int winW;
 
-		bool initialize(int w, int h, const char* title, uint32 windowFlags = 0);
 		static sdl::Matrix4x4 makeProjection(int w, int h);
 	};
 
 	// Set up window and its rendering device. Returns true if set up successfully
-	bool FWindow::initialize(int w, int h, const char* title, uint32 windowFlags) {
-		this->winH = h;
-		this->winW = w;
-		projection = makeProjection(w, h);
+	bool FWindow::initialize() {
+		this->winW = props.getResolutionX();
+		this->winH = props.getResolutionY();
+		projection = makeProjection(winW, winH);
 		// TODO setup projection
-		window = sdl::windowCreate(title, w, h, windowFlags);
+		window = sdl::windowCreate(props.getTitle(), winW, winH, props.getWindowMode());
 		if (!window) {
 			sdl::logCritical("Window went derp: %s", sdl::getError());
 			return false;
@@ -152,7 +148,26 @@ namespace fab {
 			sdl::logCritical("GPUClaimWindow went derp: %s", sdl::getError());
 			return false;
 		}
-		sdl::runner::deviceSetSwapchainParameters(window, sdl::GPUSwapchainComposition::SDL_GPU_SWAPCHAINCOMPOSITION_SDR, props.getVsync() ? sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_VSYNC : sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_IMMEDIATE);
+
+		sdl::GPUPresentMode presentMode;
+		if (props.getVsync() && sdl::runner::deviceSupportsPresentMode(window, sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_VSYNC)) {
+			presentMode = sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_VSYNC;
+		}
+		else if (sdl::runner::deviceSupportsPresentMode(window, sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_IMMEDIATE)) {
+			presentMode = sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_IMMEDIATE;
+		}
+		else if (sdl::runner::deviceSupportsPresentMode(window, sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_IMMEDIATE)) {
+			presentMode = sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_MAILBOX;
+		}
+		else {
+			sdl::logCritical("No present modes are supported! WTF!");
+			return false;
+		}
+
+		if (!sdl::runner::deviceSetSwapchainParameters(window, sdl::GPUSwapchainComposition::SDL_GPU_SWAPCHAINCOMPOSITION_SDR, presentMode)) {
+			sdl::logCritical("Swapchain went derp: %s", sdl::getError());
+			return false;
+		}
 		props.onWindowInitialize(*this);
 
 		return true;
@@ -292,8 +307,7 @@ namespace fab {
 					.store_op = sdl::GPUStoreOp::SDL_GPU_STOREOP_STORE
 				};
 
-				sdl::GPURenderPass* r = sdl::gpuBeginRenderPass(cd, &colorAttachmentInfo, 1, nullptr);
-				BatchRenderPass rp = BatchRenderPass(cd, r);
+				BatchRenderPass rp = BatchRenderPass(cd, &colorAttachmentInfo, 1, nullptr);
 				rp.pushVertexUniform(&projection, sizeof(sdl::Matrix4x4));
 				rp.reset();
 				// Render screen elements

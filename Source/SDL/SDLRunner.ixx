@@ -225,7 +225,8 @@ namespace sdl::runner {
 	export inline void setFPSLimit(int fps) { fpsLimit = fps > 0 ? NANOS_PER_SECOND / fps : 0; }
 	export inline void* deviceMapTransferBuffer(SDL_GPUTransferBuffer* transferBuffer, bool cycle) { return SDL_MapGPUTransferBuffer(device, transferBuffer, cycle); }
 
-	export bool init(const char* renderer = NULL, const char* normalFrag = SHADER_NORMAL_FRAG, const char* normalVert = SHADER_NORMAL_VERT, const char* fillFrag = SHADER_FILL_FRAG, const char* fillVert = SHADER_FILL_VERT);
+	export bool init(const char* renderer = nullptr);
+	export bool initRendering(const char* normalFrag = SHADER_NORMAL_FRAG, const char* normalVert = SHADER_NORMAL_VERT, const char* fillFrag = SHADER_FILL_FRAG, const char* fillVert = SHADER_FILL_VERT);
 	export bool poll();
 	export bool uploadVertexes(GPUCommandBuffer* cmd, GPUCopyPass* copyPass);
 	export GPUGraphicsPipeline* createPipeline(GPUShader* vertexShader, GPUShader* fragmentShader, GPUTextureFormat textureFormat = GPUTextureFormat::SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM, GPUBlendFactor srcColor = GPUBlendFactor::SDL_GPU_BLENDFACTOR_SRC_ALPHA, GPUBlendFactor dstColor = GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
@@ -250,7 +251,9 @@ namespace sdl::runner {
 
 namespace sdl::runner {
 	// Set up SDL. Returns true if SDL setup succeeds
-	bool init(const char* renderer, const char* normalFrag, const char* normalVert, const char* fillFrag, const char* fillVert) {
+	bool init(const char* renderer) {
+		SDL_SetHint(SDL_HINT_RENDER_VULKAN_DEBUG, "1");
+
 		int val = SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_GAMEPAD);
 		if (val < 0) {
 			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "SDL_INIT failed with value %d", val);
@@ -280,6 +283,14 @@ namespace sdl::runner {
 		keyJust = new Uint8[numKeys];
 		memcpy(keyJust, key, numKeys);
 
+		// TODO initialize pad
+
+		enabledInternal = true;
+
+		return true;
+	}
+
+	bool initRendering(const char* normalFrag, const char* normalVert, const char* fillFrag, const char* fillVert) {
 		// Initialize vertex storage and transfer buffers
 		constexpr size_t size = sizeof(TexProps);
 		constexpr Uint32 sizeVert = size * MAX_SPRITES;
@@ -312,13 +323,11 @@ namespace sdl::runner {
 
 		gpuReleaseShader(device, shaderFragment);
 		gpuReleaseShader(device, shaderVertex);
+		gpuReleaseShader(device, shaderFillFragment);
+		gpuReleaseShader(device, shaderFillVertex);
 
 		// Text engine
 		textEngine = TTF_CreateGPUTextEngine(device);
-
-		// TODO initialize pad
-
-		enabledInternal = true;
 
 		return true;
 	}
@@ -385,28 +394,6 @@ namespace sdl::runner {
 
 	// Generates a graphics pipeline to be used for this window
 	GPUGraphicsPipeline* createPipeline(GPUShader* vertexShader, GPUShader* fragmentShader, GPUTextureFormat textureFormat, GPUBlendFactor srcColor, GPUBlendFactor dstColor, GPUBlendFactor srcAlpha, GPUBlendFactor dstAlpha) {
-		GPUVertexBufferDescription vertexBindings[] = {
-			{
-				.slot = 0,
-				.pitch = sizeof(TexCoord),
-				.input_rate = GPUVertexInputRate::SDL_GPU_VERTEXINPUTRATE_VERTEX,
-				.instance_step_rate = 0
-			}
-		};
-		GPUVertexAttribute vertexAttributes[] = {
-			{
-				.location = 0,
-				.buffer_slot = 0,
-				.format = GPUVertexElementFormat::SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3,
-				.offset = 0
-			},
-			{
-				.location = 1,
-				.buffer_slot = 0,
-				.format = GPUVertexElementFormat::SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2,
-				.offset = sizeof(float) * 3
-			}
-		};
 		GPUColorTargetDescription colorAttachmentDescriptions[] = {
 			{
 				.format = textureFormat,
@@ -425,18 +412,7 @@ namespace sdl::runner {
 		GPUGraphicsPipelineCreateInfo pipelineCreateInfo = {
 			.vertex_shader = vertexShader,
 			.fragment_shader = fragmentShader,
-			.vertex_input_state = {
-				.vertex_buffer_descriptions = vertexBindings,
-				.num_vertex_buffers = 1,
-				.vertex_attributes = vertexAttributes,
-				.num_vertex_attributes = 2,
-			},
 			.primitive_type = GPUPrimitiveType::SDL_GPU_PRIMITIVETYPE_TRIANGLELIST,
-			.rasterizer_state = {},
-			.multisample_state = {
-				.sample_mask = 0xFFFF
-			},
-			.depth_stencil_state = {},
 			.target_info = {
 				.color_target_descriptions = colorAttachmentDescriptions,
 				.num_color_targets = 1
@@ -473,7 +449,7 @@ namespace sdl::runner {
 				.fill_mode = SDL_GPUFillMode::SDL_GPU_FILLMODE_FILL
 			},
 			.multisample_state = {
-				.sample_mask = 0xFFFF
+				.sample_mask = 0x00000000
 			},
 			.depth_stencil_state = {},
 			.target_info = {
@@ -536,6 +512,7 @@ namespace sdl::runner {
 			.sample_count = GPUSampleCount::SDL_GPU_SAMPLECOUNT_1,
 		};
 		GPUTexture* tex = runner::deviceCreateTexture(&info);
+		sdl::logCritical("Created texture array with %s", SDL_GetError());
 		return tex;
 	}
 
@@ -595,13 +572,15 @@ namespace sdl::runner {
 		Uint32 h = surface->h;
 		const Uint32 imageSizeInBytes = w * h * 4;
 
+		sdl::logCritical("Uploading texture of size %d x %d", w, h);
+
 		void* textureTransferPtr = deviceMapTransferBuffer(textureTransferBuffer, false);
 		std::memcpy(textureTransferPtr, surface->pixels, imageSizeInBytes);
 		runner::deviceUnmapTransferBuffer(textureTransferBuffer);
 
 		GPUTextureTransferInfo tInfo = {
 			.transfer_buffer = textureTransferBuffer,
-			.offset = imageSizeInBytes * layer,
+			.offset = 0,
 		};
 		GPUTextureRegion tRegion = {
 			.texture = texture,

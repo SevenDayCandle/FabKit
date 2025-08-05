@@ -62,8 +62,8 @@ namespace fab {
 	private:
 		FFont* font;
 		int textW = 0;
-		mutable sdl::GPUAtlasDrawSequence* sequence;
-		mutable sdl::Text* textObj;
+		mutable sdl::GPUAtlasDrawSequence* sequence = nullptr;
+		mutable sdl::Text* textObj = nullptr;
 		str text;
 		sdl::Color color = sdl::COLOR_STANDARD;
 		sdl::Color colorOutline = sdl::COLOR_BLACK;
@@ -83,7 +83,7 @@ namespace fab {
 
 		// TODO account for shadows
 		for (sdl::GPUAtlasDrawSequence* cur = sequence; cur != nullptr; cur = cur->next) {
-			rp.bindTexture(cur->atlas_texture, sdl::runner::SAMPLER);
+			rp.bindTexture(cur->atlas_texture);
 			sdl::Point* uv = cur->uv;
 			sdl::Point* xy = cur->xy;
 
