@@ -93,10 +93,10 @@ namespace fab {
 				int v = uv[i].y;
 				sdl::Point& diag = uv[i + 2];
 				rp.pushVertexData({
-					.texInd = 0,
-					.coord = BatchRenderPass::makeCoord(u, v, diag.x - u, diag.y - v),
+					.transform = BatchRenderPass::makeTransform(tX + xy[i].x, tY + xy[i].x, sX, sY, rotZ),
 					.color = *tint,
-					.transform = BatchRenderPass::makeTransform(tX + xy[i].x, tY + xy[i].x, sX, sY, rotZ)
+					.coord = BatchRenderPass::makeCoord(u, v, diag.x - u, diag.y - v),
+					.texInd = 0,
 				});
 			}
 		}

@@ -8,7 +8,7 @@ import std;
 namespace fab {
 	export class BatchRenderPass {
 	public:
-		BatchRenderPass(sdl::GPUCommandBuffer* cmd, sdl::GPUColorTargetInfo* info, int colorAttachmentAmount = 1, sdl::GPUDepthStencilTargetnfo* depth = nullptr): colorAttachmentAmount(colorAttachmentAmount), info(info), cmd(cmd), depth(depth) {}
+		BatchRenderPass(sdl::GPUCommandBuffer* cmd, sdl::GPUColorTargetInfo* info, int colorAttachmentAmount = 1, sdl::GPUDepthStencilTargetnfo* depth = nullptr) : colorAttachmentAmount(colorAttachmentAmount), info(info), cmd(cmd), depth(depth) {}
 		BatchRenderPass(const BatchRenderPass& other) = delete;
 
 		~BatchRenderPass() {}
@@ -61,7 +61,7 @@ namespace fab {
 			sdl::Uint32 sizeVert = numInstances * sizeof(sdl::TexProps);
 			sdl::GPUTransferBufferLocation t1 = {sdl::runner::TRANSFER_BUFFER, 0};
 			sdl::GPUBufferRegion r1 = {sdl::runner::STORAGE_BUFFER, 0, sizeVert};
-			sdl::gpuUploadToBuffer(copyPass, &t1, &r1, false);
+			sdl::gpuUploadToBuffer(copyPass, &t1, &r1, true);
 			sdl::gpuEndCopyPass(copyPass);
 
 			sdl::GPURenderPass* renderPass = sdl::gpuBeginRenderPass(cmd, info, colorAttachmentAmount, depth);
@@ -102,22 +102,14 @@ namespace fab {
 
 	// Automatically set up a vertex buffer based on the provided center coordinates, sizes, and rotation
 	sdl::Matrix4x4 BatchRenderPass::makeTransform(float tX, float tY, float sX, float sY, float rotZ) {
-		if (rotZ != 0) {
-			float cosZ = std::cos(rotZ);
-			float sinZ = std::sin(rotZ);
+		float cosZ = std::cos(rotZ);
+		float sinZ = std::sin(rotZ);
 
-			return {
-				2 * sX * cosZ, 2 * -sY * sinZ, 0, 0,
-				2 * sX * sinZ, 2 * sY * cosZ, 0, 0,
-				0, 0, 1, 0,
-				2 * tX - 1, 1 - 2 * tY, 0, 1
-			};
-		}
 		return {
-			2 * sX, 0, 0, 0,
-			0, 2 * sY, 0, 0,
+			sX * cosZ, -sY * sinZ, 0, 0,
+			sX * sinZ, sY * cosZ, 0, 0,
 			0, 0, 1, 0,
-			0, 0, 0, 1
+			tX, tY, 0, 1
 		};
 	}
 }

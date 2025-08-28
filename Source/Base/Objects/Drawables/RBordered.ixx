@@ -36,58 +36,58 @@ namespace fab {
 		rp.bindTexture(source);
 
 		rp.pushVertexData({
-			.texInd = index,
-			.coord = BatchRenderPass::makeCoord(0, 0, 0.5, 0.5),
+			.transform = BatchRenderPass::makeTransform(beginX, beginY, cornerSX, cornerSY, rotZ),
 			.color = *tint,
-			.transform = BatchRenderPass::makeTransform(beginX, beginY, cornerSX, cornerSY, rotZ)
+			.coord = BatchRenderPass::makeCoord(0, 0, 0.5, 0.5),
+			.texInd = static_cast<float>(index),
 		}); // Top Left
 		rp.pushVertexData({
-			.texInd = index,
-			.coord = BatchRenderPass::makeCoord(0.5, 0, 0, 0.5),
+			.transform = BatchRenderPass::makeTransform(tX, beginY, edgeSX, cornerSY, rotZ),
 			.color = *tint,
-			.transform = BatchRenderPass::makeTransform(tX, beginY, edgeSX, cornerSY, rotZ)
+			.coord = BatchRenderPass::makeCoord(0.5, 0, 0, 0.5),
+			.texInd = static_cast<float>(index)
 		}); // Top
 		rp.pushVertexData({
-			.texInd = index,
-			.coord = BatchRenderPass::makeCoord(0.5, 0, 0.5, 0.5),
+			.transform = BatchRenderPass::makeTransform(endX, beginY, cornerSX, cornerSY, rotZ),
 			.color = *tint,
-			.transform = BatchRenderPass::makeTransform(endX, beginY, cornerSX, cornerSY, rotZ)
+			.coord = BatchRenderPass::makeCoord(0.5, 0, 0.5, 0.5),
+			.texInd = static_cast<float>(index)
 		}); // Top Right
 		rp.pushVertexData({
-			.texInd = index,
-			.coord = BatchRenderPass::makeCoord(0, 0.5, 0.5, 0),
+			.transform = BatchRenderPass::makeTransform(beginX, tY, cornerSX, edgeSY, rotZ),
 			.color = *tint,
-			.transform = BatchRenderPass::makeTransform(beginX, tY, cornerSX, edgeSY, rotZ)
+			.coord = BatchRenderPass::makeCoord(0, 0.5, 0.5, 0),
+			.texInd = static_cast<float>(index)
 		}); // Center Left
 		rp.pushVertexData({
-			.texInd = index,
-			.coord = BatchRenderPass::makeCoord(0.5, 0.5, 0, 0),
+			.transform = BatchRenderPass::makeTransform(tX, tY, edgeSX, edgeSY, rotZ),
 			.color = *tint,
-			.transform = BatchRenderPass::makeTransform(tX, tY, edgeSX, edgeSY, rotZ)
+			.coord = BatchRenderPass::makeCoord(0.5, 0.5, 0, 0),
+			.texInd = static_cast<float>(index)
 		}); // Center
 		rp.pushVertexData({
-			.texInd = index,
-			.coord = BatchRenderPass::makeCoord(0.5, 0.5, 0.5, 0),
+			.transform = BatchRenderPass::makeTransform(endX, tY, cornerSX, edgeSY, rotZ),
 			.color = *tint,
-			.transform = BatchRenderPass::makeTransform(endX, tY, cornerSX, edgeSY, rotZ)
+			.coord = BatchRenderPass::makeCoord(0.5, 0.5, 0.5, 0),
+			.texInd = static_cast<float>(index)
 		}); // Center Right
 		rp.pushVertexData({
-			.texInd = index,
-			.coord = BatchRenderPass::makeCoord(0, 0.5, 0.5, 0.5),
+			.transform = BatchRenderPass::makeTransform(beginX, endY, cornerSX, cornerSY, rotZ),
 			.color = *tint,
-			.transform = BatchRenderPass::makeTransform(beginX, endY, cornerSX, cornerSY, rotZ)
+			.coord = BatchRenderPass::makeCoord(0, 0.5, 0.5, 0.5),
+			.texInd = static_cast<float>(index)
 		}); // Bottom Left
 		rp.pushVertexData({
-			.texInd = index,
-			.coord = BatchRenderPass::makeCoord(0.5, 0.5, 0, 0.5),
+			.transform = BatchRenderPass::makeTransform(tX, endY, edgeSX, cornerSY, rotZ),
 			.color = *tint,
-			.transform = BatchRenderPass::makeTransform(tX, endY, edgeSX, cornerSY, rotZ)
+			.coord = BatchRenderPass::makeCoord(0.5, 0.5, 0, 0.5),
+			.texInd = static_cast<float>(index)
 		}); // Bottom
 		rp.pushVertexData({
-			.texInd = index,
-			.coord = BatchRenderPass::makeCoord(0.5, 0.5, 0.5, 0.5),
+			.transform = BatchRenderPass::makeTransform(endX, endY, cornerSX, cornerSY, rotZ),
 			.color = *tint,
-			.transform = BatchRenderPass::makeTransform(endX, endY, cornerSX, cornerSY, rotZ)
+			.coord = BatchRenderPass::makeCoord(0.5, 0.5, 0.5, 0.5),
+			.texInd = static_cast<float>(index)
 		}); // Bottom Right
 	}
 }

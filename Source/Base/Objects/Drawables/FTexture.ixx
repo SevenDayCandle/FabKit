@@ -12,7 +12,7 @@ import std;
 namespace fab {
 	export class FTexture : public IDrawable, public FTextureBlock::Item {
 	public:
-		FTexture(FTextureBlock& source, strv path): FTextureBlock::Item(source), path(path) {}
+		FTexture(FTextureBlock& source, strv path) : FTextureBlock::Item(source), path(path) {}
 		FTexture(const FTexture&) = delete;
 		FTexture(FTexture&& other) noexcept : FTextureBlock::Item(move(other)), path(other.path) {}
 		~FTexture() override {}
@@ -36,10 +36,10 @@ namespace fab {
 		rp.bindPipeline(sdl::runner::pipelineForMode(pipeline));
 		rp.bindTexture(source);
 		rp.pushVertexData({
-			.texInd = index,
-			.coord = BatchRenderPass::makeCoord(0, 0, 1, 1),
+			.transform = BatchRenderPass::makeTransform(tX, tY, sX, sY, rotZ),
 			.color = *tint,
-			.transform = BatchRenderPass::makeTransform(tX, tY, sX, sY, rotZ)
+			.coord = BatchRenderPass::makeCoord(0, 0, 1, 1),
+			.texInd = static_cast<float>(index),
 		});
 	}
 

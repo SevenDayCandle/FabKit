@@ -140,11 +140,12 @@ namespace sdl {
 		float h1, h2;
 	};
 
+	// Fields need to be ordered by decreasing size, to ensure that the values align with required offsets for float4 and float2 data types in the shader
 	export struct TexProps {
-		int texInd;
-		TexCoord coord;
-		Color color;
 		Matrix4x4 transform;
+		Color color;
+		TexCoord coord;
+		float texInd;
 	};
 
 	/* Color constants. RGB can be higher than 1 to make the image brighter */

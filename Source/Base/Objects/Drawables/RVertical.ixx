@@ -27,22 +27,22 @@ namespace fab {
 		rp.bindTexture(source);
 
 		rp.pushVertexData({
-			.texInd = index,
-			.coord = BatchRenderPass::makeCoord(0, 0, 1, 0.5),
+			.transform = BatchRenderPass::makeTransform(tX, tY - distY, sX, cornerSY, rotZ),
 			.color = *tint,
-			.transform = BatchRenderPass::makeTransform(tX, tY - distY, sX, cornerSY, rotZ)
+			.coord = BatchRenderPass::makeCoord(0, 0, 1, 0.5),
+			.texInd = static_cast<float>(index)
 		}); // Top
 		rp.pushVertexData({
-			.texInd = index,
-			.coord = BatchRenderPass::makeCoord(0, 0.5, 1, 0),
+			.transform = BatchRenderPass::makeTransform(tX, tY, sX, edgeSY, rotZ),
 			.color = *tint,
-			.transform = BatchRenderPass::makeTransform(tX, tY, sX, edgeSY, rotZ)
+			.coord = BatchRenderPass::makeCoord(0, 0.5, 1, 0),
+			.texInd = static_cast<float>(index)
 		}); // Center
 		rp.pushVertexData({
-			.texInd = index,
-			.coord = BatchRenderPass::makeCoord(0, 0.5, 1, 0.5),
+			.transform = BatchRenderPass::makeTransform(tX, tY + distY, sX, cornerSY, rotZ),
 			.color = *tint,
-			.transform = BatchRenderPass::makeTransform(tX, tY + distY, sX, cornerSY, rotZ)
+			.coord = BatchRenderPass::makeCoord(0, 0.5, 1, 0.5),
+			.texInd = static_cast<float>(index)
 		}); // Bottom
 	}
 }

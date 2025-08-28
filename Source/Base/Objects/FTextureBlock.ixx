@@ -52,7 +52,6 @@ namespace fab {
 		inline int getWidth() const { return texW; }
 		inline int getMaxLength() const { return loadables.size(); }
 
-		bool reserve(sdl::GPUCopyPass* copyPass, const FTextureBlock::Item* loadable, sdl::Surface* surface) const;
 		bool reuploadSurface(sdl::GPUCopyPass* copyPass, const FTextureBlock::Item* loadable, sdl::Surface* surface) const;
 		template <c_ext<FTextureBlock::Item> T> T& create(const strv& key);
 		void dispose() override;
@@ -65,6 +64,7 @@ namespace fab {
 		const int texH = 0;
 		const int texW = 0;
 
+		bool reserve(sdl::GPUCopyPass* copyPass, const FTextureBlock::Item* loadable, sdl::Surface* surface) const;
 		int uploadSurface(sdl::GPUCopyPass* copyPass, sdl::Surface* surface) const;
 		int uploadSurface(sdl::GPUCopyPass* copyPass, sdl::Surface* surface, int index) const;
 	private:
@@ -199,8 +199,10 @@ namespace fab {
 		if (freeIndex >= loadables.size()) {
 			resize(loadables.size() * 2); // TODO have a better way to resize, watch for failures
 		}
-		T& item = static_cast<T&>(*loadables.emplace_back(make_unique<T>(*this, key)));
-		item.index = loadables.size() - 1;
+		loadables[freeIndex] = make_unique<T>(*this, key);
+		T& item = static_cast<T&>(*loadables[freeIndex]);
+		item.index = freeIndex;
+		freeIndex += 1;
 		return item;
 	}
 }
