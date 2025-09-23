@@ -141,7 +141,7 @@ namespace sdl {
 	};
 
 	// Fields need to be ordered by decreasing size, to ensure that the values align with required offsets for float4 and float2 data types in the shader
-	export struct TexProps {
+	export struct alignas(16) TexProps {
 		Matrix4x4 transform;
 		Color color;
 		TexCoord coord;

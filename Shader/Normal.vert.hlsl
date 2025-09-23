@@ -4,6 +4,7 @@ struct Data
     float4 Color;
     float2 TexPos[4];
     float TexInd;
+    float3 _Padding;
 };
 
 struct Output
@@ -37,7 +38,7 @@ Output main(uint id : SV_VertexID)
     Output output;
 
     float3 coord = VERTS[vert];
-    output.Position = mul(ViewProjectionMatrix, mul(sprite.Transform, float4(coord, 1.0f)));
+    output.Position = mul(mul(float4(coord, 1.0f), sprite.Transform), ViewProjectionMatrix);
     output.TexCoord = sprite.TexPos[vert];
     output.Color = sprite.Color;
     output.TexIndex = sprite.TexInd;

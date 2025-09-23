@@ -19,7 +19,7 @@ namespace fab {
 		/* An element that can be placed into a FWindow */
 		class Element {
 		public:
-			Element(FWindow& window): win(window) {}
+			Element(FWindow& window) : win(window) {}
 			virtual ~Element() = default;
 
 			FWindow& win;
@@ -176,10 +176,10 @@ namespace fab {
 	// left = 0, right = w, bottom = h, top = 0
 	sdl::Matrix4x4 FWindow::makeProjection(int w, int h) {
 		return {
-			2.0f / w, 0, 0, 0,
-			0, 2.0f / -h, 0, 0,
-			0, 0, 1.0f, 0,
-			-1, 1, 0, 1
+			2.0f / w, 0.0f, 0.0f, 0.0f,
+			0.0f, -2.0f / h, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 0.0f,
+			-1.0f, 1.0f, 0.0f, 1.0f
 		};
 	}
 
