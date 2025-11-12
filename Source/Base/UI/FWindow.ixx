@@ -302,14 +302,14 @@ namespace fab {
 					.texture = swapchain,
 					.mip_level = 0,
 					.layer_or_depth_plane = 0,
-					.clear_color = {0.5f, 0.5f, 0.5f, 1.0f},
+					.clear_color = {0, 0, 0, 1.0f},
 					.load_op = sdl::GPULoadOp::SDL_GPU_LOADOP_CLEAR,
 					.store_op = sdl::GPUStoreOp::SDL_GPU_STOREOP_STORE
 				};
 
 				BatchRenderPass rp = BatchRenderPass(cd, &colorAttachmentInfo, 1, nullptr);
 				rp.pushVertexUniform(&projection, sizeof(sdl::Matrix4x4));
-				rp.reset();
+				rp.start();
 				// Render screen elements
 				// TODO pass in z index
 				if (!screens.empty()) {

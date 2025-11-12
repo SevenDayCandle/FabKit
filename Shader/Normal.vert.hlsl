@@ -1,21 +1,18 @@
-struct Data
+struct VSIn
 {
-    row_major float4x4 Transform;
-    float4 Color;
-    float2 TexPos[4];
-    float TexInd;
-    float3 _Padding;
+    row_major float4x4 Transform : TEXCOORD0;
+    float4 Color : TEXCOORD1;
+    float2 TexPos[4] : TEXCOORD2;
+    float TexInd : TEXCOORD3;
 };
 
-struct Output
+struct VSOut
 {
     float4 Position : SV_Position;
     float4 Color : TEXCOORD0;
     float2 TexCoord : TEXCOORD1;
     float TexIndex : TEXCOORD2;
 };
-
-StructuredBuffer<Data> DataBuffer : register(t0, space0);
 
 cbuffer UniformBlock : register(b0, space1)
 {
@@ -31,17 +28,15 @@ static const float3 VERTS[4] =
     { -0.5, 0.5, 0 }
 };
 
-Output main(uint id : SV_VertexID)
+VSOut main(VSIn input, uint id : SV_VertexID)
 {
     uint vert = INDICES[id % 6];
-    Data sprite = DataBuffer[id / 6];
-    Output output;
-
     float3 coord = VERTS[vert];
-    output.Position = mul(mul(float4(coord, 1.0f), sprite.Transform), ViewProjectionMatrix);
-    output.TexCoord = sprite.TexPos[vert];
-    output.Color = sprite.Color;
-    output.TexIndex = sprite.TexInd;
+    VSOut output;
+    output.Position = mul(mul(float4(coord, 1.0f), input.Transform), ViewProjectionMatrix);
+    output.TexCoord = input.TexPos[vert];
+    output.Color = input.Color;
+    output.TexIndex = input.TexInd;
 
     return output;
 }
