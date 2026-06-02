@@ -95,7 +95,7 @@ namespace sdl {
 	export using GPUVertexInputState = ::SDL_GPUVertexInputState;
 	export using GPUViewport = ::SDL_GPUViewport;
 	export using Keycode = ::SDL_Keycode;
-	export using Music = ::Mix_Music;
+	export using Music = ::MIX_Track;
 	export using PixelFormat = ::SDL_PixelFormat;
 	export using Point = ::SDL_FPoint;
 	export using PointI = ::SDL_Point;
@@ -109,7 +109,7 @@ namespace sdl {
 	export using ShadercrossHLSLInfo = ::SDL_ShaderCross_HLSL_Info;
 	export using ShadercrossShaderStage = ::SDL_ShaderCross_ShaderStage;
 	export using ShadercrossSPIRVInfo = ::SDL_ShaderCross_SPIRV_Info;
-	export using Sound = ::Mix_Chunk;
+	export using Sound = ::MIX_Audio;
 	export using Surface = ::SDL_Surface;
 	export using Text = ::TTF_Text;
 	export using Window = ::SDL_Window;

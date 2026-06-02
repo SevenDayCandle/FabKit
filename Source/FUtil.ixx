@@ -1,3 +1,7 @@
+module;
+
+#include <glaze/util/type_traits.hpp>
+
 export module fab.FUtil;
 
 import fab.KeyedItem;
@@ -7,58 +11,52 @@ namespace fab {
 	constexpr std::string_view VOID_TYPESTR = "void";
 
 	// Hasing structure for string_view lookup on str containers
-	export struct str_hash
-	{
+	export struct str_hash {
 		using hash_type = std::hash<std::string_view>;
 		using is_transparent = void;
 
 		std::size_t operator()(const char* str) const { return hash_type{}(str); }
 		std::size_t operator()(std::string_view str) const { return hash_type{}(str); }
-		std::size_t operator()(std::string const& str) const { return hash_type{}(str); }
+		std::size_t operator()(const std::string& str) const { return hash_type{}(str); }
 	};
-
-	// Const stuff, adapted from https://github.com/stephenberry/glaze
-	// TODO just use the glz module version once it is available
-	export template <typename, template <typename...> typename> inline constexpr bool is_specialization_v = false;
-	export template <template <typename...> typename T, typename... Args> inline constexpr bool is_specialization_v<T<Args...>, T> = true;
 
 	// Concepts
-	export template<typename T> concept c_enum = std::is_enum_v<T>;
-	export template<typename T, typename U> concept c_ext = std::is_base_of_v<U, T>;
-	export template<typename Func, typename T, typename U> concept c_invc = requires(Func f, T t) {
+	export template <typename T> concept c_enum = std::is_enum_v<T>;
+	export template <typename T, typename U> concept c_ext = std::is_base_of_v<U, T>;
+	export template <typename Func, typename T, typename U> concept c_invc = requires(Func f, T t) {
 		{ f(t) } -> std::convertible_to<U>;
 	};
-	export template<typename It, typename T> concept c_itr = std::ranges::range<It> && std::same_as<std::ranges::range_value_t<It>, T>;
-	export template<typename T> concept c_keyed = std::is_base_of_v<KeyedItem<T>, T>;
-	export template<typename T> concept c_map = requires {
+	export template <typename It, typename T> concept c_itr = std::ranges::range<It> && std::same_as<std::ranges::range_value_t<It>, T>;
+	export template <typename T> concept c_keyed = std::is_base_of_v<KeyedItem<T>, T>;
+	export template <typename T> concept c_map = requires {
 		typename T::key_type;
 		typename T::mapped_type;
-			requires std::is_default_constructible_v<T>;
+		requires std::is_default_constructible_v<T>;
 	};
-	export template<typename TCo, typename T, typename U> concept c_map_of = std::ranges::range<TCo> &&
+	export template <typename TCo, typename T, typename U> concept c_map_of = std::ranges::range<TCo> &&
 		requires {
-		typename TCo::key_type;
-		typename TCo::mapped_type;
+			typename TCo::key_type;
+			typename TCo::mapped_type;
 			requires std::same_as<typename TCo::key_type, T>;
 			requires std::same_as<typename TCo::mapped_type, U>;
-	};
-	export template<typename T> concept c_num = std::is_arithmetic_v<T>;
-	export template<typename T> concept c_pair = is_specialization_v<T, std::pair>;
-	export template<typename T> concept c_ptr = std::is_pointer_v<T>;
-	export template<typename T> concept c_push = requires(T t, typename T::value_type v) {
+		};
+	export template <typename T> concept c_num = std::is_arithmetic_v<T>;
+	export template <typename T> concept c_pair = glz::is_specialization_v<T, std::pair>;
+	export template <typename T> concept c_ptr = std::is_pointer_v<T>;
+	export template <typename T> concept c_push = requires(T t, typename T::value_type v) {
 		{ t.push_back(v) } -> std::same_as<void>;
 	};
-	export template<typename T> concept c_ref = std::is_reference_v<T>;
-	export template<typename T> concept c_refw = is_specialization_v<T, std::reference_wrapper>;
-	export template<typename It, typename T> concept c_set = c_itr<T, It>&& requires(It a, T v) {
+	export template <typename T> concept c_ref = std::is_reference_v<T>;
+	export template <typename T> concept c_refw = glz::is_specialization_v<T, std::reference_wrapper>;
+	export template <typename It, typename T> concept c_set = c_itr<T, It> && requires(It a, T v) {
 		{ a.find(v) } -> std::convertible_to<typename It::iterator>;
 	};
-	export template<typename T> concept c_str = requires(T t) {
-		std::string_view{ t };
+	export template <typename T> concept c_str = requires(T t) {
+		std::string_view{t};
 	};
-	export template<typename T> concept c_tuple = is_specialization_v<T, std::tuple>;
-	export template<typename T, typename... Args> concept c_varg = (std::same_as<T, Args> && ...);;
-	export template<typename T> concept c_vec = is_specialization_v<T, std::vector>;
+	export template <typename T> concept c_tuple = glz::is_specialization_v<T, std::tuple>;
+	export template <typename T, typename... Args> concept c_varg = (std::same_as<T, Args> && ...);;
+	export template <typename T> concept c_vec = glz::is_specialization_v<T, std::vector>;
 
 	// std shorthands. Sorry peeps
 	export template <typename R> using func = std::function<R>;
@@ -113,6 +111,7 @@ namespace fab {
 
 	// Adapted from https://stackoverflow.com/questions/81870/is-it-possible-to-print-a-variables-type-in-standard-c/64490578#64490578
 	template <typename T> constexpr strv _funcsigimpl() { return std::source_location::current().function_name(); }
+
 	export template <typename T> constexpr strv nameof() {
 		constexpr strv fname = _funcsigimpl<T>();
 		constexpr strv vname = _funcsigimpl<void>();
@@ -126,8 +125,6 @@ namespace fab {
 
 // Utility functions
 namespace fab::futil {
-	export constexpr int INT_MAX = std::numeric_limits<int>::max();
-	export constexpr int INT_MIN = std::numeric_limits<int>::min();
 	export constexpr strv BLANK = "";
 	export constexpr strv FBC = "fab";
 	export constexpr strv JSON_EXT = ".json";
@@ -156,10 +153,14 @@ namespace fab::futil {
 	export template <typename T> str toStringWrapped(const T& obj);
 	export template <typename T> T fromString(strv input);
 	export template <typename T> T fromString(strv input, size_t& pos);
-	export template <typename TCo, typename Func> requires std::ranges::range<TCo> && c_invc<Func, range_value_t<TCo>, strv> str joinStrMap(strv delimiter, const TCo& items, Func strFunc);
-	export template <typename TCo, typename Func> requires c_itr<TCo, typename TCo::value_type> && c_invc<Func, typename TCo::value_type, invoke_result_t<Func, typename TCo::value_type>> vec<invoke_result_t<Func, typename TCo::value_type>> transform(const TCo& container, Func mapFunc);
-	export template <typename TCo, typename Func> requires c_map_of<TCo, typename TCo::key_type, typename TCo::mapped_type> && c_invc<Func, typename TCo::mapped_type, invoke_result_t<Func, typename TCo::mapped_type>> map<typename TCo::key_type, invoke_result_t<Func, typename TCo::mapped_type>> transformMap(const TCo& src, Func mapFunc);
-	export template <typename TCo, typename Func> requires c_map_of<TCo, typename TCo::key_type, typename TCo::mapped_type>&& c_invc<Func, typename TCo::mapped_type, invoke_result_t<Func, typename TCo::mapped_type>> umap<typename TCo::key_type, invoke_result_t<Func, typename TCo::mapped_type>> transformUmap(const TCo& src, Func mapFunc);
+	export template <typename TCo, typename Func> requires std::ranges::range<TCo> && c_invc<Func, range_value_t<TCo>, strv>
+	str joinStrMap(strv delimiter, const TCo& items, Func strFunc);
+	export template <typename TCo, typename Func> requires c_itr<TCo, typename TCo::value_type> && c_invc<Func, typename TCo::value_type, invoke_result_t<Func, typename TCo::value_type>>
+	vec<invoke_result_t<Func, typename TCo::value_type>> transform(const TCo& container, Func mapFunc);
+	export template <typename TCo, typename Func> requires c_map_of<TCo, typename TCo::key_type, typename TCo::mapped_type> && c_invc<Func, typename TCo::mapped_type, invoke_result_t<Func, typename TCo::mapped_type>>
+	map<typename TCo::key_type, invoke_result_t<Func, typename TCo::mapped_type>> transformMap(const TCo& src, Func mapFunc);
+	export template <typename TCo, typename Func> requires c_map_of<TCo, typename TCo::key_type, typename TCo::mapped_type> && c_invc<Func, typename TCo::mapped_type, invoke_result_t<Func, typename TCo::mapped_type>>
+	umap<typename TCo::key_type, invoke_result_t<Func, typename TCo::mapped_type>> transformUmap(const TCo& src, Func mapFunc);
 }
 
 /*
@@ -172,7 +173,7 @@ namespace fab::futil {
 		return std::to_string(x) + "x" + std::to_string(y);
 	}
 
-	str dimensionString(const pair<int,int>& p) {
+	str dimensionString(const pair<int, int>& p) {
 		return dimensionString(p.first, p.second);
 	}
 
@@ -198,14 +199,14 @@ namespace fab::futil {
 	str toLowerCase(strv input) {
 		str res(input.size(), '\0');
 		std::ranges::transform(input.begin(), input.end(), res.begin(),
-			[](unsigned char c) { return std::tolower(c); });
+		                       [](unsigned char c) { return std::tolower(c); });
 		return res;
 	}
 
 	// Modify an existing string to be lowercase
 	str& toLowerCaseInPlace(str& input) {
 		std::ranges::transform(input.begin(), input.end(), input.begin(),
-			[](unsigned char c) { return std::tolower(c); });
+		                       [](unsigned char c) { return std::tolower(c); });
 		return input;
 	}
 
@@ -213,19 +214,19 @@ namespace fab::futil {
 	str toUpperCase(strv input) {
 		str res(input.size(), '\0');
 		std::ranges::transform(input.begin(), input.end(), res.begin(),
-			[](unsigned char c) { return std::toupper(c); });
+		                       [](unsigned char c) { return std::toupper(c); });
 		return res;
 	}
 
 	// Modify an existing string to be uppercase
 	str& toUpperCaseInPlace(str& input) {
 		std::ranges::transform(input.begin(), input.end(), input.begin(),
-			[](unsigned char c) { return std::toupper(c); });
+		                       [](unsigned char c) { return std::toupper(c); });
 		return input;
 	}
 
 	// Find the first item in the container that matches the given value
-	template<typename T, c_itr<T> TCo> const T* find(const TCo& container, const T& value) {
+	template <typename T, c_itr<T> TCo> const T* find(const TCo& container, const T& value) {
 		if constexpr (c_set<T, TCo>) {
 			auto it = container.find(value);
 			if (it != container.end()) {
@@ -242,18 +243,18 @@ namespace fab::futil {
 	}
 
 	// Check whether the given container contains the given value
-	template<typename T, c_itr<T> TCo> bool has(const TCo& container, const T& value) {
+	template <typename T, c_itr<T> TCo> bool has(const TCo& container, const T& value) {
 		const T* res = find<T, TCo>(container, value);
 		return res != nullptr;
 	}
 
 	// Check whether the text can be converted into a number
 	bool isNumeric(strv text) {
-		return !text.empty() && std::ranges::all_of(text, [](unsigned char c) {return std::isdigit(c); });
+		return !text.empty() && std::ranges::all_of(text, [](unsigned char c) { return std::isdigit(c); });
 	}
 
 	// Join a collection of strings with a delimiter
-	template<c_itr<strv> SCo> str joinStr(strv delimiter, SCo items) {
+	template <c_itr<strv> SCo> str joinStr(strv delimiter, SCo items) {
 		str res;
 		auto iter = items.begin();
 		if (iter != items.end()) {
@@ -267,15 +268,15 @@ namespace fab::futil {
 	}
 
 	// Create a deep copy of an iterable of unique pointers
-	template<typename T, c_itr<uptr<T>> TCo> vec<uptr<T>> vecCopy(const TCo& container) {
+	template <typename T, c_itr<uptr<T>> TCo> vec<uptr<T>> vecCopy(const TCo& container) {
 		vec<T> res(container.size());
 		std::transform(container.begin(), container.end(), res.begin(), [](const uptr<T>& ptr) { return make_unique<T>(*ptr); });
 		return res;
 	}
 
 	// Represent a collection of objects as a joined string with a delimiter
-	template<typename TCo, typename Func> requires std::ranges::range<TCo>&& c_invc<Func, range_value_t<TCo>, strv> str joinStrMap(strv delimiter, const TCo& items, Func strFunc)
-	{
+	template <typename TCo, typename Func> requires std::ranges::range<TCo> && c_invc<Func, range_value_t<TCo>, strv>
+	str joinStrMap(strv delimiter, const TCo& items, Func strFunc) {
 		str res;
 		auto iter = items.begin();
 		if (iter != items.end()) {
@@ -290,14 +291,16 @@ namespace fab::futil {
 	}
 
 	// Transform each of the values in the container into a new value and store the results in a list
-	template <typename TCo, typename Func> requires c_itr<TCo, typename TCo::value_type> && c_invc<Func, typename TCo::value_type, invoke_result_t<Func, typename TCo::value_type>> vec<invoke_result_t<Func, typename TCo::value_type>> transform(const TCo& container, Func mapFunc) {
+	template <typename TCo, typename Func> requires c_itr<TCo, typename TCo::value_type> && c_invc<Func, typename TCo::value_type, invoke_result_t<Func, typename TCo::value_type>>
+	vec<invoke_result_t<Func, typename TCo::value_type>> transform(const TCo& container, Func mapFunc) {
 		vec<invoke_result_t<Func, typename TCo::value_type>> res(container.size());
 		std::transform(container.begin(), container.end(), res.begin(), mapFunc);
 		return res;
 	}
 
 	// Transform each of the values in the map into a new map
-	template<typename TCo, typename Func> requires c_map_of<TCo, typename TCo::key_type, typename TCo::mapped_type>&& c_invc<Func, typename TCo::mapped_type, invoke_result_t<Func, typename TCo::mapped_type>> map<typename TCo::key_type, invoke_result_t<Func, typename TCo::mapped_type>> transformMap(const TCo& src, Func mapFunc) {
+	template <typename TCo, typename Func> requires c_map_of<TCo, typename TCo::key_type, typename TCo::mapped_type> && c_invc<Func, typename TCo::mapped_type, invoke_result_t<Func, typename TCo::mapped_type>>
+	map<typename TCo::key_type, invoke_result_t<Func, typename TCo::mapped_type>> transformMap(const TCo& src, Func mapFunc) {
 		map<typename TCo::key_type, invoke_result_t<Func, typename TCo::mapped_type>> res;
 		for (const auto& p : src) {
 			res[p.first] = mapFunc(p.second);
@@ -306,7 +309,8 @@ namespace fab::futil {
 	}
 
 	// Transform each of the values in the map into a new unordered map
-	export template<typename TCo, typename Func> requires c_map_of<TCo, typename TCo::key_type, typename TCo::mapped_type>&& c_invc<Func, typename TCo::mapped_type, invoke_result_t<Func, typename TCo::mapped_type>> umap<typename TCo::key_type, invoke_result_t<Func, typename TCo::mapped_type>> transformUmap(const TCo& src, Func mapFunc) {
+	export template <typename TCo, typename Func> requires c_map_of<TCo, typename TCo::key_type, typename TCo::mapped_type> && c_invc<Func, typename TCo::mapped_type, invoke_result_t<Func, typename TCo::mapped_type>>
+	umap<typename TCo::key_type, invoke_result_t<Func, typename TCo::mapped_type>> transformUmap(const TCo& src, Func mapFunc) {
 		umap<typename TCo::key_type, invoke_result_t<Func, typename TCo::mapped_type>> res;
 		for (const auto& p : src) {
 			res[p.first] = mapFunc(p.second);
@@ -374,7 +378,7 @@ namespace fab::futil {
 					result.pop_back();
 					result.pop_back();
 				}
-				}, obj);
+			}, obj);
 			result += "]";
 			return result;
 		}
@@ -403,8 +407,7 @@ namespace fab::futil {
 	}
 
 	// For types that do not use syntax characters, we can safely treat everything in between this pos and the next syntax character as being part of the object to be deserialized
-	strv getView(strv input, size_t& pos)
-	{
+	strv getView(strv input, size_t& pos) {
 		size_t start = pos;
 		while (pos < input.size()) {
 			switch (input[pos]) {
@@ -569,5 +572,4 @@ namespace fab::futil {
 		}
 		return T();
 	}
-
 }
