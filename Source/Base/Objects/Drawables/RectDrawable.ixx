@@ -2,7 +2,7 @@ export module fab.RectDrawable;
 
 import fab.FUtil;
 import fab.IDrawable;
-import sdl.SDLBase;
+import sdl.SDLHelpers;
 import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;

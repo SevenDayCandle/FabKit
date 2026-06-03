@@ -7,7 +7,7 @@ import fab.Hitbox;
 import fab.IDrawable;
 import fab.TextDrawable;
 import fab.UIButton;
-import sdl.SDLBase;
+import sdl.SDLHelpers;
 import fab.BatchRenderPass;
 
 namespace fab {

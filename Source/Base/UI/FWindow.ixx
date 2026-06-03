@@ -1,3 +1,7 @@
+module;
+
+#include "SDL3/SDL.h"
+
 export module fab.FWindow;
 
 import fab.BatchRenderPass;
@@ -8,7 +12,7 @@ import fab.FUtil;
 import fab.IDrawable;
 import fab.WindowMode;
 import sdl.IKeyInputListener;
-import sdl.SDLBase;
+import sdl.SDLHelpers;
 import sdl.SDLRunner;
 import std;
 
@@ -149,22 +153,22 @@ namespace fab {
 			return false;
 		}
 
-		sdl::GPUPresentMode presentMode;
-		if (props.getVsync() && sdl::runner::deviceSupportsPresentMode(window, sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_VSYNC)) {
-			presentMode = sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_VSYNC;
+		SDL_GPUPresentMode presentMode;
+		if (props.getVsync() && sdl::runner::deviceSupportsPresentMode(window, SDL_GPUPresentMode::SDL_GPU_PRESENTMODE_VSYNC)) {
+			presentMode = SDL_GPUPresentMode::SDL_GPU_PRESENTMODE_VSYNC;
 		}
-		else if (sdl::runner::deviceSupportsPresentMode(window, sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_IMMEDIATE)) {
-			presentMode = sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_IMMEDIATE;
+		else if (sdl::runner::deviceSupportsPresentMode(window, SDL_GPUPresentMode::SDL_GPU_PRESENTMODE_IMMEDIATE)) {
+			presentMode = SDL_GPUPresentMode::SDL_GPU_PRESENTMODE_IMMEDIATE;
 		}
-		else if (sdl::runner::deviceSupportsPresentMode(window, sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_IMMEDIATE)) {
-			presentMode = sdl::GPUPresentMode::SDL_GPU_PRESENTMODE_MAILBOX;
+		else if (sdl::runner::deviceSupportsPresentMode(window, SDL_GPUPresentMode::SDL_GPU_PRESENTMODE_IMMEDIATE)) {
+			presentMode = SDL_GPUPresentMode::SDL_GPU_PRESENTMODE_MAILBOX;
 		}
 		else {
 			sdl::logCritical("No present modes are supported! WTF!");
 			return false;
 		}
 
-		if (!sdl::runner::deviceSetSwapchainParameters(window, sdl::GPUSwapchainComposition::SDL_GPU_SWAPCHAINCOMPOSITION_SDR, presentMode)) {
+		if (!sdl::runner::deviceSetSwapchainParameters(window, ::SDL_GPUSwapchainComposition::SDL_GPU_SWAPCHAINCOMPOSITION_SDR, presentMode)) {
 			sdl::logCritical("Swapchain went derp: %s", sdl::getError());
 			return false;
 		}
@@ -293,18 +297,18 @@ namespace fab {
 
 	// Render the last opened screen, as well as all overlays
 	void FWindow::render() {
-		sdl::GPUCommandBuffer* cd = sdl::runner::deviceAcquireCommandBuffer();
+		SDL_GPUCommandBuffer* cd = sdl::runner::deviceAcquireCommandBuffer();
 		if (cd) {
 			uint32 w, h;
-			sdl::GPUTexture* swapchain = sdl::gpuAcquireSwapchainTexture(cd, window, &w, &h);
+			SDL_GPUTexture* swapchain = sdl::gpuAcquireSwapchainTexture(cd, window, &w, &h);
 			if (swapchain) {
-				sdl::GPUColorTargetInfo colorAttachmentInfo = {
+				SDL_GPUColorTargetInfo colorAttachmentInfo = {
 					.texture = swapchain,
 					.mip_level = 0,
 					.layer_or_depth_plane = 0,
 					.clear_color = {0, 0, 0, 1.0f},
-					.load_op = sdl::GPULoadOp::SDL_GPU_LOADOP_CLEAR,
-					.store_op = sdl::GPUStoreOp::SDL_GPU_STOREOP_STORE
+					.load_op = SDL_GPULoadOp::SDL_GPU_LOADOP_CLEAR,
+					.store_op = SDL_GPUStoreOp::SDL_GPU_STOREOP_STORE
 				};
 
 				BatchRenderPass rp = BatchRenderPass(cd, &colorAttachmentInfo, 1, nullptr);

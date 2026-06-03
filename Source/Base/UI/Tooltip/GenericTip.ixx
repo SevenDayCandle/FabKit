@@ -2,7 +2,7 @@ export module fab.GenericTip;
 
 import fab.FUtil;
 import fab.FWindow;
-import sdl.SDLBase; 
+import sdl.SDLHelpers; 
 import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;

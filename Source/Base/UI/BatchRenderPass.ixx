@@ -1,20 +1,20 @@
 export module fab.BatchRenderPass;
 
 import fab.FUtil;
-import sdl.SDLBase;
+import sdl.SDLHelpers;
 import sdl.SDLRunner;
 import std;
 
 namespace fab {
 	export class BatchRenderPass {
 		struct Entry {
-			sdl::GPUGraphicsPipeline* pipeline;
-			sdl::GPUTexture* texture;
+			::SDL_GPUGraphicsPipeline* pipeline;
+			::SDL_GPUTexture* texture;
 			int offset;
 			int size;
 		};
 	public:
-		BatchRenderPass(sdl::GPUCommandBuffer* cmd, sdl::GPUColorTargetInfo* info, int colorAttachmentAmount = 1, sdl::GPUDepthStencilTargetnfo* depth = nullptr) : colorAttachmentAmount(colorAttachmentAmount), info(info), cmd(cmd), depth(depth) {}
+		BatchRenderPass(::SDL_GPUCommandBuffer* cmd, ::SDL_GPUColorTargetInfo* info, int colorAttachmentAmount = 1, ::SDL_GPUDepthStencilTargetInfo* depth = nullptr) : colorAttachmentAmount(colorAttachmentAmount), info(info), cmd(cmd), depth(depth) {}
 		BatchRenderPass(const BatchRenderPass& other) = delete;
 
 		~BatchRenderPass() {}
@@ -26,8 +26,8 @@ namespace fab {
 		template <typename T> inline void pushFragmentUniformAuto(const T* data, fab::uint32 slot = 0) { sdl::gpuPushFragmentUniformData(cmd, slot, data, sizeof(T)); };
 		template <typename T> inline void pushVertexUniformAuto(const T* data, fab::uint32 slot = 0) { sdl::gpuPushVertexUniformData(cmd, slot, data, sizeof(T)); };
 
-		void bindPipeline(sdl::GPUGraphicsPipeline* pipeline);
-		void bindTexture(sdl::GPUTexture* texture);
+		void bindPipeline(::SDL_GPUGraphicsPipeline* pipeline);
+		void bindTexture(::SDL_GPUTexture* texture);
 		void draw();
 		void reset();
 		void start();
@@ -38,11 +38,11 @@ namespace fab {
 		int colorAttachmentAmount = 1;
 		int currentIndex = 0;
 		int lastIndex = 0;
-		sdl::GPUColorTargetInfo* info;
-		sdl::GPUCommandBuffer* cmd;
-		sdl::GPUDepthStencilTargetnfo* depth;
-		sdl::GPUGraphicsPipeline* lastPipeline = nullptr;
-		sdl::GPUTexture* lastTexture = nullptr;
+		::SDL_GPUColorTargetInfo* info;
+		::SDL_GPUCommandBuffer* cmd;
+		::SDL_GPUDepthStencilTargetInfo* depth;
+		::SDL_GPUGraphicsPipeline* lastPipeline = nullptr;
+		::SDL_GPUTexture* lastTexture = nullptr;
 		sdl::TexProps* buffer;
 		vec<Entry> ledger;
 
@@ -51,7 +51,7 @@ namespace fab {
 	};
 
 	// Binds a pipeline if it was not already bound
-	void BatchRenderPass::bindPipeline(sdl::GPUGraphicsPipeline* pipeline) {
+	void BatchRenderPass::bindPipeline(::SDL_GPUGraphicsPipeline* pipeline) {
 		if (lastPipeline != pipeline) {
 			queueOnBind();
 			lastPipeline = pipeline;
@@ -59,7 +59,7 @@ namespace fab {
 	}
 
 	// Binds a texture if it was not already bound
-	void BatchRenderPass::bindTexture(sdl::GPUTexture* texture) {
+	void BatchRenderPass::bindTexture(::SDL_GPUTexture* texture) {
 		if (lastTexture != texture) {
 			queueOnBind();
 			lastTexture = texture;
@@ -76,7 +76,7 @@ namespace fab {
 			queueContents();
 		}
 
-		sdl::GPURenderPass* pass = sdl::gpuBeginRenderPass(cmd, info, colorAttachmentAmount, depth);
+		::SDL_GPURenderPass* pass = sdl::gpuBeginRenderPass(cmd, info, colorAttachmentAmount, depth);
 		sdl::runner::bindRenderBuffer(pass);
 		for (const Entry& entry : ledger) {
 			sdl::gpuBindGraphicsPipeline(pass, entry.pipeline);

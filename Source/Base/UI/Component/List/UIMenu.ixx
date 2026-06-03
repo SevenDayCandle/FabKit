@@ -9,7 +9,7 @@ import fab.IDrawable;
 import fab.RelativeHitbox;
 import fab.UIEntry;
 import fab.UIList;
-import sdl.SDLBase; 
+import sdl.SDLHelpers; 
 import fab.BatchRenderPass; 
 import sdl.SDLRunner;
 import std;

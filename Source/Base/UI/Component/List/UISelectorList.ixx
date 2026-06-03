@@ -12,7 +12,7 @@ import fab.UIBase;
 import fab.UIEntry;
 import fab.UIList;
 import fab.UIVerticalScrollbar;
-import sdl.SDLBase;
+import sdl.SDLHelpers;
 import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;

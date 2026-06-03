@@ -6,8 +6,8 @@ import fab.Hitbox;
 import fab.IDrawable;
 import fab.Tooltip;
 import fab.UIBase;
-import sdl.SDLBase; 
-import fab.BatchRenderPass; 
+import sdl.SDLHelpers;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 
 namespace fab {
@@ -24,13 +24,13 @@ namespace fab {
 		IDrawable* image;
 
 		inline virtual UIImage& setColor(sdl::Color color) { return this->color = color, *this; }
-		inline virtual UIImage& setImage(IDrawable& image) { return this->image = &image, *this;}
+		inline virtual UIImage& setImage(IDrawable& image) { return this->image = &image, *this; }
 		inline virtual UIImage& setImage(IDrawable* image) { return this->image = image, *this; }
 		inline virtual UIImage& setRotation(const float rotation) { return this->rotation = rotation, *this; }
 		inline virtual UIImage& setRotationDeg(const float rotation) { return this->rotation = sdl::rads(rotation), *this; }
 		inline virtual UIImage& setScaleX(const float scaleX) { return this->scaleX = scaleX, *this; }
 		inline virtual UIImage& setScaleY(const float scaleY) { return this->scaleY = scaleY, *this; }
-		virtual void renderImpl(BatchRenderPass& rp) override;
+		void renderImpl(BatchRenderPass& rp) override;
 	};
 
 	void UIImage::renderImpl(BatchRenderPass& rp) {

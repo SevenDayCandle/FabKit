@@ -107,7 +107,7 @@
     <ClCompile Include="Source\FUtil.ixx" />
     <ClCompile Include="Source\SDL\HSVTuple.ixx" />
     <ClCompile Include="Source\SDL\IKeyInputListener.ixx" />
-    <ClCompile Include="Source\SDL\SDLBase.ixx" />
+    <ClCompile Include="Source\SDL\SDLHelpers.ixx" />
     <ClCompile Include="Source\Base\UI\BatchRenderPass.ixx" />
     <ClCompile Include="Source\SDL\SDLProps.ixx" />
     <ClCompile Include="Source\SDL\SDLRunner.ixx" />

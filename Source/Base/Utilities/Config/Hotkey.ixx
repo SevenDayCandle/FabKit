@@ -1,13 +1,14 @@
 module;
 
 #include "glaze/glaze.hpp"
+#include "SDL3/SDL.h"
 
 export module fab.ConfigHotkey;
 
 import fab.Config;
 import fab.FUtil;
 import fab.KeyedItem;
-import sdl.SDLBase;
+import sdl.SDLHelpers;
 import sdl.SDLRunner;
 import std;
 
@@ -16,14 +17,14 @@ namespace fab {
 
 	export class Hotkey : public KeyedItem<Hotkey> {
 	public:
-		Hotkey(strv id, sdl::Scancode key, sdl::GamepadButton gamepad) : KeyedItem(id), key(key), keyDefault(key), pad(gamepad), padDefault(gamepad) {}
+		Hotkey(strv id, ::SDL_Scancode key, SDL_GamepadButton gamepad) : KeyedItem(id), key(key), keyDefault(key), pad(gamepad), padDefault(gamepad) {}
 		~Hotkey() override = default;
 
 		inline bool isKeyJustPressed() const { return key > 0 && sdl::runner::keyboardJustPressed(key); }
 		inline int getKey() const { return key; }
 		inline int getPad() const { return pad; }
-		inline void setKey(sdl::Scancode key) { this->key = key; }
-		inline void setPad(sdl::GamepadButton pad) { this->pad = pad; }
+		inline void setKey(::SDL_Scancode key) { this->key = key; }
+		inline void setPad(SDL_GamepadButton pad) { this->pad = pad; }
 
 		void reset();
 		void set(int key, int pad);

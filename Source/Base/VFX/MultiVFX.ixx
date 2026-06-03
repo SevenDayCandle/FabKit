@@ -4,7 +4,7 @@ import fab.CallbackVFX;
 import fab.FUtil;
 import fab.FWindow;
 import fab.VFX;
-import sdl.SDLBase; 
+import sdl.SDLHelpers; 
 import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;

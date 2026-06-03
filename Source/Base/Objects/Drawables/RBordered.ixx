@@ -3,7 +3,7 @@ export module fab.RBordered;
 import fab.FUtil;
 import fab.FTexture;
 import fab.FTextureBlock;
-import sdl.SDLBase;
+import sdl.SDLHelpers;
 import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;

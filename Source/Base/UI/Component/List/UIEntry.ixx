@@ -8,8 +8,8 @@ import fab.IDrawable;
 import fab.UIInteractable;
 import fab.UILabel;
 import fab.FUtil;
-import sdl.SDLBase; 
-import fab.BatchRenderPass; 
+import sdl.SDLHelpers;
+import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;
 
@@ -17,7 +17,8 @@ namespace fab {
 	export template <typename T> class UIEntry : public UIInteractable {
 	public:
 		UIEntry(const T& item, int index, const func<void(UIEntry<T>&)>& onClick, FWindow& window, uptr<Hitbox> hb, FFont& f, const str& text, IDrawable& image, IDrawable& checkImage, sdl::Color baseColor = sdl::COLOR_STANDARD, sdl::Color hoverColor = sdl::COLOR_STANDARD) :
-			UIInteractable(window, move(hb), image), item(item), index(index), onClick(onClick), baseColor(baseColor), hoverColor(hoverColor), text(f, text), checkImage(&checkImage) {}
+			UIInteractable(window, move(hb), image), item(item), index(index), baseColor(baseColor), hoverColor(hoverColor), checkImage(&checkImage), onClick(onClick), text(f, text) {}
+
 		UIEntry(const T& item, int index, const func<void(UIEntry<T>&)>& onClick, FWindow& window, uptr<Hitbox> hb, FFont& f, const str& text) :
 			UIEntry(item, index, onClick, window, move(hb), f, text, window.props.defaultCheckboxEmpty(), window.props.defaultCheckboxFilled(), sdl::COLOR_STANDARD, sdl::COLOR_STANDARD) {}
 
@@ -40,8 +41,8 @@ namespace fab {
 
 		virtual void onHbHover();
 		virtual void onHbUnhover();
-		virtual void refreshDimensions() override;
-		virtual void renderImpl(BatchRenderPass& rp) override;
+		void refreshDimensions() override;
+		void renderImpl(BatchRenderPass& rp) override;
 	protected:
 		sdl::Color baseColor;
 		sdl::Color hoverColor;
@@ -49,26 +50,23 @@ namespace fab {
 		func<void(UIEntry<T>&)> onClick;
 		TextDrawable text;
 
-		inline virtual void clickLeftEvent() override { onClick(*this); }
+		inline void clickLeftEvent() override { onClick(*this); }
 	};
 
-	template<typename T> void UIEntry<T>::onHbHover()
-	{
+	template <typename T> void UIEntry<T>::onHbHover() {
 		text.setColor(hoverColor);
 	}
 
-	template<typename T> void UIEntry<T>::onHbUnhover()
-	{
+	template <typename T> void UIEntry<T>::onHbUnhover() {
 		text.setColor(baseColor);
 	}
 
-	template<typename T> void UIEntry<T>::refreshDimensions()
-	{
+	template <typename T> void UIEntry<T>::refreshDimensions() {
 		UIInteractable::refreshDimensions();
 		text.reload();
 	}
 
-	template<typename T> void UIEntry<T>::renderImpl(BatchRenderPass& rp) {
+	template <typename T> void UIEntry<T>::renderImpl(BatchRenderPass& rp) {
 		Hitbox& h = *this->hb.get();
 		if (active) {
 			if (toggled) {

@@ -5,7 +5,7 @@ import fab.FWindow;
 import fab.FUtil;
 import fab.RectDrawable;
 import fab.TextDrawable;
-import sdl.SDLBase;
+import sdl.SDLHelpers;
 import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import sdl.IKeyInputListener;

@@ -4,7 +4,7 @@ import fab.FFont;
 import fab.FUtil;
 import fab.Hitbox;
 import fab.IDrawable;
-import sdl.SDLBase;
+import sdl.SDLHelpers;
 import fab.BatchRenderPass;
 import sdl.SDLRunner;
 
@@ -62,8 +62,8 @@ namespace fab {
 	private:
 		FFont* font;
 		int textW = 0;
-		mutable sdl::GPUAtlasDrawSequence* sequence = nullptr;
-		mutable sdl::Text* textObj = nullptr;
+		mutable ::TTF_GPUAtlasDrawSequence* sequence = nullptr;
+		mutable ::TTF_Text* textObj = nullptr;
 		str text;
 		sdl::Color color = sdl::COLOR_STANDARD;
 		sdl::Color colorOutline = sdl::COLOR_BLACK;
@@ -82,7 +82,7 @@ namespace fab {
 		rp.bindPipeline(sdl::runner::pipelineForMode(pipeline));
 
 		// TODO account for shadows
-		for (sdl::GPUAtlasDrawSequence* cur = sequence; cur != nullptr; cur = cur->next) {
+		for (::TTF_GPUAtlasDrawSequence* cur = sequence; cur != nullptr; cur = cur->next) {
 			rp.bindTexture(cur->atlas_texture);
 			sdl::Point* uv = cur->uv;
 			sdl::Point* xy = cur->xy;

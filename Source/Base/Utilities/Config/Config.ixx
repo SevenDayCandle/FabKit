@@ -5,7 +5,7 @@ module;
 export module fab.Config;
 
 import fab.FUtil;
-import sdl.SDLBase; 
+import sdl.SDLHelpers; 
 import sdl.SDLRunner;
 import std;
 

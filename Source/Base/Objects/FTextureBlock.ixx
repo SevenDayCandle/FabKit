@@ -1,8 +1,12 @@
+module;
+
+#include "SDL3/SDL.h"
+
 export module fab.FTextureBlock;
 
 import fab.FUtil;
 import fab.ILoadable;
-import sdl.SDLBase;
+import sdl.SDLHelpers;
 import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;
@@ -23,7 +27,7 @@ namespace fab {
 			operator bool() const { return loaded(); }
 
 			inline bool loaded() const { return source && index > -1; }
-			inline bool reupload(sdl::GPUCopyPass* copyPass, sdl::Surface* surface) const { return source.reuploadSurface(copyPass, this, surface); }
+			inline bool reupload(SDL_GPUCopyPass* copyPass, sdl::Surface* surface) const { return source.reuploadSurface(copyPass, this, surface); }
 			inline void release() const { return source.release(this); }
 		protected:
 			FTextureBlock& source;
@@ -45,38 +49,38 @@ namespace fab {
 		}
 
 		operator bool() const { return texture != nullptr; }
-		operator sdl::GPUTexture*() const { return texture; }
+		operator SDL_GPUTexture*() const { return texture; }
 
 		inline bool loaded() const { return texture != nullptr; }
 		inline int getHeight() const { return texH; }
 		inline int getWidth() const { return texW; }
 		inline int getMaxLength() const { return loadables.size(); }
 
-		bool reuploadSurface(sdl::GPUCopyPass* copyPass, const FTextureBlock::Item* loadable, sdl::Surface* surface) const;
+		bool reuploadSurface(SDL_GPUCopyPass* copyPass, const FTextureBlock::Item* loadable, sdl::Surface* surface) const;
 		template <c_ext<FTextureBlock::Item> T> T& create(const strv& key);
 		void dispose() override;
 		void release(const FTextureBlock::Item* loadable) const;
 		void reload() const override;
-		void reload(sdl::GPUCopyPass* copyPass) const override;
+		void reload(SDL_GPUCopyPass* copyPass) const override;
 		void resize(int maxLength) const;
 		void setup() const;
 	protected:
 		const int texH = 0;
 		const int texW = 0;
 
-		bool reserve(sdl::GPUCopyPass* copyPass, const FTextureBlock::Item* loadable, sdl::Surface* surface) const;
-		int uploadSurface(sdl::GPUCopyPass* copyPass, sdl::Surface* surface) const;
-		int uploadSurface(sdl::GPUCopyPass* copyPass, sdl::Surface* surface, int index) const;
+		bool reserve(SDL_GPUCopyPass* copyPass, const FTextureBlock::Item* loadable, sdl::Surface* surface) const;
+		int uploadSurface(SDL_GPUCopyPass* copyPass, sdl::Surface* surface) const;
+		int uploadSurface(SDL_GPUCopyPass* copyPass, sdl::Surface* surface, int index) const;
 	private:
 		mutable int freeIndex = 0;
-		mutable sdl::GPUTexture* texture = nullptr;
-		mutable sdl::GPUTransferBuffer* textureTransferBuffer = nullptr;
+		mutable SDL_GPUTexture* texture = nullptr;
+		mutable SDL_GPUTransferBuffer* textureTransferBuffer = nullptr;
 		mutable vec<uptr<FTextureBlock::Item>> loadables;
 
 		friend FTextureBlock::Item;
 	};
 
-	int FTextureBlock::uploadSurface(sdl::GPUCopyPass* copyPass, sdl::Surface* surface) const {
+	int FTextureBlock::uploadSurface(SDL_GPUCopyPass* copyPass, sdl::Surface* surface) const {
 		int res = uploadSurface(copyPass, surface, freeIndex);
 		if (res) {
 			while (freeIndex < loadables.size() && loadables[freeIndex] != nullptr) {
@@ -86,7 +90,7 @@ namespace fab {
 		return res;
 	}
 
-	int FTextureBlock::uploadSurface(sdl::GPUCopyPass* copyPass, sdl::Surface* surface, int index) const {
+	int FTextureBlock::uploadSurface(SDL_GPUCopyPass* copyPass, sdl::Surface* surface, int index) const {
 		sdl::Uint32 w = surface->w;
 		sdl::Uint32 h = surface->h;
 		if (w != texW || h != texH) {
@@ -101,7 +105,7 @@ namespace fab {
 		return index;
 	}
 
-	bool FTextureBlock::reserve(sdl::GPUCopyPass* copyPass, const FTextureBlock::Item* loadable, sdl::Surface* surface) const {
+	bool FTextureBlock::reserve(SDL_GPUCopyPass* copyPass, const FTextureBlock::Item* loadable, sdl::Surface* surface) const {
 		if (!loadable || &loadable->source != this) {
 			return false;
 		}
@@ -113,7 +117,7 @@ namespace fab {
 		return false;
 	}
 
-	bool FTextureBlock::reuploadSurface(sdl::GPUCopyPass* copyPass, const FTextureBlock::Item* loadable, sdl::Surface* surface) const {
+	bool FTextureBlock::reuploadSurface(SDL_GPUCopyPass* copyPass, const FTextureBlock::Item* loadable, sdl::Surface* surface) const {
 		if (!loadable || &loadable->source != this) {
 			return false;
 		}
@@ -159,14 +163,14 @@ namespace fab {
 	}
 
 	void FTextureBlock::reload() const {
-		sdl::GPUCommandBuffer* uploadCmdBuf = sdl::runner::deviceAcquireCommandBuffer();
-		sdl::GPUCopyPass* copyPass = sdl::gpuBeginCopyPass(uploadCmdBuf);
+		SDL_GPUCommandBuffer* uploadCmdBuf = sdl::runner::deviceAcquireCommandBuffer();
+		SDL_GPUCopyPass* copyPass = sdl::gpuBeginCopyPass(uploadCmdBuf);
 		reload(copyPass);
 		sdl::gpuEndCopyPass(copyPass);
 		sdl::gpuSubmit(uploadCmdBuf);
 	}
 
-	void FTextureBlock::reload(sdl::GPUCopyPass* copyPass) const {
+	void FTextureBlock::reload(SDL_GPUCopyPass* copyPass) const {
 		setup();
 		for (int i = 0; i < loadables.size(); ++i) {
 			if (loadables[i]) {
@@ -189,7 +193,7 @@ namespace fab {
 		}
 		texture = sdl::runner::createTextureArray(texW, texH, loadables.size());
 		textureTransferBuffer = sdl::runner::deviceCreateTransferBuffer(
-			sdl::GPUTransferBufferUsage::SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
+			::SDL_GPUTransferBufferUsage::SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
 			texW * texH * 4
 		);
 		sdl::logCritical("Create texture array of size %d x %d", texW * texH * 4);

@@ -6,7 +6,7 @@ module;
 #include "SDL3_shadercross/SDL_shadercross.h"
 #include "SDL3_ttf/SDL_ttf.h"
 
-export module sdl.SDLBase;
+export module sdl.SDLHelpers;
 
 import sdl.IKeyInputListener;
 import std;
@@ -18,100 +18,11 @@ export bool operator!=(const SDL_FColor& lhs, const SDL_FColor& rhs) { return !(
 namespace sdl {
 	export using BlendMode = ::SDL_BlendMode;
 	export using Color = ::SDL_FColor;
-	export using Event = ::SDL_Event;
-	export using FlipMode = ::SDL_FlipMode;
-	export using Font = ::TTF_Font;
-	export using Gamepad = ::SDL_Gamepad;
-	export using GamepadButton = ::SDL_GamepadButton;
-	export using GPUAtlasDrawSequence = ::TTF_GPUAtlasDrawSequence;
-	export using GPUBlendFactor = ::SDL_GPUBlendFactor;
-	export using GPUBlendOp = ::SDL_GPUBlendOp;
-	export using GPUBuffer = ::SDL_GPUBuffer;
-	export using GPUBufferBinding = ::SDL_GPUBufferBinding;
-	export using GPUBufferLocation = ::SDL_GPUBufferLocation;
-	export using GPUBufferRegion = ::SDL_GPUBufferRegion;
-	export using GPUBufferUsageFlags = ::SDL_GPUBufferUsageFlags;
-	export using GPUColorComponentFlags = ::SDL_GPUColorComponentFlags;
-	export using GPUColorTargetDescription = ::SDL_GPUColorTargetDescription;
-	export using GPUColorTargetInfo = ::SDL_GPUColorTargetInfo;
-	export using GPUCommandBuffer = ::SDL_GPUCommandBuffer;
-	export using GPUCompareOp = ::SDL_GPUCompareOp;
-	export using GPUComputePass = ::SDL_GPUComputePass;
-	export using GPUComputePipeline = ::SDL_GPUComputePipeline;
-	export using GPUComputePipelineCreateInfo = ::SDL_GPUComputePipelineCreateInfo;
-	export using GPUCopyPass = ::SDL_GPUCopyPass;
-	export using GPUCubeMapFace = ::SDL_GPUCubeMapFace;
-	export using GPUCullMode = ::SDL_GPUCullMode;
-	export using GPUDepthStencilState = ::SDL_GPUDepthStencilState;
-	export using GPUDepthStencilTargetnfo = ::SDL_GPUDepthStencilTargetInfo;
-	export using GPUDevice = ::SDL_GPUDevice;
-	export using GPUFence = ::SDL_GPUFence;
-	export using GPUFillMode = ::SDL_GPUFillMode;
-	export using GPUFilter = ::SDL_GPUFilter;
-	export using GPUFrontFace = ::SDL_GPUFrontFace;
-	export using GPUGraphicsPipeline = ::SDL_GPUGraphicsPipeline;
-	export using GPUGraphicsPipelineCreateInfo = ::SDL_GPUGraphicsPipelineCreateInfo;
-	export using GPUIndexedIndirectDrawCommand = ::SDL_GPUIndexedIndirectDrawCommand;
-	export using GPUIndexElementSize = ::SDL_GPUIndexElementSize;
-	export using GPUIndirectDispatchCommand = ::SDL_GPUIndirectDispatchCommand;
-	export using GPUIndirectDrawCommand = ::SDL_GPUIndirectDrawCommand;
-	export using GPULoadOp = ::SDL_GPULoadOp;
-	export using GPUMultisampleState = ::SDL_GPUMultisampleState;
-	export using GPUPresentMode = ::SDL_GPUPresentMode;
-	export using GPUPrimitiveType = ::SDL_GPUPrimitiveType;
-	export using GPURasterizerState = ::SDL_GPURasterizerState;
-	export using GPURenderPass = ::SDL_GPURenderPass;
-	export using GPUSampleCount = ::SDL_GPUSampleCount;
-	export using GPUSampler = ::SDL_GPUSampler;
-	export using GPUSamplerAddressMode = ::SDL_GPUSamplerAddressMode;
-	export using GPUSamplerCreateInfo = ::SDL_GPUSamplerCreateInfo;
-	export using GPUSamplerMipmapMode = ::SDL_GPUSamplerMipmapMode;
-	export using GPUShader = ::SDL_GPUShader;
-	export using GPUShaderCreateInfo = ::SDL_GPUShaderCreateInfo;
-	export using GPUShaderFormat = ::SDL_GPUShaderFormat;
-	export using GPUShaderStage = ::SDL_GPUShaderStage;
-	export using GPUStencilOp = ::SDL_GPUStencilOp;
-	export using GPUStencilOpState = ::SDL_GPUStencilOpState;
-	export using GPUStorageBufferReadWriteBinding = ::SDL_GPUStorageBufferReadWriteBinding;
-	export using GPUStorageTextureReadWriteBinding = ::SDL_GPUStorageTextureReadWriteBinding;
-	export using GPUStoreOp = ::SDL_GPUStoreOp;
-	export using GPUSwapchainComposition = ::SDL_GPUSwapchainComposition;
-	export using GPUTexture = ::SDL_GPUTexture;
-	export using GPUTextureCreateInfo = ::SDL_GPUTextureCreateInfo;
-	export using GPUTextureFormat = ::SDL_GPUTextureFormat;
-	export using GPUTextureLocation = ::SDL_GPUTextureLocation;
-	export using GPUTextureRegion = ::SDL_GPUTextureRegion;
-	export using GPUTextureSamplerBinding = ::SDL_GPUTextureSamplerBinding;
-	export using GPUTextureTransferInfo = ::SDL_GPUTextureTransferInfo;
-	export using GPUTextureType = ::SDL_GPUTextureType;
-	export using GPUTextureUsageFlags = ::SDL_GPUTextureUsageFlags;
-	export using GPUTransferBuffer = ::SDL_GPUTransferBuffer;
-	export using GPUTransferBufferLocation = ::SDL_GPUTransferBufferLocation;
-	export using GPUTransferBufferUsage = ::SDL_GPUTransferBufferUsage;
-	export using GPUVertexAttribute = ::SDL_GPUVertexAttribute;
-	export using GPUVertexBufferDescription = ::SDL_GPUVertexBufferDescription;
-	export using GPUVertexElementFormat = ::SDL_GPUVertexElementFormat;
-	export using GPUVertexInputRate = ::SDL_GPUVertexInputRate;
-	export using GPUVertexInputState = ::SDL_GPUVertexInputState;
-	export using GPUViewport = ::SDL_GPUViewport;
-	export using Keycode = ::SDL_Keycode;
-	export using Music = ::MIX_Track;
-	export using PixelFormat = ::SDL_PixelFormat;
 	export using Point = ::SDL_FPoint;
 	export using PointI = ::SDL_Point;
-	export using Properties = ::SDL_PropertiesID;
 	export using RectF = ::SDL_FRect;
 	export using RectI = ::SDL_Rect;
-	export using ScaleMode = ::SDL_ScaleMode;
-	export using Scancode = ::SDL_Scancode;
-	export using ShadercrossComputeMetadata = ::SDL_ShaderCross_ComputePipelineMetadata;
-	export using ShadercrossGraphicsMetadata = ::SDL_ShaderCross_GraphicsShaderMetadata;
-	export using ShadercrossHLSLInfo = ::SDL_ShaderCross_HLSL_Info;
-	export using ShadercrossShaderStage = ::SDL_ShaderCross_ShaderStage;
-	export using ShadercrossSPIRVInfo = ::SDL_ShaderCross_SPIRV_Info;
-	export using Sound = ::MIX_Audio;
 	export using Surface = ::SDL_Surface;
-	export using Text = ::TTF_Text;
 	export using Window = ::SDL_Window;
 	export using ::Sint32;
 	export using ::Sint64;
@@ -165,18 +76,18 @@ namespace sdl {
 	export constexpr Color COLOR_WHITE = {2, 2, 2, 1};
 
 	/* Scan constants (used for hotkeys) */
-	export constexpr Scancode SCAN_BACKSPACE = SDL_SCANCODE_BACKSPACE;
-	export constexpr Scancode SCAN_DOWN = SDL_SCANCODE_DOWN;
-	export constexpr Scancode SCAN_ENTER = SDL_SCANCODE_KP_ENTER;
-	export constexpr Scancode SCAN_ESC = SDL_SCANCODE_ESCAPE;
-	export constexpr Scancode SCAN_LEFT = SDL_SCANCODE_LEFT;
-	export constexpr Scancode SCAN_RETURN = SDL_SCANCODE_RETURN;
-	export constexpr Scancode SCAN_RIGHT = SDL_SCANCODE_RIGHT;
-	export constexpr Scancode SCAN_UP = SDL_SCANCODE_UP;
+	export constexpr SDL_Scancode SCAN_BACKSPACE = SDL_SCANCODE_BACKSPACE;
+	export constexpr SDL_Scancode SCAN_DOWN = SDL_SCANCODE_DOWN;
+	export constexpr SDL_Scancode SCAN_ENTER = SDL_SCANCODE_KP_ENTER;
+	export constexpr SDL_Scancode SCAN_ESC = SDL_SCANCODE_ESCAPE;
+	export constexpr SDL_Scancode SCAN_LEFT = SDL_SCANCODE_LEFT;
+	export constexpr SDL_Scancode SCAN_RETURN = SDL_SCANCODE_RETURN;
+	export constexpr SDL_Scancode SCAN_RIGHT = SDL_SCANCODE_RIGHT;
+	export constexpr SDL_Scancode SCAN_UP = SDL_SCANCODE_UP;
 
 	/* Shader Stage */
-	export constexpr ShadercrossShaderStage STAGE_FRAGMENT = SDL_SHADERCROSS_SHADERSTAGE_FRAGMENT;
-	export constexpr ShadercrossShaderStage STAGE_VERTEX = SDL_SHADERCROSS_SHADERSTAGE_VERTEX;
+	export constexpr SDL_ShaderCross_ShaderStage STAGE_FRAGMENT = SDL_SHADERCROSS_SHADERSTAGE_FRAGMENT;
+	export constexpr SDL_ShaderCross_ShaderStage STAGE_VERTEX = SDL_SHADERCROSS_SHADERSTAGE_VERTEX;
 
 	/* Key constants (used for input listeners) */
 	export constexpr Sint32 KEY_BACKSPACE = SDLK_BACKSPACE;
@@ -376,13 +287,13 @@ namespace sdl {
 	export inline int soundExpireChannel(int channel, int ticks) { return Mix_ExpireChannel(channel, ticks); }
 	export inline int soundFadeOutChannel(int channel, int ms) { return Mix_FadeOutChannel(channel, ms); }
 	export inline int soundGetChannelVolume(int channel) { return Mix_Volume(channel, -1); }
-	export inline int soundPlay(Sound* sound, int loops = 0, int time = -1) { return Mix_PlayChannelTimed(-1, sound, loops, time); }
-	export inline int soundPlayFade(Sound* sound, int fade, int loops = 0, int time = -1) { return Mix_FadeInChannelTimed(-1, sound, loops, fade, time); }
+	export inline int soundPlay(MIX_Audio* sound, int loops = 0, int time = -1) { return Mix_PlayChannelTimed(-1, sound, loops, time); }
+	export inline int soundPlayFade(MIX_Audio* sound, int fade, int loops = 0, int time = -1) { return Mix_FadeInChannelTimed(-1, sound, loops, fade, time); }
 	export inline int soundReserveChannels(int num) { return Mix_ReserveChannels(num); }
-	export inline int soundSetVolume(Sound* sound, int volume) { return Mix_VolumeChunk(sound, volume); }
-	export inline Sound* soundGetChunk(int channel) { return Mix_GetChunk(channel); }
-	export inline Sound* soundLoad(const char* path) { return Mix_LoadWAV(path); }
-	export inline void soundFree(Sound* sound) { Mix_FreeChunk(sound); }
+	export inline int soundSetVolume(MIX_Audio* sound, int volume) { return Mix_VolumeChunk(sound, volume); }
+	export inline MIX_Audio* soundGetChunk(int channel) { return Mix_GetChunk(channel); }
+	export inline MIX_Audio* soundLoad(const char* path) { return Mix_LoadWAV(path); }
+	export inline void soundFree(MIX_Audio* sound) { Mix_FreeChunk(sound); }
 	export inline void soundHaltChannel(int channel) { return Mix_HaltChannel(channel); }
 	export inline void soundPauseChannel(int channel) { Mix_Pause(channel); }
 	export inline void soundResumeChannel(int channel) { Mix_Resume(channel); }

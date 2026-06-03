@@ -8,7 +8,7 @@ import fab.IDrawable;
 import fab.TextSupplier;
 import fab.TextDrawable;
 import fab.UIInteractable;
-import sdl.SDLBase; 
+import sdl.SDLHelpers; 
 import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;

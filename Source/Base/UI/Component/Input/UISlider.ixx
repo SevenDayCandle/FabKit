@@ -6,7 +6,7 @@ import fab.IDrawable;
 import fab.RelativeHitbox;
 import fab.UIHorizontalScrollbar;
 import fab.UINumberInput;
-import sdl.SDLBase; 
+import sdl.SDLHelpers; 
 import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;

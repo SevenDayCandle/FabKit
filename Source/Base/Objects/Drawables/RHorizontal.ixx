@@ -3,7 +3,7 @@ export module fab.RHorizontal;
 import fab.FTexture;
 import fab.FTextureBlock;
 import fab.FUtil;
-import sdl.SDLBase;
+import sdl.SDLHelpers;
 import fab.BatchRenderPass;
 import sdl.SDLRunner;
 

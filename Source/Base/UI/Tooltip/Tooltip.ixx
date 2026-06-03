@@ -6,7 +6,7 @@ import fab.FUtil;
 import fab.GenericTip;
 import fab.IDrawable;
 import fab.TextDrawable;
-import sdl.SDLBase; 
+import sdl.SDLHelpers; 
 import fab.BatchRenderPass;
 import std;
 

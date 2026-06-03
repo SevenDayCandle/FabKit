@@ -1,10 +1,14 @@
+module;
+
+#include "SDL3/SDL.h"
+
 export module fab.FTexture;
 
 import fab.FTextureBlock;
 import fab.FUtil;
 import fab.IDrawable;
 import fab.BatchRenderPass;
-import sdl.SDLBase;
+import sdl.SDLHelpers;
 import sdl.SDLRunner;
 import std;
 
@@ -24,8 +28,8 @@ namespace fab {
 		inline void dispose() override { release(); }
 
 		void reload() const override;
-		void reload(sdl::GPUCopyPass* copyPass) const override;
-		void reload(sdl::GPUCopyPass* copyPass, sdl::Surface* surface) const;
+		void reload(::SDL_GPUCopyPass* copyPass) const override;
+		void reload(::SDL_GPUCopyPass* copyPass, sdl::Surface* surface) const;
 	protected:
 		void drawCentered(BatchRenderPass& rp, float tX, float tY, float w, float h, float scX, float scY, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline) override;
 	};
@@ -44,19 +48,19 @@ namespace fab {
 	}
 
 	void FTexture::reload() const {
-		sdl::GPUCommandBuffer* uploadCmdBuf = sdl::runner::deviceAcquireCommandBuffer();
-		sdl::GPUCopyPass* copyPass = sdl::gpuBeginCopyPass(uploadCmdBuf);
+		::SDL_GPUCommandBuffer* uploadCmdBuf = sdl::runner::deviceAcquireCommandBuffer();
+		::SDL_GPUCopyPass* copyPass = sdl::gpuBeginCopyPass(uploadCmdBuf);
 		reload(copyPass);
 		sdl::gpuEndCopyPass(copyPass);
 		sdl::gpuSubmit(uploadCmdBuf);
 	}
 
-	void FTexture::reload(sdl::GPUCopyPass* copyPass) const {
+	void FTexture::reload(::SDL_GPUCopyPass* copyPass) const {
 		sdl::Surface* surface = sdl::surfaceLoad(path.data());
 		reload(copyPass, surface);
 	}
 
-	void FTexture::reload(sdl::GPUCopyPass* copyPass, sdl::Surface* surface) const {
+	void FTexture::reload(::SDL_GPUCopyPass* copyPass, sdl::Surface* surface) const {
 		if (surface) {
 			reupload(copyPass, surface);
 			sdl::surfaceDestroy(surface);

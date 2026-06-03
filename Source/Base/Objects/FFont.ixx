@@ -1,9 +1,14 @@
+module;
+
+#include "SDL3_shadercross/SDL_shadercross.h"
+#include "SDL3_ttf/SDL_ttf.h"
+
 export module fab.FFont;
 
 import fab.FTextureBlock;
 import fab.FUtil;
 import fab.ILoadable;
-import sdl.SDLBase;
+import sdl.SDLHelpers;
 import fab.BatchRenderPass;
 import sdl.SDLRunner;
 
@@ -17,7 +22,7 @@ namespace fab {
 			int shadowSize = 0;
 		};
 
-		FFont(strv path, float scalar, int size, int outlineSize = 0, int shadowSize = 0): globalScale(scalar), outlineSize(outlineSize), shadowSize(shadowSize), size(size), path(path) {}
+		FFont(strv path, float scalar, int size, int outlineSize = 0, int shadowSize = 0) : globalScale(scalar), outlineSize(outlineSize), shadowSize(shadowSize), size(size), path(path) {}
 		FFont(strv path, const Props& props) : FFont(path, props.globalScale, props.size, props.outlineSize, props.shadowSize) {}
 		FFont(const FFont&) = delete;
 
@@ -27,7 +32,7 @@ namespace fab {
 			}
 		}
 
-		operator sdl::Font*() const { return font; }
+		operator ::TTF_Font*() const { return font; }
 
 		inline int getOutlineSize() const { return outlineSize; }
 		inline int getShadowSize() const { return outlineSize; }
@@ -43,9 +48,9 @@ namespace fab {
 		pair<int, int> measureDim(strv text) const;
 		void dispose() override;
 		void reload() const override;
-		void reload(sdl::GPUCopyPass* copyPass) const override;
+		void reload(::SDL_GPUCopyPass* copyPass) const override;
 	private:
-		mutable sdl::Font* font;
+		mutable ::TTF_Font* font;
 		float globalScale = 1;
 		int outlineSize;
 		int shadowSize;
@@ -118,15 +123,15 @@ namespace fab {
 
 	/* Refreshes the font to match its size */
 	void FFont::reload() const {
-		sdl::GPUCommandBuffer* uploadCmdBuf = sdl::runner::deviceAcquireCommandBuffer();
-		sdl::GPUCopyPass* copyPass = sdl::gpuBeginCopyPass(uploadCmdBuf);
+		::SDL_GPUCommandBuffer* uploadCmdBuf = sdl::runner::deviceAcquireCommandBuffer();
+		::SDL_GPUCopyPass* copyPass = sdl::gpuBeginCopyPass(uploadCmdBuf);
 		reload(copyPass);
 		sdl::gpuEndCopyPass(copyPass);
 		sdl::gpuSubmit(uploadCmdBuf);
 	}
 
 	/* Refreshes the font to match its size */
-	void FFont::reload(sdl::GPUCopyPass* copyPass) const {
+	void FFont::reload(::SDL_GPUCopyPass* copyPass) const {
 		if (font) {
 			sdl::fontClose(font);
 		}

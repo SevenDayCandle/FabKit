@@ -2,7 +2,7 @@ export module fab.Hitbox;
 
 import fab.FUtil;
 import fab.FWindow;
-import sdl.SDLBase;
+import sdl.SDLHelpers;
 import sdl.SDLRunner;
 
 namespace fab {

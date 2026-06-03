@@ -6,7 +6,7 @@ import fab.FWindow;
 import fab.Hoverable;
 import fab.UIImage;
 import fab.VFX;
-import sdl.SDLBase; 
+import sdl.SDLHelpers; 
 import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;

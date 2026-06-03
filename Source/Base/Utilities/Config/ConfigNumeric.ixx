@@ -3,7 +3,7 @@ export module fab.ConfigNumeric;
 import fab.Config;
 import fab.ConfigValue;
 import fab.FUtil;
-import sdl.SDLBase; 
+import sdl.SDLHelpers; 
 import sdl.SDLRunner;
 import std;
 

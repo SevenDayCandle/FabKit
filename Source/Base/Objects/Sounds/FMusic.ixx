@@ -2,7 +2,7 @@ export module fab.FMusic;
 
 import fab.FUtil;
 import fab.ILoadable;
-import sdl.SDLBase; 
+import sdl.SDLHelpers;
 import sdl.SDLRunner;
 import std;
 
@@ -11,6 +11,7 @@ namespace fab {
 	public:
 		FMusic(strv path) : path(path) {}
 		FMusic(const FMusic&) = delete;
+
 		~FMusic() override {
 			// Unload when destroyed
 			if (music && sdl::runner::enabled()) {
@@ -25,18 +26,16 @@ namespace fab {
 		void dispose() override;
 		void reload() const override;
 	private:
-		mutable sdl::Music* music;
+		mutable ::MIX_Track* music;
 		str path;
 	};
 
-	void FMusic::dispose()
-	{
+	void FMusic::dispose() {
 		sdl::musicFree(music);
 		music = nullptr;
 	}
 
-	void FMusic::reload() const
-	{
+	void FMusic::reload() const {
 		if (music) {
 			sdl::musicFree(music);
 		}

@@ -5,7 +5,7 @@ import fab.FWindow;
 import fab.Hitbox;
 import fab.Hoverable;
 import fab.RelativeHitbox;
-import sdl.SDLBase; 
+import sdl.SDLHelpers; 
 import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;

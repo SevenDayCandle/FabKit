@@ -2,7 +2,7 @@ export module fab.ConfigValue;
 
 import fab.Config;
 import fab.FUtil;
-import sdl.SDLBase; 
+import sdl.SDLHelpers; 
 import sdl.SDLRunner;
 
 namespace fab {

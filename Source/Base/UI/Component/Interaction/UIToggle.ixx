@@ -7,7 +7,7 @@ import fab.Hitbox;
 import fab.IDrawable;
 import fab.TextDrawable;
 import fab.UIInteractable;
-import sdl.SDLBase; 
+import sdl.SDLHelpers; 
 import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;

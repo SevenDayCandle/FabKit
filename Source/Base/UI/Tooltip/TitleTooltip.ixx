@@ -6,8 +6,8 @@ import fab.FWindow;
 import fab.IDrawable;
 import fab.TextDrawable;
 import fab.Tooltip;
-import sdl.SDLBase; 
-import fab.BatchRenderPass; 
+import sdl.SDLHelpers;
+import fab.BatchRenderPass;
 import std;
 
 namespace fab {
@@ -15,15 +15,16 @@ namespace fab {
 	public:
 		TitleTooltip(FWindow& window, strv title, strv text, FFont& titleFont, FFont& font, float boxSize, IDrawable& background) :
 			Tooltip(window, text, font, boxSize, background), title(titleFont, title) {}
+
 		TitleTooltip(FWindow& window, strv title, strv text) :
 			TitleTooltip(window, title, text, window.props.fontRegular(), window.props.fontSmall(), DEFAULT_SIZE, window.props.defaultBackground()) {}
 
 
 		TitleTooltip& setTitle(strv text, sdl::Color color, sdl::Color colorOutline, const FFont& font);
-		virtual void render(BatchRenderPass& rp) override;
+		void render(BatchRenderPass& rp) override;
 	protected:
 		TextDrawable title;
 
-		virtual void updateBounds() override;
+		void updateBounds() override;
 	};
 }

@@ -5,7 +5,7 @@ import fab.FWindow;
 import fab.SequentialVFX;
 import fab.UIImage;
 import fab.VFX;
-import sdl.SDLBase; 
+import sdl.SDLHelpers; 
 import fab.BatchRenderPass;
 import std;
 

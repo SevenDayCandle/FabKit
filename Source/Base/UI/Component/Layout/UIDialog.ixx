@@ -7,7 +7,7 @@ import fab.IDrawable;
 
 import fab.UICanvas;
 import fab.UIInteractable;
-import sdl.SDLBase; 
+import sdl.SDLHelpers; 
 import fab.BatchRenderPass;
 import sdl.SDLRunner;
 import std;

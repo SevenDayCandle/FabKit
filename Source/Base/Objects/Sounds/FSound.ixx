@@ -2,7 +2,7 @@ export module fab.FSound;
 
 import fab.FUtil;
 import fab.ILoadable;
-import sdl.SDLBase; 
+import sdl.SDLHelpers;
 import sdl.SDLRunner;
 import std;
 
@@ -11,6 +11,7 @@ namespace fab {
 	public:
 		FSound(strv path) : path(path) {}
 		FSound(const FSound&) = delete;
+
 		~FSound() override {
 			// Unload sound when destroyed
 			if (sound && sdl::runner::enabled()) {
@@ -25,18 +26,16 @@ namespace fab {
 		void dispose() override;
 		void reload() const override;
 	private:
-		mutable sdl::Sound* sound;
+		mutable ::MIX_Audio* sound;
 		str path;
 	};
 
-	void FSound::dispose()
-	{
+	void FSound::dispose() {
 		sdl::soundFree(sound);
 		sound = nullptr;
 	}
 
-	void FSound::reload() const
-	{
+	void FSound::reload() const {
 		if (sound) {
 			sdl::soundFree(sound);
 		}
