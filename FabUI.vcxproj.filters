@@ -29,9 +29,6 @@
     <ClCompile Include="Source\Base\Objects\Drawables\IDrawable.ixx">
       <Filter>Base\Objects\Drawables</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Base\Objects\Sounds\FMusic.ixx">
-      <Filter>Base\Objects\Sounds</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Base\Objects\Sounds\FSound.ixx">
       <Filter>Base\Objects\Sounds</Filter>
     </ClCompile>

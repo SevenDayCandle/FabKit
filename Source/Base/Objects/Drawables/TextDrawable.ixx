@@ -1,3 +1,7 @@
+module;
+
+#include "SDL3_ttf/SDL_ttf.h"
+
 export module fab.TextDrawable;
 
 import fab.FFont;
@@ -27,7 +31,7 @@ namespace fab {
 
 		TextDrawable(const TextDrawable&) = delete;
 		TextDrawable(TextDrawable&& other) noexcept : font(other.font), textW(other.textW), text(other.text), color(other.color), colorOutline(other.colorOutline) {}
-		~TextDrawable() override = default;
+		~TextDrawable() override { TextDrawable::dispose(); };
 
 		inline bool empty() const { return text.empty(); }
 		inline bool loaded() const { return textObj; }
@@ -71,7 +75,7 @@ namespace fab {
 
 	void TextDrawable::dispose() {
 		if (textObj) {
-			sdl::textDestroy(textObj);
+			TTF_DestroyText(textObj);
 			textObj = nullptr;
 		}
 	}
@@ -104,10 +108,10 @@ namespace fab {
 
 	void TextDrawable::reload() const {
 		if (textObj) {
-			sdl::textDestroy(textObj);
+			TTF_DestroyText(textObj);
 		}
 		textObj = sdl::runner::textCreate(*font, text);
-		sequence = sdl::textGetSequence(textObj);
+		sequence = TTF_GetGPUTextDrawData(textObj);
 	}
 
 	TextDrawable& TextDrawable::set(strv text, sdl::Color color) {

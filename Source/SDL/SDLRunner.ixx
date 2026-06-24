@@ -1,9 +1,8 @@
 module;
 
-#include <cstring>
-
 #include "SDL3/SDL.h"
 #include "SDL3_mixer/SDL_mixer.h"
+#include "SDL3_shadercross/SDL_shadercross.h"
 #include "SDL3_ttf/SDL_ttf.h"
 
 export module sdl.SDLRunner;
@@ -32,12 +31,14 @@ namespace sdl {
 	IKeyInputListener* kListener = nullptr;
 	SDL_Event e;
 	SDL_Gamepad* gamepad;
-	SDL_GPUBuffer* VERTEX_BUFFER;
+	SDL_GPUBuffer* vertexBuffer;
 	SDL_GPUDevice* device;
-	SDL_GPUGraphicsPipeline* RENDER_FILL;
-	SDL_GPUGraphicsPipeline* RENDER_STANDARD;
-	SDL_GPUSampler* SAMPLER;
-	SDL_GPUTransferBuffer* TRANSFER_BUFFER;
+	SDL_GPUGraphicsPipeline* renderFill;
+	SDL_GPUGraphicsPipeline* renderStandard;
+	SDL_GPUSampler* sampler;
+	SDL_GPUTransferBuffer* transferBuffer;
+	std::vector<MIX_Mixer*> mixers;
+	std::vector<MIX_Track*> tracks;
 	TTF_TextEngine* textEngine;
 	Uint64 delta;
 	Uint64 fpsLimit;
@@ -49,6 +50,9 @@ namespace sdl {
 
 namespace sdl::runner {
 	export constexpr int MAX_SPRITES = 131072;
+
+	export constexpr int MIXER_SOUND = 0;
+	export constexpr int MIXER_MUSIC = 1;
 
 	export inline bool deviceClaimWindow(SDL_Window* window) { return SDL_ClaimWindowForGPUDevice(device, window); }
 	export inline bool deviceIsTextureFormatSupported(SDL_GPUTextureFormat format, SDL_GPUTextureType type, SDL_GPUTextureUsageFlags usage) { return SDL_GPUTextureSupportsFormat(device, format, type, usage); }
@@ -101,7 +105,7 @@ namespace sdl::runner {
 		return SDL_CreateGPUTransferBuffer(device, &info);
 	}
 
-	export inline TexProps* deviceMapTexTransferBuffer(bool cycle) { return static_cast<TexProps*>(SDL_MapGPUTransferBuffer(device, TRANSFER_BUFFER, cycle)); }
+	export inline TexProps* deviceMapTexTransferBuffer(bool cycle) { return static_cast<TexProps*>(SDL_MapGPUTransferBuffer(device, transferBuffer, cycle)); }
 	export inline TTF_Text* textCreate(TTF_Font* font, std::string_view text) { return TTF_CreateText(textEngine, font, text.data(), text.length()); };
 	export inline Uint64 timeDelta() { return delta; }
 	export inline Uint64 timeTotal() { return timeCurrent; }
@@ -116,17 +120,22 @@ namespace sdl::runner {
 	export inline void deviceSetBufferName(SDL_GPUBuffer* buffer, const char* text) { SDL_SetGPUBufferName(device, buffer, text); }
 	export inline void deviceSetTextureName(SDL_GPUTexture* texture, const char* text) { SDL_SetGPUTextureName(device, texture, text); }
 	export inline void deviceUnclaimWindow(SDL_Window* window) { SDL_ReleaseWindowFromGPUDevice(device, window); }
-	export inline void deviceUnmapTexTransferBuffer() { SDL_UnmapGPUTransferBuffer(device, TRANSFER_BUFFER); }
+	export inline void deviceUnmapTexTransferBuffer() { SDL_UnmapGPUTransferBuffer(device, transferBuffer); }
 	export inline void deviceUnmapTransferBuffer(SDL_GPUTransferBuffer* transferBuffer) { SDL_UnmapGPUTransferBuffer(device, transferBuffer); }
 	export inline void deviceWait() { SDL_WaitForGPUIdle(device); }
 	export inline void deviceWaitForFences(bool waitAll, SDL_GPUFence** pFences, Uint32 fenceCount) { SDL_WaitForGPUFences(device, waitAll, pFences, fenceCount); }
 	export inline void setFPSLimit(int fps) { fpsLimit = fps > 0 ? NANOS_PER_SECOND / fps : 0; }
 	export inline void* deviceMapTransferBuffer(SDL_GPUTransferBuffer* transferBuffer, bool cycle) { return SDL_MapGPUTransferBuffer(device, transferBuffer, cycle); }
 
+
 	export bool init(const char* renderer = nullptr);
 	export bool initRendering(const char* normalFrag = SHADER_NORMAL_FRAG, const char* normalVert = SHADER_NORMAL_VERT, const char* fillFrag = SHADER_FILL_FRAG, const char* fillVert = SHADER_FILL_VERT, const int maxSprites = MAX_SPRITES);
+	export bool mixerSetGain(int index, float vol);
 	export bool poll();
 	export bool uploadVertexes(SDL_GPUCommandBuffer* cmd, SDL_GPUCopyPass* copyPass);
+	export int registerMixer(SDL_AudioDeviceID devid = SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, const SDL_AudioSpec* spec = nullptr);
+	export MIX_Audio* mixerLoadAudio(int index, const char* path, bool predecode = false);
+	export MIX_Track* requestTrack(int index);
 	export SDL_GPUGraphicsPipeline* createPipeline(SDL_GPUShader* vertexShader, SDL_GPUShader* fragmentShader, SDL_GPUTextureFormat textureFormat = SDL_GPUTextureFormat::SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM, SDL_GPUBlendFactor srcColor = SDL_GPUBlendFactor::SDL_GPU_BLENDFACTOR_SRC_ALPHA,
 	                                               SDL_GPUBlendFactor dstColor = SDL_GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
 	                                               SDL_GPUBlendFactor srcAlpha = SDL_GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE, SDL_GPUBlendFactor dstAlpha = SDL_GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA);
@@ -169,13 +178,26 @@ namespace sdl::runner {
 		}
 
 		// TODO adjust spec as needed
-		if (!Mix_OpenAudio(0, nullptr)) {
-			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "Mix_OpenAudio failed: %s", SDL_GetError());
+		if (!MIX_Init()) {
+			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "MIX_Init failed: %s", SDL_GetError());
 			return false;
 		}
+		MIX_Mixer* mixerSound = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr);
+		if (!mixerSound) {
+			SDL_LogCritical(SDL_LOG_CATEGORY_AUDIO, "Mixer Sound went derp: %s", getError());
+			return false;
+		}
+		mixers.push_back(mixerSound);
+		MIX_Mixer* mixerMusic = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr);
+		if (!mixerMusic) {
+			SDL_LogCritical(SDL_LOG_CATEGORY_AUDIO, "Mixer Sound went derp: %s", getError());
+			return false;
+		}
+		mixers.push_back(mixerMusic);
+
 
 		// Initialize driver
-		device = SDL_CreateGPUDevice(gpuGetHLSLShaderFormats(), true, renderer);
+		device = SDL_CreateGPUDevice(SDL_ShaderCross_GetHLSLShaderFormats(), true, renderer);
 		if (!device) {
 			SDL_LogCritical(SDL_LOG_CATEGORY_VIDEO, "Device went derp: %s", getError());
 			return false;
@@ -196,8 +218,8 @@ namespace sdl::runner {
 	bool initRendering(const char* normalFrag, const char* normalVert, const char* fillFrag, const char* fillVert, const int maxSprites) {
 		// Initialize vertex storage and transfer buffers
 		const Uint32 sizeVert = sizeof(TexProps) * maxSprites;
-		VERTEX_BUFFER = deviceCreateBuffer(SDL_GPU_BUFFERUSAGE_VERTEX, sizeVert);
-		TRANSFER_BUFFER = deviceCreateTransferBuffer(
+		vertexBuffer = deviceCreateBuffer(SDL_GPU_BUFFERUSAGE_VERTEX, sizeVert);
+		transferBuffer = deviceCreateTransferBuffer(
 			SDL_GPUTransferBufferUsage::SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
 			(sizeVert)
 		);
@@ -211,22 +233,22 @@ namespace sdl::runner {
 			.address_mode_v = SDL_GPUSamplerAddressMode::SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
 			.address_mode_w = SDL_GPUSamplerAddressMode::SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
 		};
-		SAMPLER = gpuCreateSampler(device, &samplerInfo);
+		sampler = SDL_CreateGPUSampler(device, &samplerInfo);
 
 		// Set up pipelines
 		SDL_GPUShader* shaderFragment = loadShader(normalFrag, STAGE_FRAGMENT, 1, 1);
 		SDL_GPUShader* shaderVertex = loadShader(normalVert, STAGE_VERTEX, 0, 1);
-		RENDER_STANDARD = createPipeline(shaderVertex, shaderFragment);
+		renderStandard = createPipeline(shaderVertex, shaderFragment);
 
 		SDL_GPUShader* shaderFillFragment = loadShader(fillFrag, STAGE_FRAGMENT, 1, 1);
 		SDL_GPUShader* shaderFillVertex = loadShader(fillVert, STAGE_VERTEX, 0, 1);
-		RENDER_FILL = createPipeline(shaderFillVertex, shaderFillFragment);
+		renderFill = createPipeline(shaderFillVertex, shaderFillFragment);
 		// TODO more shaders/blending modes
 
-		gpuReleaseShader(device, shaderFragment);
-		gpuReleaseShader(device, shaderVertex);
-		gpuReleaseShader(device, shaderFillFragment);
-		gpuReleaseShader(device, shaderFillVertex);
+		SDL_ReleaseGPUShader(device, shaderFragment);
+		SDL_ReleaseGPUShader(device, shaderVertex);
+		SDL_ReleaseGPUShader(device, shaderFillFragment);
+		SDL_ReleaseGPUShader(device, shaderFillVertex);
 
 		// Text engine
 		textEngine = TTF_CreateGPUTextEngine(device);
@@ -234,14 +256,21 @@ namespace sdl::runner {
 		return true;
 	}
 
+	bool mixerSetGain(int index, float vol) {
+		if (index < mixers.size()) {
+			return MIX_SetMixerGain(mixers[index], vol);
+		}
+		return false;
+	}
+
 	// Execute a singular game loop. Returns false if the program should terminate 
-	export bool poll() {
+	bool poll() {
 		// Update time
 		timeCurrent = SDL_GetTicksNS();
 		delta = timeCurrent - timeLast;
 		timeLast = timeCurrent;
 
-		// Update temporary states
+		// Update last known mouse/keyboard states
 		mouseLast = mouse;
 		mouseWheelX = 0;
 		mouseWheelY = 0;
@@ -292,6 +321,37 @@ namespace sdl::runner {
 		}
 
 		return true;
+	}
+
+	int registerMixer(SDL_AudioDeviceID devid, const SDL_AudioSpec* spec) {
+		MIX_Mixer* mixer = MIX_CreateMixerDevice(devid, spec);
+		if (!mixer) {
+			SDL_LogCritical(SDL_LOG_CATEGORY_AUDIO, "Mixer could not be created: %s", getError());
+			return false;
+		}
+	}
+
+	MIX_Audio* mixerLoadAudio(int index, const char* path, bool predecode) {
+		if (index < mixers.size()) {
+			return MIX_LoadAudio(mixers[index], path, predecode);
+		}
+		return nullptr;
+	}
+
+	// Returns the first track that is available for playing sounds. If none are available, creates a new one
+	MIX_Track* requestTrack(int index) {
+		if (index < mixers.size()) {
+			MIX_Mixer* mixer = mixers[index];
+			for (MIX_Track* track : tracks) {
+				if (!MIX_TrackPlaying(track)) {
+					return track;
+				}
+			}
+			MIX_Track* newTrack = MIX_CreateTrack(mixer);
+			tracks.push_back(newTrack);
+			return newTrack;
+		}
+		return nullptr;
 	}
 
 	// Generates a graphics pipeline to be used for this window
@@ -404,7 +464,7 @@ namespace sdl::runner {
 			}
 		};
 
-		return gpuCreateGraphicsPipeline(device, &pipelineCreateInfo);
+		return SDL_CreateGPUGraphicsPipeline(device, &pipelineCreateInfo);
 	}
 
 	// Generates a non-texture graphics pipeline to be used for this window
@@ -443,25 +503,25 @@ namespace sdl::runner {
 			},
 		};
 
-		return gpuCreateGraphicsPipeline(device, &pipelineCreateInfo);
+		return SDL_CreateGPUGraphicsPipeline(device, &pipelineCreateInfo);
 	}
 
 	// TODO more pipelines
 	SDL_GPUGraphicsPipeline* pipelineForMode(RenderMode mode) {
-		return RENDER_STANDARD;
+		return renderStandard;
 	}
 
 	SDL_GPUGraphicsPipeline* shapePipelineForMode(RenderMode mode) {
-		return RENDER_FILL;
+		return renderFill;
 	}
 
 	// Generates a shader to be used for this window
 	// TODO option to cache built shader
 	SDL_GPUShader* loadShader(const char* shaderFilename, ::SDL_ShaderCross_ShaderStage stage, Uint32 samplerCount, Uint32 uniformBufferCount, Uint32 storageBufferCount, Uint32 storageTextureCount) {
 		size_t codeSize;
-		std::filesystem::path name = sdl::dirBase();
+		std::filesystem::path name = SDL_GetBasePath();
 		name /= shaderFilename;
-		void* code = fileLoad(name.string().data(), &codeSize);
+		void* code = SDL_LoadFile(name.string().data(), &codeSize);
 		if (code == nullptr) {
 			logError("Failed to load shader from disk: %s, %s", name.string().data(), getError());
 			return nullptr;
@@ -479,8 +539,8 @@ namespace sdl::runner {
 			.num_storage_buffers = storageBufferCount,
 			.num_uniform_buffers = uniformBufferCount,
 		};
-		SDL_GPUShader* shader = gpuCompileHLSLShader(device, &info, &metadata);
-		free(code);
+		SDL_GPUShader* shader = SDL_ShaderCross_CompileGraphicsShaderFromHLSL(device, &info, &metadata);
+		SDL_free(code);
 		if (shader == nullptr) {
 			logError("Failed to compile shader: %s, %s", name.string().data(), getError());
 		}
@@ -550,7 +610,7 @@ namespace sdl::runner {
 			.d = 1
 		};
 
-		gpuUploadToTexture(copyPass, &tInfo, &tRegion, false);
+		SDL_UploadToGPUTexture(copyPass, &tInfo, &tRegion, false);
 		return texture;
 	}
 
@@ -579,19 +639,19 @@ namespace sdl::runner {
 			.d = 1
 		};
 
-		gpuUploadToTexture(copyPass, &tInfo, &tRegion, false);
+		SDL_UploadToGPUTexture(copyPass, &tInfo, &tRegion, false);
 		return texture;
 	}
 
 	void bindRenderBuffer(SDL_GPURenderPass* pass) {
-		SDL_GPUBufferBinding b = {VERTEX_BUFFER, 0};
-		sdl::gpuBindVertexBuffers(pass, 0, &b, 1);
+		SDL_GPUBufferBinding b = {vertexBuffer, 0};
+		SDL_BindGPUVertexBuffers(pass, 0, &b, 1);
 	}
 
 	// Bind a texture to the renderpass using the default sampler
 	void bindTexture(SDL_GPURenderPass* pass, SDL_GPUTexture* texture) {
-		SDL_GPUTextureSamplerBinding b = {texture, SAMPLER};
-		sdl::gpuBindFragmentSamplers(pass, 0, &b, 1);
+		SDL_GPUTextureSamplerBinding b = {texture, sampler};
+		SDL_BindGPUFragmentSamplers(pass, 0, &b, 1);
 	}
 
 	// When using a fixed framerate, sleep to fill up remaining time
@@ -625,30 +685,35 @@ namespace sdl::runner {
 
 	// Clean up SDL
 	export void quit() {
-		gpuReleaseBuffer(device, VERTEX_BUFFER);
-		gpuReleaseGraphicsPipeline(device, RENDER_STANDARD);
-		gpuReleaseSampler(device, SAMPLER);
-		gpuReleaseTransferBuffer(device, TRANSFER_BUFFER);
-		VERTEX_BUFFER = nullptr;
-		RENDER_STANDARD = nullptr;
-		SAMPLER = nullptr;
-		TRANSFER_BUFFER = nullptr;
+		SDL_ReleaseGPUBuffer(device, vertexBuffer);
+		SDL_ReleaseGPUGraphicsPipeline(device, renderStandard);
+		SDL_ReleaseGPUSampler(device, sampler);
+		SDL_ReleaseGPUTransferBuffer(device, transferBuffer);
+		vertexBuffer = nullptr;
+		renderStandard = nullptr;
+		sampler = nullptr;
+		transferBuffer = nullptr;
 
 		SDL_DestroyGPUDevice(device);
 		device = nullptr;
+
+		for (MIX_Mixer* mixer : mixers) {
+			MIX_DestroyMixer(mixer);
+		}
+		mixers.clear();
+
 		TTF_Quit();
-		Mix_CloseAudio();
-		Mix_Quit();
+		MIX_Quit();
 		SDL_Quit();
 		enabledInternal = false;
 	}
 
 	// Transfer data currently stored in the transfer buffer to the storage buffer
 	void uploadToVertexBuffer(SDL_GPUCommandBuffer* cmd, Uint32 sizeVert, Uint32 offset) {
-		SDL_GPUCopyPass* copyPass = sdl::gpuBeginCopyPass(cmd);
-		SDL_GPUTransferBufferLocation t1 = {TRANSFER_BUFFER, 0};
-		SDL_GPUBufferRegion r1 = {VERTEX_BUFFER, offset, sizeVert};
-		sdl::gpuUploadToBuffer(copyPass, &t1, &r1, true);
-		sdl::gpuEndCopyPass(copyPass);
+		SDL_GPUCopyPass* copyPass = SDL_BeginGPUCopyPass(cmd);
+		SDL_GPUTransferBufferLocation t1 = {transferBuffer, 0};
+		SDL_GPUBufferRegion r1 = {vertexBuffer, offset, sizeVert};
+		SDL_UploadToGPUBuffer(copyPass, &t1, &r1, true);
+		SDL_EndGPUCopyPass(copyPass);
 	}
 }

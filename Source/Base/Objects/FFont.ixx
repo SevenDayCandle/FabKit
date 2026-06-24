@@ -1,5 +1,6 @@
 module;
 
+#include "SDL3/SDL.h"
 #include "SDL3_shadercross/SDL_shadercross.h"
 #include "SDL3_ttf/SDL_ttf.h"
 
@@ -61,21 +62,21 @@ namespace fab {
 	// Get the x and y sizes of the given text written with this font
 	pair<int, int> FFont::measureDim(strv text) const {
 		pair<int, int> pair;
-		sdl::fontSizeText(font, text.data(), &pair.first, &pair.second);
+		TTF_GetStringSize(font, text.data(), 0, &pair.first, &pair.second);
 		return pair;
 	}
 
 	// Get the x size of the given text written with this font
 	int FFont::measureH(strv text) const {
 		int w, h;
-		sdl::fontSizeText(font, text.data(), &w, &h);
+		TTF_GetStringSize(font, text.data(), 0, &w, &h);
 		return h;
 	}
 
 	// Get the y size of the given text written with this font
 	int FFont::measureW(strv text) const {
 		int w, h;
-		sdl::fontSizeText(font, text.data(), &w, &h);
+		TTF_GetStringSize(font, text.data(), 0, &w, &h);
 		return w;
 	}
 
@@ -116,7 +117,7 @@ namespace fab {
 	/* Close the font */
 	void FFont::dispose() {
 		if (font) {
-			sdl::fontClose(font);
+			TTF_CloseFont(font);
 			font = nullptr;
 		}
 	}
@@ -124,20 +125,20 @@ namespace fab {
 	/* Refreshes the font to match its size */
 	void FFont::reload() const {
 		::SDL_GPUCommandBuffer* uploadCmdBuf = sdl::runner::deviceAcquireCommandBuffer();
-		::SDL_GPUCopyPass* copyPass = sdl::gpuBeginCopyPass(uploadCmdBuf);
+		::SDL_GPUCopyPass* copyPass = SDL_BeginGPUCopyPass(uploadCmdBuf);
 		reload(copyPass);
-		sdl::gpuEndCopyPass(copyPass);
-		sdl::gpuSubmit(uploadCmdBuf);
+		SDL_EndGPUCopyPass(copyPass);
+		SDL_SubmitGPUCommandBuffer(uploadCmdBuf);
 	}
 
 	/* Refreshes the font to match its size */
 	void FFont::reload(::SDL_GPUCopyPass* copyPass) const {
 		if (font) {
-			sdl::fontClose(font);
+			TTF_CloseFont(font);
 		}
 
 		int res = globalScale * (size);
-		font = sdl::fontOpen(path.c_str(), res);
+		font = TTF_OpenFont(path.c_str(), res);
 		if (!font) {
 			sdl::logError("Failed to load font %s: %s", path.c_str(), sdl::getError());
 		}

@@ -29,7 +29,7 @@ namespace fab {
 		void reset();
 		void set(int key, int pad);
 
-		inline static str configPath() { return sdl::dirPref(futil::FBC.data(), BASE_HOTKEY_FILE.data()); }
+		inline static str configPath() { return SDL_GetPrefPath(futil::FBC.data(), BASE_HOTKEY_FILE.data()); }
 
 		static void commit();
 		static void reload();

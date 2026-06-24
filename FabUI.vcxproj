@@ -29,7 +29,6 @@
     <ClCompile Include="Source\Base\Objects\Drawables\TextDrawable.ixx" />
     <ClCompile Include="Source\Base\Objects\FFont.ixx" />
     <ClCompile Include="Source\Base\Objects\FTextureBlock.ixx" />
-    <ClCompile Include="Source\Base\Objects\Sounds\FMusic.ixx" />
     <ClCompile Include="Source\Base\Objects\Sounds\FSound.ixx" />
     <ClCompile Include="Source\Base\UI\BasicWindowProps.ixx">
       <SubType>

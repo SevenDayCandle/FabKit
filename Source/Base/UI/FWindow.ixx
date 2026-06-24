@@ -141,7 +141,7 @@ namespace fab {
 		this->winH = props.getResolutionY();
 		projection = makeProjection(winW, winH);
 		// TODO setup projection
-		window = sdl::windowCreate(props.getTitle(), winW, winH, props.getWindowMode());
+		window = SDL_CreateWindow(props.getTitle(), winW, winH, props.getWindowMode());
 		if (!window) {
 			sdl::logCritical("Window went derp: %s", sdl::getError());
 			return false;
@@ -211,7 +211,7 @@ namespace fab {
 		screens.clear();
 
 		sdl::runner::deviceUnclaimWindow(window);
-		sdl::windowDestroy(window);
+		SDL_DestroyWindow(window);
 		window = nullptr;
 	}
 
@@ -286,7 +286,7 @@ namespace fab {
 		this->winH = winH;
 		this->winW = winW;
 		projection = makeProjection(winW, winH);
-		sdl::windowSetSize(window, winW, winH);
+		SDL_SetWindowSize(window, winW, winH);
 		for (const uptr<FWindow::Element>& screen : screens) {
 			screen->refreshDimensions();
 		}
@@ -300,7 +300,10 @@ namespace fab {
 		SDL_GPUCommandBuffer* cd = sdl::runner::deviceAcquireCommandBuffer();
 		if (cd) {
 			uint32 w, h;
-			SDL_GPUTexture* swapchain = sdl::gpuAcquireSwapchainTexture(cd, window, &w, &h);
+			SDL_GPUTexture* swapchain = nullptr;
+			if (!SDL_WaitAndAcquireGPUSwapchainTexture(cd, window, &swapchain, &w, &h)) {
+				SDL_Log("SDL_WaitAndAcquireGPUSwapchainTexture failed: %s", SDL_GetError());
+			}
 			if (swapchain) {
 				SDL_GPUColorTargetInfo colorAttachmentInfo = {
 					.texture = swapchain,
@@ -329,7 +332,7 @@ namespace fab {
 				rp.draw();
 			}
 
-			sdl::gpuSubmit(cd);
+			SDL_SubmitGPUCommandBuffer(cd);
 		}
 	}
 

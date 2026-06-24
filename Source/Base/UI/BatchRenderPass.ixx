@@ -1,3 +1,7 @@
+module;
+
+#include "SDL3/SDL.h"
+
 export module fab.BatchRenderPass;
 
 import fab.FUtil;
@@ -20,11 +24,11 @@ namespace fab {
 		~BatchRenderPass() {}
 
 		inline bool canPush() const { return buffer; }
-		inline void pushFragmentUniform(const void* data, fab::uint32 sizeInBytes, fab::uint32 slot = 0) { sdl::gpuPushFragmentUniformData(cmd, slot, data, sizeInBytes); };
+		inline void pushFragmentUniform(const void* data, fab::uint32 sizeInBytes, fab::uint32 slot = 0) { SDL_PushGPUFragmentUniformData(cmd, slot, data, sizeInBytes); };
 		inline void pushVertexData(const sdl::TexProps& vertexData) { buffer[currentIndex++] = vertexData; }
-		inline void pushVertexUniform(const void* data, fab::uint32 sizeInBytes, fab::uint32 slot = 0) { sdl::gpuPushVertexUniformData(cmd, slot, data, sizeInBytes); };
-		template <typename T> inline void pushFragmentUniformAuto(const T* data, fab::uint32 slot = 0) { sdl::gpuPushFragmentUniformData(cmd, slot, data, sizeof(T)); };
-		template <typename T> inline void pushVertexUniformAuto(const T* data, fab::uint32 slot = 0) { sdl::gpuPushVertexUniformData(cmd, slot, data, sizeof(T)); };
+		inline void pushVertexUniform(const void* data, fab::uint32 sizeInBytes, fab::uint32 slot = 0) { SDL_PushGPUVertexUniformData(cmd, slot, data, sizeInBytes); };
+		template <typename T> inline void pushFragmentUniformAuto(const T* data, fab::uint32 slot = 0) { SDL_PushGPUFragmentUniformData(cmd, slot, data, sizeof(T)); };
+		template <typename T> inline void pushVertexUniformAuto(const T* data, fab::uint32 slot = 0) { SDL_PushGPUVertexUniformData(cmd, slot, data, sizeof(T)); };
 
 		void bindPipeline(::SDL_GPUGraphicsPipeline* pipeline);
 		void bindTexture(::SDL_GPUTexture* texture);
@@ -76,14 +80,14 @@ namespace fab {
 			queueContents();
 		}
 
-		::SDL_GPURenderPass* pass = sdl::gpuBeginRenderPass(cmd, info, colorAttachmentAmount, depth);
+		::SDL_GPURenderPass* pass = SDL_BeginGPURenderPass(cmd, info, colorAttachmentAmount, depth);
 		sdl::runner::bindRenderBuffer(pass);
 		for (const Entry& entry : ledger) {
-			sdl::gpuBindGraphicsPipeline(pass, entry.pipeline);
+			SDL_BindGPUGraphicsPipeline(pass, entry.pipeline);
 			sdl::runner::bindTexture(pass, entry.texture);
-			sdl::gpuDrawGpuPrimitives(pass, 6, entry.size, 0, entry.offset);
+			SDL_DrawGPUPrimitives(pass, 6, entry.size, 0, entry.offset);
 		}
-		sdl::gpuEndRenderPass(pass);
+		SDL_EndGPURenderPass(pass);
 		ledger.clear();
 		currentIndex = lastIndex = 0;
 	}

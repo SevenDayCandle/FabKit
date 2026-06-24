@@ -17,7 +17,6 @@ namespace fab {
 	public:
 		constexpr static int DEFAULT_LENGTH = 1024;
 
-		/* An element that can be placed into a FWindow */
 		class Item : public ILoadable {
 		public:
 			Item(FTextureBlock& source) : source(source) {}
@@ -164,10 +163,10 @@ namespace fab {
 
 	void FTextureBlock::reload() const {
 		SDL_GPUCommandBuffer* uploadCmdBuf = sdl::runner::deviceAcquireCommandBuffer();
-		SDL_GPUCopyPass* copyPass = sdl::gpuBeginCopyPass(uploadCmdBuf);
+		SDL_GPUCopyPass* copyPass = SDL_BeginGPUCopyPass(uploadCmdBuf);
 		reload(copyPass);
-		sdl::gpuEndCopyPass(copyPass);
-		sdl::gpuSubmit(uploadCmdBuf);
+		SDL_EndGPUCopyPass(copyPass);
+		SDL_SubmitGPUCommandBuffer(uploadCmdBuf);
 	}
 
 	void FTextureBlock::reload(SDL_GPUCopyPass* copyPass) const {
@@ -196,7 +195,7 @@ namespace fab {
 			::SDL_GPUTransferBufferUsage::SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
 			texW * texH * 4
 		);
-		sdl::logCritical("Create texture array of size %d x %d", texW * texH * 4);
+		sdl::logCritical("Create texture array of size %d", texW * texH * 4);
 	}
 
 	template <c_ext<FTextureBlock::Item> T> T& FTextureBlock::create(const strv& key) {

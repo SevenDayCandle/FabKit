@@ -1,9 +1,12 @@
+module;
+
+#include "SDL3/SDL.h"
+
 export module fab.ILoadable;
 
 import fab.FUtil;
 import sdl.SDLHelpers;
 import fab.BatchRenderPass;
-import sdl.SDLProps;
 import sdl.SDLRunner;
 import std;
 

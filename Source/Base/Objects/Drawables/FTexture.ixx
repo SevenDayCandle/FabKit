@@ -1,6 +1,7 @@
 module;
 
 #include "SDL3/SDL.h"
+#include "SDL3_image/SDL_image.h"
 
 export module fab.FTexture;
 
@@ -19,9 +20,7 @@ namespace fab {
 		FTexture(FTextureBlock& source, strv path) : FTextureBlock::Item(source), path(path) {}
 		FTexture(const FTexture&) = delete;
 		FTexture(FTexture&& other) noexcept : FTextureBlock::Item(move(other)), path(other.path) {}
-		~FTexture() override {}
-
-		str path;
+		~FTexture() override { release(); }
 
 		inline float getHeight() const override { return source.getHeight(); }
 		inline float getWidth() const override { return source.getWidth(); }
@@ -31,6 +30,8 @@ namespace fab {
 		void reload(::SDL_GPUCopyPass* copyPass) const override;
 		void reload(::SDL_GPUCopyPass* copyPass, sdl::Surface* surface) const;
 	protected:
+		str path;
+
 		void drawCentered(BatchRenderPass& rp, float tX, float tY, float w, float h, float scX, float scY, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline) override;
 	};
 
@@ -49,21 +50,21 @@ namespace fab {
 
 	void FTexture::reload() const {
 		::SDL_GPUCommandBuffer* uploadCmdBuf = sdl::runner::deviceAcquireCommandBuffer();
-		::SDL_GPUCopyPass* copyPass = sdl::gpuBeginCopyPass(uploadCmdBuf);
+		::SDL_GPUCopyPass* copyPass = SDL_BeginGPUCopyPass(uploadCmdBuf);
 		reload(copyPass);
-		sdl::gpuEndCopyPass(copyPass);
-		sdl::gpuSubmit(uploadCmdBuf);
+		SDL_EndGPUCopyPass(copyPass);
+		SDL_SubmitGPUCommandBuffer(uploadCmdBuf);
 	}
 
 	void FTexture::reload(::SDL_GPUCopyPass* copyPass) const {
-		sdl::Surface* surface = sdl::surfaceLoad(path.data());
+		sdl::Surface* surface = IMG_Load(path.data());
 		reload(copyPass, surface);
 	}
 
 	void FTexture::reload(::SDL_GPUCopyPass* copyPass, sdl::Surface* surface) const {
 		if (surface) {
 			reupload(copyPass, surface);
-			sdl::surfaceDestroy(surface);
+			SDL_DestroySurface(surface);
 		}
 		else {
 			release();
