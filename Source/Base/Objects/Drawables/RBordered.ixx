@@ -32,8 +32,8 @@ namespace fab {
 		const float endX = tX + distX;
 		const float endY = tY + distY;
 
-		rp.bindPipeline(sdl::runner::pipelineForMode(pipeline));
-		rp.bindTexture(source);
+		rp.setPipeline(sdl::runner::pipelineForMode(pipeline));
+		rp.setTexture(source);
 
 		rp.pushVertexData({
 			.transform = BatchRenderPass::makeTransform(beginX, beginY, cornerSX, cornerSY, rotZ),

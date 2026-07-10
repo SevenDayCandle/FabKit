@@ -3,6 +3,7 @@ module;
 #include "SDL3/SDL.h"
 #include "SDL3_mixer/SDL_mixer.h"
 #include "SDL3_shadercross/SDL_shadercross.h"
+#include "SDL3_ttf/SDL_textengine.h"
 #include "SDL3_ttf/SDL_ttf.h"
 
 export module sdl.SDLRunner;
@@ -693,6 +694,9 @@ namespace sdl::runner {
 		renderStandard = nullptr;
 		sampler = nullptr;
 		transferBuffer = nullptr;
+
+		TTF_DestroyGPUTextEngine(textEngine);
+		textEngine = nullptr;
 
 		SDL_DestroyGPUDevice(device);
 		device = nullptr;

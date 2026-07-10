@@ -38,8 +38,8 @@ namespace fab {
 	void FTexture::drawCentered(BatchRenderPass& rp, float tX, float tY, float w, float h, float scX, float scY, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline) {
 		float sX = scX * w;
 		float sY = scY * h;
-		rp.bindPipeline(sdl::runner::pipelineForMode(pipeline));
-		rp.bindTexture(source);
+		rp.setPipeline(sdl::runner::pipelineForMode(pipeline));
+		rp.setTexture(source);
 		rp.pushVertexData({
 			.transform = BatchRenderPass::makeTransform(tX, tY, sX, sY, rotZ),
 			.color = *tint,

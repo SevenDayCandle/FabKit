@@ -6,10 +6,9 @@ export module fab.TextDrawable;
 
 import fab.FFont;
 import fab.FUtil;
-import fab.Hitbox;
 import fab.IDrawable;
-import sdl.SDLHelpers;
 import fab.BatchRenderPass;
+import sdl.SDLHelpers;
 import sdl.SDLRunner;
 
 // TODO completely redo
@@ -40,14 +39,6 @@ namespace fab {
 		inline str::const_iterator getTextEnd() const { return text.end(); }
 		inline size_t getTextLen() const { return text.size(); }
 		inline strv getText() const { return text; }
-
-		inline void drawOffsetExact(BatchRenderPass& rp, Hitbox& hb, float xOff, float yOff, float scX = 1, float scY = 1, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) {
-			drawFull(rp, hb.x + xOff, hb.y + yOff, scX, scY, rotZ, tint, pipeline);
-		}
-
-		inline void drawOffsetScaled(BatchRenderPass& rp, Hitbox& hb, float xOff, float yOff, float scX = 1, float scY = 1, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) {
-			drawFull(rp, hb.x + hb.win.renderScale(xOff), hb.y + hb.win.renderScale(yOff), scX, scY, rotZ, tint, pipeline);
-		}
 
 		void dispose() override;
 		void reload() const override;
@@ -81,13 +72,11 @@ namespace fab {
 	}
 
 	void TextDrawable::drawCentered(BatchRenderPass& rp, float tX, float tY, float w, float h, float scX, float scY, float rotZ, const sdl::Color* tint, sdl::RenderMode pipeline) {
-		float sX = scX * w;
-		float sY = scY * h;
-		rp.bindPipeline(sdl::runner::pipelineForMode(pipeline));
+		rp.setPipeline(sdl::runner::pipelineForMode(pipeline));
 
 		// TODO account for shadows
 		for (::TTF_GPUAtlasDrawSequence* cur = sequence; cur != nullptr; cur = cur->next) {
-			rp.bindTexture(cur->atlas_texture);
+			rp.setTexture(cur->atlas_texture);
 			sdl::Point* uv = cur->uv;
 			sdl::Point* xy = cur->xy;
 
@@ -97,7 +86,7 @@ namespace fab {
 				int v = uv[i].y;
 				sdl::Point& diag = uv[i + 2];
 				rp.pushVertexData({
-					.transform = BatchRenderPass::makeTransform(tX + xy[i].x, tY + xy[i].x, sX, sY, rotZ),
+					.transform = BatchRenderPass::makeTransform(tX + xy[i].x, tY + xy[i].x, scX, scY, rotZ),
 					.color = *tint,
 					.coord = BatchRenderPass::makeCoord(u, v, diag.x - u, diag.y - v),
 					.texInd = 0,
@@ -110,7 +99,7 @@ namespace fab {
 		if (textObj) {
 			TTF_DestroyText(textObj);
 		}
-		textObj = sdl::runner::textCreate(*font, text);
+		textObj = font->createText(text);
 		sequence = TTF_GetGPUTextDrawData(textObj);
 	}
 

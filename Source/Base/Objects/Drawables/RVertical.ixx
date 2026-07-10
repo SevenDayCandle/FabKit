@@ -23,8 +23,8 @@ namespace fab {
 		const float edgeSY = scY * (h - getHeight());
 		const float distY = (edgeSY + cornerSY) / 2;
 
-		rp.bindPipeline(sdl::runner::pipelineForMode(pipeline));
-		rp.bindTexture(source);
+		rp.setPipeline(sdl::runner::pipelineForMode(pipeline));
+		rp.setTexture(source);
 
 		rp.pushVertexData({
 			.transform = BatchRenderPass::makeTransform(tX, tY - distY, sX, cornerSY, rotZ),

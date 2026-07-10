@@ -21,7 +21,7 @@ namespace fab {
 		// Assume origin is at the center of the drawable
 		float sX = scX * w;
 		float sY = scY * h;
-		rp.bindPipeline(sdl::runner::shapePipelineForMode(pipeline));
+		rp.setPipeline(sdl::runner::shapePipelineForMode(pipeline));
 		rp.pushVertexData({
 			.transform = BatchRenderPass::makeTransform(tX, tY, sX, sY, rotZ),
 			.color = *tint,

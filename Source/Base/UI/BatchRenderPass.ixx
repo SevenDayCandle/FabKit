@@ -30,10 +30,10 @@ namespace fab {
 		template <typename T> inline void pushFragmentUniformAuto(const T* data, fab::uint32 slot = 0) { SDL_PushGPUFragmentUniformData(cmd, slot, data, sizeof(T)); };
 		template <typename T> inline void pushVertexUniformAuto(const T* data, fab::uint32 slot = 0) { SDL_PushGPUVertexUniformData(cmd, slot, data, sizeof(T)); };
 
-		void bindPipeline(::SDL_GPUGraphicsPipeline* pipeline);
-		void bindTexture(::SDL_GPUTexture* texture);
 		void draw();
 		void reset();
+		void setPipeline(::SDL_GPUGraphicsPipeline* pipeline);
+		void setTexture(::SDL_GPUTexture* texture);
 		void start();
 
 		static sdl::Matrix4x4 makeTransform(float tX, float tY, float sX, float sY, float rotZ = 0);
@@ -54,25 +54,10 @@ namespace fab {
 		void queueOnBind();
 	};
 
-	// Binds a pipeline if it was not already bound
-	void BatchRenderPass::bindPipeline(::SDL_GPUGraphicsPipeline* pipeline) {
-		if (lastPipeline != pipeline) {
-			queueOnBind();
-			lastPipeline = pipeline;
-		}
-	}
-
-	// Binds a texture if it was not already bound
-	void BatchRenderPass::bindTexture(::SDL_GPUTexture* texture) {
-		if (lastTexture != texture) {
-			queueOnBind();
-			lastTexture = texture;
-		}
-	}
-
 	void BatchRenderPass::draw() {
 		if (buffer) {
 			sdl::runner::deviceUnmapTexTransferBuffer();
+			sdl::runner::uploadToVertexBuffer(cmd, currentIndex * sizeof(sdl::TexProps));
 			buffer = nullptr;
 		}
 
@@ -82,9 +67,17 @@ namespace fab {
 
 		::SDL_GPURenderPass* pass = SDL_BeginGPURenderPass(cmd, info, colorAttachmentAmount, depth);
 		sdl::runner::bindRenderBuffer(pass);
+		::SDL_GPUGraphicsPipeline* drawPipeline = nullptr;
+		::SDL_GPUTexture* drawTexture = nullptr;
 		for (const Entry& entry : ledger) {
-			SDL_BindGPUGraphicsPipeline(pass, entry.pipeline);
-			sdl::runner::bindTexture(pass, entry.texture);
+			if (drawPipeline != entry.pipeline) {
+				SDL_BindGPUGraphicsPipeline(pass, entry.pipeline);
+				drawPipeline = entry.pipeline;
+			}
+			if (drawTexture != entry.texture) {
+				sdl::runner::bindTexture(pass, entry.texture);
+				drawTexture = entry.texture;
+			}
 			SDL_DrawGPUPrimitives(pass, 6, entry.size, 0, entry.offset);
 		}
 		SDL_EndGPURenderPass(pass);
@@ -94,7 +87,6 @@ namespace fab {
 
 	void BatchRenderPass::queueContents() {
 		int entrySize = currentIndex - lastIndex;
-		sdl::runner::uploadToVertexBuffer(cmd, entrySize * sizeof(sdl::TexProps));
 
 		ledger.push_back({
 			.pipeline = lastPipeline,
@@ -106,14 +98,8 @@ namespace fab {
 
 	void BatchRenderPass::queueOnBind() {
 		if (currentIndex > lastIndex) {
-			if (buffer) {
-				sdl::runner::deviceUnmapTexTransferBuffer();
-			}
-
 			queueContents();
-
 			lastIndex = currentIndex;
-			buffer = sdl::runner::deviceMapTexTransferBuffer(true);
 		}
 	}
 
@@ -123,6 +109,22 @@ namespace fab {
 		}
 		buffer = sdl::runner::deviceMapTexTransferBuffer(true);
 		currentIndex = lastIndex = 0;
+	}
+
+	// Binds a pipeline if it was not already bound
+	void BatchRenderPass::setPipeline(::SDL_GPUGraphicsPipeline* pipeline) {
+		if (lastPipeline != pipeline) {
+			queueOnBind();
+			lastPipeline = pipeline;
+		}
+	}
+
+	// Binds a texture if it was not already bound
+	void BatchRenderPass::setTexture(::SDL_GPUTexture* texture) {
+		if (lastTexture != texture) {
+			queueOnBind();
+			lastTexture = texture;
+		}
 	}
 
 	void BatchRenderPass::start() {

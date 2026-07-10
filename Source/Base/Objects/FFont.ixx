@@ -1,7 +1,5 @@
 module;
 
-#include "SDL3/SDL.h"
-#include "SDL3_shadercross/SDL_shadercross.h"
 #include "SDL3_ttf/SDL_ttf.h"
 
 export module fab.FFont;
@@ -14,6 +12,7 @@ import fab.BatchRenderPass;
 import sdl.SDLRunner;
 
 namespace fab {
+	// TODO switch to text engine
 	export class FFont : public ILoadable {
 	public:
 		struct Props {
@@ -33,11 +32,10 @@ namespace fab {
 			}
 		}
 
-		operator ::TTF_Font*() const { return font; }
-
 		inline int getOutlineSize() const { return outlineSize; }
 		inline int getShadowSize() const { return outlineSize; }
 		inline int getSize() const { return size; }
+		inline ::TTF_Text* createText(strv text) const { return sdl::runner::textCreate(font, text); }
 
 		FFont& setAllSizes(int size, int outlineSize, int shadowSize);
 		FFont& setGlobalScale(float scale);
@@ -49,7 +47,6 @@ namespace fab {
 		pair<int, int> measureDim(strv text) const;
 		void dispose() override;
 		void reload() const override;
-		void reload(::SDL_GPUCopyPass* copyPass) const override;
 	private:
 		mutable ::TTF_Font* font;
 		float globalScale = 1;
@@ -124,15 +121,6 @@ namespace fab {
 
 	/* Refreshes the font to match its size */
 	void FFont::reload() const {
-		::SDL_GPUCommandBuffer* uploadCmdBuf = sdl::runner::deviceAcquireCommandBuffer();
-		::SDL_GPUCopyPass* copyPass = SDL_BeginGPUCopyPass(uploadCmdBuf);
-		reload(copyPass);
-		SDL_EndGPUCopyPass(copyPass);
-		SDL_SubmitGPUCommandBuffer(uploadCmdBuf);
-	}
-
-	/* Refreshes the font to match its size */
-	void FFont::reload(::SDL_GPUCopyPass* copyPass) const {
 		if (font) {
 			TTF_CloseFont(font);
 		}
