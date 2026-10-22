@@ -18,6 +18,7 @@ namespace fab {
 					source = nullptr;
 				}
 			}
+
 			Token(Token&& other) noexcept {
 				if (other.source) {
 					this->source = other.source;
@@ -30,16 +31,17 @@ namespace fab {
 
 			Hoverable* operator ->() const { return source; }
 			operator bool() const { return source != nullptr; }
-			operator Hoverable* () const { return source; }
-			operator Hoverable& () const { return *source; }
+			operator Hoverable*() const { return source; }
+			operator Hoverable&() const { return *source; }
 		private:
-			Token(Hoverable* source): source(source) {}
+			Token(Hoverable* source) : source(source) {}
 
 			Hoverable* source;
 			friend Hoverable;
 		};
 
 		Hoverable(FWindow& window) : Element(window) {}
+
 		Hoverable(Hoverable&& other) noexcept : Element(other.win) {
 			if (other.tokens) {
 				tokens = move(other.tokens);
@@ -48,7 +50,8 @@ namespace fab {
 				}
 			}
 		}
-		virtual ~Hoverable() override {
+
+		~Hoverable() override {
 			if (tokens) {
 				for (Token* token : *tokens) {
 					token->source = nullptr;
@@ -57,16 +60,16 @@ namespace fab {
 		};
 
 		inline virtual bool isHovered() { return getHb()->isHovered(); }
-		inline virtual float getBeginX() { return getHb()->x; } // The left-most end X coordinate of this object, may be smaller than hb if this has labels
-		inline virtual float getBeginY() { return getHb()->y; } // The left-most end X coordinate of this object, may be smaller than hb if this has labels
-		inline virtual float getEndX() { return getHb()->x + getHb()->w; } // The right-most end X coordinate of this object, may be larger than hb if this has subcomponents
-		inline virtual float getEndY() { return getHb()->y + getHb()->h; } // The bottom-most end Y coordinate of this object, may be larger than hb if this has subcomponents
-		inline virtual Hoverable& setHbExactPos(const float x, const float y) { return getHb()->setRealPos(x, y), * this; }
-		inline virtual Hoverable& setHbExactPosX(const float x) { return getHb()->setRealPosX(x), * this; }
-		inline virtual Hoverable& setHbExactPosY(const float y) { return getHb()->setRealPosY(y), * this; }
-		inline virtual Hoverable& setHbOffsetPos(const float x, const float y) { return getHb()->setOffPos(x, y), * this; }
-		inline virtual Hoverable& setHbOffsetPosX(const float x) { return getHb()->setOffPosX(x), * this; }
-		inline virtual Hoverable& setHbOffsetPosY(const float y) { return getHb()->setOffPosY(y), * this; }
+		inline virtual float getBeginX() { return getHb()->x; } // The left-most X coordinate of this object, may be smaller than hb if this has labels
+		inline virtual float getBeginY() { return getHb()->y; } // The top-most Y coordinate of this object, may be smaller than hb if this has labels
+		inline virtual float getEndX() { return getHb()->x + getHb()->w; } // The right-most X coordinate of this object, may be larger than hb if this has subcomponents
+		inline virtual float getEndY() { return getHb()->y + getHb()->h; } // The bottom-most Y coordinate of this object, may be larger than hb if this has subcomponents
+		inline virtual Hoverable& setHbExactPos(const float x, const float y) { return getHb()->setRealPos(x, y), *this; }
+		inline virtual Hoverable& setHbExactPosX(const float x) { return getHb()->setRealPosX(x), *this; }
+		inline virtual Hoverable& setHbExactPosY(const float y) { return getHb()->setRealPosY(y), *this; }
+		inline virtual Hoverable& setHbOffsetPos(const float x, const float y) { return getHb()->setOffPos(x, y), *this; }
+		inline virtual Hoverable& setHbOffsetPosX(const float x) { return getHb()->setOffPosX(x), *this; }
+		inline virtual Hoverable& setHbOffsetPosY(const float y) { return getHb()->setOffPosY(y), *this; }
 
 		Token makeToken();
 		void invalidateTokens();

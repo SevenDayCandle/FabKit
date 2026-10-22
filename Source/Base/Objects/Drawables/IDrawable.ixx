@@ -18,7 +18,10 @@ namespace fab {
 		inline virtual float getWidth() const { return 0; }
 		inline void dispose() override {} // Should be called when this drawable will no longer be used
 		inline void reload() const override {} // Called to initialize this drawable for rendering. Calling this function again after initialization will dispose of the previous initialization and reinitialize the drawable
-		// Draw this item using the provided rectangle as its bounding box
+		/* Draw this item using the provided rectangle as its bounding box 
+		 * scX and scY are scalar multipliers of the original width and height, respectively, and are usually governed by the current window's size
+		 * rotZ is the rotation of the image, expressed in radians and going in a counter-clockwise direction
+		 */
 		inline void draw(BatchRenderPass& rp, const sdl::RectF& rect, float scX = 1, float scY = 1, float rotZ = 0, const sdl::Color* tint = &sdl::COLOR_STANDARD, sdl::RenderMode pipeline = sdl::RenderMode::NORMAL) {
 			draw(rp, rect.x, rect.y, rect.w, rect.h, scX, scY, rotZ, tint, pipeline);
 		};

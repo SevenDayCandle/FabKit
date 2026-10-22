@@ -16,7 +16,8 @@ import sdl.SDLHelpers;
 import sdl.SDLRunner;
 import std;
 
-/* Represents an application window. A wrapper around SDL's window that manages the rendering and lifecycle of screens to be rendered in that window */
+/* Represents an application window. A wrapper around SDL's window that manages the rendering and lifecycle of screens to be rendered in that window.
+ * Note that the coordinate system treats the Y coordinate as going from top to bottom, making 0,0 the top-left corner of the window.*/
 namespace fab {
 	export class FWindow {
 	public:

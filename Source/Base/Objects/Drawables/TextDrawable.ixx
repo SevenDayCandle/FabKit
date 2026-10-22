@@ -80,15 +80,16 @@ namespace fab {
 			sdl::Point* uv = cur->uv;
 			sdl::Point* xy = cur->xy;
 
-			// Each quad has four vertices; vertices 0 and 2 are always diagonal so you can get the region size from their difference
+			/* Each quad has four vertices, going top-left, top-right, bottom-right, bottom-left. 
+			 * While the Y coordinate in FabKit goes from top to bottom, the Y coordinate system from TTF_GPUAtlasDrawSequence goes from bottom to top.
+			 * However, the V coordinate in both FabKit and TTF_GPUAtlasDrawSequence goes from bottom to top.
+			*/
 			for (int i = 0; i < cur->num_vertices; i += 4) {
-				int u = uv[i].x;
-				int v = uv[i].y;
-				sdl::Point& diag = uv[i + 2];
+				int br = i + 2;
 				rp.pushVertexData({
-					.transform = BatchRenderPass::makeTransform(tX + xy[i].x, tY + xy[i].x, scX, scY, rotZ),
+					.transform = BatchRenderPass::makeTransform(tX + scX * xy[i].x, tY + scY * xy[i].y, scX * (xy[br].x - xy[i].x), scY * (xy[br].y - xy[i].y), rotZ),
 					.color = *tint,
-					.coord = BatchRenderPass::makeCoord(u, v, diag.x - u, diag.y - v),
+					.coord = BatchRenderPass::makeCoord(uv[i].x, uv[i].y, uv[br].x, uv[br].y),
 					.texInd = 0,
 				});
 			}
