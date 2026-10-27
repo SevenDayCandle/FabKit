@@ -13,10 +13,10 @@ import sdl.SDLHelpers;
 import std;
 
 namespace sdl {
-	constexpr auto SHADER_FILL_FRAG = "Shader/Fill.frag.hlsl";
-	constexpr auto SHADER_FILL_VERT = "Shader/Fill.vert.hlsl";
-	constexpr auto SHADER_NORMAL_FRAG = "Shader/Normal.frag.hlsl";
-	constexpr auto SHADER_NORMAL_VERT = "Shader/Normal.vert.hlsl";
+	constexpr auto SHADER_FILL_FRAG = "Shader/Compiled/Fill.frag.spv";
+	constexpr auto SHADER_FILL_VERT = "Shader/Compiled/Fill.vert.spv";
+	constexpr auto SHADER_NORMAL_FRAG = "Shader/Compiled/Normal.frag.spv";
+	constexpr auto SHADER_NORMAL_VERT = "Shader/Compiled/Normal.vert.spv";
 
 	bool enabledInternal;
 	const bool* key;
@@ -130,7 +130,7 @@ namespace sdl::runner {
 
 
 	export bool init(const char* renderer = nullptr);
-	export bool initRendering(const char* normalFrag = SHADER_NORMAL_FRAG, const char* normalVert = SHADER_NORMAL_VERT, const char* fillFrag = SHADER_FILL_FRAG, const char* fillVert = SHADER_FILL_VERT, const int maxSprites = MAX_SPRITES);
+	export bool initRendering(const int maxSprites = MAX_SPRITES);
 	export bool mixerSetGain(int index, float vol);
 	export bool poll();
 	export bool uploadVertexes(SDL_GPUCommandBuffer* cmd, SDL_GPUCopyPass* copyPass);
@@ -145,7 +145,7 @@ namespace sdl::runner {
 	                                                    SDL_GPUBlendFactor srcAlpha = SDL_GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE, SDL_GPUBlendFactor dstAlpha = SDL_GPUBlendFactor::SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA);
 	export SDL_GPUGraphicsPipeline* pipelineForMode(RenderMode mode);
 	export SDL_GPUGraphicsPipeline* shapePipelineForMode(RenderMode mode);
-	export SDL_GPUShader* loadShader(const char* shaderFilename, ::SDL_ShaderCross_ShaderStage stage, Uint32 samplerCount, Uint32 uniformBufferCount, Uint32 storageBufferCount = 0, Uint32 storageTextureCount = 0);
+	export SDL_GPUShader* loadShader(const char* shaderFilename, ::SDL_ShaderCross_ShaderStage stage);
 	export SDL_GPUTexture* createTextureArray(Uint32 w, Uint32 h, Uint32 maxLayers = 1024);
 	export SDL_GPUTexture* uploadSingleTexture(SDL_GPUCopyPass* copyPass, Surface* surface);
 	export SDL_GPUTexture* uploadSingleTexture(SDL_GPUCopyPass* copyPass, Surface* surface, SDL_GPUTransferBuffer* textureTransferBuffer);
@@ -216,7 +216,7 @@ namespace sdl::runner {
 		return true;
 	}
 
-	bool initRendering(const char* normalFrag, const char* normalVert, const char* fillFrag, const char* fillVert, const int maxSprites) {
+	bool initRendering(const int maxSprites) {
 		// Initialize vertex storage and transfer buffers
 		const Uint32 sizeVert = sizeof(TexProps) * maxSprites;
 		vertexBuffer = deviceCreateBuffer(SDL_GPU_BUFFERUSAGE_VERTEX, sizeVert);
@@ -237,12 +237,12 @@ namespace sdl::runner {
 		sampler = SDL_CreateGPUSampler(device, &samplerInfo);
 
 		// Set up pipelines
-		SDL_GPUShader* shaderFragment = loadShader(normalFrag, STAGE_FRAGMENT, 1, 1);
-		SDL_GPUShader* shaderVertex = loadShader(normalVert, STAGE_VERTEX, 0, 1);
+		SDL_GPUShader* shaderFragment = loadShader(SHADER_NORMAL_FRAG, STAGE_FRAGMENT);
+		SDL_GPUShader* shaderVertex = loadShader(SHADER_NORMAL_VERT, STAGE_VERTEX);
 		renderStandard = createPipeline(shaderVertex, shaderFragment);
 
-		SDL_GPUShader* shaderFillFragment = loadShader(fillFrag, STAGE_FRAGMENT, 1, 1);
-		SDL_GPUShader* shaderFillVertex = loadShader(fillVert, STAGE_VERTEX, 0, 1);
+		SDL_GPUShader* shaderFillFragment = loadShader(SHADER_FILL_FRAG, STAGE_FRAGMENT);
+		SDL_GPUShader* shaderFillVertex = loadShader(SHADER_FILL_VERT, STAGE_VERTEX);
 		renderFill = createPipeline(shaderFillVertex, shaderFillFragment);
 		// TODO more shaders/blending modes
 
@@ -517,31 +517,26 @@ namespace sdl::runner {
 	}
 
 	// Generates a shader to be used for this window
-	// TODO option to cache built shader
-	SDL_GPUShader* loadShader(const char* shaderFilename, ::SDL_ShaderCross_ShaderStage stage, Uint32 samplerCount, Uint32 uniformBufferCount, Uint32 storageBufferCount, Uint32 storageTextureCount) {
+	SDL_GPUShader* loadShader(const char* shaderFilename, ::SDL_ShaderCross_ShaderStage stage) {
 		size_t codeSize;
 		std::filesystem::path name = SDL_GetBasePath();
 		name /= shaderFilename;
-		void* code = SDL_LoadFile(name.string().data(), &codeSize);
+		void* code = (SDL_LoadFile(name.string().data(), &codeSize));
 		if (code == nullptr) {
 			logError("Failed to load shader from disk: %s, %s", name.string().data(), getError());
 			return nullptr;
 		}
 
-		::SDL_ShaderCross_HLSL_Info info = {
-			.source = static_cast<const char*>(code),
+		::SDL_ShaderCross_SPIRV_Info info = {
+			.bytecode = static_cast<const Uint8*>(code),
+			.bytecode_size = codeSize,
 			.entrypoint = "main",
 			.shader_stage = stage
 		};
-
-		::SDL_ShaderCross_GraphicsShaderMetadata metadata = {
-			.num_samplers = samplerCount,
-			.num_storage_textures = storageTextureCount,
-			.num_storage_buffers = storageBufferCount,
-			.num_uniform_buffers = uniformBufferCount,
-		};
-		SDL_GPUShader* shader = SDL_ShaderCross_CompileGraphicsShaderFromHLSL(device, &info, &metadata);
+		SDL_ShaderCross_GraphicsShaderMetadata* metadata = SDL_ShaderCross_ReflectGraphicsSPIRV(static_cast<const Uint8*>(code), codeSize, 0);
+		SDL_GPUShader* shader = SDL_ShaderCross_CompileGraphicsShaderFromSPIRV(device, &info, &metadata->resource_info, 0);
 		SDL_free(code);
+		SDL_free(metadata);
 		if (shader == nullptr) {
 			logError("Failed to compile shader: %s, %s", name.string().data(), getError());
 		}

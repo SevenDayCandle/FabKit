@@ -201,6 +201,10 @@
     <ClInclude Include="Dependencies\SDL\include\SDL_gpu_shadercross\spirv.h" />
     <ClInclude Include="Dependencies\SDL\include\SDL_gpu_shadercross\spirv_cross_c.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="vcpkg-configuration.json" />
+    <None Include="vcpkg.json" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -276,7 +280,7 @@
     <IntDir>$(SolutionDir)\Builds\Intermediate\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
-    <VcpkgEnableManifest>false</VcpkgEnableManifest>
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -318,7 +322,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;GRAPHICS_API_OPENGL_33;PLATFORM_DESKTOP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)Dependencies\Glaze\include;$(ProjectDir)Dependencies\SDL\include;$(ProjectDir)Dependencies\SDL_shadercross\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <LanguageStandard>stdcpp23</LanguageStandard>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>

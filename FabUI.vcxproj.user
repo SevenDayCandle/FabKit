@@ -3,4 +3,8 @@
   <PropertyGroup>
     <ShowAllFiles>true</ShowAllFiles>
   </PropertyGroup>
+<PropertyGroup Label="Vcpkg">
+  <VcpkgEnabled>true</VcpkgEnabled>
+  <VcpkgEnableManifest>true</VcpkgEnableManifest>
+</PropertyGroup>
 </Project>

@@ -379,4 +379,8 @@
     <ClInclude Include="Dependencies\SDL\include\SDL_gpu_shadercross\spirv.h" />
     <ClInclude Include="Dependencies\SDL\include\SDL_gpu_shadercross\spirv_cross_c.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="vcpkg.json" />
+    <None Include="vcpkg-configuration.json" />
+  </ItemGroup>
 </Project>

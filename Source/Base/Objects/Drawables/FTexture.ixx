@@ -67,8 +67,8 @@ namespace fab {
 			SDL_DestroySurface(surface);
 		}
 		else {
-			release();
 			sdl::logError("Failed to load texture %s: %s", path.c_str(), sdl::getError());
+			release();
 		}
 	}
 }
